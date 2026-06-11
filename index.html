@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YKS Productions — Cinematic Stories by Yedukrishna Suresh · Dubai & Bangalore</title>
+<meta name="description" content="YKS Productions — Yedukrishna Suresh. Cinematographer & film still photographer. Dubai real-estate films, fashion editorials, film stills for Malayalam cinema, weddings. Dubai & Bangalore." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ───────────────────────── LOADER ───────────────────────── -->
+<div class="loader" id="loader">
+  <div class="loader-mark">YKS<span>.</span></div>
+  <div class="loader-bar"><i id="loaderFill"></i></div>
+  <div class="loader-sub">Productions · rolling…</div>
+</div>
+
+<!-- ───────────────────────── CHROME ───────────────────────── -->
+<div class="letterbox top" id="lbTop"></div>
+<div class="letterbox bottom" id="lbBot"></div>
+<div class="progress" id="progress"></div>
+<div class="cursor" id="cursor"></div>
+
+<header class="nav" id="nav">
+  <a class="brandmark" href="#act-hero">YKS<span>.</span><em>Productions</em></a>
+  <nav class="links">
+    <a href="#act-work">Work</a>
+    <a href="#act-fashion">Fashion</a>
+    <a href="#act-dubai">Dubai</a>
+    <a href="#act-marriott">Marriott</a>
+    <a href="#act-films">Films</a>
+    <a href="#act-about">Story</a>
+    <a href="#act-book" class="nav-cta">Book a shoot</a>
+  </nav>
+  <div class="nav-reel" id="navReel"><span></span>REC</div>
+</header>
+
+<main id="main">
+
+  <!-- ════════ ACT I · HERO — scroll-scrubbed cinematic clip ════════ -->
+  <section class="act act-hero" id="act-hero" data-cinema="hero">
+    <div class="cinema-stage">
+      <canvas class="cinema-canvas" id="heroCanvas"></canvas>
+      <div class="hero-grade"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow" data-split="chars">Dubai · Bangalore — available for 2026</p>
+        <h1 class="hero-title">
+          <span class="line" data-split="chars">YKS</span>
+          <span class="line line-2" data-split="chars">PRODUCTIONS</span>
+        </h1>
+        <p class="hero-name" data-split="chars">Yedukrishna</p>
+        <p class="hero-roles" data-split="words">Cinematographer &amp; Film Still Photographer</p>
+        <div class="hero-meta">
+          <div><b>Known for</b><span>Dubai real estate · Fashion · Film stills</span></div>
+          <div><b>Featured</b><span>Marriott · KL Rahul · Soothravakyam</span></div>
+          <div><b>Reach</b><span>1.1M monthly views</span></div>
+        </div>
+      </div>
+      <div class="hero-scrollcue"><span></span>Scroll to roll camera</div>
+      <div class="hero-frameinfo mono"><span id="heroTC">00:00:00:00</span><span>ANAMORPHIC · 2.39:1</span></div>
+    </div>
+  </section>
+
+  <!-- ════════ STATS STRIP ════════ -->
+  <section class="strip" id="strip">
+    <div class="cell"><div class="n" data-count="1.1" data-suffix="M">0</div><div class="l">Monthly views</div></div>
+    <div class="cell"><div class="n is-word">Dubai</div><div class="l">Real-estate films · UAE</div></div>
+    <div class="cell"><div class="n is-word">Soothravakyam</div><div class="l">Malayalam film · stills</div></div>
+    <div class="cell"><div class="n is-word">KL Rahul</div><div class="l">Featured client</div></div>
+  </section>
+
+  <!-- ════════ 01 · CRAFT ════════ -->
+  <section class="act act-services" id="act-services">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">01 — Craft</p>
+        <h2 data-split="words">What I shoot</h2>
+      </div>
+      <div class="svc-grid five">
+        <article class="svc" data-tilt><span class="svc-num mono">01</span><h3>Dubai Real Estate &amp; Brand Films</h3><p>Cinematic property &amp; brand films across the UAE — Marina, Palm, Downtown.</p><i class="svc-beam"></i></article>
+        <article class="svc feat" data-tilt><span class="svc-badge mono">Signature</span><span class="svc-num mono">02</span><h3>Fashion Editorials</h3><p>Editorial fashion — styled, graded, unmistakably cinematic.</p><i class="svc-beam"></i></article>
+        <article class="svc" data-tilt><span class="svc-num mono">03</span><h3>Film Stills &amp; On-set BTS</h3><p>Stills, posters and behind-the-scenes for film &amp; OTT projects.</p><i class="svc-beam"></i></article>
+        <article class="svc" data-tilt><span class="svc-num mono">04</span><h3>Actor &amp; Model Portfolios</h3><p>Editorial portfolios and portraits for actors and models.</p><i class="svc-beam"></i></article>
+        <article class="svc" data-tilt><span class="svc-num mono">05</span><h3>Weddings</h3><p>Cinematic wedding films &amp; photography worth reliving.</p><i class="svc-beam"></i></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ 02 · WORK — horizontal gallery ════════ -->
+  <section class="act act-work" id="act-work">
+    <div class="work-pin" id="workPin">
+      <div class="work-head wrap">
+        <p class="eyebrow">02 — Selected work</p>
+        <h2>Stills that <em>move</em></h2>
+        <p class="mono work-counter"><span id="workIdx">01</span> / 09</p>
+      </div>
+      <div class="work-track" id="workTrack">
+        <a class="work-card" href="https://www.behance.net/gallery/225904233/Actor-Sharmiela-Mandre" target="_blank" rel="noopener"><img loading="lazy" src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/31e02a225904233.Y3JvcCwxNDAwLDEwOTUsMCw3MjA.jpeg" alt="Sharmiela Mandre" /><div class="work-info"><span>Actor Portfolio</span><h4>Sharmiela Mandre</h4></div></a>
+        <a class="work-card tall" href="https://www.behance.net/gallery/225901597/An-Evening-with-Actor-Ashika-Ranganath" target="_blank" rel="noopener"><img loading="lazy" src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/17a009225901597.Y3JvcCw4NDAsNjU3LDI3OCwyMTg.jpg" alt="Ashika Ranganath" /><div class="work-info"><span>An Evening With</span><h4>Ashika Ranganath</h4></div></a>
+        <a class="work-card" href="https://www.behance.net/gallery/225903787/Actor-Divya-Pandeys-Portfolio" target="_blank" rel="noopener"><img loading="lazy" src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/7bc566225903787.Y3JvcCw0MjI1LDMzMDUsMjA5LDExNzE.jpg" alt="Divya Pandey" /><div class="work-info"><span>Actor Portfolio</span><h4>Divya Pandey</h4></div></a>
+        <a class="work-card tall" href="https://www.behance.net/gallery/225903423/Actor-Sonika-Gowdas-portfolio" target="_blank" rel="noopener"><img loading="lazy" src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/0411ab225903423.688bcf977d6ab.png" alt="Sonika Gowda" /><div class="work-info"><span>Actor Portfolio</span><h4>Sonika Gowda</h4></div></a>
+        <a class="work-card" href="https://www.behance.net/gallery/239427653/Sunday-morning-with-Olivia" target="_blank" rel="noopener"><img loading="lazy" src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/b035ff239427653.6928b47c4f333.png" alt="Sunday with Olivia" /><div class="work-info"><span>Fashion</span><h4>Sunday with Olivia</h4></div></a>
+        <a class="work-card tall" href="https://www.behance.net/gallery/225903063/Sumans-Model-Portfolio" target="_blank" rel="noopener"><img loading="lazy" src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/744077225903063.688b0e6793300.png" alt="Suman" /><div class="work-info"><span>Model Portfolio</span><h4>Suman</h4></div></a>
+        <div class="work-card"><img loading="lazy" src="https://images.pixieset.com/39939474/001b14068ab276d19ccccd93ccd7f51c-large.jpg" alt="Wedding highlights" /><div class="work-info"><span>Wedding</span><h4>Wedding Highlights</h4></div></div>
+        <div class="work-card tall"><img loading="lazy" src="https://images.pixieset.com/39939474/16d4b522e924ce653b3d93a9c52e4342-large.jpg" alt="Couple portrait" /><div class="work-info"><span>Wedding</span><h4>Couple Portrait</h4></div></div>
+        <div class="work-card"><img loading="lazy" src="https://images.pixieset.com/39939474/b4700db90e7b435a5ad8dfc128a622b7-large.jpg" alt="Golden hour" /><div class="work-info"><span>Wedding</span><h4>Golden Hour</h4></div></div>
+        <div class="work-end"><p>Full portfolio</p><a class="btn" href="https://www.behance.net/yedusuresha14c" target="_blank" rel="noopener">Behance ↗</a><a class="btn ghost" href="https://yksproductions.pixieset.com/wedddinghighlights/" target="_blank" rel="noopener">Weddings ↗</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ 03 · FASHION — highlighted column ════════ -->
+  <section class="act act-fashion" id="act-fashion">
+    <div class="wrap fashion-grid">
+      <div class="fashion-col" data-reveal>
+        <p class="eyebrow">03 — Fashion</p>
+        <h2>Fashion,<br/><em>front &amp; centre.</em></h2>
+        <p class="fashion-copy">Editorial fashion is its own column at YKS — styled like a campaign, lit like a film. Lookbooks, designer collabs and portrait editorials, shot in Dubai and Bangalore.</p>
+        <ul class="fashion-list mono">
+          <li>Editorials &amp; lookbooks</li>
+          <li>Designer &amp; brand campaigns</li>
+          <li>Samyakk Sarees × Sharmiela Mandre</li>
+          <li>Street &amp; studio portraiture</li>
+        </ul>
+        <div class="fashion-ctas">
+          <a class="btn" href="https://www.behance.net/gallery/239427653/Sunday-morning-with-Olivia" target="_blank" rel="noopener">Sunday with Olivia ↗</a>
+          <a class="btn ghost" href="https://www.behance.net/gallery/225903063/Sumans-Model-Portfolio" target="_blank" rel="noopener">Suman ↗</a>
+        </div>
+      </div>
+      <a class="fashion-card" data-reveal href="https://www.behance.net/gallery/239427653/Sunday-morning-with-Olivia" target="_blank" rel="noopener">
+        <img loading="lazy" src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/b035ff239427653.6928b47c4f333.png" alt="Sunday with Olivia — fashion editorial" />
+        <span class="fashion-cap mono">Editorial · Sunday with Olivia</span>
+      </a>
+      <a class="fashion-card offset" data-reveal href="https://www.behance.net/gallery/225903063/Sumans-Model-Portfolio" target="_blank" rel="noopener">
+        <img loading="lazy" src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/744077225903063.688b0e6793300.png" alt="Suman — model portfolio" />
+        <span class="fashion-cap mono">Portfolio · Suman</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ════════ 04 · DUBAI — scroll-scrubbed sunset clip ════════ -->
+  <section class="act act-dubai" id="act-dubai" data-cinema="dubai">
+    <div class="cinema-stage">
+      <canvas class="cinema-canvas" id="dubaiCanvas"></canvas>
+      <div class="dubai-content">
+        <p class="eyebrow">04 — Dubai · Real estate films</p>
+        <h2 class="dubai-title"><span data-split="words">Scroll the sun</span><br/><em data-split="words">below the skyline.</em></h2>
+        <p class="dubai-copy" data-reveal>Burj Khalifa to Palm Jumeirah — cinematic property films shot across Dubai, built to make spaces feel aspirational and sell faster. Full-frame, graded, and cut for social and listings.</p>
+        <div class="dubai-ctas" data-reveal>
+          <a class="btn" href="#act-dubai-works">See the Dubai work ↓</a>
+          <a class="btn ghost" href="https://vimeo.com/1117232167" target="_blank" rel="noopener">Vimeo ↗</a>
+        </div>
+      </div>
+      <div class="dubai-tc mono"><span id="dubaiPhase">GOLDEN HOUR</span><span>BURJ KHALIFA · PALM JUMEIRAH</span></div>
+    </div>
+  </section>
+
+  <!-- ════════ 05 · SHOT IN DUBAI — showreel + reels ════════ -->
+  <section class="act act-dubai-works" id="act-dubai-works">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">05 — Shot in Dubai</p>
+        <h2 data-split="words">Dubai, on the reel</h2>
+      </div>
+      <div class="dw-grid">
+        <div class="embed-frame tall" data-reveal>
+          <iframe loading="lazy" src="https://player.vimeo.com/video/1117232167?h=e28737ccc2&amp;title=0&amp;byline=0&amp;portrait=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Dubai Real Estate Showreel"></iframe>
+        </div>
+        <div class="dw-copy">
+          <h3>The real-estate <em>showreel</em></h3>
+          <p data-reveal>Penthouse interiors, marina towers and golden-hour fly-throughs — a cut of recent property films for developers, brokers and property brands across the UAE.</p>
+          <div class="dw-locs" data-reveal>
+            <span class="chip">Burj Khalifa · Downtown</span>
+            <span class="chip">Palm Jumeirah</span>
+            <span class="chip">Dubai Marina</span>
+            <span class="chip">Business Bay</span>
+            <span class="chip">Creek Harbour</span>
+            <span class="chip">JBR</span>
+          </div>
+          <p class="dw-inst" data-reveal>Working with UAE developers, brokerages and property brands — films delivered for listings, socials and launch events.</p>
+          <a class="btn" href="https://vimeo.com/yksproductions" target="_blank" rel="noopener">YKS on Vimeo ↗</a>
+        </div>
+      </div>
+      <h3 class="reels-h" data-reveal>Dubai real-estate <span>reels</span></h3>
+      <div class="reel-grid">
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://www.instagram.com/reel/DV_HC8yDE2V/embed" title="Dubai Reel 01" allowtransparency="true"></iframe></div>
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://www.instagram.com/reel/DUtA6j-ki5V/embed" title="Dubai Reel 02" allowtransparency="true"></iframe></div>
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://www.instagram.com/reel/DULsQypktTA/embed" title="Dubai Reel 03" allowtransparency="true"></iframe></div>
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://www.instagram.com/reel/DT3R8pokvgP/embed" title="Dubai Reel 04" allowtransparency="true"></iframe></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════ 06 · MARRIOTT COORG — brand campaign ════════ -->
+  <a id="marriott"></a>
+  <section class="act act-marriott" id="act-marriott">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">06 — Brand campaigns</p>
+        <h2 data-split="words">Shot for Marriott, Coorg</h2>
+      </div>
+      <div class="dw-grid rev">
+        <div class="dw-copy">
+          <h3>Marriott <em>Coorg</em></h3>
+          <p data-reveal>A hospitality campaign for the Marriott resort in Coorg, Karnataka — a cinematic brand film through the misty Western Ghats, plus a series of social-first reels. Shot, graded and delivered by YKS Productions.</p>
+          <div class="dw-locs" data-reveal>
+            <span class="chip">Coorg · Karnataka</span>
+            <span class="chip">Campaign film</span>
+            <span class="chip">7 social reels</span>
+            <span class="chip">Hospitality</span>
+          </div>
+          <a class="btn" href="https://drive.google.com/drive/folders/1-HUddZGk7C_ijubgOqq-zdLaQAF9Zflx" target="_blank" rel="noopener">Full campaign folder ↗</a>
+        </div>
+        <div class="embed-frame wide" data-reveal>
+          <iframe loading="lazy" src="https://drive.google.com/file/d/1UdWdt6mB_X9cNiW7jMEDpo7gDuAMB2v_/preview" title="Marriott Coorg campaign film" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+      </div>
+      <div class="reel-grid three marriott-reels">
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://drive.google.com/file/d/1fovzcUUz5g1Rd2ytV-_154Y62N8t-NGi/preview" title="Marriott Coorg — market reel" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://drive.google.com/file/d/1BCf2qcizUlGsmFKdN7BXct0eIXBWzd9K/preview" title="Marriott Coorg — first reel" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://drive.google.com/file/d/1N61_g7wKIXeCTF42Hfuf-fgBxoSM3O87/preview" title="Marriott Coorg — reel 3" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ 06 · FILMS & BTS — YouTube + marquee + reels ════════ -->
+  <section class="act act-films" id="act-films">
+    <div class="films-marquee" id="filmsMarquee">
+      <div class="m-row" data-speed="1"><span>Soothravakyam</span><i>·</i><span>Baby Girl</span><i>·</i><span>Shine Tom Chacko</span><i>·</i><span>Vincy Aloshious</span><i>·</i><span>Soothravakyam</span><i>·</i><span>Baby Girl</span><i>·</i><span>Shine Tom Chacko</span><i>·</i><span>Vincy Aloshious</span><i>·</i></div>
+      <div class="m-row rev" data-speed="-1"><span>On-set stills</span><i>·</i><span>BTS</span><i>·</i><span>Posters</span><i>·</i><span>Malayalam cinema</span><i>·</i><span>On-set stills</span><i>·</i><span>BTS</span><i>·</i><span>Posters</span><i>·</i><span>Malayalam cinema</span><i>·</i></div>
+    </div>
+    <div class="wrap">
+      <div class="dw-grid rev">
+        <div class="dw-copy">
+          <p class="eyebrow">07 — Films &amp; BTS</p>
+          <h3>Behind <em>Soothravakyam</em></h3>
+          <p data-reveal>On-set behind-the-scenes from the Malayalam feature <em>Soothravakyam</em>, starring Shine Tom Chacko and Vincy Aloshious — a look at the stills and camera work I shot on production.</p>
+          <p class="films-quote" data-reveal>“On set, the still is the film's first trailer.”</p>
+          <a class="btn ghost" href="https://www.youtube.com/watch?v=ntrqUqTgsWM" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+        </div>
+        <div class="embed-frame wide" data-reveal>
+          <iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/ntrqUqTgsWM" title="Behind Soothravakyam — BTS" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+      </div>
+      <h3 class="reels-h" data-reveal>Films, stills <span>&amp; reels</span></h3>
+      <div class="reel-grid three">
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://www.instagram.com/p/CqBHGs0sBJs/embed" title="Leena & Akash — wedding film" allowtransparency="true"></iframe></div>
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://www.instagram.com/reel/Cc8UdFqpnc4/embed" title="Samyakk Sarees × Sharmiela Mandre" allowtransparency="true"></iframe></div>
+        <div class="embed-frame reel" data-reveal><iframe loading="lazy" src="https://www.instagram.com/p/ChpIArVpjlg/embed" title="Shanvi Sri — actor shoot" allowtransparency="true"></iframe></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ 07 · TUNNEL — 3D frame dive ════════ -->
+  <section class="act act-tunnel" id="act-tunnel">
+    <div class="tunnel-pin" id="tunnelPin">
+      <div class="tunnel-vp">
+        <div class="tunnel-world" id="tunnelWorld"></div>
+        <div class="tunnel-tint"></div>
+      </div>
+      <div class="tunnel-title">
+        <p class="eyebrow">08 — Dive the archive</p>
+        <h2>Nine frames<br/><em>deep.</em></h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ 08 · CREDITS ════════ -->
+  <section class="act act-clients" id="act-clients">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">09 — Credits</p>
+        <h2 data-split="words">Names &amp; brands I've shot for</h2>
+      </div>
+      <div class="client-grid" id="clientGrid">
+        <span class="feat">Marriott</span><span class="feat">KL Rahul</span><span>Soothravakyam</span><span>Baby Girl</span>
+        <span>Shine Tom Chacko</span><span>Vincy Aloshious</span><span>Shanvi Sri</span><span>Sharmiela Mandre</span>
+        <span>Ashika Ranganath</span><span>Divya Pandey</span><span>Sonika Gowda</span><span>Samyakk Sarees</span>
+      </div>
+      <div class="dubai-credits" data-reveal>
+        <p class="mono dubai-credits-h">Dubai — shot across</p>
+        <div class="dubai-credits-row">
+          <span class="chip">Burj Khalifa · Downtown</span>
+          <span class="chip">Palm Jumeirah</span>
+          <span class="chip">Dubai Marina</span>
+          <span class="chip">Business Bay</span>
+          <span class="chip">Creek Harbour</span>
+          <span class="chip">JBR</span>
+          <span class="chip">UAE developers · brokerages · property brands</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ 09 · ABOUT — the eye behind the lens ════════ -->
+  <section class="act act-about" id="act-about">
+    <div class="wrap about-grid">
+      <figure class="about-portrait" id="portraitTilt">
+        <div class="portrait-frame">
+          <img src="assets/yedu-portrait-2.jpg" alt="Yedukrishna Suresh — cinematographer, shot in the park at dusk" />
+          <span class="portrait-glow"></span>
+        </div>
+        <figcaption class="mono">YEDUKRISHNA SURESH · DOP / STILLS</figcaption>
+      </figure>
+      <div class="about-copy">
+        <p class="eyebrow">10 — The eye behind the lens</p>
+        <h2 class="about-lead" data-split="words">Every frame should feel like a moment you'd want to relive.</h2>
+        <p class="about-p" data-reveal>I'm Yedukrishna Suresh — a cinematographer and still photographer working between Dubai and Bangalore, with roots in the South Indian (Malayalam) film industry. Originally from Alappuzha, Kerala.</p>
+        <p class="about-p" data-reveal>My work spans cinematic real-estate films across the UAE, fashion editorials, on-set film stills and BTS — including the Malayalam features <em>Soothravakyam</em> and <em>Baby Girl</em> — plus actor &amp; model portfolios and weddings.</p>
+        <p class="about-sign">— Yedukrishna</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ 10 · BOOKING — right after the story ════════ -->
+  <section class="act act-book" id="act-book">
+    <div class="wrap book-grid">
+      <div class="book-left">
+        <p class="eyebrow">11 — Booking</p>
+        <h2 data-split="words">Let's create something cinematic.</h2>
+        <p class="book-sub" data-reveal>Tell me your date and what you have in mind — hitting send opens a pre-filled WhatsApp message straight to me. I'll confirm availability fast.</p>
+        <div class="quick">
+          <a href="https://wa.me/971501955122"><b>WhatsApp · Dubai / UAE</b><small>+971 50 195 5122</small></a>
+          <a href="https://wa.me/919746679720"><b>WhatsApp · India</b><small>+91 97466 79720</small></a>
+          <a href="mailto:ysuresh634@gmail.com"><b>Email</b><small>ysuresh634@gmail.com</small></a>
+          <a href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener"><b>Instagram</b><small>@yks_photoworks · DM “SHOOT”</small></a>
+        </div>
+      </div>
+      <form class="book-form" id="bookForm" novalidate>
+        <div class="form-row">
+          <label>Your name *<input id="f-name" type="text" placeholder="Jane Doe" required /></label>
+          <label>Contact number *<input id="f-phone" type="tel" placeholder="+971 50 000 0000" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Preferred date *<input id="f-date" type="date" required /></label>
+          <label>Preferred time<input id="f-time" type="time" /></label>
+        </div>
+        <div class="form-row">
+          <label>Type of shoot
+            <select id="f-type">
+              <option>Real Estate Film — Dubai / UAE</option><option>Fashion Editorial</option><option>Film Stills / BTS</option>
+              <option>Actor / Model Portfolio</option><option>Wedding Film &amp; Photography</option><option>Brand / Promo</option><option>Other</option>
+            </select>
+          </label>
+          <label>Book via
+            <select id="f-region"><option value="971501955122">WhatsApp Dubai / UAE</option><option value="919746679720">WhatsApp India</option></select>
+          </label>
+        </div>
+        <label>About the project<textarea id="f-msg" placeholder="Location, vibe, references, budget range…"></textarea></label>
+        <button type="submit" class="btn fill">Send via WhatsApp →</button>
+        <p class="form-note">Opens WhatsApp with your details pre-filled. Nothing sends until you press send there.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ════════ FOOTER ════════ -->
+  <footer class="foot">
+    <div class="wrap">
+      <h3 data-split="words">Have a project in mind? Let's make it unforgettable.</h3>
+      <div class="foot-links">
+        <a href="https://www.behance.net/yedusuresha14c" target="_blank" rel="noopener">Behance</a>
+        <a href="https://vimeo.com/yksproductions" target="_blank" rel="noopener">Vimeo</a>
+        <a href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.youtube.com/watch?v=ntrqUqTgsWM" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://linktr.ee/yksproductions" target="_blank" rel="noopener">Linktree</a>
+      </div>
+      <div class="foot-bottom mono">
+        <span>© 2026 YKS Productions · Yedukrishna Suresh</span>
+        <span>Dubai — Bangalore · Shot on scroll</span>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="js/cinema.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
