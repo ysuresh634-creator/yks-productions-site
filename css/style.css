@@ -268,6 +268,9 @@ img{display:block;max-width:100%}
 .feat-copy p{font-size:14px;color:rgba(244,237,226,.8);line-height:1.65;margin:0}
 .feat-copy p em{color:var(--peach);font-style:italic}
 .feat-note{color:var(--paper-dim);font-size:9.5px}
+.feat-link{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);
+  border-bottom:1px solid rgba(255,140,59,.4);padding-bottom:3px;width:max-content;transition:.3s}
+.feat-link:hover{color:var(--peach);border-color:var(--peach)}
 @media(max-width:1020px){.feat-grid{grid-template-columns:1fr}}
 @media(max-width:640px){.feat-card{grid-template-columns:1fr}.feat-photo{aspect-ratio:4/5;min-height:0}}
 
