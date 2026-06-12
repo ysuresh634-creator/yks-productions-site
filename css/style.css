@@ -412,7 +412,10 @@ img{display:block;max-width:100%}
 .klr-card figcaption{position:absolute;left:14px;bottom:12px;color:var(--peach);text-shadow:0 2px 12px rgba(0,0,0,.85)}
 
 /* ───────────────────────── RUKMINI ROW ───────────────────────── */
+.ruk-sub{color:var(--peach);letter-spacing:.18em;font-size:11px;margin:-18px 0 22px}
 .ruk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.ruk-grid img{image-rendering:-webkit-optimize-contrast}
+.ruk-grid figure{border:1px solid rgba(255,140,59,.18);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(255,140,59,.06) inset}
 .ruk-grid.four{grid-template-columns:repeat(4,1fr)}
 .ruk-grid figure{margin:0;position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/5;
   box-shadow:0 28px 70px rgba(0,0,0,.5)}

@@ -10,7 +10,7 @@ import os, sys
 def soft_s(x, s=0.16):                      # gentle filmic S on 0..1
     return np.clip(x + s * 4 * x * (1 - x) * (x - 0.5), 0, 1)
 
-def grade_skin(src, dst, crop45=None, max_w=1600):
+def grade_skin(src, dst, crop45=None, max_w=2400):
     img = Image.open(src).convert('RGB')
     if crop45 is not None:
         w, h = img.size
