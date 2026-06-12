@@ -16,8 +16,8 @@
   // internal buffer is visually identical but far cheaper on the GPU.
   // Phones get 1× (huge win on retina); desktops a modest 1.3×.
   const MOBILE = matchMedia('(max-width: 768px)').matches;
-  const DPR = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.0 : 1.3);
-  const MAX_BUF = MOBILE ? 1100 : 1600;   // hard cap on buffer width
+  const DPR = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.0 : 1.5);
+  const MAX_BUF = MOBILE ? 1100 : 2400;   // hard cap on buffer width — crisp on big screens, lean on phones
 
   /* ---------- shared GLSL ---------- */
   const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
@@ -44,7 +44,7 @@
     void main(){
       vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;
       float s=u_scroll;
-      float zoom=1.+s*1.9;                       // camera push-in
+      float zoom=1.+s*0.85;                      // gentle push-in — stays in rich detail, never blows out the centre
       vec2 p=uv/zoom;
       float t=u_time*.05+s*2.2;
 
@@ -69,7 +69,7 @@
       col=mix(col,teal, smoothstep(.55,.95,q.x*(1.-f))*.4*(1.-s*.5));
 
       // grade shifts cooler/violet as we push deeper
-      col=mix(col,col.bgr*vec3(.9,.7,1.25),s*.35);
+      col=mix(col,col.bgr*vec3(.9,.7,1.25),s*.20);
 
       // god rays from upper key light
       vec2 lp=vec2(.34-s*.2,.42);
@@ -77,7 +77,7 @@
       float ang=atan(d.y,d.x);
       float ray=pow(max(0.,sin(ang*7.+t*2.)*.5+.5),3.)*exp(-length(d)*2.2);
       col+=vec3(1.,.62,.3)*ray*.34*(1.-s*.4);
-      col+=vec3(1.,.7,.45)*exp(-length(d)*3.4)*.5;
+      col+=vec3(1.,.7,.45)*exp(-length(d)*3.4)*.38;
 
       // dust particles, 3 parallax layers
       for(int i=1;i<=3;i++){
@@ -91,8 +91,8 @@
       // anamorphic flare on key light
       col+=vec3(.3,.55,.9)*exp(-abs(d.y)*26.)*exp(-abs(d.x)*2.6)*.5;
 
-      // exposure ramp + vignette + grain
-      col*=1.05+s*.32;
+      // exposure ramp + vignette + grain — gentle, no end-of-scroll blowout
+      col*=1.03+s*.08;
       float vig=smoothstep(1.25,.35,length(uv));
       col*=vig;
       col+=(hash(gl_FragCoord.xy+fract(u_time)*100.)-.5)*.05;

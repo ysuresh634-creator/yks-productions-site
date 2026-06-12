@@ -132,7 +132,7 @@
       const p = self.progress;
       if (scenes.hero) scenes.hero.setProgress(p);
       // title drifts apart + fades as the camera pushes in
-      gsap.set('.hero-content', { y: -p * 200, opacity: 1 - Math.max(0, p - .3) * 1.7, scale: 1 + p * .1 });
+      gsap.set('.hero-content', { y: -p * 150, opacity: 1 - Math.max(0, p - .5) * 1.4, scale: 1 + p * .06 });
       gsap.set('.hero-scrollcue', { opacity: Math.max(0, 1 - p * 4) });
       const totalFrames = Math.round(p * 192); // 8s @ 24fps
       const ss = String(Math.floor(totalFrames / 24)).padStart(2, '0');
