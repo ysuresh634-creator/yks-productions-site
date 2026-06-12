@@ -463,6 +463,7 @@ img{display:block;max-width:100%}
 
 /* ───────────────────────── SPLIT / REVEAL ───────────────────────── */
 .char,.word{display:inline-block}
+.char-word{display:inline-block;white-space:nowrap}
 [data-reveal]{opacity:0;transform:translateY(34px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 [data-reveal].in{opacity:1;transform:none}
 .splitR .word{opacity:0;transform:translateY(110%);transition:opacity .7s var(--ease),transform .7s var(--ease)}
@@ -487,7 +488,7 @@ img{display:block;max-width:100%}
   .reel-grid.three{grid-template-columns:repeat(2,1fr)}
   .klr-grid{grid-template-columns:repeat(2,1fr)}
   .klr-card.tall{grid-row:span 2}
-  .ruk-grid{grid-template-columns:repeat(2,1fr)}
+  .ruk-grid,.ruk-grid.four{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:640px){
   .wrap{padding:0 22px}
@@ -517,9 +518,17 @@ img{display:block;max-width:100%}
   .fashion-grid{grid-template-columns:1fr}
   .reel-grid,.reel-grid.three{grid-template-columns:1fr}
   .embed-frame.reel{min-height:480px}
-  .klr-grid,.ruk-grid{grid-template-columns:1fr}
+  .klr-grid{grid-template-columns:1fr}
+  .ruk-grid,.ruk-grid.four{grid-template-columns:repeat(2,1fr)}
+  .hero-eyebrow{letter-spacing:.2em;font-size:10.5px;margin-bottom:24px}
+  .work-info{opacity:1;transform:none}
   .klr-card.tall{grid-row:auto;grid-column:auto}
   .chip{white-space:normal;text-align:center;line-height:1.6}
+}
+/* touch devices have no hover — reveal work-card names permanently so photos aren't anonymous */
+@media(hover:none){
+  .work-info{opacity:1;transform:none}
+  .work-card:hover img{transform:none}
 }
 @media(prefers-reduced-motion:reduce){
   .hero-scrollcue span,.nav-reel span{animation:none}

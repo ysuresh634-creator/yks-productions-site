@@ -48,11 +48,18 @@
     el.textContent = '';
     el.setAttribute('aria-label', text);
     if (mode === 'chars') {
-      text.split('').forEach(ch => {
+      text.split(/(\s+)/).forEach(token => {
+        if (token === '') return;
+        if (/^\s+$/.test(token)) { el.appendChild(document.createTextNode(' ')); return; }
+        const wrap = document.createElement('span');
+        wrap.className = 'char-word';
+        token.split('').forEach(ch => {
         const s = document.createElement('span');
         s.className = 'char';
         s.textContent = ch === ' ' ? ' ' : ch;
-        el.appendChild(s);
+        wrap.appendChild(s);
+        });
+        el.appendChild(wrap);
       });
     } else {
       text.split(/\s+/).forEach((w, i, arr) => {
