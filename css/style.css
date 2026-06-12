@@ -155,7 +155,8 @@ img{display:block;max-width:100%}
 .act-about{padding:150px 0;background:
   radial-gradient(70% 50% at 85% 15%,rgba(123,47,247,.13),transparent 60%),
   radial-gradient(60% 45% at 10% 90%,rgba(255,140,59,.1),transparent 60%),var(--black)}
-.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:80px;align-items:center}
+.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:80px;align-items:start}
+.about-portrait{position:sticky;top:120px}
 .about-portrait{perspective:900px}
 .portrait-frame{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:8px;transform-style:preserve-3d;
   box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 1px var(--line);will-change:transform}
@@ -165,6 +166,8 @@ img{display:block;max-width:100%}
 .about-lead{font-size:clamp(30px,3.6vw,48px);margin-bottom:34px;line-height:1.18}
 .about-p{font-size:17px;color:rgba(244,237,226,.78);margin-bottom:20px;max-width:560px}
 .about-p em{color:var(--peach);font-style:italic}
+.about-quote{font-family:var(--font-d);font-style:italic;font-size:clamp(19px,1.7vw,24px);line-height:1.4;
+  color:var(--paper);margin:6px 0 6px;padding-left:20px;border-left:2px solid var(--amber)}
 .about-sign{font-family:var(--font-d);font-style:italic;font-size:26px;margin-top:10px;
   background:linear-gradient(90deg,var(--amber),var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
 
