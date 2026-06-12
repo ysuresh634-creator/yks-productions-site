@@ -193,6 +193,11 @@ img{display:block;max-width:100%}
 .svc-beam{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .45s;
   background:radial-gradient(60% 40% at var(--mx,50%) var(--my,0%),rgba(255,140,59,.16),rgba(123,47,247,.08) 50%,transparent 75%)}
 .svc:hover .svc-beam{opacity:1}
+.svc{cursor:pointer}
+.svc-go{position:relative;margin-top:14px;font-size:9.5px;letter-spacing:.2em;color:var(--amber);
+  opacity:0;transform:translateY(6px);transition:.35s var(--ease)}
+.svc:hover .svc-go{opacity:1;transform:none}
+@media(hover:none){.svc-go{opacity:.85;transform:none}}
 
 /* ───────────────────────── WORK · horizontal ───────────────────────── */
 .act-work{background:var(--black-2)}
