@@ -20,7 +20,7 @@
   const NOISE_LIB = `
     precision highp float;
     uniform vec2 u_res; uniform float u_time; uniform float u_scroll;
-    float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+    float hash(vec2 p){p=fract(p*0.3183099+vec2(0.71,0.113));return fract(p.x*p.y*95.4307);}
     float noise(vec2 p){
       vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
       float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));

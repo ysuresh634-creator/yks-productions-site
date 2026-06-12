@@ -8,6 +8,7 @@
   const $ = (s, c) => (c || document).querySelector(s);
   const $$ = (s, c) => Array.from((c || document).querySelectorAll(s));
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = matchMedia('(max-width: 768px)').matches;
 
   /* ─────────── smooth scroll ─────────── */
   history.scrollRestoration = 'manual';
@@ -116,14 +117,14 @@
   /* ─────────── ACT I · hero scrub ─────────── */
   const heroTC = $('#heroTC');
   cinemaPins.hero = ScrollTrigger.create({
-    trigger: '#act-hero', start: 'top top', end: '+=260%',
+    trigger: '#act-hero', start: 'top top', end: mobile ? '+=65%' : '+=140%',
     pin: '.act-hero .cinema-stage', scrub: true, anticipatePin: 1,
     onToggle: self => letterbox(self.isActive),
     onUpdate: self => {
       const p = self.progress;
       if (scenes.hero) scenes.hero.setProgress(p);
       // title drifts apart + fades as the camera pushes in
-      gsap.set('.hero-content', { y: -p * 240, opacity: 1 - p * 1.35, scale: 1 + p * .12 });
+      gsap.set('.hero-content', { y: -p * 200, opacity: 1 - Math.max(0, p - .3) * 1.7, scale: 1 + p * .1 });
       gsap.set('.hero-scrollcue', { opacity: Math.max(0, 1 - p * 4) });
       const totalFrames = Math.round(p * 192); // 8s @ 24fps
       const ss = String(Math.floor(totalFrames / 24)).padStart(2, '0');
@@ -206,7 +207,7 @@
   const phaseEl = $('#dubaiPhase');
   const PHASES = [[0, 'GOLDEN HOUR'], [.32, 'SUNSET'], [.58, 'BLUE HOUR'], [.8, 'NIGHT']];
   cinemaPins.dubai = ScrollTrigger.create({
-    trigger: '#act-dubai', start: 'top top', end: '+=300%',
+    trigger: '#act-dubai', start: 'top top', end: mobile ? '+=110%' : '+=170%',
     pin: '.act-dubai .cinema-stage', scrub: true, anticipatePin: 1,
     onToggle: self => letterbox(self.isActive),
     onUpdate: self => {
@@ -230,15 +231,15 @@
 
   /* ─────────── ACT V · 3D frame tunnel ─────────── */
   const TUNNEL_IMGS = [
-    ['https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/31e02a225904233.Y3JvcCwxNDAwLDEwOTUsMCw3MjA.jpeg', 'Sharmiela Mandre'],
-    ['https://images.pixieset.com/39939474/b4700db90e7b435a5ad8dfc128a622b7-large.jpg', 'Golden hour'],
-    ['https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/17a009225901597.Y3JvcCw4NDAsNjU3LDI3OCwyMTg.jpg', 'Ashika Ranganath'],
-    ['https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/b035ff239427653.6928b47c4f333.png', 'Sunday with Olivia'],
-    ['https://images.pixieset.com/39939474/001b14068ab276d19ccccd93ccd7f51c-large.jpg', 'Wedding highlights'],
-    ['https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/7bc566225903787.Y3JvcCw0MjI1LDMzMDUsMjA5LDExNzE.jpg', 'Divya Pandey'],
-    ['https://images.pixieset.com/39939474/16d4b522e924ce653b3d93a9c52e4342-large.jpg', 'Couple portrait'],
-    ['https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/0411ab225903423.688bcf977d6ab.png', 'Sonika Gowda'],
-    ['https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/744077225903063.688b0e6793300.png', 'Suman']
+    ['assets/behance/tun-sharmiela.jpg', 'Sharmiela Mandre'],
+    ['assets/behance/tun-olivia2.jpg', 'Olivia, morning'],
+    ['assets/behance/tun-ashika.jpg', 'Ashika Ranganath'],
+    ['assets/behance/tun-olivia.jpg', 'Sunday with Olivia'],
+    ['assets/behance/tun-divya.jpg', 'Divya Pandey'],
+    ['assets/behance/tun-sonika.jpg', 'Sonika Gowda'],
+    ['assets/behance/tun-suman.jpg', 'Suman'],
+    ['assets/behance/tun-ashika2.jpg', 'An evening with Ashika'],
+    ['assets/behance/tun-divya2.jpg', 'Divya, again']
   ];
   const world = $('#tunnelWorld');
   const STEP = 640; // z-distance between frames
@@ -265,7 +266,7 @@
   }
   placeTunnel(0);
   ScrollTrigger.create({
-    trigger: '#act-tunnel', start: 'top top', end: '+=340%',
+    trigger: '#act-tunnel', start: 'top top', end: mobile ? '+=130%' : '+=200%',
     pin: '#tunnelPin', scrub: true, anticipatePin: 1,
     onToggle: self => letterbox(self.isActive),
     onUpdate: self => placeTunnel(self.progress)

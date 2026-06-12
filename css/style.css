@@ -129,15 +129,22 @@ img{display:block;max-width:100%}
 @keyframes drip{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 .hero-frameinfo{position:absolute;bottom:34px;right:38px;display:flex;gap:26px;z-index:2}
 
-/* ───────────────────────── STRIP ───────────────────────── */
-.strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-  background:linear-gradient(180deg,var(--black-2),var(--black))}
-.strip .cell{padding:46px 20px;text-align:center;position:relative}
-.strip .cell+.cell::before{content:"";position:absolute;left:0;top:30px;bottom:30px;width:1px;background:var(--line)}
-.strip .n{font-family:var(--font-d);font-size:clamp(28px,3.8vw,48px);line-height:1;
+/* ───────────────────────── TICKER ───────────────────────── */
+.ticker{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,var(--black-2),var(--black));padding:22px 0;position:relative}
+.ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:90px;z-index:2;pointer-events:none}
+.ticker::before{left:0;background:linear-gradient(90deg,var(--black),transparent)}
+.ticker::after{right:0;background:linear-gradient(270deg,var(--black),transparent)}
+.ticker-track{display:flex;align-items:center;gap:38px;width:max-content;animation:tick 38s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+@keyframes tick{to{transform:translateX(-50%)}}
+.tk{display:flex;align-items:baseline;gap:12px;white-space:nowrap}
+.tk b{font-family:var(--font-d);font-weight:500;font-size:24px;
   background:linear-gradient(120deg,var(--peach),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent}
-.strip .n.is-word{font-size:clamp(20px,2.4vw,30px);padding-top:8px}
-.strip .l{font-family:var(--font-m);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--paper-dim);margin-top:13px}
+.tk i{font-style:normal;font-family:var(--font-m);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--paper-dim)}
+.ticker em{font-style:normal;font-size:13px}
+.ticker .d1{color:var(--amber)}.ticker .d2{color:var(--teal)}.ticker .d3{color:var(--magenta)}
+@media(prefers-reduced-motion:reduce){.ticker-track{animation:none}}
 
 /* ───────────────────────── ABOUT ───────────────────────── */
 .act-about{padding:150px 0;background:
@@ -160,13 +167,24 @@ img{display:block;max-width:100%}
 .act-services{padding:130px 0 150px;background:var(--black)}
 .sec-head{margin-bottom:64px}
 .svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.svc{position:relative;border:1px solid var(--line);border-radius:10px;padding:34px 26px 44px;min-height:280px;
-  display:flex;flex-direction:column;background:linear-gradient(170deg,rgba(244,237,226,.035),transparent 55%);
-  overflow:hidden;transition:border-color .4s,transform .4s var(--ease);will-change:transform}
-.svc:hover{border-color:rgba(255,140,59,.5)}
-.svc-num{margin-bottom:auto;color:var(--amber)}
-.svc h3{font-size:24px;margin:18px 0 12px}
-.svc p{font-size:13.5px;color:var(--paper-dim)}
+.svc{position:relative;border:1px solid var(--line);border-radius:14px;padding:26px 24px 28px;min-height:230px;
+  display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;
+  transition:border-color .4s,transform .4s var(--ease);will-change:transform}
+.svc::before{content:"";position:absolute;inset:0;opacity:.85;transition:opacity .5s}
+.svc:nth-child(1)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(255,140,59,.30),rgba(196,80,44,.10) 45%,transparent 70%)}
+.svc:nth-child(2)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(255,47,135,.30),rgba(123,47,247,.12) 50%,transparent 72%)}
+.svc:nth-child(3)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(31,214,201,.26),rgba(12,80,90,.12) 48%,transparent 70%)}
+.svc:nth-child(4)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(123,47,247,.30),rgba(255,47,135,.10) 50%,transparent 72%)}
+.svc:nth-child(5)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(255,201,163,.28),rgba(255,140,59,.12) 48%,transparent 70%)}
+.svc:hover{border-color:rgba(255,140,59,.55);transform:translateY(-4px)}
+.svc-num{position:absolute;top:6px;right:16px;margin:0;font-family:var(--font-d);font-style:italic;font-weight:600;
+  font-size:92px;line-height:1;letter-spacing:0;color:transparent;-webkit-text-stroke:1px rgba(244,237,226,.22);
+  transition:.5s var(--ease)}
+.svc:hover .svc-num{-webkit-text-stroke:1px rgba(255,140,59,.65);transform:translateY(-4px)}
+.svc h3{font-size:22px;margin:0 0 10px;position:relative}
+.svc h3::before{content:"";display:block;width:34px;height:2px;margin-bottom:14px;border-radius:2px;
+  background:linear-gradient(90deg,var(--amber),var(--magenta))}
+.svc p{font-size:13.5px;color:var(--paper-dim);position:relative;margin:0}
 .svc-beam{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .45s;
   background:radial-gradient(60% 40% at var(--mx,50%) var(--my,0%),rgba(255,140,59,.16),rgba(123,47,247,.08) 50%,transparent 75%)}
 .svc:hover .svc-beam{opacity:1}
@@ -333,6 +351,37 @@ img{display:block;max-width:100%}
   radial-gradient(55% 50% at 90% 95%,rgba(255,140,59,.09),transparent 60%),var(--black-2)}
 .act-marriott .reel-grid{margin-top:24px}
 
+/* ───────────────────────── KL RAHUL GRID ───────────────────────── */
+.klr-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(180px,auto);gap:18px;margin-top:24px}
+.klr-card{position:relative;margin:0;border-radius:12px;overflow:hidden;box-shadow:0 26px 70px rgba(0,0,0,.5)}
+.klr-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1s var(--ease)}
+.klr-card:hover img{transform:scale(1.04)}
+.klr-card.tall{grid-row:span 3;grid-column:1}
+.klr-card figcaption{position:absolute;left:14px;bottom:12px;color:var(--peach);text-shadow:0 2px 12px rgba(0,0,0,.85)}
+
+/* ───────────────────────── RUKMINI ROW ───────────────────────── */
+.ruk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.ruk-grid.four{grid-template-columns:repeat(4,1fr)}
+.ruk-grid figure{margin:0;position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/5;
+  box-shadow:0 28px 70px rgba(0,0,0,.5)}
+.ruk-grid img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1s var(--ease)}
+.ruk-grid figure:hover img{transform:scale(1.04)}
+.ruk-grid figcaption{position:absolute;left:14px;bottom:12px;color:var(--peach);text-shadow:0 2px 12px rgba(0,0,0,.85)}
+
+.fashion-reel-row{display:grid;grid-template-columns:1.2fr .8fr;gap:60px;align-items:center;margin-top:78px}
+.fashion-reel-row .embed-frame.reel{max-width:380px;justify-self:center;width:100%}
+@media(max-width:1020px){.fashion-reel-row{grid-template-columns:1fr;gap:34px}}
+
+/* ───────────────────────── WEDDINGS ───────────────────────── */
+.act-weddings{padding:140px 0;background:
+  radial-gradient(70% 55% at 88% 8%,rgba(255,47,135,.10),transparent 60%),
+  radial-gradient(55% 50% at 8% 95%,rgba(255,140,59,.10),transparent 60%),var(--black)}
+.wed-gallery{columns:3 300px;column-gap:18px}
+.wed-gallery figure{margin:0 0 18px;break-inside:avoid;border-radius:14px;overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.wed-gallery img{width:100%;display:block;transition:transform 1s var(--ease)}
+.wed-gallery figure:hover img{transform:scale(1.04)}
+
 /* ───────────────────────── DUBAI CREDITS ───────────────────────── */
 .dubai-credits{margin-top:54px;border:1px solid rgba(31,214,201,.3);border-radius:16px;padding:30px 32px;
   background:linear-gradient(120deg,rgba(31,214,201,.07),rgba(123,47,247,.07))}
@@ -348,7 +397,6 @@ img{display:block;max-width:100%}
   .about-grid,.book-grid,.dw-grid,.dw-grid.rev{grid-template-columns:1fr;gap:54px}
   .svc-grid,.svc-grid.five{grid-template-columns:repeat(2,1fr)}
   .client-grid{grid-template-columns:repeat(3,1fr)}
-  .strip{grid-template-columns:repeat(2,1fr)}
   .dubai-content{padding-left:32px;max-width:520px}
   .tunnel-title{padding:0 32px 60px}
   .fashion-grid{grid-template-columns:1fr 1fr}
@@ -356,12 +404,19 @@ img{display:block;max-width:100%}
   .fashion-card.offset{margin-top:0}
   .reel-grid{grid-template-columns:repeat(2,1fr)}
   .reel-grid.three{grid-template-columns:repeat(2,1fr)}
+  .klr-grid{grid-template-columns:repeat(2,1fr)}
+  .klr-card.tall{grid-row:span 2}
+  .ruk-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:640px){
   .wrap{padding:0 22px}
   .nav .links{display:none}
   .hero-meta{gap:26px}
-  .svc-grid,.svc-grid.five{grid-template-columns:1fr}
+  .svc-grid,.svc-grid.five{grid-template-columns:1fr;gap:12px}
+  .svc{min-height:0;padding:22px 20px}
+  .svc-num{font-size:64px;top:10px}
+  .svc h3{font-size:19px}
+  .svc h3::before{margin-bottom:10px}
   .client-grid{grid-template-columns:repeat(2,1fr)}
   .form-row{grid-template-columns:1fr}
   .book-form{padding:26px}
@@ -371,6 +426,8 @@ img{display:block;max-width:100%}
   .fashion-grid{grid-template-columns:1fr}
   .reel-grid,.reel-grid.three{grid-template-columns:1fr}
   .embed-frame.reel{min-height:480px}
+  .klr-grid,.ruk-grid{grid-template-columns:1fr}
+  .klr-card.tall{grid-row:auto;grid-column:auto}
 }
 @media(prefers-reduced-motion:reduce){
   .hero-scrollcue span,.nav-reel span{animation:none}
