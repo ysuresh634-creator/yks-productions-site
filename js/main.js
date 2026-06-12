@@ -298,6 +298,21 @@
     });
   }
 
+  /* ─────────── video facades: load player on tap ─────────── */
+  $$('.vfacade[data-embed]').forEach(f => {
+    f.addEventListener('click', () => {
+      if (f.classList.contains('on')) return;
+      f.classList.add('on');
+      const ifr = document.createElement('iframe');
+      ifr.src = f.dataset.embed;
+      ifr.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
+      ifr.allowFullscreen = true;
+      f.appendChild(ifr);
+      const p = f.querySelector('.vplay'); if (p) p.remove();
+      const t = f.querySelector('.vtag'); if (t) t.remove();
+    });
+  });
+
   /* ─────────── booking → WhatsApp ─────────── */
   $('#bookForm').addEventListener('submit', e => {
     e.preventDefault();
