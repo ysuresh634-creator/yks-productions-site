@@ -86,6 +86,11 @@ img{display:block;max-width:100%}
 .nav-cta:hover{background:var(--amber);border-color:var(--amber);color:var(--black)}
 .nav-reel{display:flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:10px;letter-spacing:.26em;color:var(--paper-dim)}
 .nav-reel span{width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 12px #ff3b30;animation:blink 1.6s infinite}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:0;padding:8px;cursor:pointer;z-index:130}
+.burger span{display:block;width:24px;height:2px;border-radius:2px;background:var(--paper);transition:.35s var(--ease)}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
 .btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-m);font-size:11.5px;letter-spacing:.18em;
@@ -407,7 +412,10 @@ img{display:block;max-width:100%}
 
 /* ───────────────────────── SPLIT / REVEAL ───────────────────────── */
 .char,.word{display:inline-block;will-change:transform,opacity}
-[data-reveal]{opacity:0;transform:translateY(34px)}
+[data-reveal]{opacity:0;transform:translateY(34px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+[data-reveal].in{opacity:1;transform:none}
+.splitR .word{opacity:0;transform:translateY(110%);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.splitR.in .word{opacity:1;transform:none}
 
 /* ───────────────────────── RESPONSIVE ───────────────────────── */
 @media(max-width:1020px){
@@ -427,7 +435,14 @@ img{display:block;max-width:100%}
 }
 @media(max-width:640px){
   .wrap{padding:0 22px}
-  .nav .links{display:none}
+  .burger{display:flex}
+  .nav-reel{display:none}
+  .nav .links{position:fixed;inset:0 0 0 auto;width:min(320px,82vw);background:rgba(7,6,10,.97);
+    backdrop-filter:blur(16px);flex-direction:column;justify-content:center;align-items:flex-start;
+    padding:48px 38px;gap:26px;transform:translateX(102%);transition:transform .45s var(--ease);
+    border-left:1px solid var(--line);z-index:120}
+  .nav .links.open{transform:none}
+  .nav .links a{font-size:15px}
   .hero-meta{gap:26px}
   .svc-grid,.svc-grid.five{grid-template-columns:1fr;gap:12px}
   .svc{min-height:0;padding:22px 20px}

@@ -30,8 +30,16 @@
     const target = $(a.getAttribute('href'));
     if (!target) return;
     e.preventDefault();
+    $('#burger') && $('#burger').classList.remove('open');
+    $('.nav .links').classList.remove('open');
     lenis.scrollTo(target, { offset: 0, duration: 1.6 });
   }));
+
+  /* ─────────── mobile menu ─────────── */
+  $('#burger').addEventListener('click', () => {
+    $('#burger').classList.toggle('open');
+    $('.nav .links').classList.toggle('open');
+  });
 
   /* ─────────── text splitting ─────────── */
   $$('[data-split]').forEach(el => {
@@ -148,22 +156,30 @@
     });
   });
 
-  /* ─────────── generic reveals ─────────── */
-  $$('[data-reveal]').forEach(el => {
-    gsap.to(el, {
-      opacity: 1, y: 0, duration: 1, ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 86%' }
+  /* ─────────── reveals via IntersectionObserver ───────────
+     (immune to layout shifts from lazy images, unlike
+     position-based ScrollTriggers which drift and leave
+     blocks invisible) */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      io.unobserve(e.target);
     });
+  }, { threshold: .1, rootMargin: '0px 0px -5% 0px' });
+  $$('[data-reveal]').forEach(el => io.observe(el));
+  $$('h2[data-split], .about-lead, .films-quote, .foot h3, .dubai-title span, .dubai-title em').forEach(el => {
+    if (el.closest('.act-hero') || !$$('.word', el).length) return;
+    el.classList.add('splitR');
+    $$('.word', el).forEach((w, i) => w.style.transitionDelay = (i * 35) + 'ms');
+    io.observe(el);
   });
-  // split headings outside the hero reveal on scroll
-  $$('h2[data-split], .about-lead, .films-quote, .foot h3').forEach(el => {
-    const words = $$('.word', el);
-    if (!words.length || el.closest('.act-hero')) return;
-    gsap.from(words, {
-      yPercent: 110, opacity: 0, stagger: .035, duration: .9, ease: 'power4.out',
-      scrollTrigger: { trigger: el, start: 'top 85%' }
-    });
-  });
+  // keep pinned-section geometry honest as lazy images land
+  let refreshT;
+  $$('img[loading="lazy"]').forEach(im => im.addEventListener('load', () => {
+    clearTimeout(refreshT);
+    refreshT = setTimeout(() => ScrollTrigger.refresh(), 350);
+  }, { once: true }));
 
   /* ─────────── portrait + service-card tilt ─────────── */
   if (!reduced && matchMedia('(hover:hover)').matches) {
