@@ -470,7 +470,12 @@ img{display:block;max-width:100%}
 
 /* ───────────────────────── RESPONSIVE ───────────────────────── */
 @media(max-width:1020px){
-  .about-grid,.book-grid,.dw-grid,.dw-grid.rev{grid-template-columns:1fr;gap:54px}
+  .about-grid,.book-grid,.dw-grid,.dw-grid.rev{grid-template-columns:1fr;gap:40px}
+  /* portrait must not stick/overlap once the columns stack */
+  .about-portrait{position:static;top:auto;max-width:400px;margin:0 auto;perspective:none}
+  .portrait-frame{transform:none!important}
+  .act-about{padding:90px 0}
+  .about-p{max-width:none}
   .svc-grid,.svc-grid.five{grid-template-columns:repeat(2,1fr)}
   .client-grid{grid-template-columns:repeat(3,1fr)}
   .dubai-content{padding-left:32px;max-width:520px}
