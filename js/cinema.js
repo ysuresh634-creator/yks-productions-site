@@ -12,7 +12,12 @@
 (function () {
   'use strict';
 
-  const DPR = Math.min(window.devicePixelRatio || 1, 1.6);
+  // Render resolution: the nebula/skyline shaders are soft, so a lower
+  // internal buffer is visually identical but far cheaper on the GPU.
+  // Phones get 1× (huge win on retina); desktops a modest 1.3×.
+  const MOBILE = matchMedia('(max-width: 768px)').matches;
+  const DPR = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.0 : 1.3);
+  const MAX_BUF = MOBILE ? 1100 : 1600;   // hard cap on buffer width
 
   /* ---------- shared GLSL ---------- */
   const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
@@ -294,18 +299,26 @@
     const uTime = gl.getUniformLocation(prog, 'u_time');
     const uScroll = gl.getUniformLocation(prog, 'u_scroll');
 
-    let scroll = 0, raf = null, t0 = performance.now();
+    let scroll = 0, raf = null, t0 = performance.now(), needResize = true;
 
+    // resize reads layout (clientWidth) — kept OUT of the per-frame loop
+    // so we never force a reflow 60×/sec; only on actual viewport changes.
     function resize() {
-      const w = Math.floor(canvas.clientWidth * DPR), h = Math.floor(canvas.clientHeight * DPR);
+      let w = Math.floor(canvas.clientWidth * DPR);
+      let h = Math.floor(canvas.clientHeight * DPR);
+      if (w > MAX_BUF) { h = Math.round(h * (MAX_BUF / w)); w = MAX_BUF; }
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w; canvas.height = h;
         gl.viewport(0, 0, w, h);
       }
+      needResize = false;
     }
+    addEventListener('resize', () => { needResize = true; }, { passive: true });
+    addEventListener('orientationchange', () => { needResize = true; }, { passive: true });
+
     function frame(now) {
       raf = requestAnimationFrame(frame);
-      resize();
+      if (needResize) resize();
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, (now - t0) / 1000);
       gl.uniform1f(uScroll, scroll);
@@ -315,8 +328,8 @@
       setProgress(p) { scroll = p; canvas.dataset.p = p.toFixed(3); },
       setActive(on) {
         canvas.dataset.active = on;
-        if (on && raf === null) raf = requestAnimationFrame(frame);
-        else if (!on && raf !== null) { cancelAnimationFrame(raf); raf = null; }
+        if (on) { needResize = true; if (raf === null) raf = requestAnimationFrame(frame); }
+        else if (raf !== null) { cancelAnimationFrame(raf); raf = null; }
       }
     };
   }

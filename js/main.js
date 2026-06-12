@@ -125,7 +125,7 @@
   /* ─────────── ACT I · hero scrub ─────────── */
   const heroTC = $('#heroTC');
   cinemaPins.hero = ScrollTrigger.create({
-    trigger: '#act-hero', start: 'top top', end: mobile ? '+=65%' : '+=140%',
+    trigger: '#act-hero', start: 'top top', end: mobile ? '+=48%' : '+=90%',
     pin: '.act-hero .cinema-stage', scrub: true, anticipatePin: 1,
     onToggle: self => letterbox(self.isActive),
     onUpdate: self => {
@@ -223,7 +223,7 @@
   const phaseEl = $('#dubaiPhase');
   const PHASES = [[0, 'GOLDEN HOUR'], [.32, 'SUNSET'], [.58, 'BLUE HOUR'], [.8, 'NIGHT']];
   cinemaPins.dubai = ScrollTrigger.create({
-    trigger: '#act-dubai', start: 'top top', end: mobile ? '+=110%' : '+=170%',
+    trigger: '#act-dubai', start: 'top top', end: mobile ? '+=80%' : '+=120%',
     pin: '.act-dubai .cinema-stage', scrub: true, anticipatePin: 1,
     onToggle: self => letterbox(self.isActive),
     onUpdate: self => {
@@ -282,7 +282,7 @@
   }
   placeTunnel(0);
   ScrollTrigger.create({
-    trigger: '#act-tunnel', start: 'top top', end: mobile ? '+=130%' : '+=200%',
+    trigger: '#act-tunnel', start: 'top top', end: mobile ? '+=95%' : '+=150%',
     pin: '#tunnelPin', scrub: true, anticipatePin: 1,
     onToggle: self => letterbox(self.isActive),
     onUpdate: self => placeTunnel(self.progress)
@@ -305,7 +305,9 @@
     const pos = { x: innerWidth / 2, y: innerHeight / 2 }, tgt = { ...pos };
     addEventListener('mousemove', e => { tgt.x = e.clientX; tgt.y = e.clientY; });
     gsap.ticker.add(() => {
-      pos.x += (tgt.x - pos.x) * .16; pos.y += (tgt.y - pos.y) * .16;
+      const dx = tgt.x - pos.x, dy = tgt.y - pos.y;
+      if (dx * dx + dy * dy < 0.02) return;   // settled — stop writing to the DOM
+      pos.x += dx * .16; pos.y += dy * .16;
       cursor.style.transform = 'translate(' + (pos.x - 9) + 'px,' + (pos.y - 9) + 'px)';
     });
     $$('a,button,.work-card,.svc').forEach(el => {
