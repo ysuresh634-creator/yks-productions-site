@@ -522,6 +522,11 @@ img{display:block;max-width:100%}
   .ruk-grid,.ruk-grid.four{grid-template-columns:repeat(2,1fr)}
   .hero-eyebrow{letter-spacing:.2em;font-size:10.5px;margin-bottom:24px}
   .work-info{opacity:1;transform:none}
+  /* desktop section padding (120-150px) stacks into huge dark gaps on phones — halve it */
+  .act-services{padding:64px 0 72px}
+  .act-fashion,.act-dubai-works,.act-marriott,.act-weddings,.act-films,
+  .act-featured,.act-clients,.act-about,.act-book{padding:70px 0}
+  .foot{padding:60px 0 30px}
   .klr-card.tall{grid-row:auto;grid-column:auto}
   .chip{white-space:normal;text-align:center;line-height:1.6}
 }
