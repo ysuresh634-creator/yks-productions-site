@@ -252,6 +252,25 @@ img{display:block;max-width:100%}
   justify-content:flex-end;align-items:flex-start;padding:0 64px 70px;pointer-events:none;z-index:3}
 .tunnel-title h2{font-size:clamp(44px,6.4vw,92px);line-height:.95;text-shadow:0 10px 60px rgba(0,0,0,.7)}
 
+/* ───────────────────────── FEATURED FACES ───────────────────────── */
+.act-featured{padding:140px 0;background:
+  radial-gradient(70% 55% at 10% 10%,rgba(255,140,59,.10),transparent 60%),
+  radial-gradient(60% 50% at 92% 90%,rgba(123,47,247,.12),transparent 60%),var(--black)}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.feat-card{display:grid;grid-template-columns:.85fr 1.15fr;border:1px solid var(--line);border-radius:18px;
+  overflow:hidden;background:linear-gradient(165deg,rgba(244,237,226,.04),transparent 60%);
+  transition:border-color .4s,transform .4s var(--ease)}
+.feat-card:hover{border-color:rgba(255,140,59,.5);transform:translateY(-4px)}
+.feat-photo{min-height:340px}
+.feat-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.feat-copy{padding:30px 28px;display:flex;flex-direction:column;gap:14px;justify-content:center}
+.feat-copy h3{font-size:clamp(24px,2.2vw,32px)}
+.feat-copy p{font-size:14px;color:rgba(244,237,226,.8);line-height:1.65;margin:0}
+.feat-copy p em{color:var(--peach);font-style:italic}
+.feat-note{color:var(--paper-dim);font-size:9.5px}
+@media(max-width:1020px){.feat-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.feat-card{grid-template-columns:1fr}.feat-photo{aspect-ratio:4/5;min-height:0}}
+
 /* ───────────────────────── CLIENTS ───────────────────────── */
 .act-clients{padding:140px 0;background:
   radial-gradient(60% 50% at 15% 20%,rgba(31,214,201,.08),transparent 60%),var(--black-2)}
