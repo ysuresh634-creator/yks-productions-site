@@ -468,6 +468,58 @@ img{display:block;max-width:100%}
 .splitR .word{opacity:0;transform:translateY(110%);transition:opacity .7s var(--ease),transform .7s var(--ease)}
 .splitR.in .word{opacity:1;transform:none}
 
+/* ═════════════════════════════════════════════
+   ACT 12 · STUDIO STORE
+   ═════════════════════════════════════════════ */
+.act-store{padding:120px 0;background:var(--black-2)}
+.store-intro{max-width:560px;color:var(--paper-dim);font-size:1.05rem;line-height:1.7;margin:0 0 56px}
+.store-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.store-card-wide{grid-column:span 2}
+.store-card{
+  position:relative;border-radius:18px;overflow:hidden;
+  background:rgba(22,19,28,.7);border:1px solid rgba(244,237,226,.06);
+  padding:40px 36px 36px;display:flex;flex-direction:column;gap:18px;
+  transition:border-color .35s var(--ease),transform .35s var(--ease)
+}
+.store-card:hover{border-color:rgba(255,140,59,.28);transform:translateY(-4px)}
+.store-card h3{font-size:clamp(1.5rem,2.1vw,2.1rem);line-height:1.05;margin:0}
+.store-card p{color:var(--paper-dim);font-size:.93rem;line-height:1.68;flex:1}
+.store-num{position:absolute;top:28px;right:28px;font-size:10px;letter-spacing:.3em;opacity:.3}
+.store-tag{font-size:10.5px;letter-spacing:.2em;
+  background:linear-gradient(90deg,var(--amber),var(--peach));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.store-meta{display:flex;flex-direction:column;gap:12px}
+.store-price{display:flex;flex-direction:column;gap:3px}
+.price-main{font-size:1.25rem;font-weight:600;color:var(--paper)}
+.price-main small{font-size:.72rem;color:var(--paper-dim);font-weight:400}
+.price-sub{font-size:.78rem;color:rgba(244,237,226,.38);font-family:var(--font-m);letter-spacing:.12em}
+.store-pills{display:flex;flex-wrap:wrap;gap:7px}
+.store-pills span{
+  font-size:10px;letter-spacing:.1em;
+  background:rgba(244,237,226,.04);border:1px solid rgba(244,237,226,.08);
+  padding:4px 11px;border-radius:20px;color:var(--paper-dim)
+}
+.store-btn{align-self:flex-start;margin-top:4px}
+/* masterclass wide card */
+.store-wide-inner{display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:start}
+.store-wide-copy{display:flex;flex-direction:column;gap:18px}
+.store-wide-copy h3{font-size:clamp(1.8rem,2.8vw,2.5rem)}
+.waitlist-block{
+  background:rgba(255,140,59,.05);border:1px solid rgba(255,140,59,.15);
+  border-radius:14px;padding:28px 26px;display:flex;flex-direction:column;gap:14px
+}
+.wl-head{font-size:10.5px;letter-spacing:.22em}
+.waitlist-form{display:flex;flex-direction:column;gap:10px}
+.waitlist-form input[type="email"]{
+  background:rgba(244,237,226,.05);border:1px solid rgba(244,237,226,.14);
+  border-radius:10px;padding:12px 16px;color:var(--paper);
+  font-size:.9rem;font-family:var(--font-b);outline:none;transition:border-color .3s;width:100%
+}
+.waitlist-form input[type="email"]:focus{border-color:var(--amber)}
+.waitlist-form input::placeholder{color:rgba(244,237,226,.3)}
+.waitlist-form .btn{width:100%;justify-content:center}
+.wl-note{font-size:9.5px;letter-spacing:.12em;color:rgba(244,237,226,.3)}
+
 /* ───────────────────────── RESPONSIVE ───────────────────────── */
 @media(max-width:1020px){
   .about-grid,.book-grid,.dw-grid,.dw-grid.rev{grid-template-columns:1fr;gap:40px}
@@ -488,6 +540,9 @@ img{display:block;max-width:100%}
   .klr-grid{grid-template-columns:repeat(2,1fr)}
   .klr-card.tall{grid-row:span 2}
   .ruk-grid,.ruk-grid.four{grid-template-columns:repeat(2,1fr)}
+  .store-grid{grid-template-columns:1fr}
+  .store-card-wide{grid-column:auto}
+  .store-wide-inner{grid-template-columns:1fr;gap:28px}
 }
 @media(max-width:640px){
   .wrap{padding:0 22px}
@@ -524,7 +579,8 @@ img{display:block;max-width:100%}
   /* desktop section padding (120-150px) stacks into huge dark gaps on phones — halve it */
   .act-services{padding:64px 0 72px}
   .act-fashion,.act-dubai-works,.act-marriott,.act-weddings,.act-films,
-  .act-featured,.act-clients,.act-about,.act-book{padding:70px 0}
+  .act-featured,.act-clients,.act-store,.act-about,.act-book{padding:70px 0}
+  .store-card{padding:28px 22px 24px}
   .foot{padding:60px 0 30px}
   .klr-card.tall{grid-row:auto;grid-column:auto}
   .chip{white-space:normal;text-align:center;line-height:1.6}

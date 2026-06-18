@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>What I Shoot With — YKS Productions</title>
+<meta name="description" content="The exact camera kit Yedukrishna Suresh carries across Dubai real-estate shoots and Kerala film sets." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+/* ── reset + tokens ── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#07060a;--black-2:#0d0b12;--paper:#f4ede2;--paper-dim:rgba(244,237,226,.6);
+  --amber:#ff8c3b;--peach:#ffc9a3;--teal:#1fd6c9;--violet:#7b2ff7;--magenta:#ff2f87;
+  --line:rgba(244,237,226,.12);--ease:cubic-bezier(.22,.61,.36,1);
+  --serif:'Playfair Display',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--mono:'Space Grotesk',monospace
+}
+body{font-family:var(--sans);background:var(--black);color:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.wrap{max-width:1160px;margin:0 auto;padding:0 36px}
+h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.05}
+h2 em,h3 em{font-style:italic;background:linear-gradient(100deg,var(--amber),var(--magenta) 55%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--paper-dim)}
+::selection{background:var(--amber);color:var(--black)}
+
+/* ── nav ── */
+.g-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:18px 36px;background:rgba(7,6,10,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line)}
+.g-brand{font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:.03em}
+.g-brand span{color:var(--amber)}
+.g-brand em{font-style:normal;font-size:12px;opacity:.6;margin-left:2px;letter-spacing:.08em}
+.g-back{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;color:var(--paper-dim);transition:color .3s}
+.g-back:hover{color:var(--amber)}
+.g-back::before{content:"←";font-size:14px;letter-spacing:0}
+
+/* ── hero ── */
+.g-hero{padding:160px 0 80px;border-bottom:1px solid var(--line)}
+.g-hero-inner{display:grid;grid-template-columns:1fr auto;align-items:end;gap:40px}
+.g-hero h1{font-size:clamp(46px,7vw,100px);line-height:.9;letter-spacing:-.02em}
+.g-hero h1 em{font-style:italic}
+.g-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--amber),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent;
+  display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.g-eyebrow::before{content:"";width:32px;height:1px;background:linear-gradient(90deg,var(--amber),var(--teal))}
+.g-hero-note{max-width:420px;color:var(--paper-dim);font-size:.95rem;line-height:1.7}
+.g-aff-note{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:rgba(244,237,226,.35);
+  border:1px solid var(--line);border-radius:8px;padding:10px 14px;max-width:300px;line-height:1.6}
+
+/* ── categories ── */
+.g-section{padding:72px 0 0}
+.g-section:last-of-type{padding-bottom:80px}
+.g-cat-head{display:flex;align-items:center;gap:20px;margin-bottom:36px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.g-cat-head h2{font-size:clamp(22px,2.8vw,34px)}
+.g-cat-num{font-family:var(--mono);font-size:10px;letter-spacing:.35em;opacity:.35}
+.g-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g-grid.two{grid-template-columns:repeat(2,1fr)}
+
+/* ── gear card ── */
+.gear-card{
+  border-radius:14px;border:1px solid rgba(244,237,226,.06);
+  background:rgba(22,19,28,.65);padding:28px 26px;
+  display:flex;flex-direction:column;gap:14px;
+  transition:border-color .35s var(--ease),transform .35s var(--ease)
+}
+.gear-card:hover{border-color:rgba(255,140,59,.24);transform:translateY(-3px)}
+.gear-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;
+  background:linear-gradient(90deg,var(--amber),var(--peach));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.gear-card h3{font-size:clamp(1.05rem,1.5vw,1.25rem);line-height:1.2}
+.gear-note{font-size:.86rem;color:var(--paper-dim);line-height:1.65;flex:1}
+.gear-verdict{
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+  color:rgba(244,237,226,.42);border-top:1px solid rgba(244,237,226,.06);
+  padding-top:12px;line-height:1.6
+}
+.gear-price{font-size:.82rem;color:rgba(244,237,226,.5);font-style:italic}
+.gear-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  border:1px solid rgba(255,140,59,.4);color:var(--paper);padding:9px 18px;border-radius:30px;
+  transition:.3s var(--ease);align-self:flex-start
+}
+.gear-link:hover{background:var(--amber);color:var(--black);border-color:var(--amber)}
+.gear-link.secondary{border-color:rgba(31,214,201,.35)}
+.gear-link.secondary:hover{background:var(--teal);border-color:var(--teal)}
+
+/* ── footer ── */
+.g-foot{border-top:1px solid var(--line);padding:48px 0 40px;margin-top:80px}
+.g-foot-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.g-foot-brand{font-family:var(--serif);font-size:18px;font-weight:600}
+.g-foot-brand span{color:var(--amber)}
+.g-foot-links{display:flex;gap:24px;font-family:var(--mono);font-size:10px;letter-spacing:.18em}
+.g-foot-links a:hover{color:var(--amber)}
+.g-foot-disc{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:rgba(244,237,226,.3);
+  line-height:1.7;margin-top:24px}
+
+/* ── responsive ── */
+@media(max-width:900px){
+  .g-hero-inner{grid-template-columns:1fr}
+  .g-aff-note{max-width:100%}
+  .g-grid{grid-template-columns:repeat(2,1fr)}
+  .g-grid.two{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .wrap{padding:0 22px}
+  .g-nav{padding:16px 22px}
+  .g-hero{padding:120px 0 60px}
+  .g-grid,.g-grid.two{grid-template-columns:1fr}
+  .g-section{padding:56px 0 0}
+  .g-foot-inner{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="g-nav">
+  <a class="g-brand" href="index.html">YKS<span>.</span><em>Productions</em></a>
+  <a class="g-back" href="index.html">Back to portfolio</a>
+</nav>
+
+<main>
+
+<!-- ── HERO ── -->
+<section class="g-hero">
+  <div class="wrap">
+    <p class="g-eyebrow">Studio Store · 04</p>
+    <div class="g-hero-inner">
+      <div>
+        <h1>What I<br/><em>Shoot With</em></h1>
+        <p class="g-hero-note" style="margin-top:28px">The exact kit I carry across Dubai rooftops and Kerala film sets — bodies, glass, light and movement. Honest notes on what earns its place in the bag.</p>
+      </div>
+      <div class="g-aff-note">
+        Links below may be affiliate links. When you buy through them, I earn a small commission at no extra cost to you — it helps fund new gear and keeps this guide updated.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 01 · CAMERA BODIES ══════════ -->
+<section class="g-section">
+  <div class="wrap">
+    <div class="g-cat-head">
+      <span class="g-cat-num">01</span>
+      <h2>Camera <em>Bodies</em></h2>
+    </div>
+    <div class="g-grid two">
+
+      <div class="gear-card">
+        <span class="gear-tag">Primary · Stills + Video</span>
+        <!-- UPDATE: replace product name + link with your actual primary body -->
+        <h3>Sony Alpha 7 IV</h3>
+        <p class="gear-note">The workhorse. 33MP full-frame sensor that holds up to A1 print size for the fine art prints, with 4K/60fps video for real-estate reels. Sony's autofocus tracks subjects through fashion sets reliably enough that I rarely miss a frame.</p>
+        <p class="gear-price">~₹2,30,000 / AED 2,200</p>
+        <div class="gear-verdict">When I reach for it: fashion editorials, actor portfolios, any shoot where I need both print-quality stills and video in one body.</div>
+        <!-- UPDATE: replace href with your Amazon Associates / affiliate link -->
+        <a class="gear-link" href="https://www.amazon.in/s?k=Sony+A7+IV" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+      <div class="gear-card">
+        <span class="gear-tag">Video specialist · Low light</span>
+        <!-- UPDATE: replace product name + link with your actual second body -->
+        <h3>Sony FX3</h3>
+        <p class="gear-note">Dedicated cinema body — full-frame, 12.1MP for video, ISO range that makes Dubai golden-hour drone pickup shots feel like daylight. The built-in 5-axis stabilisation means usable handheld footage without a gimbal on tighter setups.</p>
+        <p class="gear-price">~₹3,40,000 / AED 3,200</p>
+        <div class="gear-verdict">When I reach for it: real-estate walkthrough films, on-set BTS for Malayalam productions, any low-light event work.</div>
+        <!-- UPDATE: replace href with your affiliate link -->
+        <a class="gear-link" href="https://www.amazon.in/s?k=Sony+FX3" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 02 · LENSES ══════════ -->
+<section class="g-section">
+  <div class="wrap">
+    <div class="g-cat-head">
+      <span class="g-cat-num">02</span>
+      <h2>The <em>Glass</em></h2>
+    </div>
+    <div class="g-grid">
+
+      <div class="gear-card">
+        <span class="gear-tag">Zoom · Workhorse</span>
+        <h3>Sony FE 24–70mm f/2.8 GM II</h3>
+        <p class="gear-note">The lens that lives on the camera 70% of the time. Fast enough for indoor fashion sets, sharp enough for architecture, and the f/2.8 constant aperture means I'm not fumbling with exposure mid-zoom on a moving fashion set.</p>
+        <p class="gear-price">~₹1,95,000 / AED 1,900</p>
+        <div class="gear-verdict">The zoom I reach for when I don't know exactly what I'm going to need.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Sony+FE+24-70mm+f2.8+GM+II" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+      <div class="gear-card">
+        <span class="gear-tag">Prime · Portraits</span>
+        <h3>Sony FE 85mm f/1.4 GM</h3>
+        <p class="gear-note">The portrait standard. The f/1.4 rendering at this focal length is why Rukmini Vasanth and Ashika Ranganath's frames feel like they breathe — the background compression separates the subject from the world in a way a zoom can't replicate.</p>
+        <p class="gear-price">~₹1,50,000 / AED 1,450</p>
+        <div class="gear-verdict">Any shoot where the face is the frame. Actor portfolios, editorial fashion, featured close-ups.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Sony+FE+85mm+f1.4+GM" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+      <div class="gear-card">
+        <span class="gear-tag">Prime · Cinematic wide</span>
+        <h3>Sony FE 35mm f/1.4 GM</h3>
+        <p class="gear-note">The environmental portrait lens. Wide enough to show the room, tight enough to feel intimate — this is the focal length that put Rukmini in context with the garden without shrinking her. Also my preferred lens for real-estate interior walk-throughs.</p>
+        <p class="gear-price">~₹1,30,000 / AED 1,250</p>
+        <div class="gear-verdict">Environmental portraits, interior real-estate, any frame where the setting is part of the story.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Sony+FE+35mm+f1.4+GM" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 03 · AERIAL ══════════ -->
+<section class="g-section">
+  <div class="wrap">
+    <div class="g-cat-head">
+      <span class="g-cat-num">03</span>
+      <h2>Aerial — <em>Dubai from above</em></h2>
+    </div>
+    <div class="g-grid two">
+
+      <div class="gear-card">
+        <span class="gear-tag">Drone · Primary</span>
+        <h3>DJI Mavic 3 Pro</h3>
+        <p class="gear-note">The reason Dubai real-estate films look the way they do. Three-camera system (24mm, 70mm, 166mm equivalent) means I can reframe aerially without changing altitude — critical for the tight urban geometry around Downtown Dubai and the Marina. 5.1K Apple ProRes when I need it.</p>
+        <p class="gear-price">~₹1,70,000 / AED 1,650</p>
+        <div class="gear-verdict">Every Dubai real-estate film. Every aerial establishing shot. The single piece of kit most responsible for the Dubai section of the portfolio.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=DJI+Mavic+3+Pro" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+        <a class="gear-link secondary" href="https://store.dji.com/in/product/dji-mavic-3-pro" target="_blank" rel="noopener noreferrer">DJI Official ↗</a>
+      </div>
+
+      <div class="gear-card">
+        <span class="gear-tag">Note · UAE regulations</span>
+        <h3>Drone permits in Dubai</h3>
+        <p class="gear-note">Flying commercially in Dubai requires a DCAA (Dubai Civil Aviation Authority) permit and a GCAA Remote Pilot Licence. Do not fly without these — fines are significant. I hold all relevant approvals for commercial aerial photography in the UAE. If you're hiring me for a Dubai shoot, aerial is covered.</p>
+        <p class="gear-price">No cost — already built into the shoot rate</p>
+        <div class="gear-verdict">This is the single most common question I get from UAE property developers. Yes, it's legal. Yes, I'm covered.</div>
+        <a class="gear-link" href="index.html#act-book">Book a Dubai shoot →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 04 · LIGHT ══════════ -->
+<section class="g-section">
+  <div class="wrap">
+    <div class="g-cat-head">
+      <span class="g-cat-num">04</span>
+      <h2>Light — <em>the real subject</em></h2>
+    </div>
+    <div class="g-grid">
+
+      <div class="gear-card">
+        <span class="gear-tag">Speedlight · On-camera + off</span>
+        <h3>Godox V1 Pro</h3>
+        <p class="gear-note">TTL speedlight with a round head that produces a naturally soft, circular catch-light — subtler than the rectangle you get from a standard flash. Magnetic modifier system means I can attach a small dome diffuser in seconds on a fast-moving fashion set.</p>
+        <p class="gear-price">~₹18,000 / AED 170</p>
+        <div class="gear-verdict">Fashion editorials, actor portfolios, any shoot where I'm filling shadows rather than sculpting the primary light.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Godox+V1+Pro+Sony" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+      <div class="gear-card">
+        <span class="gear-tag">Strobe · Location + studio</span>
+        <h3>Godox AD400 Pro</h3>
+        <p class="gear-note">400Ws battery-powered monolight that I take on location for the fashion editorials that need more power than a speedlight can deliver. HSS sync lets me overpower the harsh Dubai midday sun for outdoor fashion work. Recycles fast enough that I never wait between frames.</p>
+        <p class="gear-price">~₹55,000 / AED 520</p>
+        <div class="gear-verdict">Outdoor fashion campaigns in direct sunlight, any shoot requiring a large softbox on location.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Godox+AD400+Pro" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+      <div class="gear-card">
+        <span class="gear-tag">Continuous · Video + BTS</span>
+        <h3>Aputure AL-MX Bi-Color</h3>
+        <p class="gear-note">Pocket-sized bi-color LED that fits in a jacket pocket but produces enough output to add a warm practitioner fill on a real-estate interior or a motivated backlight on a portrait. Invaluable for on-set BTS work where I need light without a light stand.</p>
+        <p class="gear-price">~₹12,000 / AED 115</p>
+        <div class="gear-verdict">On-set BTS, hotel room interiors for real-estate, any situation where a full strobe setup is impractical.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Aputure+AL-MX" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 05 · MOVEMENT ══════════ -->
+<section class="g-section">
+  <div class="wrap">
+    <div class="g-cat-head">
+      <span class="g-cat-num">05</span>
+      <h2>Movement — <em>the gimbal</em></h2>
+    </div>
+    <div class="g-grid two">
+
+      <div class="gear-card">
+        <span class="gear-tag">Gimbal · 3-axis stabiliser</span>
+        <h3>DJI RS 3 Pro</h3>
+        <p class="gear-note">Handles the A7 IV + 24-70 f/2.8 with room to spare. The OLED touch panel means I can adjust tilt limits and following mode without touching my phone mid-shot. LiDAR focus assist is genuinely useful on dark interiors where the camera's phase-detect struggles.</p>
+        <p class="gear-price">~₹55,000 / AED 520</p>
+        <div class="gear-verdict">Real-estate walk-through films, fashion reels, behind-the-scenes video — any moving shot where handheld shake would read as amateur.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=DJI+RS+3+Pro" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+        <a class="gear-link secondary" href="https://store.dji.com/in/product/dji-rs-3-pro" target="_blank" rel="noopener noreferrer">DJI Official ↗</a>
+      </div>
+
+      <div class="gear-card">
+        <span class="gear-tag">Slider · Smooth pull-backs</span>
+        <h3>Edelkrone SliderONE Pro</h3>
+        <p class="gear-note">Motorised slider that fits in a backpack and sets up in under two minutes. The slow, perfectly-consistent pulls on a real-estate interior make the space feel bigger and more aspirational than static shots. Particularly effective on penthouse kitchens and living rooms with a long lens.</p>
+        <p class="gear-price">~₹90,000 / AED 880</p>
+        <div class="gear-verdict">Dubai property films, any shoot where movement needs to feel slow and considered rather than handheld-energetic.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Edelkrone+SliderONE+Pro" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 06 · CARRY ══════════ -->
+<section class="g-section">
+  <div class="wrap">
+    <div class="g-cat-head">
+      <span class="g-cat-num">06</span>
+      <h2>Carry — <em>bags &amp; storage</em></h2>
+    </div>
+    <div class="g-grid">
+
+      <div class="gear-card">
+        <span class="gear-tag">Bag · Travel system</span>
+        <h3>Think Tank Airport Roller Derby</h3>
+        <p class="gear-note">The rolling studio. Fits two bodies, four lenses, flash, cables and a laptop — and meets carry-on size requirements on Emirates and IndiGo. I've wheeled this through Dubai Airport, Bangalore's T2 and Kerala's Kochi airport without checking a bag. Worth every rupee.</p>
+        <p class="gear-price">~₹38,000 / AED 360</p>
+        <div class="gear-verdict">Every flight. Every shoot that requires me to carry the full kit cross-city without trusting it to baggage handlers.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Think+Tank+Airport+Roller" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+      <div class="gear-card">
+        <span class="gear-tag">Cards · Fast + reliable</span>
+        <h3>Sony Tough CFexpress Type A (160GB)</h3>
+        <p class="gear-note">The A7 IV's card slot accepts CFexpress Type A — these Sony Tough cards are rated for 800MB/s read and are physically waterproof and dustproof. I carry four. Two in the camera, two in my pocket. I've never had a card failure; I'd rather not find out what that feels like mid-shoot.</p>
+        <p class="gear-price">~₹16,000 / AED 155 each</p>
+        <div class="gear-verdict">Primary cards for the A7 IV on every shoot. Non-negotiable for video work where buffer overflow mid-take is not an option.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Sony+Tough+CFexpress+Type+A" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+      <div class="gear-card">
+        <span class="gear-tag">Monitor · On-camera field</span>
+        <h3>Atomos Ninja V+</h3>
+        <p class="gear-note">5.2-inch HDR monitor-recorder that pulls ProRes RAW out of the FX3 via HDMI — files that grade far more generously than the internal recording. The brightness (1000 nits) makes focus-checking possible in direct Dubai sunlight when the camera's built-in screen washes out completely.</p>
+        <p class="gear-price">~₹65,000 / AED 620</p>
+        <div class="gear-verdict">Real-estate films and brand campaign video work where I want maximum latitude in post without the file size penalty of RAW on internal cards.</div>
+        <a class="gear-link" href="https://www.amazon.in/s?k=Atomos+Ninja+V+Plus" target="_blank" rel="noopener noreferrer">See on Amazon ↗</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer class="g-foot">
+  <div class="wrap">
+    <div class="g-foot-inner">
+      <div class="g-foot-brand">YKS<span>.</span>Productions</div>
+      <div class="g-foot-links">
+        <a href="index.html">Portfolio</a>
+        <a href="index.html#act-store">Store</a>
+        <a href="index.html#act-book">Book a shoot</a>
+        <a href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <p class="g-foot-disc">
+      Affiliate disclosure: some links on this page are affiliate links. If you buy through them, YKS Productions earns a small commission at no additional cost to you. All gear listed is used or personally recommended — nothing is listed for commission alone. Prices are approximate and may vary by region and retailer.
+      <!-- UPDATE: replace Amazon links above with your actual Amazon Associates affiliate links once enrolled at affiliate-program.amazon.com/home -->
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
