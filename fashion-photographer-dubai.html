@@ -35,7 +35,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/landing.css?v=1" />
+<link rel="stylesheet" href="/css/landing.css?v=2" />
 
 <script type="application/ld+json">
 {
@@ -247,9 +247,18 @@
   <div class="wrap">
     <h2>Let's shoot something <em>worth remembering</em></h2>
     <p>If you're a designer, brand or model who wants Dubai fashion images with a cinematic edge, tell me the brief — I'll take it from there.</p>
-    <div class="l-cta-row center">
-      <a class="btn btn-fill" href="https://wa.me/971501955122?text=Hi%20Yedukrishna%2C%20I%27d%20like%20to%20enquire%20about%20a%20fashion%20shoot%20in%20Dubai." target="_blank" rel="noopener">WhatsApp +971 50 195 5122</a>
-      <a class="btn btn-ghost" href="/index.html#act-book">Booking &amp; rates</a>
+    <div class="l-form-wrap">
+      <form class="l-form" data-source="Fashion · Dubai" data-subject="New enquiry — Fashion Dubai">
+        <div class="row2">
+          <input type="text" name="name" placeholder="Your name" required />
+          <input type="tel" name="contact" placeholder="Phone / WhatsApp" required />
+        </div>
+        <input type="email" name="email" placeholder="Email (optional)" />
+        <textarea name="message" placeholder="Tell me about your shoot — concept, dates, looks…"></textarea>
+        <button type="submit" class="btn btn-fill">Send enquiry →</button>
+      </form>
+      <p class="l-form-ok">✓ Thank you — your enquiry is in. I'll be in touch shortly.</p>
+      <p class="l-form-alt">Prefer to chat? <a href="https://wa.me/971501955122?text=Hi%20Yedukrishna%2C%20I%27d%20like%20to%20enquire%20about%20a%20fashion%20shoot%20in%20Dubai." target="_blank" rel="noopener">Message me on WhatsApp →</a></p>
     </div>
   </div>
 </section>
@@ -271,6 +280,8 @@
     </p>
   </div>
 </footer>
+
+<script src="/js/landing.js"></script>
 
 </body>
 </html>

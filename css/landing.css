@@ -105,6 +105,20 @@ h2 em,h3 em,h1 em{font-style:italic;background:linear-gradient(100deg,var(--ambe
 .l-related a{color:var(--paper-dim);border-bottom:1px solid rgba(255,140,59,.3)}
 .l-related a:hover{color:var(--amber)}
 
+/* enquiry form */
+.l-form-wrap{max-width:560px;margin:28px auto 0}
+.l-form{display:grid;gap:13px;text-align:left}
+.l-form .row2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.l-form input,.l-form textarea{width:100%;background:rgba(244,237,226,.05);border:1px solid rgba(244,237,226,.16);border-radius:12px;padding:14px 16px;color:var(--paper);font-family:var(--sans);font-size:.95rem;outline:none;transition:border-color .3s}
+.l-form input::placeholder,.l-form textarea::placeholder{color:rgba(244,237,226,.4)}
+.l-form input:focus,.l-form textarea:focus{border-color:var(--amber)}
+.l-form textarea{min-height:96px;resize:vertical}
+.l-form button{justify-self:center;cursor:pointer;border:0}
+.l-form-ok{display:none;color:var(--teal);font-family:var(--mono);font-size:13px;letter-spacing:.04em;margin-top:14px}
+.l-form-alt{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--paper-dim);margin-top:16px}
+.l-form-alt a{color:var(--amber);border-bottom:1px solid rgba(255,140,59,.3)}
+@media(max-width:600px){.l-form .row2{grid-template-columns:1fr}}
+
 /* responsive */
 @media(max-width:900px){
   .l-grid{grid-template-columns:1fr 1fr}
