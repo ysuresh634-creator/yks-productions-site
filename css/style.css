@@ -340,6 +340,9 @@ img{display:block;max-width:100%}
 .foot-links a{font-family:var(--font-m);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
   border:1px solid var(--line);border-radius:40px;padding:12px 22px;transition:.3s var(--ease)}
 .foot-links a:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-3px)}
+.foot-services{display:flex;gap:12px 22px;flex-wrap:wrap;margin:-46px 0 54px}
+.foot-services a{font-family:var(--font-m);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-dim);transition:color .3s var(--ease)}
+.foot-services a:hover{color:var(--amber)}
 .foot-bottom{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:26px;border-top:1px solid var(--line)}
 
 /* ───────────────────────── SVC HIGHLIGHT (Fashion) ───────────────────────── */
