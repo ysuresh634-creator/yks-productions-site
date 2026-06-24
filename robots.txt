@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Internal client review & photo-selection pages — keep these out of Google
+Disallow: /contact-sheet.html
+Disallow: /cs-couple.html
+Disallow: /cs-rukmini.html
+Disallow: /cs-wedding.html
+Disallow: /ruk-choose.html
+Disallow: /review.html
+
+Sitemap: https://yksproductions.com/sitemap.xml
