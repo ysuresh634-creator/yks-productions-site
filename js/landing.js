@@ -43,7 +43,7 @@
 (function () {
   if (document.querySelector('.l-fab')) return;
   var waLink = document.querySelector('a[href*="wa.me/"]');
-  var num = (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1]) || '971501955122';
+  var num = (document.body && document.body.getAttribute('data-wa')) || (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1]) || '971501955122';
   var msg = encodeURIComponent("Hi Yedukrishna, I'd like to enquire about a shoot.");
   var css = '.l-fab{position:fixed;right:18px;bottom:18px;z-index:300;display:flex;flex-direction:column;gap:12px}'
     + '.l-fab a{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(0,0,0,.42);transition:transform .25s cubic-bezier(.22,.61,.36,1)}'
