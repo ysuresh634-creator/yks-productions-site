@@ -45,6 +45,9 @@
 .l-play::after{content:"";border-style:solid;border-width:13px 0 13px 21px;border-color:transparent transparent transparent #07060a;margin-left:5px}
 .l-reel-frame:hover .l-play{transform:scale(1.08);box-shadow:0 12px 34px rgba(255,140,59,.4)}
 @media(max-width:760px){.l-reel-inner{grid-template-columns:1fr;justify-items:center;text-align:center;gap:30px}.l-reel-frame{max-width:300px}}
+.l-vgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.l-vgrid video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:#000;display:block;cursor:pointer}
+@media(max-width:760px){.l-vgrid{grid-template-columns:1fr 1fr}}
 </style>
 
 <script type="application/ld+json">
@@ -118,6 +121,23 @@
         <a class="btn btn-fill" href="https://wa.me/971501955122?text=Hi%20Yedukrishna%2C%20I%27d%20like%20a%20cinematic%20film%20for%20my%20Dubai%20property." target="_blank" rel="noopener">Get a property film</a>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- DUBAI PROPERTY REELS -->
+<section class="l-section alt">
+  <div class="wrap">
+    <div class="l-head">
+      <h2>Dubai property, <em>in motion</em></h2>
+      <p>Recent vertical films from a Dubai real-estate shoot — the social-first reels that sell off-plan and fill viewings.</p>
+    </div>
+    <div class="l-vgrid">
+      <video class="l-vreel" data-src="/assets/realestate/dubai-property-1.mp4" muted loop playsinline preload="none" aria-label="Dubai real estate property film"></video>
+      <video class="l-vreel" data-src="/assets/realestate/dubai-property-2.mp4" muted loop playsinline preload="none" aria-label="Dubai real estate property film"></video>
+      <video class="l-vreel" data-src="/assets/realestate/dubai-property-3.mp4" muted loop playsinline preload="none" aria-label="Dubai real estate property film"></video>
+      <video class="l-vreel" data-src="/assets/realestate/dubai-property-4.mp4" muted loop playsinline preload="none" aria-label="Dubai real estate property film"></video>
+    </div>
+    <p class="l-form-alt" style="text-align:center;margin-top:18px">Tap a reel to unmute</p>
   </div>
 </section>
 
@@ -308,6 +328,25 @@
     f.innerHTML = '';
     f.appendChild(i);
   });
+})();
+
+/* Dubai property reels — lazy-play when in view, tap to unmute */
+(function(){
+  var vids = document.querySelectorAll('.l-vreel');
+  if(!vids.length) return;
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        var v = e.target;
+        if(e.isIntersecting){ if(!v.src){ v.src = v.dataset.src; } v.play().catch(function(){}); }
+        else { v.pause(); }
+      });
+    }, { threshold: 0.35 });
+    vids.forEach(function(v){ io.observe(v); });
+  } else {
+    vids.forEach(function(v){ v.src = v.dataset.src; v.play().catch(function(){}); });
+  }
+  vids.forEach(function(v){ v.addEventListener('click', function(){ v.muted = !v.muted; }); });
 })();
 </script>
 
