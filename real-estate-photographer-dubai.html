@@ -36,6 +36,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=1" />
+<style>
+.l-reel-inner{display:grid;grid-template-columns:340px 1fr;gap:52px;align-items:center}
+.l-reel-frame{position:relative;width:100%;max-width:340px;aspect-ratio:9/16;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#000;cursor:pointer}
+.l-reel-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.l-reel-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.l-play{position:absolute;inset:0;margin:auto;width:74px;height:74px;border-radius:50%;border:0;background:rgba(255,140,59,.94);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .3s var(--ease),box-shadow .3s}
+.l-play::after{content:"";border-style:solid;border-width:13px 0 13px 21px;border-color:transparent transparent transparent #07060a;margin-left:5px}
+.l-reel-frame:hover .l-play{transform:scale(1.08);box-shadow:0 12px 34px rgba(255,140,59,.4)}
+@media(max-width:760px){.l-reel-inner{grid-template-columns:1fr;justify-items:center;text-align:center;gap:30px}.l-reel-frame{max-width:300px}}
+</style>
 
 <script type="application/ld+json">
 {
@@ -89,6 +99,24 @@
     <div class="l-cta-row">
       <a class="btn btn-fill" href="https://wa.me/971501955122?text=Hi%20Yedukrishna%2C%20I%27d%20like%20a%20quote%20for%20a%20real%20estate%20shoot%20in%20Dubai." target="_blank" rel="noopener">Get a quote</a>
       <a class="btn btn-ghost" href="/index.html#act-dubai">See Dubai work</a>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWREEL -->
+<section class="l-section">
+  <div class="wrap">
+    <div class="l-reel-inner">
+      <div class="l-reel-frame" id="reel" data-src="https://player.vimeo.com/video/1117232167?autoplay=1&amp;title=0&amp;byline=0&amp;portrait=0&amp;badge=0">
+        <img src="/assets/realestate-reel.jpg" alt="Dubai real estate showreel by YKS Productions — cinematic property film" loading="lazy" />
+        <button class="l-play" aria-label="Play Dubai real estate showreel"></button>
+      </div>
+      <div>
+        <p class="l-eyebrow">Showreel</p>
+        <h2 style="font-size:clamp(28px,4vw,46px)">Dubai real estate, <em>in motion</em></h2>
+        <p class="l-lede" style="margin-top:18px">Stills sell a room — film sells the feeling of living there. This is the kind of cinematic property reel I shoot for Dubai developers, agencies and listings: paced, graded and scored to stop the scroll and book the viewing.</p>
+        <a class="btn btn-fill" href="https://wa.me/971501955122?text=Hi%20Yedukrishna%2C%20I%27d%20like%20a%20cinematic%20film%20for%20my%20Dubai%20property." target="_blank" rel="noopener">Get a property film</a>
+      </div>
     </div>
   </div>
 </section>
@@ -257,6 +285,21 @@
     </p>
   </div>
 </footer>
+
+<script>
+(function(){
+  var f = document.getElementById('reel');
+  if(!f) return;
+  f.addEventListener('click', function(){
+    var i = document.createElement('iframe');
+    i.src = f.dataset.src;
+    i.allow = 'autoplay; fullscreen; picture-in-picture';
+    i.setAttribute('allowfullscreen','');
+    f.innerHTML = '';
+    f.appendChild(i);
+  });
+})();
+</script>
 
 </body>
 </html>
