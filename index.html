@@ -47,6 +47,26 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css?v=32" />
+<style>
+/* credibility stat band */
+.stat-band{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin:0 0 56px;padding:0 0 46px;border-bottom:1px solid rgba(244,237,226,.12)}
+.stat-band .stat{text-align:center}
+.stat-band .stat b{display:block;font-family:'Playfair Display',Georgia,serif;font-size:clamp(34px,4.6vw,58px);font-weight:600;line-height:1;color:#f4ede2;letter-spacing:-.01em}
+.stat-band .stat b span{color:#ff8c3b}
+.stat-band .stat i{display:block;margin-top:11px;font-family:'Space Grotesk',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,237,226,.55);font-style:normal}
+@media(max-width:820px){.stat-band{grid-template-columns:repeat(3,1fr);row-gap:30px}}
+@media(max-width:520px){.stat-band{grid-template-columns:1fr 1fr}}
+/* testimonials */
+.act-words{padding:120px 0}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+.testi{margin:0;border:1px solid rgba(244,237,226,.1);background:rgba(22,19,28,.6);border-radius:16px;padding:30px 28px}
+.testi blockquote{margin:0;font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;line-height:1.5;color:#f4ede2;font-style:italic}
+.testi figcaption{margin-top:20px;display:flex;flex-direction:column;gap:3px}
+.testi figcaption b{font-size:.95rem;color:#f4ede2;font-weight:500}
+.testi figcaption span{font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#ff8c3b}
+.testi-stars{color:#ff8c3b;letter-spacing:3px;margin-bottom:14px;font-size:13px}
+@media(max-width:820px){.testi-grid{grid-template-columns:1fr}}
+</style>
 
 <!-- ───────── Structured data: tells Google what YKS is + where it serves ───────── -->
 <script type="application/ld+json">
@@ -511,6 +531,14 @@
         <p class="eyebrow">11 — Credits</p>
         <h2 data-split="words">Names &amp; brands I've shot for</h2>
       </div>
+      <div class="stat-band">
+        <div class="stat"><b>100<span>+</span></b><i>Weddings in India</i></div>
+        <div class="stat"><b>200<span>+</span></b><i>Brand campaigns</i></div>
+        <div class="stat"><b>2</b><i>Feature films</i></div>
+        <div class="stat"><b>1.1M</b><i>Monthly views</i></div>
+        <div class="stat"><b>8<span>+</span></b><i>Years behind the lens</i></div>
+      </div>
+
       <div class="client-grid" id="clientGrid">
         <span class="feat">Marriott</span><span class="feat">Reportage</span><span>Soothravakyam</span><span>Baby Girl</span>
         <span>Shine Tom Chacko</span><span>Rukmini Vasanth</span><span>Shanvi Sri</span><span>Sharmiela Mandre</span>
@@ -639,6 +667,34 @@
           <a class="soc-link" href="https://www.behance.net/yedusuresha14c" target="_blank" rel="noopener">Behance ↗</a>
           <a class="soc-link" href="https://linktr.ee/yksproductions" target="_blank" rel="noopener">Linktree ↗</a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ TESTIMONIALS — HIDDEN until real quotes are added.
+       To go live: replace the 3 quotes + names below, then remove style="display:none". ════════ -->
+  <section class="act act-words" id="act-words" style="display:none">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">In their words</p>
+        <h2>What clients say</h2>
+      </div>
+      <div class="testi-grid">
+        <figure class="testi">
+          <div class="testi-stars">★★★★★</div>
+          <blockquote>Add a real wedding-client quote here — what the day felt like, and how the film and photos turned out.</blockquote>
+          <figcaption><b>Client name</b><span>Wedding · Bangalore</span></figcaption>
+        </figure>
+        <figure class="testi">
+          <div class="testi-stars">★★★★★</div>
+          <blockquote>Add a real brand or agency quote here — the brief, the result, and why they'd work with you again.</blockquote>
+          <figcaption><b>Client name</b><span>Brand campaign · Dubai</span></figcaption>
+        </figure>
+        <figure class="testi">
+          <div class="testi-stars">★★★★★</div>
+          <blockquote>Add a real actor or model quote here — the experience on set and what the portfolio did for them.</blockquote>
+          <figcaption><b>Client name</b><span>Actor portfolio · Bangalore</span></figcaption>
+        </figure>
       </div>
     </div>
   </section>
