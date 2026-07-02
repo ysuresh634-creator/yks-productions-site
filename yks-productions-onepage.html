@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YKS Productions — Yedukrishna Suresh · Photographer & Videographer (Dubai & Bangalore)</title>
+<meta name="description" content="Cinematic photography, videography & content creation by Yedukrishna Suresh — fashion, weddings, real estate & brand films across Dubai and Bangalore." />
+<!--
+  ════════════════════════════════════════════════════════════════════
+  YKS PRODUCTIONS — SINGLE-FILE SNAPSHOT / SEED
+  ════════════════════════════════════════════════════════════════════
+  This ONE file is the whole brand distilled: who Yedukrishna is, what he
+  shoots, where to see it, and how to reach him. Everything is inline —
+  open it in any browser by double-clicking. No other files needed.
+
+  • The LIVE site (the big cinematic version) is at https://yksproductions.com
+  • Every "View ↗" link below opens the matching live page.
+  • Use this file as a backup, a portable business card, or a starting
+    point to rebuild / extend the site later.
+  ════════════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --black:#07060a;--black-2:#0d0b12;--paper:#f4ede2;--dim:rgba(244,237,226,.6);
+    --amber:#ff8c3b;--teal:#1fd6c9;--magenta:#ff2f87;--violet:#7b2ff7;
+    --line:rgba(244,237,226,.12);--ease:cubic-bezier(.22,.61,.36,1);
+    --serif:'Playfair Display',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--mono:'Space Grotesk',monospace;
+  }
+  body{font-family:var(--sans);background:var(--black);color:var(--paper);-webkit-font-smoothing:antialiased;line-height:1.7;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.05}
+  em{font-style:italic;background:linear-gradient(100deg,var(--amber),var(--magenta) 55%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .mono{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+  ::selection{background:var(--amber);color:var(--black)}
+
+  /* nav */
+  .nav{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:18px 32px;background:rgba(7,6,10,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .brand{font-family:var(--serif);font-size:20px;font-weight:600}.brand span{color:var(--amber)}.brand em{font-style:normal;font-size:12px;opacity:.6;margin-left:3px;-webkit-text-fill-color:var(--paper)}
+  .nav a.cta{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;border:1px solid var(--amber);color:var(--amber);padding:9px 18px;border-radius:30px;transition:.3s}
+  .nav a.cta:hover{background:var(--amber);color:var(--black)}
+
+  /* hero */
+  .hero{padding:120px 0 80px;border-bottom:1px solid var(--line);text-align:center}
+  .hero .eyebrow{justify-content:center;display:flex;gap:12px;align-items:center;margin-bottom:24px}
+  .hero h1{font-size:clamp(44px,8vw,96px);letter-spacing:-.02em;line-height:.95}
+  .hero p.tag{max-width:620px;margin:28px auto 36px;color:var(--dim);font-size:1.1rem}
+  .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding:14px 26px;border-radius:32px;transition:.3s var(--ease)}
+  .btn.fill{background:var(--amber);color:var(--black);font-weight:500}.btn.fill:hover{transform:translateY(-2px)}
+  .btn.ghost{border:1px solid rgba(244,237,226,.25)}.btn.ghost:hover{border-color:var(--amber);color:var(--amber)}
+
+  /* section */
+  section.block{padding:80px 0;border-bottom:1px solid var(--line)}
+  .head{max-width:680px;margin:0 auto 48px;text-align:center}
+  .head h2{font-size:clamp(28px,4vw,44px)}.head p{color:var(--dim);margin-top:16px}
+  .prose{max-width:680px;margin:0 auto;color:rgba(244,237,226,.82);font-size:1.06rem}
+  .prose p+p{margin-top:18px}.prose strong{color:var(--paper)}
+
+  /* work grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{border:1px solid var(--line);background:rgba(22,19,28,.6);border-radius:16px;padding:28px 26px;transition:.35s var(--ease)}
+  .card:hover{border-color:rgba(255,140,59,.3);transform:translateY(-3px)}
+  .card .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber)}
+  .card h3{font-size:1.25rem;margin:12px 0 10px}.card p{color:var(--dim);font-size:.92rem}
+  .card .links{margin-top:16px;display:flex;gap:14px;flex-wrap:wrap}
+  .card .links a{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);border-bottom:1px solid rgba(255,140,59,.4);padding-bottom:2px;transition:.3s}
+  .card .links a:hover{color:var(--amber)}
+
+  /* store */
+  .store{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .pill{border:1px solid var(--line);border-radius:14px;padding:22px 20px;text-align:center}
+  .pill .ic{font-size:24px}.pill b{display:block;font-family:var(--serif);font-size:1.05rem;margin:8px 0 4px;font-weight:500}.pill small{color:var(--dim);font-size:.82rem}
+
+  /* contact */
+  .contact{text-align:center}
+  .contact .rows{display:flex;flex-direction:column;gap:14px;max-width:440px;margin:36px auto 0}
+  .contact .rows a{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:14px;padding:16px 22px;transition:.3s var(--ease)}
+  .contact .rows a:hover{border-color:var(--amber);transform:translateY(-2px)}
+  .contact .rows b{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .contact .rows span{font-size:.95rem}
+
+  /* footer */
+  footer{padding:48px 0 60px;text-align:center}
+  footer .fb{font-family:var(--serif);font-size:18px;font-weight:600}footer .fb span{color:var(--amber)}
+  footer .fl{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin:18px 0;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+  footer .fl a:hover{color:var(--amber)}
+  footer .fc{color:rgba(244,237,226,.32);font-size:12px;margin-top:8px}
+
+  @media(max-width:860px){.grid{grid-template-columns:1fr 1fr}.store{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.grid,.store{grid-template-columns:1fr}.wrap{padding:0 22px}.nav{padding:15px 22px}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="https://yksproductions.com">YKS<span>.</span><em>Productions</em></a>
+  <a class="cta" href="https://wa.me/971501955122" target="_blank" rel="noopener">Book a shoot</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow mono">Dubai · Bangalore — available for 2026</p>
+    <h1>Cinematic frames,<br/><em>worth reliving</em></h1>
+    <p class="tag">Photography, videography &amp; content creation by Yedukrishna Suresh — fashion, weddings, real estate &amp; brand films, lit like cinema, across Dubai and Bangalore.</p>
+    <div class="btns">
+      <a class="btn fill" href="https://yksproductions.com" target="_blank" rel="noopener">View the full site ↗</a>
+      <a class="btn ghost" href="https://wa.me/971501955122" target="_blank" rel="noopener">WhatsApp me</a>
+    </div>
+  </div>
+</header>
+
+<!-- ABOUT -->
+<section class="block">
+  <div class="wrap">
+    <div class="head"><h2>The person <em>behind the lens</em></h2></div>
+    <div class="prose">
+      <p>I'm <strong>Yedukrishna Suresh</strong>. I grew up in Alappuzha, on the Kerala coast, where an ordinary afternoon already looks like a film. I work as a cinematographer and on-set stills photographer in the South Indian film industry — most recently the Malayalam features <strong>Soothravakyam</strong> and <strong>Baby Girl</strong>.</p>
+      <p>These days I move between <strong>Bangalore</strong> and <strong>Dubai</strong>, shooting fashion editorials, weddings, real-estate films and brand content for people who care how they're remembered. Photography and filmmaking were never two separate things for me — they're two ways of slowing a moment down until it means something.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section class="block">
+  <div class="wrap">
+    <div class="head"><h2>What I <em>shoot</em></h2><p>Each is its own world — tap through to the live pages.</p></div>
+    <div class="grid">
+      <div class="card">
+        <span class="t">Fashion</span>
+        <h3>Fashion &amp; Editorial</h3>
+        <p>Lookbooks, designer campaigns, model &amp; actor portfolios — styled like a campaign, lit like a film.</p>
+        <div class="links">
+          <a href="https://yksproductions.com/fashion-photographer-dubai.html" target="_blank" rel="noopener">Dubai ↗</a>
+          <a href="https://yksproductions.com/fashion-photographer-bangalore.html" target="_blank" rel="noopener">Bangalore ↗</a>
+        </div>
+      </div>
+      <div class="card">
+        <span class="t">Weddings</span>
+        <h3>Wedding Films &amp; Candids</h3>
+        <p>Candid photography and cinematic films — Indian, expat and destination weddings, told like a story.</p>
+        <div class="links">
+          <a href="https://yksproductions.com/wedding-photographer-dubai.html" target="_blank" rel="noopener">Dubai ↗</a>
+          <a href="https://yksproductions.com/wedding-photographer-bangalore.html" target="_blank" rel="noopener">Bangalore ↗</a>
+        </div>
+      </div>
+      <div class="card">
+        <span class="t">Real Estate</span>
+        <h3>Property &amp; Brand Films</h3>
+        <p>Listing photography and cinematic walkthrough films that make a property impossible to scroll past.</p>
+        <div class="links">
+          <a href="https://yksproductions.com/real-estate-photographer-dubai.html" target="_blank" rel="noopener">Dubai ↗</a>
+          <a href="https://yksproductions.com/real-estate-photographer-bangalore.html" target="_blank" rel="noopener">Bangalore ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORE -->
+<section class="block">
+  <div class="wrap">
+    <div class="head"><h2>The <em>studio store</em></h2><p>More than shoots — products and resources.</p></div>
+    <div class="store">
+      <div class="pill"><div class="ic">🎞️</div><b>Lightroom Presets</b><small>My editing looks · ₹1,499 / AED 65</small></div>
+      <div class="pill"><div class="ic">🖼️</div><b>Fine Art Prints</b><small>Museum-grade · from ₹8,500</small></div>
+      <div class="pill"><div class="ic">🎓</div><b>YKS Masterclass</b><small>Waitlist · ₹4,999 early bird</small></div>
+      <div class="pill"><div class="ic">🎒</div><b>Gear Guide</b><small><a href="https://yksproductions.com/gear.html" target="_blank" rel="noopener" style="color:var(--amber)">What I shoot with ↗</a></small></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="block contact">
+  <div class="wrap">
+    <div class="head"><h2>Let's <em>make something</em></h2><p>Tell me your date and what you have in mind.</p></div>
+    <div class="rows">
+      <a href="https://wa.me/971501955122" target="_blank" rel="noopener"><b>WhatsApp · UAE</b><span>+971 50 195 5122</span></a>
+      <a href="https://wa.me/919746679720" target="_blank" rel="noopener"><b>WhatsApp · India</b><span>+91 97466 79720</span></a>
+      <a href="mailto:ysuresh634@gmail.com"><b>Email</b><span>ysuresh634@gmail.com</span></a>
+      <a href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener"><b>Instagram</b><span>@yks_photoworks</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="fb">YKS<span>.</span>Productions</div>
+    <div class="fl">
+      <a href="https://yksproductions.com" target="_blank" rel="noopener">Website</a>
+      <a href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.behance.net/ysuresh634f0a1" target="_blank" rel="noopener">Behance</a>
+    </div>
+    <p class="fc">© 2026 YKS Productions · Yedukrishna Suresh · Dubai — Bangalore</p>
+    <p class="fc">Single-file snapshot. Live site: yksproductions.com</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -128,6 +128,7 @@ h2 em,h3 em,h1 em{font-style:italic;background:linear-gradient(100deg,var(--ambe
 }
 @media(max-width:600px){
   .wrap{padding:0 22px}
+  .l-foot{padding-bottom:150px}
   .l-nav{padding:15px 22px}
   .l-hero{padding:116px 0 54px}
   .l-section{padding:56px 0}

@@ -63,10 +63,13 @@
       });
     } else {
       text.split(/\s+/).forEach((w, i, arr) => {
+        const m = document.createElement('span');
+        m.className = 'w-mask';
         const s = document.createElement('span');
         s.className = 'word';
         s.textContent = w;
-        el.appendChild(s);
+        m.appendChild(s);
+        el.appendChild(m);
         if (i < arr.length - 1) el.appendChild(document.createTextNode(' '));
       });
     }

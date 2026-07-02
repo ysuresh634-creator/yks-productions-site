@@ -82,8 +82,8 @@ img{display:block;max-width:100%}
 .nav .links a:not(.nav-cta)::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;
   background:linear-gradient(90deg,var(--amber),var(--teal));transition:width .35s var(--ease)}
 .nav .links a:not(.nav-cta):hover::after{width:100%}
-.nav-cta{border:1px solid rgba(255,140,59,.55);padding:9px 18px;border-radius:40px;transition:.3s var(--ease)}
-.nav-cta:hover{background:var(--amber);border-color:var(--amber);color:var(--black)}
+.nav .links a.nav-cta{background:var(--amber);border:1px solid var(--amber);color:var(--black);font-weight:600;padding:11px 22px;border-radius:40px;transition:.3s var(--ease)}
+.nav .links a.nav-cta:hover{background:var(--peach);border-color:var(--peach);transform:translateY(-1px);box-shadow:0 10px 26px rgba(255,140,59,.35)}
 .nav-reel{display:flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:10px;letter-spacing:.26em;color:var(--paper-dim)}
 .nav-reel span{width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 12px #ff3b30;animation:blink 1.6s infinite}
 .burger{display:none;flex-direction:column;gap:5px;background:none;border:0;padding:8px;cursor:pointer;z-index:130}
@@ -465,8 +465,9 @@ img{display:block;max-width:100%}
 
 /* ───────────────────────── SPLIT / REVEAL ───────────────────────── */
 .char,.word{display:inline-block}
+.w-mask{display:inline-block;overflow:hidden;vertical-align:top;padding:0 .06em .14em;margin:0 -.06em -.14em}
 .char-word{display:inline-block;white-space:nowrap}
-[data-reveal]{opacity:0;transform:translateY(34px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+[data-reveal]{opacity:0;transform:translateY(16px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 [data-reveal].in{opacity:1;transform:none}
 .splitR .word{opacity:0;transform:translateY(110%);transition:opacity .7s var(--ease),transform .7s var(--ease)}
 .splitR.in .word{opacity:1;transform:none}
@@ -547,11 +548,24 @@ img{display:block;max-width:100%}
   .store-card-wide{grid-column:auto}
   .store-wide-inner{grid-template-columns:1fr;gap:28px}
 }
+/* nav links don't fit beside the brandmark below ~1020px — hand over to the burger panel
+   early so the menu can never collide with or overlap the logo */
+@media(max-width:1020px){
+  .burger{display:flex}
+  .nav-reel{display:none}
+  .nav .links{position:fixed;inset:0 0 0 auto;width:min(320px,82vw);background:rgba(10,8,16,.68);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+    flex-direction:column;justify-content:center;align-items:flex-start;
+    padding:48px 38px;gap:26px;transform:translateX(102%);transition:transform .45s var(--ease);
+    border-left:1px solid var(--line);z-index:120}
+  .nav .links.open{transform:none}
+  .nav .links a{font-size:15px}
+  .nav .links a.nav-cta{display:block;width:100%;margin-top:14px;text-align:center;padding:16px 20px;border-radius:12px;font-size:13px;letter-spacing:.22em}
+}
 @media(max-width:640px){
   .wrap{padding:0 22px}
   .burger{display:flex}
   .nav-reel{display:none}
-  .nav .links{position:fixed;inset:0 0 0 auto;width:min(320px,82vw);background:#0a0810;
+  .nav .links{position:fixed;inset:0 0 0 auto;width:min(320px,82vw);background:rgba(10,8,16,.68);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
     flex-direction:column;justify-content:center;align-items:flex-start;
     padding:48px 38px;gap:26px;transform:translateX(102%);transition:transform .45s var(--ease);
     border-left:1px solid var(--line);z-index:120}
@@ -584,7 +598,7 @@ img{display:block;max-width:100%}
   .act-fashion,.act-dubai-works,.act-marriott,.act-weddings,.act-films,
   .act-featured,.act-clients,.act-store,.act-about,.act-book{padding:70px 0}
   .store-card{padding:28px 22px 24px}
-  .foot{padding:60px 0 30px}
+  .foot{padding:60px 0 150px}
   .klr-card.tall{grid-row:auto;grid-column:auto}
   .chip{white-space:normal;text-align:center;line-height:1.6}
 }
