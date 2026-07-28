@@ -628,8 +628,9 @@
 
 <style>
   .geo{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px}
-  .geo span{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 15px;background:rgba(244,237,226,.03)}
-  .geo span.hub{color:var(--ink);border-color:var(--amber);background:rgba(255,140,59,.10)}
+  .geo a{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 15px;background:rgba(244,237,226,.03);text-decoration:none;transition:border-color .2s ease,color .2s ease}
+  .geo a:hover{border-color:var(--amber);color:var(--ink)}
+  .geo a.hub{color:var(--ink);border-color:var(--amber);background:rgba(255,140,59,.10)}
 </style>
 <section>
   <div class="wrap">
@@ -637,10 +638,10 @@
     <h2>Pan-India, and across the UAE.</h2>
     <p class="lead">Most of this job travels well — strategy, ads, social and reporting run from anywhere, and I fly out for the shoot. I work with brands right across India, and in the Emirates. If your city isn't listed, ask anyway; it's usually a flight and a shoot day.</p>
     <div class="geo">
-      <span class="hub">Mumbai</span><span class="hub">Bangalore</span><span class="hub">Dubai</span>
-      <span>Delhi NCR</span><span>Hyderabad</span><span>Chennai</span><span>Pune</span><span>Kolkata</span>
-      <span>Ahmedabad</span><span>Jaipur</span><span>Kochi</span><span>Goa</span><span>Chandigarh</span>
-      <span>Indore</span><span>Coimbatore</span><span>Abu Dhabi</span><span>Sharjah</span>
+      <a class="hub" href="https://yksproductions.com/photographer-mumbai.html">Mumbai</a><a class="hub" href="https://yksproductions.com/portrait-photographer-bangalore.html">Bangalore</a><a class="hub" href="https://yksproductions.com/photographer-dubai.html">Dubai</a>
+      <a href="https://yksproductions.com/photographer-delhi.html">Delhi NCR</a><a href="https://yksproductions.com/photographer-hyderabad.html">Hyderabad</a><a href="https://yksproductions.com/photographer-chennai.html">Chennai</a><a href="https://yksproductions.com/photographer-pune.html">Pune</a><a href="https://yksproductions.com/photographer-kolkata.html">Kolkata</a>
+      <a href="https://yksproductions.com/photographer-india.html">Ahmedabad</a><a href="https://yksproductions.com/photographer-india.html">Jaipur</a><a href="https://yksproductions.com/photographer-kochi.html">Kochi</a><a href="https://yksproductions.com/photographer-goa.html">Goa</a><a href="https://yksproductions.com/photographer-india.html">Chandigarh</a>
+      <a href="https://yksproductions.com/photographer-india.html">Indore</a><a href="https://yksproductions.com/photographer-india.html">Coimbatore</a><a href="https://yksproductions.com/photographer-abu-dhabi.html">Abu Dhabi</a><a href="https://yksproductions.com/photographer-uae.html">Sharjah</a>
     </div>
   </div>
 </section>
@@ -745,7 +746,7 @@
     .sgroup .sgt,.flow .ai,.mnode .ml,.dstat .dsrc,.dash-bar .badge,
     .heronums .l,.kpi .l,.k .l,.one .ol,.rf-bar .badge,.sampnote{font-size:11.5px}
     .sgroup li em,.fld .flabel em,.dstat .dsrc,.rrow .rn em{font-size:11px}
-    .geo span{font-size:13px;padding:8px 15px}
+    .geo a{font-size:13px;padding:8px 15px}
     .btn{padding:16px 26px;font-size:12.5px}
   }
 </style>
