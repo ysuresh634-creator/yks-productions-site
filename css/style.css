@@ -110,7 +110,7 @@ img{display:block;max-width:100%}
   background:radial-gradient(120% 90% at 50% 110%,rgba(7,6,10,.92) 0%,transparent 55%),
              radial-gradient(100% 60% at 50% -10%,rgba(7,6,10,.7) 0%,transparent 60%)}
 .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
-  align-items:center;text-align:center;padding:0 24px;z-index:2}
+  align-items:center;text-align:center;padding:clamp(76px,9vh,104px) 24px 0;z-index:2}
 .hero-eyebrow{font-family:var(--font-m);font-size:12px;letter-spacing:.42em;text-transform:uppercase;color:var(--peach);margin-bottom:30px}
 .hero-title{font-size:clamp(56px,15vw,240px);font-weight:600;line-height:.84;letter-spacing:.01em}
 .hero-title .line{display:block;white-space:nowrap}
@@ -609,4 +609,20 @@ img{display:block;max-width:100%}
 }
 @media(prefers-reduced-motion:reduce){
   .hero-scrollcue span,.nav-reel span{animation:none}
+}
+
+
+/* ── short-viewport hero: keep the eyebrow clear of the fixed nav and the
+      whole block inside the frame on laptop screens (height-aware sizing) ── */
+@media (max-height:860px){
+  .hero-title{font-size:min(clamp(56px,15vw,240px),15.5vh)}
+  .hero-title .line-2{font-size:min(clamp(36px,10.6vw,170px),11vh)}
+  .hero-name{margin-top:2.4vh;font-size:min(clamp(26px,4vw,52px),4.8vh)}
+  .hero-roles{margin-top:1.8vh;font-size:min(clamp(14px,1.8vw,19px),2.4vh)}
+  .hero-eyebrow{margin-bottom:2.4vh}
+  .hero-meta{margin-top:3vh;gap:38px}
+}
+@media (max-height:700px){
+  .hero-meta{gap:26px;margin-top:2.4vh}
+  .hero-scrollcue{bottom:18px}
 }
