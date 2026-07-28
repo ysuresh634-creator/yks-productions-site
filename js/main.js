@@ -368,7 +368,17 @@
         Project: v('f-msg') || '—',
         Source: 'Homepage booking form'
       })
-    }).catch(() => {});
+    })
+      .then(r => { if (!r.ok) throw new Error('web3forms ' + r.status); })
+      .catch(() => {
+        /* the email hop failed — say so instead of a false "Sent", WhatsApp
+           still opens below so the enquiry isn't lost */
+        const n = document.querySelector('#bookForm .form-note');
+        if (n) {
+          n.textContent = 'Couldn’t email your details — please send the WhatsApp message that just opened, or call +91 97466 79720.';
+          n.style.color = 'var(--amber)';
+        }
+      });
 
     /* 2) Still open a pre-filled WhatsApp for those who prefer to chat */
     const msg =
@@ -385,6 +395,45 @@
     const note = document.querySelector('#bookForm .form-note');
     if (note) { note.textContent = '✓ Sent — your details are with Yedukrishna. WhatsApp opened too.'; note.style.color = 'var(--teal)'; }
   });
+
+  /* ── Masterclass waitlist — capture the email instead of reloading the page ── */
+  const wlForm = $('#waitlistForm');
+  if (wlForm) {
+    wlForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const field = $('#wl-email');
+      const email = (field.value || '').trim();
+      if (!email || !field.checkValidity()) { field.focus(); return; }
+      const success = $('#wlSuccess');
+      const btn = wlForm.querySelector('button[type="submit"]');
+      if (btn) { btn.disabled = true; btn.textContent = 'Joining…'; }
+
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: 'fbf5d037-af64-46a1-8ddc-5777379ec179',
+          subject: 'Masterclass waitlist — ' + email,
+          from_name: 'YKS Productions website',
+          Email: email,
+          Source: 'Masterclass waitlist'
+        })
+      })
+        .then(r => { if (!r.ok) throw new Error('web3forms ' + r.status); return r; })
+        .then(() => {
+          wlForm.style.display = 'none';
+          if (success) success.style.display = 'block';
+        })
+        .catch(() => {
+          if (btn) { btn.disabled = false; btn.textContent = 'Join waitlist'; }
+          if (success) {
+            success.textContent = 'Couldn’t save that — please WhatsApp +91 97466 79720 and I’ll add you.';
+            success.style.color = 'var(--amber)';
+            success.style.display = 'block';
+          }
+        });
+    });
+  }
 
   /* refresh pins once everything (fonts/images) settles */
   addEventListener('load', () => {
