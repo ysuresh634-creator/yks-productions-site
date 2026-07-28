@@ -46,31 +46,19 @@
 </head>
 <body>
 <style>
+  /* Palette matched to yksproductions.com (css/style.css) — one cinematic dark theme, always */
   :root{
-    --bg:#F3EEE4; --surface:#FBF8F1; --ink:#171309; --muted:#6C6456; --faint:#928A7B;
-    --line:#E3DAC8; --amber:#BC5F1D; --amber-soft:#E7C9A8; --teal:#1E655F; --teal-soft:#BFD8D3;
-    --good:#1E655F; --shadow:0 1px 0 rgba(23,19,9,.04),0 18px 40px -24px rgba(23,19,9,.28);
+    --bg:#07060A; --surface:#16131C; --ink:#F4EDE2; --muted:rgba(244,237,226,.62); --faint:rgba(244,237,226,.4);
+    --line:rgba(244,237,226,.14); --amber:#FF8C3B; --amber-deep:#C4502C; --amber-soft:rgba(255,140,59,.18);
+    --teal:#1FD6C9; --teal-soft:rgba(31,214,201,.16);
+    --good:#1FD6C9; --shadow:0 1px 0 rgba(0,0,0,.35),0 24px 50px -28px rgba(0,0,0,.75);
     --disp:'Helvetica Neue',Helvetica,Arial,system-ui,sans-serif;
     --body:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
     --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
   }
-  @media (prefers-color-scheme:dark){
-    :root{
-      --bg:#131009; --surface:#1C1810; --ink:#EFE8D9; --muted:#9C9384; --faint:#726B5D;
-      --line:#2C261C; --amber:#E8934A; --amber-soft:#4a3520; --teal:#57A79F; --teal-soft:#1e332f;
-      --good:#57A79F; --shadow:0 1px 0 rgba(0,0,0,.3),0 24px 50px -28px rgba(0,0,0,.7);
-    }
-  }
-  :root[data-theme="dark"]{
-    --bg:#131009; --surface:#1C1810; --ink:#EFE8D9; --muted:#9C9384; --faint:#726B5D;
-    --line:#2C261C; --amber:#E8934A; --amber-soft:#4a3520; --teal:#57A79F; --teal-soft:#1e332f;
-    --good:#57A79F; --shadow:0 1px 0 rgba(0,0,0,.3),0 24px 50px -28px rgba(0,0,0,.7);
-  }
-  :root[data-theme="light"]{
-    --bg:#F3EEE4; --surface:#FBF8F1; --ink:#171309; --muted:#6C6456; --faint:#928A7B;
-    --line:#E3DAC8; --amber:#BC5F1D; --amber-soft:#E7C9A8; --teal:#1E655F; --teal-soft:#BFD8D3;
-    --good:#1E655F; --shadow:0 1px 0 rgba(23,19,9,.04),0 18px 40px -24px rgba(23,19,9,.28);
-  }
+  @media (prefers-color-scheme:dark){ :root{ --bg:#07060A } }
+  :root[data-theme="dark"]{ --bg:#07060A }
+  :root[data-theme="light"]{ --bg:#07060A }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased;font-size:17px}
   .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
@@ -161,7 +149,7 @@
   .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
   .btn{font-family:var(--mono);font-size:14px;letter-spacing:.02em;text-decoration:none;padding:14px 24px;border-radius:11px;font-weight:600;transition:transform .15s ease}
   .btn:hover{transform:translateY(-2px)}
-  .btn.p{background:var(--amber);color:#fff}
+  .btn.p{background:var(--amber);color:#07060A}
   .btn.s{background:transparent;color:var(--bg);border:1px solid color-mix(in srgb,var(--bg) 40%,transparent)}
   footer{padding:40px 0 60px;border-top:1px solid var(--line);font-family:var(--mono);font-size:12.5px;color:var(--faint);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
@@ -244,7 +232,7 @@
   .sgroup li::before{content:"—";position:absolute;left:0;color:var(--amber)}
   .sgroup li b{color:var(--ink);font-weight:700}
   .allin{margin-top:22px;background:var(--ink);border-radius:14px;padding:22px 24px;font-size:clamp(16px,2vw,18.5px);line-height:1.6;color:color-mix(in srgb,var(--bg) 78%,var(--ink))}
-  .allin b{color:var(--amber)}
+  .allin b{color:var(--amber-deep)}
   @media(max-width:1020px){.scope{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.scope{grid-template-columns:1fr}}
 </style>
@@ -324,7 +312,7 @@
   .mnode .ms{font-size:12px;color:var(--faint);margin-top:6px}
   .mnode.win{background:var(--ink)}
   .mnode.win .ml{color:color-mix(in srgb,var(--bg) 62%,var(--ink))}
-  .mnode.win .mv{color:var(--amber)}
+  .mnode.win .mv{color:var(--amber-deep)}
   .mnode.win .ms{color:color-mix(in srgb,var(--bg) 50%,var(--ink))}
   .marrow{display:flex;align-items:center;color:var(--amber);font-size:24px;font-weight:800}
   .rtag{margin-top:22px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:20px 22px;border:1px solid var(--amber);border-radius:14px;background:color-mix(in srgb,var(--amber) 7%,transparent)}
@@ -363,7 +351,7 @@
   .one{background:var(--ink);border-radius:16px;padding:24px 24px;display:flex;flex-direction:column;justify-content:center}
   .one .ol{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--bg) 58%,var(--ink))}
   .one .ov{font-family:var(--disp);font-weight:800;font-size:clamp(24px,3.6vw,33px);letter-spacing:-.03em;margin-top:10px;line-height:1.06;color:var(--bg)}
-  .one .ov b{color:var(--amber)}
+  .one .ov b{color:var(--amber-deep)}
   .one .os{margin-top:13px;font-size:14px;color:color-mix(in srgb,var(--bg) 76%,var(--ink));line-height:1.55}
   /* market data */
   .datagrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:32px}
