@@ -626,3 +626,31 @@ img{display:block;max-width:100%}
   .hero-meta{gap:26px;margin-top:2.4vh}
   .hero-scrollcue{bottom:18px}
 }
+
+
+/* ── mobile viewing fixes ──────────────────────────────────────────────
+   1. iOS Safari zooms the whole page whenever a focused input is under
+      16px and never zooms back — kills the booking form on iPhone.
+   2. The footer service list grew to 19 links; single-column made it an
+      828px wall on a phone. Two columns + tighter tracking halves it. */
+@media (max-width:640px){
+  .book-form input,
+  .book-form select,
+  .book-form textarea,
+  .waitlist-form input[type="email"]{ font-size:16px }
+
+  .foot-services{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 16px;
+    margin:-46px 0 44px;
+  }
+  .foot-services a{
+    font-size:9.5px;
+    letter-spacing:.1em;
+    line-height:1.35;
+  }
+}
+@media (max-width:330px){
+  .foot-services{grid-template-columns:1fr}
+}
