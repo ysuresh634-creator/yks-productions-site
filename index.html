@@ -46,7 +46,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/style.css?v=35" />
+<link rel="stylesheet" href="css/style.css?v=36" />
 <style>
 /* credibility stat band */
 .stat-band{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin:0 0 56px;padding:0 0 46px;border-bottom:1px solid rgba(244,237,226,.12)}
@@ -66,6 +66,22 @@
 .testi figcaption span{font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#ff8c3b}
 .testi-stars{color:#ff8c3b;letter-spacing:3px;margin-bottom:14px;font-size:13px}
 @media(max-width:820px){.testi-grid{grid-template-columns:1fr}}
+
+/* FAQ — answer-first content for search + AI answer engines */
+.act-faq{padding:110px 0}
+.faq-list{margin-top:48px;border-top:1px solid rgba(244,237,226,.12)}
+.faq-list details{border-bottom:1px solid rgba(244,237,226,.12)}
+.faq-list summary{list-style:none;cursor:pointer;padding:24px 40px 24px 0;position:relative;
+  font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.05rem,2.1vw,1.35rem);color:#f4ede2;font-weight:500}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary::after{content:"+";position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  font-family:'Space Grotesk',monospace;font-size:1.5rem;color:#ff8c3b}
+.faq-list details[open] summary::after{content:"−"}
+.faq-list .fa{padding:0 0 26px;max-width:72ch;color:rgba(244,237,226,.72);font-size:1rem;line-height:1.7}
+.faq-list .fa b{color:#f4ede2}
+.faq-list .fa p{margin:0 0 12px}
+.faq-list .fa p:last-child{margin:0}
+@media(max-width:640px){ .act-faq{padding:70px 0} .faq-list summary{padding:20px 34px 20px 0} }
 </style>
 
 <!-- ───────── Structured data: tells Google what YKS is + where it serves ───────── -->
@@ -126,6 +142,63 @@
       { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Content Creation & Social Reels" } }
     ]
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://yksproductions.com/#faq",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How much does a professional photographer cost in India?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most professional shoots in India are priced per day or per project, not per photo. Rates swing widely with the category — a product shoot, a fashion campaign and a wedding film are three different jobs with three different crews. I quote one all-in number per project, covering the shoot, the edit and the final delivery, so there's nothing to add later. Tell me the brief and the dates and you'll get a straight figure."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you travel across India for shoots?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — I shoot right across India, and in the UAE. Mumbai, Bangalore and Dubai are my regular bases, and I regularly travel to Delhi NCR, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad, Jaipur, Kochi and Goa, plus Abu Dhabi and Sharjah. Travel and stay are built into the project quote — you'll never get a surprise line item after the shoot."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you shoot both photo and video?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Both, usually on the same day. I'm a cinematographer and a stills photographer, so one booking can produce the campaign film, the social reels and the still images together. That's normally cheaper and more consistent than hiring a separate photographer and videographer, because the lighting, styling and look are set up once."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What's included in a brand or product shoot?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Concept, casting, locations, the shoot, the edit, the colour grade and final delivery. If the shoot needs faces, I can source models and creators too. You get files ready to publish — reels cut for vertical, stills retouched, and formats sized for the platforms you actually run."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How far in advance should I book a shoot?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Two to three weeks is comfortable for a brand or product shoot — enough time to lock concept, casting and location. Weddings and large campaigns are usually booked months ahead. Short notice is often still possible depending on the calendar. Message me with the date and I'll tell you honestly whether it's doable."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you also run the marketing and ads, not just the shoot?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — content is one half of what I do. I also run social media day to day, manage Google and Meta ad campaigns, generate leads and report on what every rupee returned. You can see the whole scope at marketing.yksproductions.com ."
+      }
+    }
+  ]
 }
 </script>
 </head>
@@ -705,6 +778,49 @@
   </section>
 
   <!-- ════════ 10 · BOOKING — right after the story ════════ -->
+
+  <!-- ════════ FAQ — real questions, answer-first (search + AI engines) ════════ -->
+  <section class="act act-faq" id="act-faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Before you book</p>
+        <h2>Questions I get asked most</h2>
+      </div>
+      <div class="faq-list">
+        <details open>
+          <summary>How much does a professional photographer cost in India?</summary>
+          <div class="fa"><p><b>Most professional shoots in India are priced per day or per project, not per photo.</b> Rates swing widely with the category — a product shoot, a fashion campaign and a wedding film are three different jobs with three different crews.</p>
+          <p>I quote one all-in number per project, covering the shoot, the edit and the final delivery, so there's nothing to add later. Tell me the brief and the dates and you'll get a straight figure.</p></div>
+        </details>
+        <details>
+          <summary>Do you travel across India for shoots?</summary>
+          <div class="fa"><p><b>Yes — I shoot right across India, and in the UAE.</b> Mumbai, Bangalore and Dubai are my regular bases, and I regularly travel to Delhi NCR, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad, Jaipur, Kochi and Goa, plus Abu Dhabi and Sharjah.</p>
+          <p>Travel and stay are built into the project quote — you'll never get a surprise line item after the shoot.</p></div>
+        </details>
+        <details>
+          <summary>Do you shoot both photo and video?</summary>
+          <div class="fa"><p><b>Both, usually on the same day.</b> I'm a cinematographer and a stills photographer, so one booking can produce the campaign film, the social reels and the still images together.</p>
+          <p>That's normally cheaper and more consistent than hiring a separate photographer and videographer, because the lighting, styling and look are set up once.</p></div>
+        </details>
+        <details>
+          <summary>What's included in a brand or product shoot?</summary>
+          <div class="fa"><p><b>Concept, casting, locations, the shoot, the edit, the colour grade and final delivery.</b> If the shoot needs faces, I can source models and creators too.</p>
+          <p>You get files ready to publish — reels cut for vertical, stills retouched, and formats sized for the platforms you actually run.</p></div>
+        </details>
+        <details>
+          <summary>How far in advance should I book a shoot?</summary>
+          <div class="fa"><p><b>Two to three weeks is comfortable for a brand or product shoot</b> — enough time to lock concept, casting and location. Weddings and large campaigns are usually booked months ahead.</p>
+          <p>Short notice is often still possible depending on the calendar. Message me with the date and I'll tell you honestly whether it's doable.</p></div>
+        </details>
+        <details>
+          <summary>Do you also run the marketing and ads, not just the shoot?</summary>
+          <div class="fa"><p><b>Yes — content is one half of what I do.</b> I also run social media day to day, manage Google and Meta ad campaigns, generate leads and report on what every rupee returned.</p>
+          <p>You can see the whole scope at <a href="https://marketing.yksproductions.com" style="color:#ff8c3b">marketing.yksproductions.com</a>.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
   <section class="act act-book" id="act-book">
     <div class="wrap book-grid">
       <div class="book-left">
