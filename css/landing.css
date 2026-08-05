@@ -231,3 +231,42 @@ h2 em,h3 em,h1 em{font-style:italic;background:linear-gradient(100deg,var(--ambe
   .l-cats + main .l-hero,
   .l-cats ~ main .l-hero{padding-top:44px}
 }
+
+/* ══════════════════════════════════════════════════════════════
+   MARKET HUBS  (/dubai/ and /india/)
+   The parent pages the 38 service pages were missing. Same
+   lightweight base — no pinning, no Lenis — so scroll stays sane.
+   ══════════════════════════════════════════════════════════════ */
+
+/* place / city tiles */
+.l-places{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.l-places a{display:flex;flex-direction:column;gap:5px;padding:20px 20px 19px;
+  border:1px solid rgba(244,237,226,.1);border-radius:13px;background:rgba(22,19,28,.55);
+  transition:border-color .3s var(--ease),transform .3s var(--ease),background .3s var(--ease)}
+.l-places a:hover{border-color:rgba(255,140,59,.45);background:rgba(255,140,59,.06);transform:translateY(-3px)}
+.l-places b{font-family:var(--serif);font-size:1.22rem;font-weight:500;letter-spacing:-.005em}
+.l-places small{font-size:.86rem;color:var(--paper-dim);line-height:1.55}
+
+/* service groups — the map of what's on offer in this market */
+.l-svcgroup{margin-top:38px}
+.l-svcgroup:first-of-type{margin-top:0}
+.l-svch{display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--amber);font-weight:400;margin-bottom:16px}
+.l-svch::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(255,140,59,.32),transparent)}
+.l-svclist{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:11px}
+.l-svclist a{display:flex;flex-direction:column;gap:5px;padding:17px 19px;
+  border:1px solid rgba(244,237,226,.09);border-radius:12px;background:rgba(22,19,28,.45);
+  transition:border-color .3s var(--ease),transform .3s var(--ease),background .3s var(--ease)}
+.l-svclist a:hover{border-color:rgba(255,140,59,.42);background:rgba(255,140,59,.06);transform:translateY(-2px)}
+.l-svclist a:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.l-svclist b{font-size:1.02rem;font-weight:600;letter-spacing:.002em}
+.l-svclist small{font-size:.855rem;color:var(--paper-dim);line-height:1.6}
+
+@media(max-width:640px){
+  .l-places{grid-template-columns:1fr 1fr;gap:10px}
+  .l-places a{padding:16px 15px}
+  .l-places b{font-size:1.06rem}
+  .l-places small{font-size:.8rem}
+  .l-svclist{grid-template-columns:1fr}
+  .l-svcgroup{margin-top:30px}
+}

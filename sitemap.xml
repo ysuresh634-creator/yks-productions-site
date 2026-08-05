@@ -25,6 +25,18 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://yksproductions.com/dubai/</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://yksproductions.com/india/</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
     <loc>https://yksproductions.com/weddings.html</loc>
     <lastmod>2026-08-05</lastmod>
     <changefreq>monthly</changefreq>
