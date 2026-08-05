@@ -50,7 +50,7 @@ const ALLOWED_ORIGINS = [
   'http://localhost:4173'
 ];
 
-const FALLBACK = "I can't reach my brain right now — but I don't want to leave you stuck. Message Yedukrishna directly on WhatsApp (https://wa.me/971501955122) or use the quote form at /quote.html and he'll reply personally.";
+const FALLBACK = wa => "I can't reach my brain right now — but I don't want to leave you stuck. Message Yedukrishna directly on WhatsApp (https://wa.me/" + wa + ") or use the quote form at /quote.html and he'll reply personally.";
 
 const SYSTEM_PROMPT = `You are IRIS — the assistant on yksproductions.com, the site of Yedukrishna Suresh, who trades as YKS Productions. He is a film-trained photographer, videographer and content creator working between Dubai (UAE) and Bangalore (India).
 
@@ -146,6 +146,20 @@ THE MIXED REGISTERS — this is how people ACTUALLY message, and getting these r
 - ARABIZI — Arabic in English letters and numbers (3 for ع, 7 for ح). Looks like: "keefak, bade tsawer sha22a bi Marina"
 Reply in the SAME register they used, composing your own words from what they actually said.
 
+## ⚠️ RESPECT — THIS IS NOT NEGOTIABLE, IN EVERY LANGUAGE
+Address every visitor with full respect, and refer to Yedukrishna with full respect. Indian and Arab visitors read pronoun choice instantly, and the familiar form is not casual — it is rude. It reads as talking down to someone. Getting this wrong loses the client on the first line.
+
+Always use the RESPECTFUL form. Never the familiar one:
+- MALAYALAM — for him: അദ്ദേഹം / addeham. NEVER അവൻ / avan, NEVER ഇവൻ / ivan, NEVER അയാൾ / ayaal, NEVER പുള്ളി / pulli. For the visitor: നിങ്ങൾ / ningal, or താങ്കൾ / thankal. NEVER നീ / nee. Verbs in the polite form — "cheyyaam", "parayaam", "ayakkoo" — never the blunt imperative.
+- HINDI — for him: वो / उन्हें / उनका with PLURAL verbs (देंगे, करेंगे, बताएंगे). NEVER उसका / उसे / उसने. For the visitor: आप / आपको / आपका. NEVER तू, NEVER तुम, NEVER तेरा. Verbs must agree politely — "कीजिए" or "करिए", never "कर".
+- KANNADA — for him: ಅವರು / avaru, ಅವರ / avara. NEVER ಅವನು / avanu, NEVER ಇವನು / ivanu. For the visitor: ನೀವು / neevu, ನಿಮ್ಮ / nimma. NEVER ನೀನು / neenu, NEVER ನಿನ್ನ / ninna. Verbs in the -ri form: "maadi", "heli", "nodi" — never "maadu", "helu", "nodu".
+- ARABIC — keep a courteous register. حضرتك is welcome with an older or formal visitor. Never be blunt or curt.
+- ENGLISH — plain courtesy; never patronising.
+
+This applies identically in the romanised registers. Manglish, Hinglish and Kanglish are casual in SPELLING, never casual in RESPECT. "Neenu yavaga beku?" is wrong — it must be "Neevu yavaga beku?".
+
+Address forms like chetta, chechi, bhai, ji, sir, madam, akhi are only ever used if the visitor uses them first. Defaulting to plain politeness is always safe; assumed familiarity is not.
+
 ## ⚠️ ONE LANGUAGE PER REPLY — NEVER BLEND TWO INDIAN LANGUAGES
 Malayalam, Hindi and Kannada are completely different languages. Mixing them in one message is gibberish and is deeply insulting to a native speaker.
 - Manglish reply = Malayalam words + English words. NO Hindi. NO Kannada. Never "accha", "hai", "chahiye", "prakaara", "aagutte", "madi", "beku".
@@ -198,6 +212,13 @@ If someone just wants information, give it and stop. Not every conversation is a
 CRITICAL — LISTEN. Track everything they've told you. Never ask for something they just said. If they said "villa in Dubai Marina", you have the property type AND the location — ask about something else entirely. Re-asking is the fastest way to feel like a bot.
 
 WHAT YOU CANNOT DO: you can't send messages, emails or WhatsApps, make calls, book dates, or open their files. Never offer to. Hand them the link instead: "Easiest is to send this to him on [WhatsApp](https://wa.me/971501955122)."
+
+THIS HOLDS IN EVERY LANGUAGE, and the fix is to write the instruction TO THEM rather than a promise FROM you. You are handing over a link they tap — you are not a messenger.
+- Hindi — say "आप उन्हें WhatsApp पर मैसेज कर दीजिए, वो खुद जवाब देंगे". NEVER "मैं भेज दूंगा", "मैं भेज सकता हूँ", "मैं आपका संदेश पहुँचा दूंगा".
+- Malayalam — say "WhatsApp-il oru message ayakkoo, addeham thanne reply tharum". NEVER "njan ariyikkam", "njan ayakkam".
+- Kannada — say "WhatsApp alli message maadi, avaru reply maadtaare". NEVER "naanu kalisthini".
+- Arabic — say "راسله على واتساب وبيرد عليك بنفسه". NEVER "سأرسل له".
+The test: if the sentence has YOU doing the delivering, it is wrong. Rewrite it so THEY do the sending.
 
 # HARD RULES — never break
 - NEVER give a price, rate, ballpark, range, "starting from", or any currency figure — even if pushed, even "off the record", even if they say they won't hold you to it. Everything is quoted per project as one all-in number covering shoot and edit, no hidden extras. Explain what drives cost (hours/days, photo vs film, deliverables, location, turnaround) and move them to a quote.
@@ -287,6 +308,9 @@ const LANG_NAMES = { ar: 'Arabic', ml: 'Malayalam', hi: 'Hindi', kn: 'Kannada', 
 function buildSystem(ctx) {
   if (!ctx) return SYSTEM_PROMPT;
   const bits = [];
+  if (ctx.wa) {
+    bits.push(`This visitor should be given the WhatsApp number ${ctx.wa} — use https://wa.me/${ctx.wa} for EVERY WhatsApp link you write, and never the other one. It is the line they can dial without international rates.`);
+  }
   if (ctx.page) bits.push(`They are reading: "${ctx.page}" (${ctx.path || '/'}). Assume that's what they care about — don't ask them to state it again.`);
   if (ctx.lang) {
     const code = String(ctx.lang).slice(0, 2).toLowerCase();
@@ -320,6 +344,8 @@ VOICE: short, warm, contractions, no corporate filler. 2-3 sentences maximum. Ne
 
 LANGUAGE: if they write in Malayalam, Hindi, Kannada, Arabic or a romanised mix like Manglish, Hinglish or Kanglish, keep your reply VERY short and simple in their language, then give them the WhatsApp link — you can't hold a long conversation reliably right now.
 
+RESPECT — never the familiar pronoun, in any language. For Yedukrishna: addeham (Malayalam), avaru (Kannada), plural verb forms (Hindi). NEVER avan, ivan, avanu, or singular Hindi forms. For the visitor: ningal (Malayalam), aap (Hindi), neevu (Kannada) — NEVER nee, tu, tum, or neenu. Casual spelling is fine; casual respect is not.
+
 Always end by pointing them at WhatsApp: https://wa.me/971501955122 (or the quote form at /quote.html). He replies personally.`;
 
 /* The fallback models can't write Malayalam, Kannada, Hindi or Arabic
@@ -327,10 +353,10 @@ Always end by pointing them at WhatsApp: https://wa.me/971501955122 (or the quot
    language is worse than no reply, so on this tier we don't let the model try:
    native script in, hand-written handoff out. Always correct, never garbled. */
 const SCRIPT_HANDOFF = [
-  [/[\u0D00-\u0D7F]/, 'ക്ഷമിക്കണം, ഇപ്പോൾ എനിക്ക് ശരിക്കും മറുപടി പറയാൻ പറ്റുന്നില്ല. യദുകൃഷ്ണനോട് നേരിട്ട് WhatsApp-ൽ സംസാരിക്കാം — അദ്ദേഹം നേരിട്ട് മറുപടി തരും: https://wa.me/971501955122'],
-  [/[\u0C80-\u0CFF]/, 'ಕ್ಷಮಿಸಿ, ಈಗ ನನಗೆ ಸರಿಯಾಗಿ ಉತ್ತರಿಸೋಕೆ ಆಗ್ತಿಲ್ಲ. ಯದುಕೃಷ್ಣ ಅವರಿಗೆ ನೇರವಾಗಿ WhatsApp ನಲ್ಲಿ ಮೆಸೇಜ್ ಮಾಡಿ — ಅವರೇ ಉತ್ತರಿಸ್ತಾರೆ: https://wa.me/919746679720'],
-  [/[\u0900-\u097F]/, 'माफ़ कीजिए, अभी मैं ठीक से जवाब नहीं दे पा रही हूँ। यदुकृष्ण से सीधे WhatsApp पर बात कर लीजिए — वो खुद जवाब देंगे: https://wa.me/919746679720'],
-  [/[\u0600-\u06FF]/, 'عذراً، ما أقدر أرد عليك بشكل كامل الحين. تواصل مع يدوكريشنا مباشرة على واتساب وبيرد عليك بنفسه: https://wa.me/971501955122']
+  [/[\u0D00-\u0D7F]/, wa => 'ക്ഷമിക്കണം, ഇപ്പോൾ എനിക്ക് ശരിക്കും മറുപടി പറയാൻ പറ്റുന്നില്ല. യദുകൃഷ്ണനോട് നേരിട്ട് WhatsApp-ൽ സംസാരിക്കാം — അദ്ദേഹം നേരിട്ട് മറുപടി തരും: https://wa.me/' + wa],
+  [/[\u0C80-\u0CFF]/, wa => 'ಕ್ಷಮಿಸಿ, ಈಗ ನನಗೆ ಸರಿಯಾಗಿ ಉತ್ತರಿಸೋಕೆ ಆಗ್ತಿಲ್ಲ. ಯದುಕೃಷ್ಣ ಅವರಿಗೆ ನೇರವಾಗಿ WhatsApp ನಲ್ಲಿ ಮೆಸೇಜ್ ಮಾಡಿ — ಅವರೇ ಉತ್ತರಿಸ್ತಾರೆ: https://wa.me/' + wa],
+  [/[\u0900-\u097F]/, wa => 'माफ़ कीजिए, अभी मैं ठीक से जवाब नहीं दे पा रही हूँ। यदुकृष्ण से सीधे WhatsApp पर बात कर लीजिए — वो खुद जवाब देंगे: https://wa.me/' + wa],
+  [/[\u0600-\u06FF]/, wa => 'عذراً، ما أقدر أرد عليك بشكل كامل الحين. تواصل مع يدوكريشنا مباشرة على واتساب وبيرد عليك بنفسه: https://wa.me/' + wa]
 ];
 
 /* Native script is obvious; the romanised registers need marker words. These
@@ -359,11 +385,41 @@ function looksNonEnglish(s) {
    speaker spots every one of those, so on this tier we don't generate those
    two at all. A short correct line beats a fluent-looking broken one.
    (Gemini handles them properly; this only applies when its quota is spent.) */
-const ML_ROMAN = /\b(venam|vendo|aanu|aano|ethra|undo|cheyyam|njan|chetta|chechi|aakum|evide|eppo|ayakkoo|thanne|alle|und)\b/i;
-const KN_ROMAN = /\b(beku|bekagide|aagutte|aagatte|madi|maadi|iddini|yeshtu|eshtu|alli|nimma|namma|jothe)\b/i;
+const ML_ROMAN = /\b(venam|vendo|aanu|aano|ethra|undo|cheyyam|cheyyum|cheyyaam|njan|enikku|ningal|chetta|chechi|aakum|evide|eppo|engane|ariyikkum|vilikkum|ayakkoo|ayakkam|thanne|alle|und|illa|nalla|onnu)\b/i;
+const HI_ROMAN = /\b(chahiye|kitna|kitne|bhai|karwana|karna|nahi|nahin|accha|shaadi|mujhe|aapko|hoga|kaise|paisa|kripya)\b/i;
+const KN_ROMAN = /\b(beku|bekagide|aagutte|aagatte|madi|maadi|maadbeku|maatna|maathadu|hege|yaava|iddini|yeshtu|eshtu|alli|nimma|namma|neevu|jothe|olle|thumba)\b/i;
 
-const ML_HANDOFF = 'Ithinu Yedu-vinodu nere samsaarikkunnathaanu nallathu. WhatsApp-il oru message ayakkoo — avan thanne reply tharum: https://wa.me/971501955122';
-const KN_HANDOFF = 'Iddakke Yedu jothe nere maathaadodu olle. WhatsApp alli ondu message maadi — avare reply maadtaare: https://wa.me/919746679720';
+/* ── which number to hand out ──────────────────────────────────
+   He has a UAE line and an Indian line, and a client should get the
+   one they can actually dial without international rates. Cloudflare
+   attaches the visitor's country to every request, so use it; fall
+   back to the language they wrote in, which is a strong signal on its
+   own (Malayalam/Kannada/Hindi → India, Arabic → UAE). */
+const WA_AE = '971501955122';
+const WA_IN = '919746679720';
+const IN_REGION = new Set(['IN', 'LK', 'NP', 'BD']);   // India + neighbours who'd dial it
+const GULF = new Set(['AE', 'SA', 'QA', 'KW', 'BH', 'OM']);
+
+function lastUserText(msgs) {
+  const m = msgs.filter(x => x.role === 'user').slice(-1)[0];
+  return m ? m.content : '';
+}
+
+function pickWa(request, text) {
+  const country = (request && request.cf && request.cf.country) || '';
+  if (IN_REGION.has(country)) return WA_IN;
+  if (GULF.has(country)) return WA_AE;
+  // no country header (or somewhere else entirely) — let the language decide
+  if (text) {
+    if (/[ഀ-ൿಀ-೿ऀ-ॿ]/.test(text)) return WA_IN;
+    if (ML_ROMAN.test(text) || KN_ROMAN.test(text) || HI_ROMAN.test(text)) return WA_IN;
+  }
+  return WA_AE;   // Dubai is the default book of business
+}
+
+/* Respectful third person only: addeham (never avan), avaru (never avanu). */
+const ML_HANDOFF = wa => 'Ithinu Yedukrishnan-odu nere samsaarikkunnathaanu nallathu. WhatsApp-il oru message ayakkoo — addeham thanne reply tharum: https://wa.me/' + wa;
+const KN_HANDOFF = wa => 'Iddakke Yedukrishna avara jothe nere maathaadodu olle. WhatsApp alli ondu message maadi — avaru thaane reply maadtaare: https://wa.me/' + wa;
 
 /* "Have you shot at Atlantis?" → the free model answers "yes, weddings mostly".
    It invents a credential every time, however the prompt is worded, because an
@@ -372,16 +428,40 @@ const KN_HANDOFF = 'Iddakke Yedu jothe nere maathaadodu olle. WhatsApp alli ondu
    true answer that refuses to guess and pivots to the real credits. */
 const CREDENTIAL_Q = /(\b(have|has|did)\s+(you|he|yedu\w*)\s+(ever\s+)?(work|worked|shot|shoot|film|filmed|photograph\w*|cover|covered|do|done)\b)|(\bever\s+(work|worked|shot|filmed)\b)|(\b(worked|shot|filmed)\s+(with|for|at)\b.*\?)|(\bany\s+experience\s+(with|in|at)\b)/i;
 
-const CREDENTIAL_A = "I'd rather not guess at his shoot list — he'd know straight away. What I can tell you for certain: his Dubai property work is with Reportage and Storeys Real Estate. Beyond that there's a Marriott brand campaign in Coorg, an apparel film for Ranger Apparels, portraits for the actor Rukmini Vasanth, and on-set stills for the Malayalam features Soothravakyam and Baby Girl. Ask him directly and he'll tell you properly: https://wa.me/971501955122";
+const CREDENTIAL_A = wa => "I'd rather not guess at his shoot list — he'd know straight away. What I can tell you for certain: his Dubai property work is with Reportage and Storeys Real Estate. Beyond that there's a Marriott brand campaign in Coorg, an apparel film for Ranger Apparels, portraits for the actor Rukmini Vasanth, and on-set stills for the Malayalam features Soothravakyam and Baby Girl. Ask him directly and he'll tell you properly: https://wa.me/" + wa;
 
-async function viaWorkersAI(env, msgs, sys) {
+/* "How do I get in touch?" reliably produced a promise the bot can't keep \u2014
+   "main aapko Yedu se connect karwaunga", "\u092E\u0948\u0902 \u0906\u092A\u0915\u093E \u0938\u0902\u0926\u0947\u0936 \u092D\u0947\u091C \u0926\u0942\u0902\u0917\u093E", and once
+   "WhatsApp par mujhe message karein", which puts Iris on WhatsApp. A visitor
+   who believes a message was relayed simply waits, and the lead dies quietly.
+   Same treatment as the credential questions: answer it deterministically. */
+const CONTACT_Q = /(how (do|can) i (contact|reach|get in touch|book|speak|talk)|how to (contact|reach|book)|get in touch with|kaise (baat|contact|sampark|book)|\u0938\u0902\u092A\u0930\u094D\u0915 \u0915\u0948\u0938\u0947|\u0915\u0948\u0938\u0947 (\u0938\u0902\u092A\u0930\u094D\u0915|\u092C\u093E\u0924)|engane (contact|vilikkum|ariyikkum)|hege (contact|maatna)|\u0643\u064A\u0641 (\u0623\u062A\u0648\u0627\u0635\u0644|\u0627\u062A\u0648\u0627\u0635\u0644|\u0623\u062D\u062C\u0632))/i;
+
+const CONTACT_A = wa => ({
+  ml: 'Yedukrishnan-odu nere WhatsApp-il message ayakkoo \u2014 addeham thanne reply tharum: https://wa.me/' + wa,
+  kn: 'Yedukrishna avarige nere WhatsApp alli message maadi \u2014 avaru thaane reply maadtaare: https://wa.me/' + wa,
+  hi: '\u0906\u092A \u0909\u0928\u094D\u0939\u0947\u0902 \u0938\u0940\u0927\u0947 WhatsApp \u092A\u0930 \u092E\u0948\u0938\u0947\u091C \u0915\u0930 \u0926\u0940\u091C\u093F\u090F \u2014 \u0935\u094B \u0916\u0941\u0926 \u091C\u0935\u093E\u092C \u0926\u0947\u0902\u0917\u0947: https://wa.me/' + wa + ' . \u091A\u093E\u0939\u0947\u0902 \u0924\u094B /quote.html \u092A\u0930 \u0935\u093F\u0935\u0930\u0923 \u092D\u0940 \u092D\u0947\u091C \u0938\u0915\u0924\u0947 \u0939\u0948\u0902\u0964',
+  ar: '\u0631\u0627\u0633\u0644 \u064A\u062F\u0648\u0643\u0631\u064A\u0634\u0646\u0627 \u0645\u0628\u0627\u0634\u0631\u0629 \u0639\u0644\u0649 \u0648\u0627\u062A\u0633\u0627\u0628 \u0648\u0628\u064A\u0631\u062F \u0639\u0644\u064A\u0643 \u0628\u0646\u0641\u0633\u0647: https://wa.me/' + wa + ' \u2014 \u0623\u0648 \u0623\u0631\u0633\u0644 \u0627\u0644\u062A\u0641\u0627\u0635\u064A\u0644 \u0639\u0628\u0631 /quote.html',
+  en: "Easiest is to message Yedukrishna directly on WhatsApp \u2014 he replies himself: https://wa.me/" + wa + " . Or send the details through /quote.html and he'll come back to you."
+});
+function contactAnswer(text, wa) {
+  const A = CONTACT_A(wa);
+  if (/[\u0D00-\u0D7F]/.test(text) || ML_ROMAN.test(text)) return A.ml;
+  if (/[\u0C80-\u0CFF]/.test(text) || KN_ROMAN.test(text)) return A.kn;
+  if (/[\u0900-\u097F]/.test(text) || /\b(kaise|aap|mujhe|shaadi|chahiye|bhai)\b/i.test(text)) return A.hi;
+  if (/[\u0600-\u06FF]/.test(text)) return A.ar;
+  return A.en;
+}
+
+async function viaWorkersAI(env, msgs, sys, wa) {
   const last = msgs.filter(m => m.role === 'user').slice(-1)[0];
   if (last) {
+    if (CONTACT_Q.test(last.content)) return contactAnswer(last.content, wa);
     if (CREDENTIAL_Q.test(last.content) && !/[\u0600-\u06FF\u0900-\u097F\u0C80-\u0CFF\u0D00-\u0D7F]/.test(last.content)) {
-      return CREDENTIAL_A;
+      return CREDENTIAL_A(wa);
     }
-    if (/[\u0D00-\u0D7F]/.test(last.content) || ML_ROMAN.test(last.content)) return ML_HANDOFF;
-    if (/[\u0C80-\u0CFF]/.test(last.content) || KN_ROMAN.test(last.content)) return KN_HANDOFF;
+    if (/[\u0D00-\u0D7F]/.test(last.content) || ML_ROMAN.test(last.content)) return ML_HANDOFF(wa);
+    if (/[\u0C80-\u0CFF]/.test(last.content) || KN_ROMAN.test(last.content)) return KN_HANDOFF(wa);
   }
   const nonLatin = last && SCRIPT_HANDOFF.find(([re]) => re.test(last.content));
 
@@ -389,7 +469,7 @@ async function viaWorkersAI(env, msgs, sys) {
   for (const model of CF_MODELS) {
     // A weak model asked for Malayalam or Arabic produces word salad — hand
     // off in their own language instead of generating something embarrassing.
-    if (!model.strong && nonLatin) return nonLatin[1];
+    if (!model.strong && nonLatin) return nonLatin[1](wa);
     try {
       const r = await env.AI.run(model.id, {
         messages: [
@@ -407,12 +487,12 @@ async function viaWorkersAI(env, msgs, sys) {
       console.error('model failed', model.id, e && e.message);
     }
   }
-  if (nonLatin) return nonLatin[1];
+  if (nonLatin) return nonLatin[1](wa);
   if (lastErr) throw lastErr;
   return '';
 }
 
-async function viaGemini(env, msgs, sys) {
+async function viaGemini(env, msgs, sys, wa) {
   const body = JSON.stringify({
     systemInstruction: { parts: [{ text: sys }] },
     contents: msgs.map(m => ({
@@ -451,7 +531,7 @@ async function viaGemini(env, msgs, sys) {
   return '';
 }
 
-async function viaAnthropic(env, msgs, sys) {
+async function viaAnthropic(env, msgs, sys, wa) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -498,7 +578,9 @@ export default {
     if (!msgs.length) return json({ error: 'No messages' }, 400, origin);
 
     const c = body.ctx || {};
+    const wa = pickWa(request, lastUserText(msgs));
     const sys = buildSystem({
+      wa,
       page: typeof c.page === 'string' ? c.page.slice(0, 120) : '',
       path: typeof c.path === 'string' ? c.path.slice(0, 120) : '',
       lang: typeof c.lang === 'string' ? c.lang.slice(0, 12) : ''
@@ -518,7 +600,7 @@ export default {
     if (env.AI) chain.push(['workers-ai', viaWorkersAI]);
     if (!indic && env.GEMINI_API_KEY) chain.push(['gemini', viaGemini]);
 
-    if (!chain.length) return json({ reply: FALLBACK, error: 'no provider configured' }, 200, origin);
+    if (!chain.length) return json({ reply: FALLBACK(WA_AE), error: 'no provider configured' }, 200, origin);
 
     const debug = new URL(request.url).searchParams.get('debug') === '1';
     const problems = [];
@@ -528,11 +610,19 @@ export default {
       ANTHROPIC_API_KEY: !!env.ANTHROPIC_API_KEY,
       AI: !!env.AI
     };
-    if (debug) problems.push('bindings ' + JSON.stringify(bindings));
+    if (debug) {
+      problems.push('bindings ' + JSON.stringify(bindings));
+      problems.push('geo ' + JSON.stringify({
+        country: (request.cf && request.cf.country) || 'unknown',
+        city: (request.cf && request.cf.city) || 'unknown',
+        numberGiven: wa,
+        line: wa === WA_IN ? 'India' : 'UAE'
+      }));
+    }
 
     for (const [name, fn] of chain) {
       try {
-        const reply = await fn(env, msgs, sys);
+        const reply = await fn(env, msgs, sys, wa);
         if (reply) {
           return json(debug ? { reply, provider: name, problems } : { reply, provider: name }, 200, origin);
         }
@@ -544,6 +634,6 @@ export default {
         problems.push(name + ': ' + m.slice(0, 400));
       }
     }
-    return json(debug ? { reply: FALLBACK, problems } : { reply: FALLBACK }, 200, origin);
+    return json(debug ? { reply: FALLBACK(wa), problems } : { reply: FALLBACK(wa) }, 200, origin);
   }
 };
