@@ -27,7 +27,8 @@ h2 em,h3 em,h1 em{font-style:italic;background:linear-gradient(100deg,var(--ambe
 
 /* buttons */
 .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-  padding:14px 26px;border-radius:32px;transition:.3s var(--ease);border:1px solid transparent}
+  padding:14px 26px;border-radius:32px;transition:.3s var(--ease);border:1px solid transparent;
+  background:transparent;color:var(--paper);cursor:pointer}
 .btn-fill{background:var(--amber);color:var(--black);font-weight:500}
 .btn-fill:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,140,59,.28)}
 .btn-ghost{border-color:rgba(244,237,226,.25);color:var(--paper)}

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C57X89TN45"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-C57X89TN45');
+</script>
+
+<title>Get a Quote in 60 Seconds | Photography &amp; Video — YKS Productions</title>
+<meta name="description" content="Answer a few quick questions and get an all-in quote for photography or video in Dubai, Abu Dhabi or Bangalore — weddings, real estate, corporate, events, portraits and social content." />
+<meta name="keywords" content="photography quote Dubai, videographer quote Dubai, hire photographer Dubai, book photographer Dubai, get a quote photographer Bangalore, photography booking Dubai" />
+<link rel="canonical" href="https://yksproductions.com/quote.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta name="geo.region" content="AE-DU" />
+<meta name="geo.placename" content="Dubai, United Arab Emirates" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="YKS Productions" />
+<meta property="og:title" content="Get a Quote in 60 Seconds — YKS Productions" />
+<meta property="og:description" content="A few quick questions and you'll have an all-in quote for your shoot." />
+<meta property="og:url" content="https://yksproductions.com/quote.html" />
+<meta property="og:image" content="https://yksproductions.com/assets/og-cover.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48.png" />
+<link rel="apple-touch-icon" href="/assets/favicon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/landing.css?v=3" />
+<style>
+.q-wrap{max-width:720px;margin:0 auto}
+.q-bar{height:3px;background:rgba(244,237,226,.1);border-radius:3px;overflow:hidden;margin-bottom:34px}
+.q-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--peach));transition:width .5s var(--ease)}
+.q-log{display:flex;flex-direction:column;gap:14px;margin-bottom:26px}
+.q-row{display:flex;gap:12px;align-items:flex-start;animation:qin .45s var(--ease) both}
+@keyframes qin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.q-av{flex:none;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--peach));
+  display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:600;color:#07060a;font-size:14px}
+.q-bub{background:rgba(244,237,226,.06);border:1px solid var(--line);border-radius:14px;border-top-left-radius:4px;
+  padding:14px 18px;font-size:1rem;line-height:1.6;color:var(--paper);max-width:88%}
+.q-row.me{justify-content:flex-end}
+.q-row.me .q-bub{background:rgba(255,140,59,.14);border-color:rgba(255,140,59,.32);border-radius:14px;border-top-right-radius:4px;color:var(--paper)}
+.q-opts{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.q-opt{font-family:'Space Grotesk',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid rgba(244,237,226,.24);background:transparent;color:var(--paper);border-radius:40px;padding:13px 20px;cursor:pointer;
+  transition:.25s var(--ease)}
+.q-opt:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.q-opt.on{background:var(--amber);border-color:var(--amber);color:#07060a}
+.q-in{width:100%;background:rgba(244,237,226,.05);border:1px solid rgba(244,237,226,.16);border-radius:12px;
+  padding:14px 16px;color:var(--paper);font-family:var(--sans);font-size:.98rem;outline:none;transition:border-color .3s;margin-top:4px}
+.q-in:focus{border-color:var(--amber)}
+.q-in::placeholder{color:rgba(244,237,226,.38)}
+.q-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.q-back{background:none;border:0;color:var(--paper-dim);font-family:'Space Grotesk',monospace;font-size:10.5px;
+  letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:color .3s}
+.q-back:hover{color:var(--amber)}
+.q-sum{border:1px solid var(--line);border-radius:14px;padding:22px 24px;background:rgba(244,237,226,.03);margin-top:4px}
+.q-sum dl{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;margin:0}
+.q-sum dt{font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-dim);white-space:nowrap}
+.q-sum dd{margin:0;font-size:.95rem;color:var(--paper)}
+.q-done{text-align:center;padding:20px 0}
+.q-done .tick{width:60px;height:60px;border-radius:50%;background:rgba(255,140,59,.15);border:1px solid var(--amber);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-size:28px;color:var(--amber)}
+@media(max-width:600px){.q-bub{max-width:100%}.q-opt{font-size:11px;padding:12px 16px}}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": "Get a Quote — YKS Productions",
+      "description": "Answer a few quick questions and get an all-in quote for photography or video in Dubai, Abu Dhabi or Bangalore.",
+      "url": "https://yksproductions.com/quote.html"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://yksproductions.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Get a Quote", "item": "https://yksproductions.com/quote.html" }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body data-wa="971501955122">
+
+<nav class="l-nav">
+  <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
+  <a class="l-back" href="/index.html">Back to portfolio</a>
+</nav>
+
+<main>
+
+<section class="l-hero" style="padding-bottom:40px">
+  <div class="wrap">
+    <p class="l-eyebrow">Quote Assistant</p>
+    <h1>Tell me about it, <em>get a real quote</em></h1>
+    <p class="l-lede">A few quick questions — about 60 seconds — and I'll have everything I need to send you availability and one all-in number. No call required, no obligation.</p>
+  </div>
+</section>
+
+<section class="l-section" style="padding-top:20px">
+  <div class="wrap">
+    <div class="q-wrap">
+      <div class="q-bar"><i id="qBar"></i></div>
+      <div class="q-log" id="qLog"></div>
+      <div id="qNow"></div>
+      <noscript><p class="l-lede">This assistant needs JavaScript. You can message me directly on <a href="https://wa.me/971501955122" style="color:var(--amber)">WhatsApp</a> instead.</p></noscript>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="l-foot">
+  <div class="wrap">
+    <div class="l-foot-inner">
+      <div class="l-foot-brand">YKS<span>.</span>Productions</div>
+      <div class="l-foot-links">
+        <a href="/index.html">Portfolio</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/photographer-dubai.html">Services</a>
+        <a href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <p class="l-related">
+      Prefer to talk? <a href="https://wa.me/971501955122?text=Hi%20Yedukrishna%2C%20I%27d%20like%20a%20quote." target="_blank" rel="noopener">WhatsApp me directly</a> · Or read the <a href="/faq.html">FAQ</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var KEY = 'fbf5d037-af64-46a1-8ddc-5777379ec179';
+  var log = document.getElementById('qLog'), now = document.getElementById('qNow'), bar = document.getElementById('qBar');
+  var A = {}, idx = 0, hist = [];
+
+  var SCALE = {
+    'Wedding': { q: 'How many events or days are we covering?', o: ['One event / single day', 'Two days', 'Three or more days', 'Not decided yet'] },
+    'Real estate / property': { q: 'What kind of property is it?', o: ['Apartment', 'Villa / townhouse', 'Off-plan or show unit', 'Multiple listings / ongoing'] },
+    'Corporate / brand video': { q: 'What is the film for?', o: ['Brand / company film', 'Product or explainer', 'Testimonials', 'Event recap', 'Not sure yet'] },
+    'Event': { q: 'Roughly how long is the event?', o: ['2–3 hours', 'Half day', 'Full day', 'Multi-day'] },
+    'Portraits / headshots': { q: 'Is this for one person or a team?', o: ['Just me', 'A few people', 'Whole team (10+)', 'Actor / model portfolio'] },
+    'Fashion / editorial': { q: 'What are we shooting?', o: ['Lookbook', 'Campaign', 'Editorial', 'Model / actor portfolio'] },
+    'Food / restaurant': { q: 'Roughly how much are we shooting?', o: ['A few hero dishes', 'Part of the menu', 'Full menu', 'Menu + reels'] },
+    'Social content / reels': { q: 'What kind of arrangement suits you?', o: ['One-off content batch', 'Monthly retainer', 'Just reels', 'Not sure yet'] }
+  };
+
+  var STEPS = [
+    { k: 'need', q: "Hi — I'm Yedukrishna. What do you need?", o: ['Photography', 'Video', 'Both photo &amp; video', 'Social content &amp; reels'] },
+    { k: 'type', q: 'What kind of shoot is it?', o: ['Wedding', 'Real estate / property', 'Corporate / brand video', 'Event', 'Portraits / headshots', 'Fashion / editorial', 'Food / restaurant', 'Social content / reels', 'Something else'] },
+    { k: 'scale', dyn: true },
+    { k: 'where', q: 'Where is the shoot?', o: ['Dubai', 'Abu Dhabi', 'Elsewhere in the UAE', 'Bangalore', 'Elsewhere in India', 'Somewhere else'] },
+    { k: 'when', q: 'When are you thinking?', o: ['Within 2 weeks', 'This month', 'In 1–3 months', 'In 3+ months', 'Date not fixed yet'] },
+    { k: 'deliver', q: 'What do you want to end up with? (pick any)', o: ['Edited photos', 'A hero film', 'Social reels', 'Same-day edit', 'Album / prints', 'Not sure — advise me'], multi: true },
+    { k: 'detail', q: "Anything else I should know? Venue, brief, references — or just skip it.", input: 'Tell me anything useful… (optional)', skip: true },
+    { k: 'contact', contact: true, q: 'Last bit — how do I reach you?' }
+  ];
+
+  function esc(s) { return String(s).replace(/[<>&"]/g, function (c) { return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[c]; }); }
+  function bubble(who, html) {
+    var r = document.createElement('div'); r.className = 'q-row' + (who === 'me' ? ' me' : '');
+    r.innerHTML = (who === 'me' ? '' : '<div class="q-av">Y</div>') + '<div class="q-bub">' + html + '</div>';
+    log.appendChild(r);
+  }
+  function step() {
+    var s = STEPS[idx];
+    bar.style.width = Math.round((idx / STEPS.length) * 100) + '%';
+    if (!s) return finish();
+    if (s.dyn) {
+      var cfg = SCALE[A.type];
+      if (!cfg) { idx++; return step(); }
+      s = { k: 'scale', q: cfg.q, o: cfg.o };
+    }
+    now.innerHTML = '';
+    var wrap = document.createElement('div');
+    wrap.innerHTML = '<div class="q-row"><div class="q-av">Y</div><div class="q-bub">' + s.q + '</div></div>';
+    var body = document.createElement('div'); body.style.marginTop = '14px';
+
+    if (s.contact) {
+      body.innerHTML = '<input class="q-in" id="cN" placeholder="Your name" autocomplete="name" />'
+        + '<input class="q-in" id="cP" placeholder="Phone / WhatsApp" autocomplete="tel" />'
+        + '<input class="q-in" id="cE" placeholder="Email (optional)" autocomplete="email" />'
+        + '<div class="q-actions"><button class="btn btn-fill" id="cGo">Review my brief →</button>'
+        + (hist.length ? '<button class="q-back" id="qB">← Back</button>' : '') + '</div>';
+    } else if (s.input) {
+      body.innerHTML = '<textarea class="q-in" id="tIn" rows="3" placeholder="' + s.input + '"></textarea>'
+        + '<div class="q-actions"><button class="btn btn-fill" id="tGo">Continue →</button>'
+        + (s.skip ? '<button class="q-back" id="tSkip">Skip</button>' : '')
+        + (hist.length ? '<button class="q-back" id="qB">← Back</button>' : '') + '</div>';
+    } else {
+      var o = '<div class="q-opts">';
+      s.o.forEach(function (t, i) { o += '<button class="q-opt" data-v="' + esc(t) + '">' + t + '</button>'; });
+      o += '</div>';
+      if (s.multi) o += '<div class="q-actions"><button class="btn btn-fill" id="mGo">Continue →</button>'
+        + (hist.length ? '<button class="q-back" id="qB">← Back</button>' : '') + '</div>';
+      else if (hist.length) o += '<div class="q-actions"><button class="q-back" id="qB">← Back</button></div>';
+      body.innerHTML = o;
+    }
+    wrap.appendChild(body); now.appendChild(wrap);
+
+    var back = document.getElementById('qB');
+    if (back) back.onclick = function () {
+      var p = hist.pop(); idx = p; delete A[STEPS[p] && STEPS[p].k];
+      if (log.lastChild) log.removeChild(log.lastChild);
+      if (log.lastChild) log.removeChild(log.lastChild);
+      step();
+    };
+
+    if (s.contact) {
+      document.getElementById('cGo').onclick = function () {
+        var n = document.getElementById('cN').value.trim(), p = document.getElementById('cP').value.trim();
+        if (!n || !p) { alert('I just need a name and a number to get back to you.'); return; }
+        A.name = n; A.phone = p; A.email = document.getElementById('cE').value.trim();
+        bubble('bot', s.q); bubble('me', esc(n) + ' · ' + esc(p));
+        hist.push(idx); idx++; step();
+      };
+    } else if (s.input) {
+      var go = function (v) { A[s.k] = v; bubble('bot', s.q); bubble('me', v ? esc(v) : '—'); hist.push(idx); idx++; step(); };
+      document.getElementById('tGo').onclick = function () { go(document.getElementById('tIn').value.trim()); };
+      if (s.skip) document.getElementById('tSkip').onclick = function () { go(''); };
+    } else if (s.multi) {
+      var picked = [];
+      body.querySelectorAll('.q-opt').forEach(function (b) {
+        b.onclick = function () {
+          var v = b.dataset.v, i = picked.indexOf(v);
+          if (i < 0) { picked.push(v); b.classList.add('on'); } else { picked.splice(i, 1); b.classList.remove('on'); }
+        };
+      });
+      document.getElementById('mGo').onclick = function () {
+        if (!picked.length) { alert('Pick at least one — or choose "Not sure, advise me".'); return; }
+        A[s.k] = picked.join(', '); bubble('bot', s.q); bubble('me', esc(A[s.k]));
+        hist.push(idx); idx++; step();
+      };
+    } else {
+      body.querySelectorAll('.q-opt').forEach(function (b) {
+        b.onclick = function () {
+          A[s.k] = b.dataset.v.replace(/&amp;/g, '&');
+          bubble('bot', s.q); bubble('me', esc(A[s.k]));
+          hist.push(idx); idx++; step();
+        };
+      });
+    }
+    now.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function brief() {
+    var L = [];
+    if (A.need) L.push(['Needs', A.need]);
+    if (A.type) L.push(['Shoot type', A.type]);
+    if (A.scale) L.push(['Scale', A.scale]);
+    if (A.where) L.push(['Location', A.where]);
+    if (A.when) L.push(['Timing', A.when]);
+    if (A.deliver) L.push(['Deliverables', A.deliver]);
+    if (A.detail) L.push(['Notes', A.detail]);
+    return L;
+  }
+
+  function finish() {
+    bar.style.width = '100%';
+    var L = brief(), dl = '';
+    L.forEach(function (r) { dl += '<dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd>'; });
+    now.innerHTML = '<div class="q-row"><div class="q-av">Y</div><div class="q-bub">Here\'s your brief. Look right? Send it and I\'ll come back with availability and an all-in quote — usually within a few hours.</div></div>'
+      + '<div class="q-sum" style="margin-top:14px"><dl>' + dl + '<dt>Name</dt><dd>' + esc(A.name) + '</dd><dt>Contact</dt><dd>' + esc(A.phone) + (A.email ? ' · ' + esc(A.email) : '') + '</dd></dl></div>'
+      + '<div class="q-actions"><button class="btn btn-fill" id="sGo">Send my brief →</button>'
+      + '<button class="btn btn-ghost" id="sWa">Send on WhatsApp instead</button></div>';
+
+    var txt = L.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n');
+    document.getElementById('sWa').onclick = function () {
+      var m = "Hi Yedukrishna, I'd like a quote.\n\n" + txt + "\nName: " + A.name;
+      window.open('https://wa.me/971501955122?text=' + encodeURIComponent(m), '_blank');
+    };
+    document.getElementById('sGo').onclick = function () {
+      var b = document.getElementById('sGo'); b.textContent = 'Sending…'; b.disabled = true;
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: KEY,
+          subject: 'QUOTE REQUEST — ' + (A.type || 'Shoot') + ' · ' + (A.where || ''),
+          from_name: 'YKS quote assistant',
+          Source: 'Quote assistant',
+          Name: A.name, Contact: A.phone, Email: A.email || '—',
+          Needs: A.need || '—', Type: A.type || '—', Scale: A.scale || '—',
+          Location: A.where || '—', Timing: A.when || '—',
+          Deliverables: A.deliver || '—', Notes: A.detail || '—'
+        })
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        if (j.success) {
+          if (window.gtag) gtag('event', 'generate_lead', { method: 'quote_assistant' });
+          now.innerHTML = '<div class="q-done"><div class="tick">✓</div>'
+            + '<h2 style="font-size:clamp(24px,3.4vw,36px);margin-bottom:14px">Got it — thank you</h2>'
+            + '<p class="l-lede" style="margin:0 auto 26px">Your brief is with me. I\'ll come back with availability and an all-in quote, usually within a few hours.</p>'
+            + '<div class="q-actions" style="justify-content:center"><a class="btn btn-ghost" href="/faq.html">Read the FAQ</a>'
+            + '<a class="btn btn-ghost" href="/index.html">See the work</a></div></div>';
+          now.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else { b.textContent = 'Try again →'; b.disabled = false; }
+      }).catch(function () { b.textContent = 'Try again →'; b.disabled = false; });
+    };
+    now.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  step();
+})();
+</script>
+<script src="/js/landing.js?v=3"></script>
+
+</body>
+</html>

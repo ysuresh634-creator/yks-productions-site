@@ -78,7 +78,7 @@ img{display:block;max-width:100%}
 .brandmark span{color:var(--amber)}
 .brandmark em{font-style:normal;font-size:13px;opacity:.65;margin-left:2px;letter-spacing:.08em}
 .nav .links{display:flex;gap:26px;align-items:center}
-.nav .links a{font-family:var(--font-m);font-size:11px;letter-spacing:.18em;text-transform:uppercase;position:relative;padding:4px 0;color:var(--paper)}
+.nav .links a{font-family:var(--font-m);font-size:11px;letter-spacing:.18em;text-transform:uppercase;position:relative;padding:4px 0;color:var(--paper);white-space:nowrap}
 .nav .links a:not(.nav-cta)::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;
   background:linear-gradient(90deg,var(--amber),var(--teal));transition:width .35s var(--ease)}
 .nav .links a:not(.nav-cta):hover::after{width:100%}
@@ -550,7 +550,7 @@ img{display:block;max-width:100%}
 }
 /* nav links don't fit beside the brandmark below ~1020px — hand over to the burger panel
    early so the menu can never collide with or overlap the logo */
-@media(max-width:1020px){
+@media(max-width:1200px){
   .burger{display:flex}
   .nav-reel{display:none}
   .nav .links{position:fixed;inset:0 0 0 auto;width:min(320px,82vw);background:rgba(10,8,16,.68);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
