@@ -685,7 +685,14 @@ img{display:block;max-width:100%}
    page. Seven now, each a real destination, with the portfolio
    sections gathered under Work instead of sitting loose beside
    cities and a client's name. */
-.nav-drop{position:relative;display:flex;align-items:center}
+/* The menu is absolutely positioned, so it does NOT extend .nav-drop's
+   box. With the menu sitting 8px below the button, moving the cursor
+   toward it left the element, fired mouseleave, and closed the menu
+   before it could be reached — Work was unusable with a mouse. The
+   padding extends the hover target down to meet the menu; the negative
+   margin keeps the nav's layout unchanged. */
+.nav-drop{position:relative;display:flex;align-items:center;
+  padding-bottom:14px;margin-bottom:-14px}
 .nav-dropbtn{display:flex;align-items:center;gap:6px;background:none;border:0;cursor:pointer;padding:4px 0;
   font-family:var(--font-m);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper);
   white-space:nowrap;transition:color .3s var(--ease)}
@@ -695,7 +702,7 @@ img{display:block;max-width:100%}
 .nav-drop.on .nav-dropbtn svg{transform:rotate(180deg)}
 .nav-dropbtn:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 
-.nav-menu{position:absolute;top:calc(100% + 16px);left:50%;transform:translateX(-50%) translateY(-8px);
+.nav-menu{position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(-8px);
   min-width:212px;background:rgba(10,8,16,.94);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
   border:1px solid rgba(244,237,226,.14);border-radius:14px;padding:8px;
   box-shadow:0 24px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:2px;
@@ -708,7 +715,9 @@ img{display:block;max-width:100%}
 
 /* inside the burger panel it becomes an indented list — no floating card */
 @media(max-width:1020px){
-  .nav-drop{flex-direction:column;align-items:flex-start;width:100%;gap:0}
+  /* no hover here, so the bridge isn't needed and would add dead space */
+  .nav-drop{flex-direction:column;align-items:flex-start;width:100%;gap:0;
+    padding-bottom:0;margin-bottom:0}
   .nav-dropbtn{font-size:15px;letter-spacing:.14em;padding:0;width:100%;justify-content:space-between}
   .nav-menu{position:static;transform:none;opacity:1;visibility:visible;pointer-events:auto;
     background:none;border:0;box-shadow:none;padding:0 0 0 14px;min-width:0;width:100%;
