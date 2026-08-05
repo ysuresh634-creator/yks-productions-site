@@ -49,6 +49,32 @@
     $('.nav .links').classList.toggle('open');
   });
 
+  /* ─────────── Work dropdown ─────────── */
+  const drop = $('#navDrop'), dropBtn = $('#navWorkBtn');
+  if (drop && dropBtn) {
+    const setDrop = on => {
+      drop.classList.toggle('on', on);
+      dropBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    };
+    dropBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      setDrop(!drop.classList.contains('on'));
+    });
+    // pointer users get hover; the click above covers touch and keyboard
+    if (matchMedia('(hover:hover)').matches) {
+      drop.addEventListener('mouseenter', () => setDrop(true));
+      drop.addEventListener('mouseleave', () => setDrop(false));
+    }
+    document.addEventListener('click', e => {
+      if (!drop.contains(e.target)) setDrop(false);
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') setDrop(false);
+    });
+    // picking a section closes the whole nav, burger panel included
+    drop.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setDrop(false)));
+  }
+
   /* ─────────── text splitting ─────────── */
   $$('[data-split]').forEach(el => {
     const mode = el.dataset.split;
