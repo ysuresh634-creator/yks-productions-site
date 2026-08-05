@@ -32,7 +32,15 @@
     e.preventDefault();
     $('#burger') && $('#burger').classList.remove('open');
     $('.nav .links').classList.remove('open');
-    lenis.scrollTo(target, { offset: 0, duration: 1.6 });
+    // -80 clears the fixed nav; offset 0 tucked section headings underneath it.
+    // Animating across this page's full height (~190,000px) never completes —
+    // Lenis has to cover ~115,000px/sec while ScrollTrigger re-pins and the
+    // WebGL shaders update, and the tween stalls at zero. Glide for nearby
+    // sections, jump instantly for far ones.
+    const distance = Math.abs(target.getBoundingClientRect().top);
+    lenis.scrollTo(target, distance > 8000
+      ? { offset: -80, immediate: true, force: true }
+      : { offset: -80, duration: 1.2 });
   }));
 
   /* ─────────── mobile menu ─────────── */
@@ -435,13 +443,24 @@
     });
   }
 
+  /* Lenis caches the max scroll position when it initialises. ScrollTrigger's
+     pin-spacers are added afterwards and grow the document — the page ended up
+     189,959px tall while Lenis still thought the limit was 35,793px, so every
+     nav tab past that point (Marriott, Weddings, Films, Store, Story, Book)
+     silently clamped and went nowhere. Re-measure after every refresh. */
+  ScrollTrigger.addEventListener('refresh', () => lenis.resize());
+
   /* refresh pins once everything (fonts/images) settles */
   addEventListener('load', () => {
     ScrollTrigger.refresh();
+    lenis.resize();
     // re-aim any #hash deep link — pin spacers shift anchors after load
     if (location.hash) {
       const target = $(location.hash);
       if (target) lenis.scrollTo(target, { immediate: true, offset: -80 });
     }
   });
+
+  // late-loading media can grow the page again well after load
+  addEventListener('resize', () => lenis.resize());
 })();

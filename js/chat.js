@@ -201,11 +201,15 @@
     /* chips live inside the log, directly under the last reply — so they read
        as part of the conversation instead of stranding a gap above the input */
     + '.yc-chips{display:flex;flex-wrap:wrap;gap:7px;padding:1px 0 6px}'
-    + '.yc-chip{font-size:12.5px;padding:9px 14px;border-radius:30px;border:1px solid rgba(244,237,226,.2);'
-    + 'background:rgba(244,237,226,.03);color:rgba(244,237,226,.86);cursor:pointer;font-family:inherit;'
-    + 'transition:.2s;animation:ycMsg .3s cubic-bezier(.22,.61,.36,1)}'
+    /* matches the site button system: 999px radius, 40px tap target,
+       same amber hover, same .015em tracking */
+    + '.yc-chip{font-size:13px;letter-spacing:.015em;min-height:40px;padding:0 16px;'
+    + 'display:inline-flex;align-items:center;border-radius:999px;border:1px solid rgba(244,237,226,.26);'
+    + 'background:transparent;color:rgba(244,237,226,.86);cursor:pointer;font-family:inherit;'
+    + 'transition:border-color .3s,color .3s,background .3s;animation:ycMsg .3s cubic-bezier(.22,.61,.36,1)}'
     + '.yc-chip:hover{border-color:#ff8c3b;color:#ff8c3b;background:rgba(255,140,59,.08)}'
-    + '.yc-chip.go{border-color:rgba(255,140,59,.5);color:#ff8c3b}'
+    + '.yc-chip:focus-visible{outline:2px solid #ff8c3b;outline-offset:3px}'
+    + '.yc-chip.go{border-color:rgba(255,140,59,.55);color:#ff8c3b}'
     + '.yc-foot{display:flex;gap:8px;padding:12px 12px 8px;align-items:flex-end}'
     + '.yc-in{flex:1;background:rgba(244,237,226,.06);border:1px solid rgba(244,237,226,.16);border-radius:14px;'
     + 'padding:12px 14px;color:#f4ede2;font-family:inherit;font-size:14px;outline:none;resize:none;'
