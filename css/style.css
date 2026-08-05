@@ -769,3 +769,37 @@ img{display:block;max-width:100%}
   .market-card{padding:28px 24px 24px}
 }
 @media(max-width:560px){.pf-grid{grid-template-columns:1fr}}
+
+/* ── nav status chip ────────────────────────────────────────────
+   Replaces the solid amber "Get a quote" pill. Two amber pills were
+   on screen at once — this one and the floating dock — and a filled
+   block sat badly among light letter-spaced caps. The dock already
+   carries the CTA permanently and more visibly, so the nav slot is
+   free to say something instead of asking for something. It keeps the
+   old REC light's blink (a working camera) and still routes to the
+   quote page, so nothing is lost. "Available 2026" is the hero's own
+   line, not a new claim. */
+.nav-status{display:flex;align-items:center;gap:9px;font-family:var(--font-m);font-size:10px;
+  letter-spacing:.26em;text-transform:uppercase;color:var(--paper-dim);white-space:nowrap;
+  padding:8px 2px;transition:color .3s var(--ease)}
+.nav-status span{width:8px;height:8px;border-radius:50%;background:#ff3b30;flex:none;
+  box-shadow:0 0 12px #ff3b30;animation:blink 1.6s infinite}
+.nav-status:hover{color:var(--amber)}
+.nav-status:hover span{background:var(--amber);box-shadow:0 0 12px var(--amber)}
+.nav-status:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+
+/* The chip lives outside .links, so on phones it would sit beside the
+   burger and crowd it — the old REC light was hidden here for the same
+   reason. Hidden, and the burger panel gets its own entry instead. */
+.nav-panel-cta{display:none}
+@media(max-width:1020px){
+  .nav-status{display:none}
+  .nav .links .nav-panel-cta{display:flex;align-items:flex-start;gap:10px;width:100%;
+    margin-top:18px;padding-top:18px;border-top:1px solid rgba(244,237,226,.14);
+    font-size:12.5px;letter-spacing:.1em;color:var(--paper);
+    white-space:normal;line-height:1.6}   /* wraps rather than clipping in a 320px panel */
+  .nav .links .nav-panel-cta i{margin-top:6px}
+  .nav .links .nav-panel-cta::after{display:none}
+  .nav .links .nav-panel-cta i{width:8px;height:8px;border-radius:50%;background:#ff3b30;flex:none;
+    box-shadow:0 0 12px #ff3b30;animation:blink 1.6s infinite;font-style:normal}
+}
