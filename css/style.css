@@ -717,3 +717,46 @@ img{display:block;max-width:100%}
   .nav-menu a{font-size:13.5px;padding:9px 0;border-left:1px solid rgba(244,237,226,.16);padding-left:14px;border-radius:0}
   .nav-menu a:hover{background:none;border-left-color:var(--amber)}
 }
+
+/* ── market band + portfolio grid (shortened homepage) ──────────
+   The split as a door, not a gate: a visitor who knows where they're
+   shooting takes one tap; a visitor who doesn't keeps scrolling. */
+.act-market{padding:96px 0 40px}
+.market-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:44px}
+.market-card{position:relative;display:flex;flex-direction:column;gap:12px;padding:38px 34px 32px;
+  border:1px solid var(--line);border-radius:18px;background:linear-gradient(165deg,rgba(22,19,28,.9),rgba(13,11,18,.7));
+  overflow:hidden;transition:border-color .4s var(--ease),transform .4s var(--ease)}
+.market-card::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .4s var(--ease);
+  background:radial-gradient(120% 100% at 0 0,rgba(255,140,59,.14),transparent 60%)}
+.market-card:hover{border-color:rgba(255,140,59,.5);transform:translateY(-4px)}
+.market-card:hover::before{opacity:1}
+.market-card>*{position:relative}
+.market-flag{font-family:var(--font-m);font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--amber)}
+.market-card h3{font-family:var(--font-d);font-size:clamp(26px,2.8vw,36px);font-weight:500}
+.market-card p{color:var(--paper-dim);font-size:1rem;line-height:1.7;max-width:44ch}
+.market-go{font-family:var(--font-m);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--paper);margin-top:6px;transition:color .3s var(--ease)}
+.market-card:hover .market-go{color:var(--amber)}
+
+.act-portfolio{padding:70px 0 96px}
+.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
+.pf{position:relative;display:block;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+  transition:border-color .4s var(--ease),transform .4s var(--ease)}
+.pf img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;
+  transition:transform .6s var(--ease),filter .5s var(--ease);filter:brightness(.82)}
+.pf:hover{border-color:rgba(255,140,59,.5);transform:translateY(-4px)}
+.pf:hover img{transform:scale(1.05);filter:brightness(1)}
+.pf-body{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:3px;
+  padding:44px 22px 20px;background:linear-gradient(transparent,rgba(7,6,10,.9) 55%)}
+.pf-body b{font-family:var(--font-d);font-size:1.4rem;font-weight:500}
+.pf-body small{font-size:.85rem;color:var(--paper-dim);line-height:1.5}
+.pf:focus-visible,.market-card:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+@media(max-width:900px){
+  .market-grid{grid-template-columns:1fr}
+  .pf-grid{grid-template-columns:1fr 1fr;gap:12px}
+  .act-market{padding:70px 0 30px}
+  .act-portfolio{padding:50px 0 70px}
+  .market-card{padding:28px 24px 24px}
+}
+@media(max-width:560px){.pf-grid{grid-template-columns:1fr}}

@@ -251,7 +251,11 @@
   }
 
   /* ─────────── ACT III · horizontal work reel ─────────── */
+  /* This act moved to its own page, so the pin only builds where the
+     markup still exists — otherwise ScrollTrigger warns about a missing
+     trigger on every refresh. */
   const track = $('#workTrack'), workIdx = $('#workIdx');
+  if (track && workIdx && $('#act-work') && $('#workPin')) {
   const cards = $$('.work-card', track).length;
   function workDistance() { return Math.max(0, track.scrollWidth - innerWidth); }
   ScrollTrigger.create({
@@ -262,10 +266,13 @@
       workIdx.textContent = String(Math.min(cards, 1 + Math.floor(self.progress * cards))).padStart(2, '0');
     }
   });
+  }
 
   /* ─────────── ACT IV · Dubai sunset scrub ─────────── */
+  /* Also moved to its own page — same guard. */
   const phaseEl = $('#dubaiPhase');
   const PHASES = [[0, 'GOLDEN HOUR'], [.32, 'SUNSET'], [.58, 'BLUE HOUR'], [.8, 'NIGHT']];
+  if ($('#act-dubai') && $('.act-dubai .cinema-stage')) {
   cinemaPins.dubai = ScrollTrigger.create({
     trigger: '#act-dubai', start: 'top top', end: mobile ? '+=80%' : '+=120%',
     pin: '.act-dubai .cinema-stage', scrub: true, anticipatePin: 1,
@@ -279,6 +286,7 @@
       gsap.set('.dubai-content', { y: -p * 60 });
     }
   });
+  }
 
   /* ─────────── films marquee drift ─────────── */
   $$('.m-row').forEach(row => {
