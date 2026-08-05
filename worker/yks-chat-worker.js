@@ -16,7 +16,13 @@
  * ---------------------------------------------------------------
  */
 
-const CF_MODEL = '@cf/meta/llama-3.1-8b-instruct'; // free tier on Workers AI
+// Verified working on this account 2026-08-05 (llama-3.1-8b-instruct was
+// deprecated 2026-05-30). Falls back down the list if one is retired.
+const CF_MODELS = [
+  '@cf/meta/llama-3.1-8b-instruct-fast',
+  '@cf/meta/llama-3.2-3b-instruct',
+  '@cf/mistral/mistral-7b-instruct-v0.1'
+];
 const GEMINI_MODEL = 'gemini-2.0-flash';
 const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
 
@@ -78,12 +84,32 @@ const json = (body, status, origin) =>
 
 /* ── providers ─────────────────────────────────────────────── */
 
+function readAI(r) {
+  if (!r) return '';
+  // Workers AI returns OpenAI-style {choices:[{message:{content}}]} on current
+  // models, and {response} on older ones — support both.
+  const c = r.choices && r.choices[0];
+  const text = (c && c.message && c.message.content) || r.response || r.result || '';
+  return String(text).trim();
+}
+
 async function viaWorkersAI(env, msgs) {
-  const r = await env.AI.run(CF_MODEL, {
-    messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...msgs],
-    max_tokens: MAX_TOKENS
-  });
-  return (r && (r.response || r.result)) ? String(r.response || r.result).trim() : '';
+  let lastErr;
+  for (const model of CF_MODELS) {
+    try {
+      const r = await env.AI.run(model, {
+        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...msgs],
+        max_tokens: MAX_TOKENS
+      });
+      const text = readAI(r);
+      if (text) return text;
+    } catch (e) {
+      lastErr = e;
+      console.error('model failed', model, e && e.message);
+    }
+  }
+  if (lastErr) throw lastErr;
+  return '';
 }
 
 async function viaGemini(env, msgs) {
