@@ -152,3 +152,74 @@ h2 em,h3 em,h1 em{font-style:italic;background:linear-gradient(100deg,var(--ambe
   .l-foot-inner{flex-direction:column;align-items:flex-start}
   .l-back{display:none}
 }
+
+/* ══════════════════════════════════════════════════════════════
+   CATEGORY PAGES
+   Shared by the portfolio pages split out of the old single-page
+   homepage. Deliberately built on this stylesheet rather than the
+   GSAP/WebGL one — no pinning, no pin-spacers, so the scroll here
+   cannot desync the way the 190,000px homepage did.
+   ══════════════════════════════════════════════════════════════ */
+
+/* category strip — every entry opens a real page.
+   .l-nav is position:fixed and therefore out of flow, so this needs an
+   explicit offset or it renders underneath it. --navh matches the nav's
+   measured height (70px desktop, 64px once its padding tightens). */
+:root{--navh:70px}
+.l-cats{position:sticky;top:var(--navh);z-index:60;margin-top:var(--navh);
+  background:rgba(7,6,10,.86);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(244,237,226,.1)}
+/* the strip already supplies the clearance the hero was padding for */
+.l-cats + main .l-hero,
+.l-cats ~ main .l-hero{padding-top:64px}
+.l-cats-inner{display:flex;gap:6px;overflow-x:auto;padding:11px 30px;
+  scrollbar-width:none;-ms-overflow-style:none}
+.l-cats-inner::-webkit-scrollbar{display:none}
+.l-cats a{flex:none;font-family:var(--mono);font-size:12.5px;letter-spacing:.015em;
+  min-height:38px;padding:0 15px;display:inline-flex;align-items:center;
+  border:1px solid rgba(244,237,226,.18);border-radius:999px;color:var(--paper-dim);
+  white-space:nowrap;transition:border-color .3s,color .3s,background .3s}
+.l-cats a:hover{border-color:var(--amber);color:var(--amber);background:rgba(255,140,59,.08)}
+.l-cats a[aria-current="page"]{background:var(--amber);border-color:var(--amber);
+  color:var(--black);font-weight:600}
+.l-cats a:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+/* video facade — poster + play, iframe only injected on click.
+   Same pattern as the homepage, ported so category pages stay light. */
+.vfacade{position:relative;display:block;width:100%;aspect-ratio:16/9;overflow:hidden;
+  border-radius:16px;cursor:pointer;background:#0d0b12;border:1px solid rgba(244,237,226,.1)}
+.vfacade img{width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform .6s var(--ease),opacity .4s}
+.vfacade:hover img{transform:scale(1.03);opacity:.82}
+.vfacade .vplay{position:absolute;left:50%;top:50%;width:70px;height:70px;margin:-35px 0 0 -35px;
+  border-radius:50%;background:rgba(255,140,59,.94);display:flex;align-items:center;justify-content:center;
+  transition:transform .35s var(--ease);box-shadow:0 10px 34px rgba(0,0,0,.45)}
+.vfacade .vplay::after{content:"";border-left:19px solid var(--black);
+  border-top:12px solid transparent;border-bottom:12px solid transparent;margin-left:5px}
+.vfacade:hover .vplay{transform:scale(1.09)}
+.vfacade .vtag{position:absolute;left:16px;bottom:14px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--paper);
+  background:rgba(7,6,10,.6);padding:7px 12px;border-radius:999px;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.vfacade iframe{width:100%;height:100%;border:0;display:block}
+.vfacade.playing{cursor:default}
+
+/* film + copy side by side */
+.l-feature{display:grid;grid-template-columns:1.35fr 1fr;gap:34px;align-items:center;margin-top:16px}
+.l-feature h3{font-family:var(--serif);font-size:clamp(24px,2.6vw,34px);font-weight:500;margin-bottom:14px}
+.l-feature .l-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.l-feature .l-chips span{font-family:var(--mono);font-size:12px;letter-spacing:.02em;
+  min-height:36px;padding:0 15px;display:inline-flex;align-items:center;
+  border:1px solid rgba(244,237,226,.22);border-radius:999px;color:var(--paper-dim)}
+
+@media(max-width:860px){
+  .l-feature{grid-template-columns:1fr;gap:22px}
+}
+@media(max-width:640px){
+  :root{--navh:64px}          /* .l-nav padding tightens to 15px here */
+  .l-cats-inner{padding:9px 16px;gap:5px}
+  .l-cats a{font-size:12px;padding:0 13px;min-height:36px}
+  .l-cats + main .l-hero,
+  .l-cats ~ main .l-hero{padding-top:44px}
+}

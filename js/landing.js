@@ -59,3 +59,22 @@
     + '<a class="tel" href="tel:+' + num + '" aria-label="Call">' + TEL + '</a>';
   document.body.appendChild(fab);
 })();
+
+/* Video facade — poster + play button; the iframe is only created on click,
+   so a category page with several films still loads like a static page. */
+(function () {
+  document.addEventListener('click', function (e) {
+    var f = e.target.closest && e.target.closest('.vfacade');
+    if (!f || f.classList.contains('playing')) return;
+    var src = f.getAttribute('data-embed');
+    if (!src) return;
+    var frame = document.createElement('iframe');
+    frame.src = src;
+    frame.title = f.getAttribute('data-title') || 'Video';
+    frame.allow = 'autoplay; fullscreen; picture-in-picture';
+    frame.setAttribute('allowfullscreen', '');
+    f.classList.add('playing');
+    f.innerHTML = '';
+    f.appendChild(frame);
+  });
+})();
