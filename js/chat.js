@@ -20,11 +20,21 @@
 
   var BOT = 'Iris';
 
-  /* Dubai pages carry the UAE number, India pages the Indian one. */
-  var waLink = document.querySelector('a[href*="wa.me/"]');
-  var NUM = (document.body && document.body.getAttribute('data-wa'))
-         || (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1])
-         || '971501955122';
+  /* Which line to offer. A page can pin one with data-wa (the Dubai and
+     Bangalore landing pages do). Otherwise read the visitor's timezone —
+     free, instant, no API — so someone in India isn't handed a UAE number
+     to dial. Mirrors what the worker does with request.cf.country. */
+  var WA_AE = '971501955122', WA_IN = '919746679720';
+  function localNum() {
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    if (/Kolkata|Calcutta|Colombo|Kathmandu|Dhaka/i.test(tz)) return WA_IN;
+    if (/Dubai|Muscat|Qatar|Riyadh|Bahrain|Kuwait/i.test(tz)) return WA_AE;
+    // no timezone signal — fall back to whatever the page already links to
+    var waLink = document.querySelector('a[href*="wa.me/"]');
+    return (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1]) || WA_AE;
+  }
+  var NUM = (document.body && document.body.getAttribute('data-wa')) || localNum();
   var WA_URL = 'https://wa.me/' + NUM + '?text='
              + encodeURIComponent("Hi Yedukrishna, I'd like to enquire about a shoot.");
 
@@ -130,27 +140,54 @@
 
   /* ── styles ────────────────────────────────────────────────── */
   var css = ''
-    /* one toolbar, clear hierarchy: two quiet circles + one loud pill */
-    + '.yc-bar{position:fixed;right:18px;bottom:18px;z-index:301;display:flex;align-items:center;gap:9px;'
-    + 'font-family:Inter,system-ui,-apple-system,sans-serif}'
+    /* ONE inviting control, not three competing circles.
+       The old stack failed for human reasons, not technical ones: nothing
+       was primary, the two dark circles read as decoration, and "Ask Iris"
+       means nothing to a stranger — a name is not a reason to tap. So the
+       button now offers an outcome ("Let's talk") plus reassurance (a live
+       dot and "usually replies in minutes"), and the channels appear only
+       once you've shown intent, each with a reason to pick it. */
+    + '.yc-bar{position:fixed;right:20px;bottom:20px;z-index:301;display:flex;flex-direction:column;'
+    + 'align-items:flex-end;gap:10px;font-family:Inter,system-ui,-apple-system,sans-serif}'
     + '.yc-bar.hide{display:none}'
-    + '.yc-mini{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;'
-    + 'background:rgba(18,15,24,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);'
-    + 'border:1px solid rgba(244,237,226,.18);box-shadow:0 6px 20px rgba(0,0,0,.4);'
-    + 'transition:transform .25s cubic-bezier(.22,.61,.36,1),border-color .25s,color .25s}'
-    + '.yc-mini svg{width:19px;height:19px;display:block}'
-    + '.yc-mini.wa{color:#25D366}.yc-mini.tel{color:#ff8c3b}'
-    + '.yc-mini:hover{transform:translateY(-2px);border-color:currentColor}'
-    + '.yc-pill{display:flex;align-items:center;gap:9px;height:52px;padding:0 20px 0 8px;border:0;cursor:pointer;'
-    + 'border-radius:30px;background:linear-gradient(135deg,#ff8c3b,#ffc9a3);color:#07060a;'
-    + 'box-shadow:0 10px 30px rgba(255,140,59,.34),0 4px 14px rgba(0,0,0,.34);'
-    + 'font-family:inherit;font-size:14.5px;font-weight:600;letter-spacing:.01em;white-space:nowrap;'
-    + 'transition:transform .25s cubic-bezier(.22,.61,.36,1),box-shadow .25s}'
-    + '.yc-pill:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(255,140,59,.46),0 4px 14px rgba(0,0,0,.34)}'
-    + '.yc-pill .yc-mark{width:36px;height:36px;border-radius:50%;background:rgba(7,6,10,.14);'
-    + 'display:flex;align-items:center;justify-content:center;flex:none}'
-    + '.yc-pill .yc-ap{width:21px;height:21px;display:block;animation:ycSpin 26s linear infinite}'
-    + '@keyframes ycSpin{to{transform:rotate(360deg)}}'
+    + '.yc-cta{display:flex;align-items:center;gap:10px;height:56px;padding:0 22px;border:0;cursor:pointer;'
+    + 'border-radius:32px;background:linear-gradient(135deg,#ff8c3b,#ffb27a 55%,#ffc9a3);color:#07060a;'
+    + 'box-shadow:0 12px 34px rgba(255,140,59,.4),0 4px 16px rgba(0,0,0,.4);'
+    + 'font-family:inherit;font-size:15px;font-weight:600;letter-spacing:.01em;white-space:nowrap;'
+    + 'transition:transform .28s cubic-bezier(.22,.61,.36,1),box-shadow .28s}'
+    + '.yc-cta:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(255,140,59,.52),0 4px 16px rgba(0,0,0,.4)}'
+    + '.yc-cta:active{transform:translateY(-1px)}'
+    + '.yc-cta:focus-visible{outline:2px solid #f4ede2;outline-offset:3px}'
+    /* a live dot does more for trust than any icon — it says someone is there */
+    + '.yc-live{position:relative;width:9px;height:9px;border-radius:50%;background:#12b76a;flex:none}'
+    + '.yc-live::after{content:"";position:absolute;inset:-5px;border-radius:50%;'
+    + 'border:2px solid rgba(18,183,106,.5);animation:ycPulse 2.4s ease-out infinite}'
+    + '@keyframes ycPulse{0%{transform:scale(.6);opacity:1}70%,100%{transform:scale(1.25);opacity:0}}'
+    + '.yc-chev{width:15px;height:15px;flex:none;transition:transform .3s cubic-bezier(.22,.61,.36,1)}'
+    + '.yc-bar.open .yc-chev{transform:rotate(180deg)}'
+    /* the channel card — each row says what you GET, not just where it goes */
+    + '.yc-menu{width:min(310px,calc(100vw - 40px));background:rgba(13,11,18,.96);'
+    + '-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);'
+    + 'border:1px solid rgba(244,237,226,.14);border-radius:20px;overflow:hidden;'
+    + 'box-shadow:0 28px 70px rgba(0,0,0,.62);display:none;transform-origin:bottom right}'
+    + '.yc-menu.on{display:block;animation:ycPop .3s cubic-bezier(.22,.61,.36,1)}'
+    + '@keyframes ycPop{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}'
+    + '.yc-mh{padding:15px 18px 11px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;'
+    + 'color:rgba(244,237,226,.45);border-bottom:1px solid rgba(244,237,226,.09)}'
+    + '.yc-opt{display:flex;align-items:center;gap:13px;width:100%;padding:14px 18px;background:none;'
+    + 'border:0;border-bottom:1px solid rgba(244,237,226,.07);cursor:pointer;text-align:left;'
+    + 'font-family:inherit;text-decoration:none;transition:background .22s}'
+    + '.yc-opt:last-child{border-bottom:0}'
+    + '.yc-opt:hover{background:rgba(255,140,59,.09)}'
+    + '.yc-opt:focus-visible{outline:2px solid #ff8c3b;outline-offset:-2px}'
+    + '.yc-oi{width:40px;height:40px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center}'
+    + '.yc-oi svg{width:19px;height:19px;display:block}'
+    + '.yc-oi.amber{background:linear-gradient(135deg,#ff8c3b,#ffc9a3);color:#07060a}'
+    + '.yc-oi.green{background:#25D366;color:#fff}'
+    + '.yc-oi.plain{background:rgba(244,237,226,.1);color:#f4ede2}'
+    + '.yc-ot{display:flex;flex-direction:column;gap:2px;min-width:0}'
+    + '.yc-ot b{font-size:14.5px;font-weight:600;color:#f4ede2;line-height:1.25}'
+    + '.yc-ot small{font-size:12px;color:rgba(244,237,226,.5);line-height:1.35}'
     /* the invitation — the thing that makes it discoverable at all */
     + '.yc-tease{position:fixed;right:18px;bottom:82px;z-index:301;max-width:min(268px,calc(100vw - 36px));'
     + 'background:#14111c;border:1px solid rgba(255,140,59,.34);border-radius:16px 16px 4px 16px;'
@@ -230,8 +267,9 @@
     + '.yc-note a{color:rgba(255,140,59,.8)}'
     /* phone: a proper bottom sheet, not a floating card wedged above the fold */
     + '@media(max-width:640px){'
-    + '.yc-bar{right:14px;bottom:14px;gap:8px}'
-    + '.yc-mini{width:42px;height:42px}.yc-pill{height:50px;padding:0 18px 0 7px;font-size:14px}'
+    + '.yc-bar{right:14px;bottom:14px;left:14px;align-items:flex-end}'
+    + '.yc-cta{height:54px;padding:0 20px;font-size:14.5px}'
+    + '.yc-menu{width:100%}'
     + '.yc-tease{right:14px;left:14px;bottom:76px;max-width:none}'
     + '.yc-panel{right:0;left:0;bottom:0;width:100%;height:86vh;height:86dvh;'
     + 'border-radius:22px 22px 0 0;border-bottom:0}'
@@ -241,8 +279,8 @@
     + '.yc-note{padding-bottom:calc(12px + env(safe-area-inset-bottom))}'
     + '.yc-msg{font-size:14.5px;max-width:90%}'
     + '}'
-    + '@media(prefers-reduced-motion:reduce){.yc-pill .yc-ap{animation:none}'
-    + '.yc-panel.on,.yc-msg,.yc-chip{animation:none}}';
+    + '@media(prefers-reduced-motion:reduce){.yc-live::after{animation:none}'
+    + '.yc-panel.on,.yc-menu.on,.yc-msg,.yc-chip{animation:none}}';
 
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
@@ -257,15 +295,56 @@
   window.addEventListener('load', dropOldFab);
 
   /* ── the bar ───────────────────────────────────────────────── */
+  /* +971501955122 → +971 50 195 5122 · a readable number reassures; a
+     14-digit run reads as a machine's */
+  function prettyNum(n) {
+    if (n.indexOf('971') === 0) return '+971 ' + n.slice(3, 5) + ' ' + n.slice(5, 8) + ' ' + n.slice(8);
+    if (n.indexOf('91') === 0) return '+91 ' + n.slice(2, 7) + ' ' + n.slice(7);
+    return '+' + n;
+  }
+
+  var CHEV = '<svg class="yc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+
   var bar = document.createElement('div');
   bar.className = 'yc-bar';
   bar.innerHTML =
-      '<a class="yc-mini wa" href="' + WA_URL + '" target="_blank" rel="noopener" aria-label="Message Yedukrishna on WhatsApp">' + WA_ICON + '</a>'
-    + '<a class="yc-mini tel" href="tel:+' + NUM + '" aria-label="Call Yedukrishna">' + TEL_ICON + '</a>'
-    + '<button class="yc-pill" aria-label="Chat with ' + BOT + ', the YKS Productions assistant">'
-    + '<span class="yc-mark">' + APERTURE + '</span>Ask ' + BOT + '</button>';
+      '<div class="yc-menu" id="ycMenu" role="menu" aria-label="Ways to get in touch">'
+    + '<div class="yc-mh">How would you like to talk?</div>'
+    + '<button class="yc-opt" data-act="chat" role="menuitem">'
+    +   '<span class="yc-oi amber">' + APERTURE + '</span>'
+    +   '<span class="yc-ot"><b>Ask ' + BOT + '</b><small>Instant answers, any language</small></span>'
+    + '</button>'
+    + '<a class="yc-opt" href="' + WA_URL + '" target="_blank" rel="noopener" role="menuitem">'
+    +   '<span class="yc-oi green">' + WA_ICON + '</span>'
+    +   '<span class="yc-ot"><b>WhatsApp</b><small>Yedukrishna replies himself</small></span>'
+    + '</a>'
+    + '<a class="yc-opt" href="tel:+' + NUM + '" role="menuitem">'
+    +   '<span class="yc-oi plain">' + TEL_ICON + '</span>'
+    +   '<span class="yc-ot"><b>Call</b><small>' + prettyNum(NUM) + '</small></span>'
+    + '</a>'
+    + '</div>'
+    + '<button class="yc-cta" aria-expanded="false" aria-controls="ycMenu">'
+    +   '<span class="yc-live" aria-hidden="true"></span>Let’s talk' + CHEV
+    + '</button>';
   document.body.appendChild(bar);
-  var pill = bar.querySelector('.yc-pill');
+
+  var cta = bar.querySelector('.yc-cta');
+  var menu = bar.querySelector('#ycMenu');
+
+  function setMenu(on) {
+    menu.classList.toggle('on', on);
+    bar.classList.toggle('open', on);
+    cta.setAttribute('aria-expanded', on ? 'true' : 'false');
+  }
+  cta.onclick = function (e) {
+    e.stopPropagation();
+    killTease();
+    setMenu(!menu.classList.contains('on'));
+  };
+  bar.querySelector('[data-act="chat"]').onclick = function () { setMenu(false); open(); };
+  document.addEventListener('click', function (e) {
+    if (menu.classList.contains('on') && !bar.contains(e.target)) setMenu(false);
+  });
 
   /* ── the panel ─────────────────────────────────────────────── */
   var panel = document.createElement('div');
@@ -436,11 +515,12 @@
     bar.classList.remove('hide');
   }
 
-  pill.onclick = open;
   panel.querySelector('.yc-hbtn.x').onclick = close;
   send.onclick = function () { ask(); };
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && panel.classList.contains('on')) close();
+    if (e.key !== 'Escape') return;
+    if (panel.classList.contains('on')) close();
+    else if (menu.classList.contains('on')) setMenu(false);
   });
   input.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); }

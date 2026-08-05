@@ -362,7 +362,11 @@ img{display:block;max-width:100%}
 .foot-services{display:flex;gap:12px 22px;flex-wrap:wrap;margin:-46px 0 54px}
 .foot-services a{font-family:var(--font-m);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-dim);transition:color .3s var(--ease)}
 .foot-services a:hover{color:var(--amber)}
-.foot-bottom{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:26px;border-top:1px solid var(--line)}
+/* the floating contact dock sits bottom-right; reserve room so it never
+   lands on top of this row the way it was covering the location line */
+.foot-bottom{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:26px;
+  padding-bottom:96px;border-top:1px solid var(--line)}
+@media(min-width:861px){.foot-bottom{padding-right:290px;padding-bottom:26px}}
 
 /* ───────────────────────── SVC HIGHLIGHT (Fashion) ───────────────────────── */
 .svc-grid.five{grid-template-columns:repeat(5,1fr)}
