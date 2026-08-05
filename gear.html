@@ -128,6 +128,26 @@ h2 em,h3 em{font-style:italic;background:linear-gradient(100deg,var(--amber),var
   .g-section{padding:56px 0 0}
   .g-foot-inner{flex-direction:column;align-items:flex-start}
 }
+
+/* category strip — same component as the landing pages, inlined because
+   this page carries its own self-contained styles */
+.l-cats{position:sticky;top:70px;z-index:60;margin-top:70px;background:rgba(7,6,10,.86);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid rgba(244,237,226,.1)}
+.l-cats-inner{display:flex;gap:6px;overflow-x:auto;padding:11px 30px;scrollbar-width:none;-ms-overflow-style:none}
+.l-cats-inner::-webkit-scrollbar{display:none}
+.l-cats a{flex:none;font-family:var(--mono);font-size:12.5px;letter-spacing:.015em;min-height:38px;
+  padding:0 15px;display:inline-flex;align-items:center;border:1px solid rgba(244,237,226,.18);
+  border-radius:999px;color:var(--paper-dim);white-space:nowrap;text-decoration:none;
+  transition:border-color .3s,color .3s,background .3s}
+.l-cats a:hover{border-color:var(--amber);color:var(--amber);background:rgba(255,140,59,.08)}
+.l-cats a.l-home{color:var(--paper);gap:7px;padding-left:13px}
+.l-cats a.l-home svg{width:14px;height:14px;flex:none;display:block}
+.l-cats-div{flex:none;align-self:center;width:1px;height:20px;background:rgba(244,237,226,.18);margin:0 4px}
+@media(max-width:640px){
+  .l-cats{top:64px;margin-top:64px}
+  .l-cats-inner{padding:9px 16px;gap:5px}
+  .l-cats a{font-size:12px;padding:0 13px;min-height:36px}
+}
 </style>
 </head>
 <body>
@@ -137,6 +157,20 @@ h2 em,h3 em{font-style:italic;background:linear-gradient(100deg,var(--amber),var
   <a class="g-brand" href="index.html">YKS<span>.</span><em>Productions</em></a>
   <a class="g-back" href="index.html">Back to portfolio</a>
 </nav>
+<div class="l-cats">
+  <div class="l-cats-inner">
+    <a class="l-home" href="/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.2 12 3l9 7.2V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+    <span class="l-cats-div" aria-hidden="true"></span>
+    <a href="/index.html#act-dubai">Real estate</a>
+    <a href="/weddings.html">Weddings</a>
+    <a href="/index.html#act-fashion">Fashion</a>
+    <a href="/index.html#act-films">Films &amp; BTS</a>
+    <a href="/index.html#act-marriott">Marriott</a>
+    <a href="/index.html#act-store">Print store</a>
+    <a href="/index.html#act-about">Story</a>
+  </div>
+</div>
+
 
 <main>
 
