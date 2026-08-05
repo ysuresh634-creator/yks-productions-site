@@ -23,10 +23,11 @@ const CF_MODELS = [
   '@cf/meta/llama-3.2-3b-instruct',
   '@cf/mistral/mistral-7b-instruct-v0.1'
 ];
-const GEMINI_MODEL = 'gemini-2.0-flash';
+// Tried in order — survives Google retiring a model name.
+const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
 const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
 
-const MAX_TOKENS = 600;
+const MAX_TOKENS = 1000; // headroom so replies never cut off mid-sentence
 const MAX_TURNS = 20;        // cap history sent upstream (keeps usage low)
 const DAILY_IP_LIMIT = 30;   // messages per IP per day (needs CHAT_KV)
 
@@ -40,7 +41,7 @@ const FALLBACK = "I can't reach my brain right now — but I don't want to leave
 
 const SYSTEM_PROMPT = `You are the assistant on yksproductions.com, the website of Yedukrishna Suresh (brand: YKS Productions) — a film-trained photographer, videographer and content creator working between Dubai (UAE) and Bangalore (India).
 
-Speak in a warm, direct, human voice. Never corporate, never salesy. Keep replies to 2-4 short sentences unless genuinely asked for detail. If asked whether you are Yedukrishna or a human, say plainly that you are the AI assistant on his site and can pass anything to him.
+Speak in a warm, direct, human voice. Never corporate, never salesy. Keep replies SHORT — 2-4 sentences, under 90 words, unless genuinely asked for detail. Always finish your final sentence rather than trailing off. If asked whether you are Yedukrishna or a human, say plainly that you are the AI assistant on his site and can pass anything to him.
 
 ## GOAL
 1. Answer the visitor's question honestly and specifically.
@@ -113,22 +114,37 @@ async function viaWorkersAI(env, msgs) {
 }
 
 async function viaGemini(env, msgs) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${env.GEMINI_API_KEY}`;
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents: msgs.map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }]
-      })),
-      generationConfig: { maxOutputTokens: MAX_TOKENS, temperature: 0.6 }
-    })
+  const body = JSON.stringify({
+    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+    contents: msgs.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    })),
+    generationConfig: {
+      maxOutputTokens: MAX_TOKENS,
+      temperature: 0.6,
+      // Flash models reason internally and that reasoning is billed against
+      // maxOutputTokens — leaving it on truncated replies mid-sentence.
+      thinkingConfig: { thinkingBudget: 0 }
+    }
   });
-  if (!r.ok) throw new Error('gemini ' + r.status + ' ' + (await r.text()).slice(0, 300));
-  const d = await r.json();
-  return (d.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
+
+  let lastErr;
+  for (const model of GEMINI_MODELS) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`;
+      const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+      if (!r.ok) { lastErr = new Error('gemini ' + model + ' ' + r.status + ' ' + (await r.text()).slice(0, 200)); continue; }
+      const d = await r.json();
+      const text = (d.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
+      if (text) return text;
+    } catch (e) {
+      lastErr = e;
+      console.error('gemini model failed', model, e && e.message);
+    }
+  }
+  if (lastErr) throw lastErr;
+  return '';
 }
 
 async function viaAnthropic(env, msgs) {
