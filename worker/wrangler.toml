@@ -1,0 +1,11 @@
+name = "yks-chat"
+main = "yks-chat-worker.js"
+compatibility_date = "2026-01-01"
+
+# Zero-cost AI brain — runs on Cloudflare's free Workers AI allocation.
+# This binding is what the worker calls as env.AI
+[ai]
+binding = "AI"
+
+[observability]
+enabled = true

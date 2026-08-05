@@ -10,4 +10,4 @@
 
    Setup guide: worker/SETUP.md
    ═══════════════════════════════════════════════════════════════ */
-window.YKS_CHAT_ENDPOINT = '';
+window.YKS_CHAT_ENDPOINT = 'https://yks-chat.ysuresh634.workers.dev';
