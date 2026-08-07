@@ -310,3 +310,15 @@ h2 em,h3 em,h1 em{font-style:italic;background:linear-gradient(100deg,var(--ambe
 @media (prefers-reduced-motion: reduce){
   ::view-transition-new(root){animation:none}
 }
+
+/* proof line above enquiry forms on the growth pages */
+.l-proofline{max-width:560px;margin:0 auto 22px;font-size:1rem;color:var(--paper-dim);line-height:1.7}
+.l-proofline a{border-bottom:1px solid rgba(255,140,59,.5)}
+.l-proofline strong{color:var(--amber);font-weight:600}
+
+/* nights wall — denser than the standard gallery, one wide closer */
+.nights-wall{grid-template-columns:repeat(5,1fr)}
+.nights-wide{margin-top:10px}
+.nights-wide img{width:100%;aspect-ratio:21/9;object-fit:cover;border-radius:10px}
+@media(max-width:900px){.nights-wall{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.nights-wall{grid-template-columns:1fr 1fr}.nights-wide img{aspect-ratio:16/9}}
