@@ -761,6 +761,10 @@ img{display:block;max-width:100%}
 .pf-frame:not(:first-child){opacity:0;animation:pfPeek 17s ease-in-out infinite}
 .pf-frame:nth-child(3){animation-delay:-8.5s}
 @keyframes pfPeek{0%,6%{opacity:0}15%,40%{opacity:1}49%,100%{opacity:0}}
+/* single-image tiles (Films, Portraits) — a slow Ken Burns instead of a
+   cross-fade, so we never morph between two different people's faces */
+.pf-solo .pf-frame{animation:pfZoom 24s ease-in-out infinite}
+@keyframes pfZoom{0%,100%{transform:scale(1.02)}50%{transform:scale(1.1)}}
 .pf-grad{position:absolute;inset:0;z-index:1;pointer-events:none;
   background:linear-gradient(transparent 38%,rgba(7,6,10,.5) 66%,rgba(7,6,10,.94))}
 .pf:hover{border-color:rgba(255,140,59,.6);transform:translateY(-5px);
