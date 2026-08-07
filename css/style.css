@@ -211,7 +211,7 @@ img{display:block;max-width:100%}
 .act-services{padding:130px 0 150px;background:var(--black)}
 .sec-head{margin-bottom:64px}
 /* ── "What I shoot" — image-led craft panels: each craft SHOWN, not described ── */
-.craft-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.craft-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .craft{position:relative;display:block;aspect-ratio:4/5;border-radius:16px;overflow:hidden;
   border:1px solid var(--line);text-decoration:none;color:var(--paper);
   opacity:0;transform:translateY(22px);
@@ -243,14 +243,11 @@ img{display:block;max-width:100%}
   background:linear-gradient(100deg,rgba(255,47,135,.92),rgba(123,47,247,.85));padding:5px 9px;border-radius:20px}
 @media(max-width:900px){
   .craft-row{grid-template-columns:1fr 1fr;gap:11px}
-  .craft:last-child{grid-column:1 / -1;aspect-ratio:16/9}   /* Weddings closes the set as a wide banner */
   .craft-num{font-size:20px;top:11px;left:13px}
   .craft-body{padding:14px 13px 15px}
-  .craft-body h3{font-size:1.04rem}
-  /* compact tiles show image + name only; the wide closer keeps its copy */
-  .craft:not(:last-child) .craft-body small,
-  .craft:not(:last-child) .craft-go{display:none}
-  .craft:not(:last-child) .craft-body h3{margin:0}
+  .craft-body h3{font-size:1.04rem;margin:0}
+  /* compact 2×2 tiles show image + name only */
+  .craft-body small,.craft-go{display:none}
 }
 @media(prefers-reduced-motion:reduce){.craft{opacity:1;transform:none}}
 
