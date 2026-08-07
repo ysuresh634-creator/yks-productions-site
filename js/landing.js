@@ -193,6 +193,10 @@
   function close() { box.classList.remove('on'); document.documentElement.style.overflow = ''; }
 
   imgs.forEach(function (img) {
+    // if the photo is wrapped in a real link (e.g. a feed post → Instagram),
+    // respect the link — don't hijack it with the lightbox
+    var link = img.closest('a[href]');
+    if (link && !/^#/.test(link.getAttribute('href') || '')) { img.style.cursor = 'pointer'; return; }
     img.addEventListener('click', function (e) { e.preventDefault(); open(img); });
   });
   box.querySelector('.lbx-close').onclick = close;

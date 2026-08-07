@@ -84,6 +84,8 @@ h2 em,h3 em,h1 em{font-style:italic;background:linear-gradient(100deg,var(--ambe
 .l-gallery{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
 .l-gallery img{border-radius:10px;aspect-ratio:3/4;object-fit:cover;width:100%;transition:.4s var(--ease)}
 .l-gallery img:hover{transform:scale(1.03);filter:brightness(1.08)}
+/* Feed gallery = square Instagram posts; keep them 1:1 so faces aren't cropped */
+.l-feed img{aspect-ratio:1/1}
 
 /* process steps */
 .l-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:step}
