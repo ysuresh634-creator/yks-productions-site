@@ -270,3 +270,43 @@ h2 em,h3 em,h1 em{font-style:italic;background:linear-gradient(100deg,var(--ambe
   .l-svclist{grid-template-columns:1fr}
   .l-svcgroup{margin-top:30px}
 }
+
+/* ══════════════════════════════════════════════════════════════
+   DOLLY GALLERY  (js/dolly.js)
+   A sticky viewport the camera moves through — no pinning library,
+   no scroll hijack. .dolly-flat is the reduced-motion fallback:
+   the same figures as a plain grid.
+   ══════════════════════════════════════════════════════════════ */
+.dolly-wrap{height:280vh;position:relative}
+.dolly-view{position:sticky;top:0;height:100vh;overflow:hidden;perspective:820px;
+  background:radial-gradient(100% 110% at 50% 0%,#120d1e,#07060a 72%)}
+.dolly-scene{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+.dolly-plane{position:absolute;left:50%;top:50%;width:min(340px,58vw);border-radius:14px;
+  overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.6);border:1px solid rgba(244,237,226,.14)}
+.dolly-plane img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+.dolly-plane figcaption{position:absolute;left:14px;bottom:12px;font-family:var(--mono);
+  font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--paper);
+  text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.dolly-hint{position:absolute;left:0;right:0;bottom:26px;text-align:center;font-family:var(--mono);
+  font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--paper-dim);z-index:5}
+
+/* reduced-motion: an honest grid instead of a still tunnel */
+.dolly-flat{height:auto}
+.dolly-flat .dolly-view{position:static;height:auto;overflow:visible;perspective:none;
+  background:var(--black-2);padding:60px 0}
+.dolly-flat .dolly-scene{position:static;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:14px;max-width:1160px;margin:0 auto;padding:0 36px}
+.dolly-flat .dolly-plane{position:static;transform:none!important;opacity:1!important;width:auto}
+.dolly-flat .dolly-hint{display:none}
+
+/* ── aperture page transitions ─────────────────────────────────
+   Navigating irises open on the incoming page — a shutter blink
+   between pages, tying the whole site to the mark. Browsers without
+   cross-document view transitions simply navigate as before. */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:none}
+::view-transition-new(root){animation:vtIris .42s cubic-bezier(.22,.61,.36,1)}
+@keyframes vtIris{from{clip-path:circle(0% at 50% 42%)}to{clip-path:circle(125% at 50% 42%)}}
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-new(root){animation:none}
+}

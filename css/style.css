@@ -803,3 +803,12 @@ img{display:block;max-width:100%}
   .nav .links .nav-panel-cta i{width:8px;height:8px;border-radius:50%;background:#ff3b30;flex:none;
     box-shadow:0 0 12px #ff3b30;animation:blink 1.6s infinite;font-style:normal}
 }
+
+/* ── aperture page transitions — same shutter blink as landing.css ── */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:none}
+::view-transition-new(root){animation:vtIris .42s cubic-bezier(.22,.61,.36,1)}
+@keyframes vtIris{from{clip-path:circle(0% at 50% 42%)}to{clip-path:circle(125% at 50% 42%)}}
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-new(root){animation:none}
+}
