@@ -19,12 +19,35 @@
   const DPR = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.0 : 1.5);
   const MAX_BUF = MOBILE ? 1100 : 2400;   // hard cap on buffer width — crisp on big screens, lean on phones
 
+  /* ---------- pointer / tilt tracker ----------
+     One tracker for every scene. Desktop follows the cursor; Android
+     follows the gyroscope (no permission dialog there). iOS gets no
+     random permission prompt — the shader simply rests at centre.
+     Reduced-motion never attaches, so u_point stays (0,0). */
+  const POINT = { x: 0, y: 0 };
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (matchMedia('(hover:hover) and (pointer:fine)').matches) {
+      addEventListener('pointermove', e => {
+        POINT.x = Math.max(-1, Math.min(1, (e.clientX / innerWidth - .5) * 2));
+        POINT.y = Math.max(-1, Math.min(1, -(e.clientY / innerHeight - .5) * 2));
+      }, { passive: true });
+    } else if (window.DeviceOrientationEvent &&
+               typeof DeviceOrientationEvent.requestPermission !== 'function') {
+      addEventListener('deviceorientation', e => {
+        if (e.gamma == null) return;
+        POINT.x = Math.max(-1, Math.min(1, e.gamma / 30));
+        POINT.y = Math.max(-1, Math.min(1, (35 - e.beta) / 30));
+      }, { passive: true });
+    }
+  }
+
   /* ---------- shared GLSL ---------- */
   const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
 
   const NOISE_LIB = `
     precision highp float;
     uniform vec2 u_res; uniform float u_time; uniform float u_scroll;
+    uniform vec2 u_point;   // smoothed pointer/tilt, -1..1 (0,0 when idle)
     float hash(vec2 p){p=fract(p*0.3183099+vec2(0.71,0.113));return fract(p.x*p.y*95.4307);}
     float noise(vec2 p){
       vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
@@ -45,7 +68,7 @@
       vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;
       float s=u_scroll;
       float zoom=1.+s*0.85;                      // gentle push-in — stays in rich detail, never blows out the centre
-      vec2 p=uv/zoom;
+      vec2 p=(uv+u_point*.05)/zoom;              // the nebula leans a few degrees toward the hand
       float t=u_time*.05+s*2.2;
 
       // domain-warped nebula
@@ -90,6 +113,10 @@
 
       // anamorphic flare on key light
       col+=vec3(.3,.55,.9)*exp(-abs(d.y)*26.)*exp(-abs(d.x)*2.6)*.5;
+
+      // faint warmth where the pointer rests — light following attention
+      vec2 pd=uv-u_point*vec2(.42,.26);
+      col+=vec3(1.,.55,.25)*.055*exp(-dot(pd,pd)*7.5)*min(1.,length(u_point)*2.5);
 
       // exposure ramp + vignette + grain — gentle, no end-of-scroll blowout
       col*=1.03+s*.08;
@@ -298,8 +325,10 @@
     const uRes = gl.getUniformLocation(prog, 'u_res');
     const uTime = gl.getUniformLocation(prog, 'u_time');
     const uScroll = gl.getUniformLocation(prog, 'u_scroll');
+    const uPoint = gl.getUniformLocation(prog, 'u_point');
 
     let scroll = 0, raf = null, t0 = performance.now(), needResize = true;
+    let px = 0, py = 0;   // smoothed — the light glides, it doesn't snap
 
     // resize reads layout (clientWidth) — kept OUT of the per-frame loop
     // so we never force a reflow 60×/sec; only on actual viewport changes.
@@ -322,6 +351,8 @@
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, (now - t0) / 1000);
       gl.uniform1f(uScroll, scroll);
+      px += (POINT.x - px) * .035; py += (POINT.y - py) * .035;
+      if (uPoint) gl.uniform2f(uPoint, px, py);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
     return {

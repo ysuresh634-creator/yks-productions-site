@@ -78,3 +78,49 @@
     f.appendChild(frame);
   });
 })();
+
+/* Depth tilt — makes the long-dead data-tilt attribute real.
+   Frame, gloss and content read as planes; the card leans toward the
+   cursor. Pointer-fine devices only: on touch, cards stay still — the
+   gyro version lives in /labs.html where iOS permission is explained.
+   One delegated listener, no per-card handlers. */
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+
+  var SEL = '[data-tilt], .pf, .l-places a';
+  var current = null;
+
+  var st = document.createElement('style');
+  st.textContent =
+    '[data-tilt],.pf,.l-places a{will-change:transform}' +
+    '.tilting{transition:transform .14s ease-out!important}' +
+    '.tilt-reset{transition:transform .45s cubic-bezier(.22,.61,.36,1)!important}';
+  document.head.appendChild(st);
+
+  document.addEventListener('pointermove', function (e) {
+    var el = e.target.closest && e.target.closest(SEL);
+    if (el !== current) {
+      if (current) release(current);
+      current = el;
+      if (el) el.classList.add('tilting');
+    }
+    if (!el) return;
+    var r = el.getBoundingClientRect();
+    var nx = ((e.clientX - r.left) / r.width - .5) * 2;
+    var ny = ((e.clientY - r.top) / r.height - .5) * 2;
+    el.style.transform = 'perspective(760px) rotateY(' + (nx * 6).toFixed(2) + 'deg)'
+                       + ' rotateX(' + (-ny * 6).toFixed(2) + 'deg) translateY(-3px)';
+  }, { passive: true });
+
+  document.addEventListener('pointerout', function (e) {
+    if (current && !current.contains(e.relatedTarget)) { release(current); current = null; }
+  }, { passive: true });
+
+  function release(el) {
+    el.classList.remove('tilting');
+    el.classList.add('tilt-reset');
+    el.style.transform = '';
+    setTimeout(function () { el.classList.remove('tilt-reset'); }, 480);
+  }
+})();
