@@ -16,7 +16,7 @@
   // internal buffer is visually identical but far cheaper on the GPU.
   // Phones get 1× (huge win on retina); desktops a modest 1.3×.
   const MOBILE = matchMedia('(max-width: 768px)').matches;
-  const DPR = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.0 : 1.5);
+  const DPR = Math.min(window.devicePixelRatio || 1, MOBILE ? 0.85 : 1.5);
   const MAX_BUF = MOBILE ? 1100 : 2400;   // hard cap on buffer width — crisp on big screens, lean on phones
 
   /* ---------- pointer / tilt tracker ----------
@@ -327,7 +327,10 @@
     const uScroll = gl.getUniformLocation(prog, 'u_scroll');
     const uPoint = gl.getUniformLocation(prog, 'u_point');
 
-    let scroll = 0, raf = null, t0 = performance.now(), needResize = true;
+    let scroll = 0, raf = null, t0 = performance.now(), needResize = true, lastDraw = 0;
+    // 60fps of fullscreen fragment shading is the homepage's main stutter source
+    // on phones — the nebula drifts slowly, so cap it to ~30fps on mobile.
+    const MIN_DT = MOBILE ? 33 : 0;
     let px = 0, py = 0;   // smoothed — the light glides, it doesn't snap
 
     // resize reads layout (clientWidth) — kept OUT of the per-frame loop
@@ -347,6 +350,8 @@
 
     function frame(now) {
       raf = requestAnimationFrame(frame);
+      if (MIN_DT && now - lastDraw < MIN_DT) return;   // throttle to ~30fps on mobile
+      lastDraw = now;
       if (needResize) resize();
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, (now - t0) / 1000);

@@ -11,6 +11,9 @@
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // phones don't need an ambient canvas repainting behind the hero — it's pure
+  // decoration, and dropping it keeps the first screen buttery on mobile.
+  if (matchMedia('(max-width: 768px)').matches) return;
   var hosts = document.querySelectorAll('[data-bokeh]');
   if (!hosts.length) return;
 

@@ -761,15 +761,19 @@ img{display:block;max-width:100%}
     background:none;border:0;box-shadow:none;min-width:0;width:100%;
     max-height:0;overflow:hidden;transition:max-height .38s var(--ease),padding .38s var(--ease)}
   .nav-mega{display:block;padding:0;width:100%}
-  .nav-drop.on .nav-menu{max-height:640px;padding:10px 0 4px 12px}
-  .nav-mega-view{display:none}                 /* no floating preview in the burger list */
+  /* mobile is where the clients are — keep the visual menu (thumbnail + name +
+     caption per row); only the hover-preview panel drops (no hover on touch) */
+  .nav-drop.on .nav-menu{max-height:72vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:8px 2px 6px;transform:none}
+  .nav-mega-view{display:none}
   .nav-drop.on .nav-mega-list a{animation:none}
-  .nav-mega-list a{grid-template-columns:1fr;gap:0;padding:9px 0 9px 14px;
-    border-left:1px solid rgba(244,237,226,.16);border-radius:0}
-  .nav-mega-list a:hover{background:none;border-left-color:var(--amber)}
-  .nm-thumb,.nm-go{display:none}               /* desktop-only visuals; clean text list on mobile */
-  .nm-txt small{display:none}
-  .nm-txt b{font-size:13.5px;font-family:var(--font-m);font-weight:400;letter-spacing:.1em;text-transform:uppercase}
+  .nav-mega-list{gap:3px}
+  .nav-mega-list a{grid-template-columns:48px 1fr;gap:13px;padding:7px 8px;border-radius:12px}
+  .nav-mega-list a:active{background:rgba(255,140,59,.14)}
+  .nm-thumb{display:block;width:48px;height:58px}
+  .nm-go{display:none}
+  .nm-txt small{display:block}
+  .nm-txt b{font-size:15.5px}
 }
 
 /* ── market band + portfolio grid (shortened homepage) ──────────

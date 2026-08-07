@@ -10,16 +10,33 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mobile = matchMedia('(max-width: 768px)').matches;
 
-  /* ─────────── smooth scroll ─────────── */
+  /* ─────────── smooth scroll ───────────
+     Desktop gets Lenis (smooth wheel). Phones use NATIVE scroll — it's the
+     smoothest option on touch and skips a continuous rAF; a tiny stub keeps the
+     rest of the code (scrollTo for anchors) working unchanged. ScrollTrigger
+     reads native scroll on its own, so reveals/counters still fire. */
   history.scrollRestoration = 'manual';
-  const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+  let lenis;
+  if (mobile) {
+    lenis = {
+      scrollTo: function (target, opts) {
+        opts = opts || {};
+        let top;
+        if (typeof target === 'number') top = target;
+        else { const el = typeof target === 'string' ? $(target) : target; if (!el) return; top = window.scrollY + el.getBoundingClientRect().top + (opts.offset || 0); }
+        window.scrollTo({ top: top, behavior: opts.immediate ? 'auto' : 'smooth' });
+      },
+      on: function () {}, raf: function () {}, resize: function () {}
+    };
+  } else {
+    lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(t => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+  }
   window.lenis = lenis;
-  lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add(t => lenis.raf(t * 1000));
-  gsap.ticker.lagSmoothing(0);
-  // rAF pauses while the tab is hidden; if the scroll position moved
-  // meanwhile (anchors, restored position), resync Lenis so it doesn't
-  // yank the page back to its stale internal position on wake
+  // rAF pauses while the tab is hidden; if the scroll position moved meanwhile
+  // (anchors, restored position), resync so it doesn't yank back on wake
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       lenis.scrollTo(window.scrollY, { immediate: true, force: true });
@@ -188,24 +205,29 @@
     gsap.to([lbT, lbB], { height: on ? '7vh' : 0, duration: .8, ease: 'power3.inOut', overwrite: 'auto' });
   }
 
-  /* ─────────── ACT I · hero scrub ─────────── */
+  /* ─────────── ACT I · hero scrub ───────────
+     Desktop only: pinning the hero + scrubbing the WebGL every scroll frame is
+     the homepage's biggest stutter source on a phone. On mobile the hero just
+     scrolls naturally (the nebula still plays, throttled) — smooth beats sticky. */
   const heroTC = $('#heroTC');
-  cinemaPins.hero = ScrollTrigger.create({
-    trigger: '#act-hero', start: 'top top', end: mobile ? '+=48%' : '+=90%',
-    pin: '.act-hero .cinema-stage', scrub: true, anticipatePin: 1,
-    onToggle: self => letterbox(self.isActive),
-    onUpdate: self => {
-      const p = self.progress;
-      if (scenes.hero) scenes.hero.setProgress(p);
-      // title drifts apart + fades as the camera pushes in
-      gsap.set('.hero-content', { y: -p * 150, opacity: 1 - Math.max(0, p - .5) * 1.4, scale: 1 + p * .06 });
-      gsap.set('.hero-scrollcue', { opacity: Math.max(0, 1 - p * 4) });
-      const totalFrames = Math.round(p * 192); // 8s @ 24fps
-      const ss = String(Math.floor(totalFrames / 24)).padStart(2, '0');
-      const ff = String(totalFrames % 24).padStart(2, '0');
-      heroTC.textContent = '00:00:' + ss + ':' + ff;
-    }
-  });
+  if (!mobile) {
+    cinemaPins.hero = ScrollTrigger.create({
+      trigger: '#act-hero', start: 'top top', end: '+=90%',
+      pin: '.act-hero .cinema-stage', scrub: true, anticipatePin: 1,
+      onToggle: self => letterbox(self.isActive),
+      onUpdate: self => {
+        const p = self.progress;
+        if (scenes.hero) scenes.hero.setProgress(p);
+        // title drifts apart + fades as the camera pushes in
+        gsap.set('.hero-content', { y: -p * 150, opacity: 1 - Math.max(0, p - .5) * 1.4, scale: 1 + p * .06 });
+        gsap.set('.hero-scrollcue', { opacity: Math.max(0, 1 - p * 4) });
+        const totalFrames = Math.round(p * 192); // 8s @ 24fps
+        const ss = String(Math.floor(totalFrames / 24)).padStart(2, '0');
+        const ff = String(totalFrames % 24).padStart(2, '0');
+        heroTC.textContent = '00:00:' + ss + ':' + ff;
+      }
+    });
+  }
 
   /* ─────────── stats counters ─────────── */
   $$('.strip .n[data-count]').forEach(el => {
