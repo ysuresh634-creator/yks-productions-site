@@ -146,8 +146,9 @@
   const scenes = {};
   const cinemaPins = {}; // filled below once the pin triggers exist
   async function bootScenes() {
-    scenes.hero = await YKSCinema.create('hero', $('#heroCanvas'));
-    scenes.dubai = await YKSCinema.create('dubai', $('#dubaiCanvas'));
+    // acts can live on their own pages now — only boot what's in the DOM
+    if ($('#heroCanvas'))  scenes.hero  = await YKSCinema.create('hero', $('#heroCanvas'));
+    if ($('#dubaiCanvas')) scenes.dubai = await YKSCinema.create('dubai', $('#dubaiCanvas'));
   }
   bootScenes();
   // render only near the pinned range — checked against the pin triggers'
@@ -310,6 +311,7 @@
     ['assets/behance/tun-divya2.jpg', 'Divya, again']
   ];
   const world = $('#tunnelWorld');
+  if (world) {
   const STEP = 640; // z-distance between frames
   const frames = TUNNEL_IMGS.map(([src, cap], i) => {
     const f = document.createElement('figure');
@@ -339,6 +341,7 @@
     onToggle: self => letterbox(self.isActive),
     onUpdate: self => placeTunnel(self.progress)
   });
+  }
 
   /* ─────────── nav + progress + cursor ─────────── */
   const nav = $('#nav');
