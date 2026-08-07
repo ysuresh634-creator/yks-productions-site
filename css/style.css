@@ -210,33 +210,49 @@ img{display:block;max-width:100%}
 /* ───────────────────────── SERVICES ───────────────────────── */
 .act-services{padding:130px 0 150px;background:var(--black)}
 .sec-head{margin-bottom:64px}
-.svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.svc{position:relative;border:1px solid var(--line);border-radius:14px;padding:26px 24px 28px;min-height:230px;
-  display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;
-  transition:border-color .4s,transform .4s var(--ease)}
-.svc::before{content:"";position:absolute;inset:0;opacity:.85;transition:opacity .5s}
-.svc:nth-child(1)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(255,140,59,.30),rgba(196,80,44,.10) 45%,transparent 70%)}
-.svc:nth-child(2)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(255,47,135,.30),rgba(123,47,247,.12) 50%,transparent 72%)}
-.svc:nth-child(3)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(31,214,201,.26),rgba(12,80,90,.12) 48%,transparent 70%)}
-.svc:nth-child(4)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(123,47,247,.30),rgba(255,47,135,.10) 50%,transparent 72%)}
-.svc:nth-child(5)::before{background:radial-gradient(120% 90% at 85% -10%,rgba(255,201,163,.28),rgba(255,140,59,.12) 48%,transparent 70%)}
-.svc:hover{border-color:rgba(255,140,59,.55);transform:translateY(-4px)}
-.svc-num{position:absolute;top:6px;right:16px;margin:0;font-family:var(--font-d);font-style:italic;font-weight:600;
-  font-size:92px;line-height:1;letter-spacing:0;color:transparent;-webkit-text-stroke:1px rgba(244,237,226,.22);
-  transition:.5s var(--ease)}
-.svc:hover .svc-num{-webkit-text-stroke:1px rgba(255,140,59,.65);transform:translateY(-4px)}
-.svc h3{font-size:22px;margin:0 0 10px;position:relative}
-.svc h3::before{content:"";display:block;width:34px;height:2px;margin-bottom:14px;border-radius:2px;
-  background:linear-gradient(90deg,var(--amber),var(--magenta))}
-.svc p{font-size:13.5px;color:var(--paper-dim);position:relative;margin:0}
-.svc-beam{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .45s;
-  background:radial-gradient(60% 40% at var(--mx,50%) var(--my,0%),rgba(255,140,59,.16),rgba(123,47,247,.08) 50%,transparent 75%)}
-.svc:hover .svc-beam{opacity:1}
-.svc{cursor:pointer}
-.svc-go{position:relative;margin-top:14px;font-size:9.5px;letter-spacing:.2em;color:var(--amber);
-  opacity:0;transform:translateY(6px);transition:.35s var(--ease)}
-.svc:hover .svc-go{opacity:1;transform:none}
-@media(hover:none){.svc-go{opacity:.85;transform:none}}
+/* ── "What I shoot" — image-led craft panels: each craft SHOWN, not described ── */
+.craft-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.craft{position:relative;display:block;aspect-ratio:4/5;border-radius:16px;overflow:hidden;
+  border:1px solid var(--line);text-decoration:none;color:var(--paper);
+  opacity:0;transform:translateY(22px);
+  transition:opacity .6s var(--ease),transform .6s var(--ease),box-shadow .5s,border-color .5s}
+.craft.in{opacity:1;transform:none}
+.craft-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  filter:brightness(.8) saturate(1.05);transition:transform .9s var(--ease),filter .5s}
+.craft:hover{border-color:rgba(255,140,59,.5);box-shadow:0 26px 60px rgba(0,0,0,.55)}
+.craft:hover .craft-img{transform:scale(1.07);filter:brightness(.94) saturate(1.14)}
+.craft:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.craft-grad{position:absolute;inset:0;background:linear-gradient(transparent 28%,rgba(7,6,10,.55) 60%,rgba(7,6,10,.97))}
+.craft-num{position:absolute;top:13px;left:15px;z-index:2;font-family:var(--font-d);font-style:italic;font-weight:600;
+  font-size:24px;color:rgba(244,237,226,.9);text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.craft-body{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px 16px 20px;display:flex;flex-direction:column}
+.craft-body h3{font-family:var(--font-d);font-weight:500;font-size:clamp(1.05rem,1.35vw,1.42rem);line-height:1.08;
+  margin:0 0 7px;letter-spacing:.005em}
+.craft-body h3 em{font-style:italic}
+.craft-body small{font-size:11.5px;color:var(--paper-dim);line-height:1.5;max-width:24ch}
+.craft-go{margin-top:11px;font-family:var(--font-m);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--amber);opacity:0;transform:translateY(6px);transition:.3s var(--ease)}
+.craft:hover .craft-go{opacity:1;transform:none}
+@media(hover:none){.craft-go{opacity:.9;transform:none}}
+.craft-sig{border-color:rgba(255,47,135,.5)}
+.craft-sig .craft-body h3,.craft-sig .craft-body h3 em{
+  background:linear-gradient(100deg,var(--peach),var(--magenta));-webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent}
+.craft-badge{position:absolute;top:13px;right:13px;z-index:2;font-family:var(--font-m);font-size:8px;
+  letter-spacing:.2em;text-transform:uppercase;color:#fff;
+  background:linear-gradient(100deg,rgba(255,47,135,.92),rgba(123,47,247,.85));padding:5px 9px;border-radius:20px}
+@media(max-width:900px){
+  .craft-row{grid-template-columns:1fr 1fr;gap:11px}
+  .craft:last-child{grid-column:1 / -1;aspect-ratio:16/9}   /* Weddings closes the set as a wide banner */
+  .craft-num{font-size:20px;top:11px;left:13px}
+  .craft-body{padding:14px 13px 15px}
+  .craft-body h3{font-size:1.04rem}
+  /* compact tiles show image + name only; the wide closer keeps its copy */
+  .craft:not(:last-child) .craft-body small,
+  .craft:not(:last-child) .craft-go{display:none}
+  .craft:not(:last-child) .craft-body h3{margin:0}
+}
+@media(prefers-reduced-motion:reduce){.craft{opacity:1;transform:none}}
 
 /* ───────────────────────── WORK · horizontal ───────────────────────── */
 .act-work{background:var(--black-2)}
