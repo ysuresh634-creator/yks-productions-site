@@ -46,7 +46,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/style.css?v=49" />
+<link rel="stylesheet" href="css/style.css?v=50" />
 <style>
 /* credibility stat band */
 .stat-band{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin:0 0 56px;padding:0 0 46px;border-bottom:1px solid rgba(244,237,226,.12)}
@@ -265,15 +265,54 @@
     <a href="#act-hero">Home</a>
     <div class="nav-drop" id="navDrop">
       <button class="nav-dropbtn" id="navWorkBtn" aria-expanded="false" aria-controls="navWork">Work<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="nav-menu" id="navWork">
-        <a href="/weddings.html">Weddings</a>
-        <a href="/real-estate.html">Real estate</a>
-        <a href="/fashion.html">Fashion</a>
-        <a href="/films.html">Films &amp; BTS</a>
-        <a href="/nights.html">Nights</a>
-        <a href="/marriott.html">Marriott</a>
-        <a href="/portraits.html">Portfolios</a>
-        <a href="#act-store">Prints</a>
+      <div class="nav-menu nav-mega" id="navWork">
+        <div class="nav-mega-list">
+          <a href="/weddings.html" data-prev="/assets/navthumbs/nav-weddings.jpg" data-label="Weddings">
+            <span class="nm-thumb"><img src="/assets/navthumbs/nav-weddings.jpg" alt="" loading="lazy" /></span>
+            <span class="nm-txt"><b>Weddings</b><small>Films &amp; frames, cinema-lit</small></span>
+            <svg class="nm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="/real-estate.html" data-prev="/assets/navthumbs/nav-realestate.jpg" data-label="Real estate">
+            <span class="nm-thumb"><img src="/assets/navthumbs/nav-realestate.jpg" alt="" loading="lazy" /></span>
+            <span class="nm-txt"><b>Real estate</b><small>Dubai property, on screen</small></span>
+            <svg class="nm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="/fashion.html" data-prev="/assets/navthumbs/nav-fashion.jpg" data-label="Fashion">
+            <span class="nm-thumb"><img src="/assets/navthumbs/nav-fashion.jpg" alt="" loading="lazy" /></span>
+            <span class="nm-txt"><b>Fashion</b><small>Editorial, campaign-lit</small></span>
+            <svg class="nm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="/films.html" data-prev="/assets/navthumbs/nav-films.jpg" data-label="Films &amp; BTS">
+            <span class="nm-thumb"><img src="/assets/navthumbs/nav-films.jpg" alt="" loading="lazy" /></span>
+            <span class="nm-txt"><b>Films &amp; BTS</b><small>Stills &amp; motion posters</small></span>
+            <svg class="nm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="/nights.html" data-prev="/assets/navthumbs/nav-nights.jpg" data-label="Nights">
+            <span class="nm-thumb"><img src="/assets/navthumbs/nav-nights.jpg" alt="" loading="lazy" /></span>
+            <span class="nm-txt"><b>Nights</b><small>After dark, flash-lit</small></span>
+            <svg class="nm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="/marriott.html" data-prev="/assets/navthumbs/nav-marriott.jpg" data-label="Marriott">
+            <span class="nm-thumb"><img src="/assets/navthumbs/nav-marriott.jpg" alt="" loading="lazy" /></span>
+            <span class="nm-txt"><b>Marriott</b><small>Hospitality, on brand</small></span>
+            <svg class="nm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="/portraits.html" data-prev="/assets/navthumbs/nav-portfolios.jpg" data-label="Portfolios">
+            <span class="nm-thumb"><img src="/assets/navthumbs/nav-portfolios.jpg" alt="" loading="lazy" /></span>
+            <span class="nm-txt"><b>Portfolios</b><small>Actors · models · portraits</small></span>
+            <svg class="nm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#act-store" data-prev="/assets/navthumbs/nav-prints.jpg" data-label="Prints">
+            <span class="nm-thumb"><img src="/assets/navthumbs/nav-prints.jpg" alt="" loading="lazy" /></span>
+            <span class="nm-txt"><b>Prints</b><small>Fine-art frames</small></span>
+            <svg class="nm-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+        <div class="nav-mega-view" aria-hidden="true">
+          <img class="nav-mega-img" id="navMegaImg" src="/assets/navthumbs/nav-weddings.jpg" alt="" />
+          <span class="nav-mega-label" id="navMegaLabel">Weddings</span>
+          <span class="nav-mega-cue">View the set →</span>
+        </div>
       </div>
     </div>
     <a href="/dubai/">Dubai</a>
@@ -742,7 +781,7 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="js/cinema.js?v=32"></script>
-<script src="js/main.js?v=40"></script>
+<script src="js/main.js?v=41"></script>
 <script src="js/landing.js?v=7"></script>
 <script>
 (function(){

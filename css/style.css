@@ -703,15 +703,53 @@ img{display:block;max-width:100%}
 .nav-dropbtn:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 
 .nav-menu{position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(-8px);
-  min-width:212px;background:rgba(10,8,16,.94);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
-  border:1px solid rgba(244,237,226,.14);border-radius:14px;padding:8px;
-  box-shadow:0 24px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:2px;
-  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .26s var(--ease),transform .26s var(--ease)}
+  background:rgba(10,8,16,.96);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+  border:1px solid rgba(244,237,226,.14);border-radius:16px;
+  box-shadow:0 30px 72px rgba(0,0,0,.64);
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .26s var(--ease),transform .3s var(--ease)}
 .nav-drop.on .nav-menu{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(-50%) translateY(0)}
-.nav-menu a{display:block;padding:10px 14px;border-radius:9px;font-size:12px;letter-spacing:.1em;
-  color:var(--paper);white-space:nowrap;transition:background .22s,color .22s}
 .nav-menu a::after{display:none}          /* kill the inherited underline sweep */
-.nav-menu a:hover{background:rgba(255,140,59,.12);color:var(--amber)}
+
+/* ── visual mega-menu: list + live preview ── */
+.nav-mega{width:min(548px,calc(100vw - 32px));display:grid;grid-template-columns:1fr 196px;gap:10px;padding:12px}
+.nav-mega-list{display:flex;flex-direction:column;gap:1px}
+.nav-mega-list a{display:grid;grid-template-columns:40px 1fr 16px;align-items:center;gap:12px;
+  padding:7px 10px 7px 7px;border-radius:11px;color:var(--paper);transition:background .2s var(--ease)}
+.nav-mega-list a:hover,.nav-mega-list a:focus-visible{background:rgba(255,140,59,.11);outline:none}
+.nm-thumb{width:40px;height:50px;border-radius:8px;overflow:hidden;position:relative;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.nm-thumb::after{content:"";position:absolute;inset:0;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(244,237,226,.13)}
+.nm-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease)}
+.nav-mega-list a:hover .nm-thumb img{transform:scale(1.09)}
+.nm-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.nm-txt b{font-family:var(--font-d);font-weight:500;font-size:14.5px;line-height:1.06;letter-spacing:.01em;
+  color:var(--paper);transition:color .2s}
+.nm-txt small{font-family:var(--font-m);font-size:9px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-mega-list a:hover .nm-txt b{color:var(--amber)}
+.nm-go{width:15px;height:15px;color:var(--amber);opacity:0;transform:translateX(-5px);
+  transition:opacity .25s var(--ease),transform .25s var(--ease)}
+.nav-mega-list a:hover .nm-go{opacity:1;transform:none}
+.nav-mega-view{position:relative;border-radius:12px;overflow:hidden;background:#0d0b12;
+  box-shadow:inset 0 0 0 1px rgba(244,237,226,.1)}
+.nav-mega-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .3s var(--ease)}
+.nav-mega-view::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to top,rgba(6,5,10,.9) 2%,rgba(6,5,10,.2) 44%,transparent 72%)}
+.nav-mega-label{position:absolute;left:14px;bottom:31px;z-index:2;font-family:var(--font-d);
+  font-size:19px;font-weight:500;color:var(--paper);text-shadow:0 2px 14px rgba(0,0,0,.75)}
+.nav-mega-cue{position:absolute;left:14px;bottom:13px;z-index:2;font-family:var(--font-m);
+  font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+/* staggered entrance */
+.nav-drop.on .nav-mega-list a{animation:navRowIn .42s var(--ease) both}
+.nav-drop.on .nav-mega-list a:nth-child(2){animation-delay:.04s}
+.nav-drop.on .nav-mega-list a:nth-child(3){animation-delay:.07s}
+.nav-drop.on .nav-mega-list a:nth-child(4){animation-delay:.10s}
+.nav-drop.on .nav-mega-list a:nth-child(5){animation-delay:.13s}
+.nav-drop.on .nav-mega-list a:nth-child(6){animation-delay:.16s}
+.nav-drop.on .nav-mega-list a:nth-child(7){animation-delay:.19s}
+.nav-drop.on .nav-mega-list a:nth-child(8){animation-delay:.22s}
+.nav-drop.on .nav-mega-view{animation:navRowIn .5s var(--ease) .1s both}
+@keyframes navRowIn{from{opacity:0;transform:translateX(-7px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.nav-drop.on .nav-mega-list a,.nav-drop.on .nav-mega-view{animation:none}}
 
 /* inside the burger panel it becomes an indented list — no floating card */
 @media(max-width:1020px){
@@ -720,11 +758,18 @@ img{display:block;max-width:100%}
     padding-bottom:0;margin-bottom:0}
   .nav-dropbtn{font-size:15px;letter-spacing:.14em;padding:0;width:100%;justify-content:space-between}
   .nav-menu{position:static;transform:none;opacity:1;visibility:visible;pointer-events:auto;
-    background:none;border:0;box-shadow:none;padding:0 0 0 14px;min-width:0;width:100%;
-    max-height:0;overflow:hidden;transition:max-height .34s var(--ease),padding .34s var(--ease)}
-  .nav-drop.on .nav-menu{max-height:420px;padding:12px 0 4px 14px;transform:none}
-  .nav-menu a{font-size:13.5px;padding:9px 0;border-left:1px solid rgba(244,237,226,.16);padding-left:14px;border-radius:0}
-  .nav-menu a:hover{background:none;border-left-color:var(--amber)}
+    background:none;border:0;box-shadow:none;min-width:0;width:100%;
+    max-height:0;overflow:hidden;transition:max-height .38s var(--ease),padding .38s var(--ease)}
+  .nav-mega{display:block;padding:0;width:100%}
+  .nav-drop.on .nav-menu{max-height:640px;padding:10px 0 4px 12px}
+  .nav-mega-view{display:none}                 /* no floating preview in the burger list */
+  .nav-drop.on .nav-mega-list a{animation:none}
+  .nav-mega-list a{grid-template-columns:1fr;gap:0;padding:9px 0 9px 14px;
+    border-left:1px solid rgba(244,237,226,.16);border-radius:0}
+  .nav-mega-list a:hover{background:none;border-left-color:var(--amber)}
+  .nm-thumb,.nm-go{display:none}               /* desktop-only visuals; clean text list on mobile */
+  .nm-txt small{display:none}
+  .nm-txt b{font-size:13.5px;font-family:var(--font-m);font-weight:400;letter-spacing:.1em;text-transform:uppercase}
 }
 
 /* ── market band + portfolio grid (shortened homepage) ──────────

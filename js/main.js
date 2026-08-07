@@ -73,6 +73,27 @@
     });
     // picking a section closes the whole nav, burger panel included
     drop.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setDrop(false)));
+
+    // live preview — hovering/focusing a row crossfades the big preview image
+    const megaImg = $('#navMegaImg'), megaLabel = $('#navMegaLabel');
+    if (megaImg && megaLabel) {
+      let swap;
+      drop.querySelectorAll('.nav-mega-list a').forEach(a => {
+        const show = () => {
+          const src = a.getAttribute('data-prev');
+          if (!src || megaImg.getAttribute('src') === src) return;
+          clearTimeout(swap);
+          megaImg.style.opacity = '0';
+          swap = setTimeout(() => {
+            megaImg.src = src;
+            megaLabel.textContent = a.getAttribute('data-label') || '';
+            megaImg.style.opacity = '1';
+          }, 120);
+        };
+        a.addEventListener('mouseenter', show);
+        a.addEventListener('focus', show);
+      });
+    }
   }
 
   /* ─────────── text splitting ─────────── */
