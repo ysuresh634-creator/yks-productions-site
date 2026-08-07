@@ -749,17 +749,60 @@ img{display:block;max-width:100%}
 
 .act-portfolio{padding:70px 0 96px}
 .pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
-.pf{position:relative;display:block;border-radius:16px;overflow:hidden;border:1px solid var(--line);
-  transition:border-color .4s var(--ease),transform .4s var(--ease)}
-.pf img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;
-  transition:transform .6s var(--ease),filter .5s var(--ease);filter:brightness(.82)}
-.pf:hover{border-color:rgba(255,140,59,.5);transform:translateY(-4px)}
-.pf:hover img{transform:scale(1.05);filter:brightness(1)}
-.pf-body{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:3px;
-  padding:44px 22px 20px;background:linear-gradient(transparent,rgba(7,6,10,.9) 55%)}
-.pf-body b{font-family:var(--font-d);font-size:1.4rem;font-weight:500}
+/* taller, portrait tiles — 4/3 landscape was cropping every subject's head.
+   object-position keeps faces (which sit high in the frame) inside the crop. */
+.pf{position:relative;display:block;aspect-ratio:4/5;border-radius:16px;overflow:hidden;
+  border:1px solid var(--line);transition:border-color .4s var(--ease),transform .4s var(--ease)}
+.pf-media{position:absolute;inset:0;z-index:0}
+.pf-frame{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 32%;
+  filter:brightness(.8);transition:transform .7s var(--ease),filter .5s var(--ease)}
+/* the work breathes: base frame stays, two more fade across it on a slow loop —
+   movement signals depth and draws the eye to tap through */
+.pf-frame:not(:first-child){opacity:0;animation:pfPeek 17s ease-in-out infinite}
+.pf-frame:nth-child(3){animation-delay:-8.5s}
+@keyframes pfPeek{0%,6%{opacity:0}15%,40%{opacity:1}49%,100%{opacity:0}}
+.pf-grad{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(transparent 38%,rgba(7,6,10,.5) 66%,rgba(7,6,10,.94))}
+.pf:hover{border-color:rgba(255,140,59,.6);transform:translateY(-5px);
+  box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.pf:hover .pf-frame{transform:scale(1.06);filter:brightness(1.05)}
+.pf-body{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;gap:3px;padding:22px}
+.pf-body b{font-family:var(--font-d);font-size:1.55rem;font-weight:500;line-height:1.05}
 .pf-body small{font-size:.85rem;color:var(--paper-dim);line-height:1.5}
+/* the tap cue — hidden until hover, then slides up in amber */
+.pf-cue{position:absolute;top:16px;right:16px;z-index:2;font-family:var(--font-m);font-size:10px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--amber);
+  padding:7px 12px;border:1px solid rgba(255,140,59,.5);border-radius:999px;
+  background:rgba(7,6,10,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  opacity:0;transform:translateY(-6px);transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.pf-cue i{font-style:normal;transition:transform .3s var(--ease);display:inline-block}
+.pf:hover .pf-cue{opacity:1;transform:none}
+.pf:hover .pf-cue i{transform:translateX(3px)}
 .pf:focus-visible,.market-card:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.pf-frame:not(:first-child){display:none}}
+
+/* ── client roster — a flowing marquee, not a dead grid of names ──
+   Two rows drift in opposite directions; hover pauses. Replaces the
+   static bordered boxes the names used to sit in. */
+.roster{margin-top:40px;display:flex;flex-direction:column;gap:8px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:34px 0}
+.roster-row{overflow:hidden;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.roster-track{display:flex;width:max-content;animation:rosterL 48s linear infinite}
+.roster-row.rev .roster-track{animation:rosterR 56s linear infinite}
+@keyframes rosterL{to{transform:translateX(-50%)}}
+@keyframes rosterR{from{transform:translateX(-50%)}to{transform:none}}
+.roster-track span{font-family:var(--font-d);font-size:clamp(24px,3.2vw,46px);font-weight:500;
+  color:var(--paper-dim);white-space:nowrap;padding:0 .34em;display:inline-flex;align-items:center;
+  transition:color .3s var(--ease)}
+.roster-track span::after{content:"·";color:var(--amber);opacity:.55;margin-left:.34em}
+.roster-track span:hover{color:var(--paper)}
+.roster:hover .roster-track{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){
+  .roster-track{animation:none;flex-wrap:wrap}
+  .roster-row.rev{display:none}
+}
 
 @media(max-width:900px){
   .market-grid{grid-template-columns:1fr}

@@ -46,7 +46,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/style.css?v=46" />
+<link rel="stylesheet" href="css/style.css?v=47" />
 <style>
 /* credibility stat band */
 .stat-band{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin:0 0 56px;padding:0 0 46px;border-bottom:1px solid rgba(244,237,226,.12)}
@@ -383,29 +383,41 @@
       <p class="eyebrow">The work</p>
       <h2 data-split="words">Pick a <em>thread.</em></h2>
       <div class="pf-grid">
-        <a class="pf" href="/real-estate.html" data-reveal>
-          <img loading="lazy" src="assets/posters/vimeo-showreel.jpg" alt="Dubai real estate films" />
+        <a class="pf" href="/real-estate.html" data-tilt data-reveal>
+          <span class="pf-media"><img class="pf-frame" loading="lazy" src="assets/posters/vimeo-showreel.jpg" alt="Dubai real estate films" /><img class="pf-frame" loading="lazy" src="assets/realestate-reel.jpg" alt="" /><img class="pf-frame" loading="lazy" src="assets/posters/ig-dxb1.jpg" alt="" /></span>
+          <span class="pf-grad"></span>
           <span class="pf-body"><b>Real estate</b><small>Cinematic property films across Dubai</small></span>
+          <span class="pf-cue">Explore <i>&rarr;</i></span>
         </a>
-        <a class="pf" href="/weddings.html" data-reveal>
-          <img loading="lazy" src="assets/wedding/wed-couple.jpg" alt="Wedding photography and films" />
+        <a class="pf" href="/weddings.html" data-tilt data-reveal>
+          <span class="pf-media"><img class="pf-frame" loading="lazy" src="assets/wedding/wed-couple.jpg" alt="Wedding photography and films" /><img class="pf-frame" loading="lazy" src="assets/jessica-leon/jl-08.jpg" alt="" /><img class="pf-frame" loading="lazy" src="assets/rithu-kevin/rk-04.jpg" alt="" /></span>
+          <span class="pf-grad"></span>
           <span class="pf-body"><b>Weddings</b><small>Engagement films, ceremony, couple work</small></span>
+          <span class="pf-cue">Explore <i>&rarr;</i></span>
         </a>
-        <a class="pf" href="/fashion.html" data-reveal>
-          <img loading="lazy" src="assets/rukmini/rukmini-1.jpg" alt="Fashion and editorial" />
+        <a class="pf" href="/fashion.html" data-tilt data-reveal>
+          <span class="pf-media"><img class="pf-frame" loading="lazy" src="assets/rukmini/rukmini-1.jpg" alt="Fashion and editorial" /><img class="pf-frame" loading="lazy" src="assets/behance/ig-tanny.jpg" alt="" /><img class="pf-frame" loading="lazy" src="assets/behance/ig-shifa1.jpg" alt="" /></span>
+          <span class="pf-grad"></span>
           <span class="pf-body"><b>Fashion</b><small>Editorial, lookbooks, designer collabs</small></span>
+          <span class="pf-cue">Explore <i>&rarr;</i></span>
         </a>
-        <a class="pf" href="/films.html" data-reveal>
-          <img loading="lazy" src="assets/soothravakyam-bts.jpg" alt="Film stills and on-set BTS" />
+        <a class="pf" href="/films.html" data-tilt data-reveal>
+          <span class="pf-media"><img class="pf-frame" loading="lazy" src="assets/soothravakyam-bts.jpg" alt="Film stills and on-set BTS" /><img class="pf-frame" loading="lazy" src="assets/rukmini/rukmini-4.jpg" alt="" /></span>
+          <span class="pf-grad"></span>
           <span class="pf-body"><b>Films &amp; BTS</b><small>On-set stills for Malayalam cinema</small></span>
+          <span class="pf-cue">Explore <i>&rarr;</i></span>
         </a>
-        <a class="pf" href="/marriott.html" data-reveal>
-          <img loading="lazy" src="assets/posters/marriott-film.jpg" alt="Brand campaigns" />
+        <a class="pf" href="/marriott.html" data-tilt data-reveal>
+          <span class="pf-media"><img class="pf-frame" loading="lazy" src="assets/posters/marriott-film.jpg" alt="Brand campaigns" /><img class="pf-frame" loading="lazy" src="assets/posters/ranger.jpg" alt="" /><img class="pf-frame" loading="lazy" src="assets/posters/evantha.jpg" alt="" /></span>
+          <span class="pf-grad"></span>
           <span class="pf-body"><b>Brand campaigns</b><small>Marriott, Ranger Apparels, Evantha</small></span>
+          <span class="pf-cue">Explore <i>&rarr;</i></span>
         </a>
-        <a class="pf" href="/portraits.html" data-reveal>
-          <img loading="lazy" src="assets/behance/work-olivia.jpg" alt="Portraits and portfolios" />
+        <a class="pf" href="/portraits.html" data-tilt data-reveal>
+          <span class="pf-media"><img class="pf-frame" loading="lazy" src="assets/behance/work-olivia.jpg" alt="Portraits and portfolios" /><img class="pf-frame" loading="lazy" src="assets/behance/work-ashika.jpg" alt="" /><img class="pf-frame" loading="lazy" src="assets/behance/work-sharmiela.jpg" alt="" /></span>
+          <span class="pf-grad"></span>
           <span class="pf-body"><b>Portraits</b><small>Actor and model portfolios</small></span>
+          <span class="pf-cue">Explore <i>&rarr;</i></span>
         </a>
       </div>
     </div>
@@ -484,10 +496,9 @@
         <div class="stat"><b>8<span>+</span></b><i>Years behind the lens</i></div>
       </div>
 
-      <div class="client-grid" id="clientGrid">
-        <span class="feat">Marriott</span><span class="feat">Reportage</span><span>Soothravakyam</span><span>Baby Girl</span>
-        <span>Shine Tom Chacko</span><span>Rukmini Vasanth</span><span>Shanvi Sri</span><span>Sharmiela Mandre</span>
-        <span>Ashika Ranganath</span><span>Divya Pandey</span><span>Sonika Gowda</span><span>Samyakk Sarees</span>
+      <div class="roster" aria-label="Clients, actors and brands">
+        <div class="roster-row"><div class="roster-track"><span>Rukmini Vasanth</span><span>Ashika Ranganath</span><span>Shine Tom Chacko</span><span>Shanvi Sri</span><span>Sharmiela Mandre</span><span>Sonika Gowda</span><span>Divya Pandey</span><span>Samyakk Sarees</span><span>Rukmini Vasanth</span><span>Ashika Ranganath</span><span>Shine Tom Chacko</span><span>Shanvi Sri</span><span>Sharmiela Mandre</span><span>Sonika Gowda</span><span>Divya Pandey</span><span>Samyakk Sarees</span></div></div>
+        <div class="roster-row rev"><div class="roster-track"><span>Marriott</span><span>Reportage</span><span>Leezu&#39;s</span><span>Max Fashion India</span><span>Ranger Apparels</span><span>Evantha</span><span>Storeys Real Estate</span><span>Soothravakyam</span><span>Baby Girl</span><span>Marriott</span><span>Reportage</span><span>Leezu&#39;s</span><span>Max Fashion India</span><span>Ranger Apparels</span><span>Evantha</span><span>Storeys Real Estate</span><span>Soothravakyam</span><span>Baby Girl</span></div></div>
       </div>
     </div>
   </section>
