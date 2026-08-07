@@ -36,7 +36,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=10" />
-<link rel="stylesheet" href="/css/talents.css?v=2" />
+<link rel="stylesheet" href="/css/talents.css?v=3" />
 
 <script type="application/ld+json">
 {
@@ -143,10 +143,23 @@
       </div>
     </div>
 
-    <p class="tal-seed-note">Example roster — profiles below are placeholders. Real talent profiles are added as they join.</p>
+    <p class="tal-seed-note">A selection of our roster — new faces are added as talent joins the pool.</p>
 
     <!-- grid (each card carries its full profile in data-* for the modal) -->
     <div class="tal-grid" id="talGrid">
+
+      <article class="tal" data-cat="model" data-region="india" data-name="Shalini Singh" data-city="India"
+        data-tags="Fashion · Editorial · Runway · Commercial · Bridal"
+        data-stats="Height:5&#39;5|Hair:Brown / blonde|Eyes:Dark brown|Shoe:35 EU"
+        data-bio="Professional model and digital creator working across fashion, editorial and commercial print. She moves easily between the controlled language of a studio call and the faster register of content — equally castable for a lookbook, a runway line-up or a campaign built for a phone. A fast study on set: quick to take direction, precise with hands and jawline, and able to hold a look for as long as the frame needs."
+        data-gallery="/assets/talents/shalini/shalini-01.jpg|/assets/talents/shalini/shalini-02.jpg|/assets/talents/shalini/shalini-03.jpg|/assets/talents/shalini/shalini-04.jpg|/assets/talents/shalini/shalini-05.jpg|/assets/talents/shalini/shalini-06.jpg">
+        <button class="tal-open" type="button">
+          <span class="tal-media"><img src="/assets/talents/shalini/shalini-01.jpg" alt="Shalini Singh — model, India" loading="lazy" /></span>
+          <span class="tal-grad"></span><span class="tal-cat">Model</span>
+          <span class="tal-body"><b>Shalini Singh</b><small>India</small><em>Fashion · Editorial · Runway</em></span>
+          <span class="tal-cue">View &amp; enquire →</span>
+        </button>
+      </article>
 
       <article class="tal" data-cat="model" data-region="india" data-name="Olivia" data-city="Bangalore, India"
         data-tags="Fashion editorial · Street · Campaign" data-bio="Editorial and street-fashion model based in Bangalore — clean commercial looks, strong with campaign and lookbook work."
@@ -308,6 +321,7 @@
       <span class="tal-modal-cat" id="talModalCat"></span>
       <h3 id="talModalName"></h3>
       <p class="tal-modal-city" id="talModalCity"></p>
+      <div class="tal-modal-stats" id="talModalStats" hidden></div>
       <p class="tal-modal-bio" id="talModalBio"></p>
       <p class="tal-modal-tags" id="talModalTags"></p>
       <a class="btn btn-fill" id="talModalBook" href="#" target="_blank" rel="noopener">Enquire to book →</a>
@@ -333,7 +347,7 @@
 </footer>
 
 <script src="/js/landing.js?v=7"></script>
-<script src="/js/talents.js?v=2"></script>
+<script src="/js/talents.js?v=3"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=5"></script>
 </body>

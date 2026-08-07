@@ -70,7 +70,8 @@
   /* ── profile modal ── */
   var modal = $('#talModal');
   var mGallery = $('#talModalGallery'), mCat = $('#talModalCat'), mName = $('#talModalName'),
-      mCity = $('#talModalCity'), mBio = $('#talModalBio'), mTags = $('#talModalTags'), mBook = $('#talModalBook');
+      mCity = $('#talModalCity'), mBio = $('#talModalBio'), mTags = $('#talModalTags'),
+      mBook = $('#talModalBook'), mStats = $('#talModalStats');
   var CAT_LABEL = { model: 'Model', influencer: 'Influencer / Creator', actor: 'Actor' };
 
   function openModal(card) {
@@ -78,6 +79,19 @@
     mCat.textContent = CAT_LABEL[d.cat] || d.cat;
     mName.textContent = d.name;
     mCity.textContent = d.city || '';
+    // optional spec strip (models) — "Label:Value|Label:Value"; contact stats stay private
+    if (mStats) {
+      mStats.innerHTML = '';
+      var pairs = (d.stats || '').split('|').filter(Boolean);
+      pairs.forEach(function (p) {
+        var i = p.indexOf(':'); if (i < 0) return;
+        var cell = document.createElement('span'); cell.className = 'tal-stat';
+        var k = document.createElement('small'); k.textContent = p.slice(0, i).trim();
+        var v = document.createElement('b'); v.textContent = p.slice(i + 1).trim();
+        cell.appendChild(k); cell.appendChild(v); mStats.appendChild(cell);
+      });
+      mStats.hidden = pairs.length === 0;
+    }
     mBio.textContent = d.bio || '';
     mTags.textContent = d.tags || '';
     mGallery.innerHTML = '';

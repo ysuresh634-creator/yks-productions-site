@@ -103,6 +103,12 @@
 .tal-modal-city{font-size:13px;color:var(--paper-dim);margin:0 0 18px;font-family:var(--tal-mono);letter-spacing:.08em;text-transform:uppercase}
 .tal-modal-bio{font-size:15px;color:var(--paper-dim);line-height:1.7;margin:0 0 16px}
 .tal-modal-tags{font-family:var(--tal-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,201,163,.85);margin:0 0 26px}
+/* optional spec strip (models) — non-sensitive attributes only */
+.tal-modal-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:2px 0 22px;flex:0 0 auto}
+.tal-modal-stats[hidden]{display:none}
+.tal-stat{display:flex;flex-direction:column;gap:3px;padding:12px 14px;background:#0c0a11}
+.tal-stat small{font-family:var(--tal-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim)}
+.tal-stat b{font-family:var(--tal-serif);font-size:16px;font-weight:500;color:var(--paper)}
 .tal-modal-info .btn{align-self:flex-start}
 .tal-modal-priv{font-size:11.5px;color:var(--paper-dim);line-height:1.6;margin:16px 0 0}
 
