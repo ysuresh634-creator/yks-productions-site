@@ -188,7 +188,16 @@
     if ($('#heroCanvas'))  scenes.hero  = await YKSCinema.create('hero', $('#heroCanvas'));
     if ($('#dubaiCanvas')) scenes.dubai = await YKSCinema.create('dubai', $('#dubaiCanvas'));
   }
-  bootScenes();
+  bootScenes().then(() => {
+    // Desktop drives the hero nebula's on/off through its scroll pin (below).
+    // Mobile has no pin — so switch the nebula ON directly (the hero is at the
+    // top, visible on load); an observer then pauses it once scrolled away.
+    if (mobile && scenes.hero) {
+      scenes.hero.setActive(true);
+      const hero = $('#act-hero');
+      if (hero) new IntersectionObserver(e => scenes.hero.setActive(e[0].isIntersecting), { threshold: 0 }).observe(hero);
+    }
+  });
   // render only near the pinned range — checked against the pin triggers'
   // live start/end so it survives refreshes, resizes and pin spacers
   gsap.ticker.add(() => {
