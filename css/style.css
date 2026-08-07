@@ -595,8 +595,9 @@ img{display:block;max-width:100%}
   .burger{display:flex}
   .nav-reel{display:none}
   .nav .links{position:fixed;inset:0 0 0 auto;width:min(320px,82vw);background:rgba(10,8,16,.68);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
-    flex-direction:column;justify-content:center;align-items:flex-start;
-    padding:48px 38px;gap:26px;transform:translateX(102%);transition:transform .45s var(--ease);
+    flex-direction:column;justify-content:flex-start;align-items:flex-start;
+    padding:76px 34px 40px;gap:22px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    transform:translateX(102%);transition:transform .45s var(--ease);
     border-left:1px solid var(--line);z-index:120}
   .nav .links.open{transform:none}
   .nav .links a{font-size:15px}
@@ -607,8 +608,9 @@ img{display:block;max-width:100%}
   .burger{display:flex}
   .nav-reel{display:none}
   .nav .links{position:fixed;inset:0 0 0 auto;width:min(320px,82vw);background:rgba(10,8,16,.68);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
-    flex-direction:column;justify-content:center;align-items:flex-start;
-    padding:48px 38px;gap:26px;transform:translateX(102%);transition:transform .45s var(--ease);
+    flex-direction:column;justify-content:flex-start;align-items:flex-start;
+    padding:76px 34px 40px;gap:22px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    transform:translateX(102%);transition:transform .45s var(--ease);
     border-left:1px solid var(--line);z-index:120}
   /* drop expensive blur compositing on phones — solid bgs render free */
   .nav.scrolled{background:rgba(7,6,10,.94);backdrop-filter:none}
@@ -779,8 +781,7 @@ img{display:block;max-width:100%}
   .nav-mega{display:block;padding:0;width:100%}
   /* mobile is where the clients are — keep the visual menu (thumbnail + name +
      caption per row); only the hover-preview panel drops (no hover on touch) */
-  .nav-drop.on .nav-menu{max-height:72vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
-    padding:8px 2px 6px;transform:none}
+  .nav-drop.on .nav-menu{max-height:760px;padding:8px 2px 6px;transform:none}
   .nav-mega-view{display:none}
   .nav-drop.on .nav-mega-list a{animation:none}
   .nav-mega-list{gap:3px}
