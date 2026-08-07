@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>3D Labs — YKS Productions</title>
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{--black:#07060a;--black-2:#0d0b12;--paper:#f4ede2;--paper-dim:rgba(244,237,226,.6);
+    --amber:#ff8c3b;--peach:#ffc9a3;--violet:#7b2ff7;--line:rgba(244,237,226,.12);
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --serif:'Playfair Display',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--mono:'Space Grotesk',monospace}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--black);color:var(--paper);line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+    padding:16px 24px;background:rgba(7,6,10,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .brand{font-family:var(--serif);font-size:19px;font-weight:600}
+  .brand span{color:var(--amber)}
+  .back{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--paper-dim)}
+  .back:hover{color:var(--amber)}
+
+  header.hero{padding:130px 0 30px;text-align:left}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--amber);margin-bottom:16px}
+  h1{font-family:var(--serif);font-size:clamp(34px,6vw,58px);font-weight:500;line-height:1.05;letter-spacing:-.015em}
+  h1 em{font-style:italic;background:linear-gradient(100deg,var(--amber),#ff2f87 60%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--paper-dim);max-width:58ch;margin-top:18px;font-size:1.05rem}
+
+  section.demo{padding:64px 0;border-top:1px solid var(--line)}
+  .dhead{display:flex;flex-direction:column;gap:8px;margin-bottom:30px}
+  .dnum{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;color:var(--amber);text-transform:uppercase}
+  h2{font-family:var(--serif);font-size:clamp(24px,3.6vw,38px);font-weight:500}
+  .dhead p{color:var(--paper-dim);max-width:62ch}
+  .where{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--paper-dim);
+    border-left:2px solid rgba(255,140,59,.5);padding:4px 0 4px 14px;margin-top:8px}
+  .where b{color:var(--amber);font-weight:500}
+
+  /* ── 01 depth-tilt card ─────────────────────── */
+  .tilt-stage{display:flex;justify-content:center;padding:20px 0;perspective:950px;touch-action:none}
+  .tilt{position:relative;width:min(360px,84vw);border-radius:18px;transform-style:preserve-3d;
+    transition:transform .16s ease-out;will-change:transform}
+  .tilt img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:18px;display:block;
+    box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  .tilt .gloss{position:absolute;inset:0;border-radius:18px;pointer-events:none;
+    background:radial-gradient(420px 320px at var(--gx,50%) var(--gy,20%),rgba(255,255,255,.16),transparent 60%);
+    transform:translateZ(46px)}
+  .tilt .frame{position:absolute;inset:0;border:1px solid rgba(244,237,226,.28);border-radius:18px;
+    pointer-events:none;transform:translateZ(26px)}
+  .tilt figcaption{position:absolute;left:20px;bottom:18px;transform:translateZ(64px);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--paper);
+    text-shadow:0 2px 12px rgba(0,0,0,.7)}
+  .gyro-btn{display:none;margin:16px auto 0;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;padding:11px 20px;border-radius:999px;border:1px solid rgba(255,140,59,.5);
+    background:transparent;color:var(--amber);cursor:pointer}
+
+  /* ── 02 bokeh field ─────────────────────────── */
+  .bokeh-stage{position:relative;height:340px;border-radius:18px;overflow:hidden;
+    border:1px solid var(--line);background:radial-gradient(120% 130% at 70% 10%,#171126,#07060a 70%)}
+  .bokeh-stage canvas{position:absolute;inset:0;width:100%;height:100%}
+  .bokeh-copy{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;pointer-events:none;gap:8px}
+  .bokeh-copy h3{font-family:var(--serif);font-size:clamp(22px,3.4vw,34px);font-weight:500}
+  .bokeh-copy p{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--paper-dim)}
+
+  /* ── 03 dolly tunnel ────────────────────────── */
+  .tunnel-wrap{height:320vh;position:relative}
+  .tunnel-view{position:sticky;top:0;height:100vh;overflow:hidden;perspective:820px;
+    background:radial-gradient(100% 110% at 50% 0%,#120d1e,#07060a 72%)}
+  .tunnel-scene{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+  .plane{position:absolute;left:50%;top:50%;width:min(340px,58vw);border-radius:14px;overflow:hidden;
+    box-shadow:0 24px 70px rgba(0,0,0,.6);border:1px solid rgba(244,237,226,.14)}
+  .plane img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+  .plane figcaption{position:absolute;left:14px;bottom:12px;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--paper);text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  .tunnel-hint{position:absolute;left:0;right:0;bottom:26px;text-align:center;font-family:var(--mono);
+    font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--paper-dim);z-index:5}
+
+  footer{padding:70px 0 90px;border-top:1px solid var(--line);text-align:center}
+  footer p{color:var(--paper-dim);max-width:52ch;margin:0 auto 26px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:var(--mono);
+    font-size:13.5px;letter-spacing:.015em;font-weight:600;min-height:48px;padding:0 26px;border-radius:999px;
+    background:var(--amber);color:var(--black);border:1px solid var(--amber)}
+  @media (prefers-reduced-motion:reduce){
+    .tilt{transition:none}
+    .bokeh-stage canvas{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="/index.html">YKS<span>.</span> Labs</a>
+  <a class="back" href="/index.html">← Back to the site</a>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Experiments · not linked from the site</p>
+    <h1>Three ways this site <em>gains depth</em></h1>
+    <p class="lede">Live prototypes, built with your real frames. Tilt your phone, move your cursor, scroll — each one is a technique that could ship, applied where it would actually live.</p>
+  </div>
+</header>
+
+<!-- ═══ 01 · DEPTH-TILT CARD ═══ -->
+<section class="demo">
+  <div class="wrap">
+    <div class="dhead">
+      <p class="dnum">Lab 01 · move your cursor over it — or tilt your phone</p>
+      <h2>Photographs with a z-axis</h2>
+      <p>The frame, the gloss and the caption sit on different depth planes, so the photo reads as an object you're holding rather than a rectangle. On phones it follows the gyroscope — the print moves as the hand does.</p>
+      <p class="where">Where it goes: <b>the six portfolio cards on the homepage</b>, the hub tiles on /dubai/ and /india/, and the Journal covers.</p>
+    </div>
+    <div class="tilt-stage" id="tiltStage">
+      <figure class="tilt" id="tiltCard">
+        <img src="/assets/rukmini/rukmini-1.jpg" alt="Rukmini Vasanth — editorial portrait" />
+        <span class="gloss"></span>
+        <span class="frame"></span>
+        <figcaption>Rukmini Vasanth · editorial</figcaption>
+      </figure>
+    </div>
+    <button class="gyro-btn" id="gyroBtn">Enable motion</button>
+  </div>
+</section>
+
+<!-- ═══ 02 · BOKEH FIELD ═══ -->
+<section class="demo">
+  <div class="wrap">
+    <div class="dhead">
+      <p class="dnum">Lab 02 · move your cursor through it</p>
+      <h2>A bokeh field that answers the hand</h2>
+      <p>Out-of-focus highlights drifting in three depth layers — the closest move most, the way real bokeh parallaxes when a lens moves. It's the photographic signature, made ambient.</p>
+      <p class="where">Where it goes: <b>behind the "Two bases, one eye" market band</b>, the quote page, and the category-page heros — replacing flat black with atmosphere that costs almost nothing.</p>
+    </div>
+    <div class="bokeh-stage" id="bokehStage">
+      <canvas id="bokehCanvas"></canvas>
+      <div class="bokeh-copy">
+        <h3>Two bases, one eye.</h3>
+        <p>Dubai · Bangalore</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 03 · DOLLY TUNNEL ═══ -->
+<section class="demo" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="dhead">
+      <p class="dnum">Lab 03 · keep scrolling — the scroll is the dolly</p>
+      <h2>A dolly move through the work</h2>
+      <p>Scrolling pushes the camera forward through floating frames — the one camera move every visitor gets to perform themselves. Frames drift past on both sides and fade as they pass the lens.</p>
+      <p class="where">Where it goes: <b>a "walk through the weddings" mode on weddings.html</b>, or the fashion page — one act per page, never the whole site.</p>
+    </div>
+  </div>
+  <div class="tunnel-wrap" id="tunnelWrap">
+    <div class="tunnel-view">
+      <div class="tunnel-scene" id="tunnelScene"></div>
+      <p class="tunnel-hint">Scroll · the camera is yours</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Any of these can ship as-is. They're plain CSS transforms and one canvas — no libraries, nothing that fights the WebGL already running on the homepage.</p>
+    <a class="btn" href="/index.html">Back to the site</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var fine = matchMedia('(pointer:fine)').matches;
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── 01 · depth tilt ── */
+  var card = document.getElementById('tiltCard'), stage = document.getElementById('tiltStage');
+  function setTilt(nx, ny) {   // nx, ny in -1..1
+    card.style.transform = 'rotateY(' + (nx * 10) + 'deg) rotateX(' + (-ny * 10) + 'deg)';
+    card.style.setProperty('--gx', (50 + nx * 40) + '%');
+    card.style.setProperty('--gy', (32 + ny * 40) + '%');
+  }
+  if (!reduced) {
+    stage.addEventListener('pointermove', function (e) {
+      var r = card.getBoundingClientRect();
+      setTilt(((e.clientX - r.left) / r.width - .5) * 2, ((e.clientY - r.top) / r.height - .5) * 2);
+    });
+    stage.addEventListener('pointerleave', function () { card.style.transform = ''; });
+
+    // gyro on phones — iOS needs a user-gesture permission request
+    var gbtn = document.getElementById('gyroBtn');
+    function startGyro() {
+      addEventListener('deviceorientation', function (e) {
+        if (e.gamma == null) return;
+        setTilt(Math.max(-1, Math.min(1, e.gamma / 24)), Math.max(-1, Math.min(1, (e.beta - 40) / 28)));
+      });
+    }
+    if (!fine && window.DeviceOrientationEvent) {
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        gbtn.style.display = 'block';
+        gbtn.addEventListener('click', function () {
+          DeviceOrientationEvent.requestPermission().then(function (s) {
+            if (s === 'granted') { gbtn.remove(); startGyro(); }
+          });
+        });
+      } else { startGyro(); }
+    }
+  }
+
+  /* ── 02 · bokeh field ── */
+  var canvas = document.getElementById('bokehCanvas'), bstage = document.getElementById('bokehStage');
+  if (canvas && !reduced) {
+    var ctx = canvas.getContext('2d');
+    var dpr = Math.min(devicePixelRatio || 1, 1.5), W, H;
+    function size() {
+      W = bstage.clientWidth; H = bstage.clientHeight;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    size(); addEventListener('resize', size);
+
+    var COLORS = ['255,140,59', '255,201,163', '123,47,247', '255,47,135'];
+    var discs = [], L = 3;
+    for (var i = 0; i < 66; i++) {
+      var layer = i % L;
+      discs.push({
+        x: Math.random(), y: Math.random(),
+        r: 6 + layer * 9 + Math.random() * 14,
+        c: COLORS[i % COLORS.length],
+        a: .05 + layer * .05 + Math.random() * .06,
+        vy: (.006 + layer * .008) * (Math.random() > .5 ? 1 : -1),
+        vx: .004 + Math.random() * .006,
+        depth: (layer + 1) / L
+      });
+    }
+    var mx = .5, my = .5, tx = .5, ty = .5, running = true;
+    bstage.addEventListener('pointermove', function (e) {
+      var r = bstage.getBoundingClientRect();
+      tx = (e.clientX - r.left) / r.width; ty = (e.clientY - r.top) / r.height;
+    });
+    new IntersectionObserver(function (en) { running = en[0].isIntersecting; })
+      .observe(bstage);
+    /* no document.hidden check — browsers already stop rAF in hidden tabs,
+       and some embedded webviews report hidden while still painting */
+    (function draw(t) {
+      requestAnimationFrame(draw);
+      if (!running) return;
+      mx += (tx - mx) * .04; my += (ty - my) * .04;
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'lighter';
+      for (var i = 0; i < discs.length; i++) {
+        var d = discs[i];
+        var px = (d.x + Math.sin(t * .0001 * d.vx * 60 + i) * .02) * W
+               + (mx - .5) * 70 * d.depth;
+        var py = (d.y + Math.sin(t * .00008 * 60 * d.vy + i * 2) * .03) * H
+               + (my - .5) * 46 * d.depth;
+        var g = ctx.createRadialGradient(px, py, 0, px, py, d.r);
+        g.addColorStop(0, 'rgba(' + d.c + ',' + d.a + ')');
+        g.addColorStop(1, 'rgba(' + d.c + ',0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(px, py, d.r, 0, 6.2832); ctx.fill();
+      }
+    })(0);
+  }
+
+  /* ── 03 · dolly tunnel ── */
+  var FRAMES = [
+    ['/assets/wedding/wed-couple.jpg', 'Under the chandeliers'],
+    ['/assets/posters/ig-dxb1.jpg', 'Dubai on the reel'],
+    ['/assets/wedding/bride-veil.jpg', 'The veil'],
+    ['/assets/rukmini/rukmini-2.jpg', 'An evening in gold'],
+    ['/assets/wedding/wed-lift.jpg', 'The lift'],
+    ['/assets/posters/marriott-film.jpg', 'Marriott · Coorg'],
+    ['/assets/wedding/wed-banister.jpg', 'The staircase']
+  ];
+  var scene = document.getElementById('tunnelScene'), wrapEl = document.getElementById('tunnelWrap');
+  var SPACING = 620, planes = [];
+  FRAMES.forEach(function (f, i) {
+    var el = document.createElement('figure');
+    el.className = 'plane';
+    el.innerHTML = '<img src="' + f[0] + '" alt="' + f[1] + '" loading="lazy" /><figcaption>' + f[1] + '</figcaption>';
+    var side = (i % 2 ? 1 : -1) * (26 + (i % 3) * 7);
+    var z = -420 - i * SPACING;
+    el.dataset.z = z;
+    el.style.transform = 'translate(-50%,-50%) translate3d(' + side + '%,' + ((i % 3 - 1) * 12) + '%,' + z + 'px)';
+    scene.appendChild(el); planes.push(el);
+  });
+  var travel = 420 + (FRAMES.length - 1) * SPACING;
+  var ticking = false;
+  function dolly() {
+    ticking = false;
+    var r = wrapEl.getBoundingClientRect();
+    var p = Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)));
+    if (reduced) p = 0;
+    var camZ = p * travel;
+    scene.style.transform = 'translateZ(' + camZ + 'px)';
+    for (var i = 0; i < planes.length; i++) {
+      var rel = parseFloat(planes[i].dataset.z) + camZ;   // >0 = behind the camera
+      planes[i].style.opacity = rel > 40 ? 0 : rel > -140 ? (140 + Math.min(rel, 0)) / 140 * .4 + .6 : 1;
+    }
+  }
+  addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(dolly); }
+  }, { passive: true });
+  dolly();
+})();
+</script>
+</body>
+</html>

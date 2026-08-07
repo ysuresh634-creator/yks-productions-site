@@ -125,12 +125,17 @@
     'See his work': 'https://www.instagram.com/yks_photoworks/'
   };
 
-  /* ── the aperture mark ─────────────────────────────────────── */
+  /* ── the aperture mark ─────────────────────────────────────────
+     Blades live in their own group so they can animate: the dock CTA
+     blooms open on approach (a lens opening up — letting light in),
+     and the same rig gives Iris her face — blinking when idle,
+     spinning while she thinks, pulsing when she answers. */
   var APERTURE =
       '<svg class="yc-ap" viewBox="0 0 100 100" aria-hidden="true">'
     + '<circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="7"/>'
-    + '<path d="M50 30 67.3 40 67.3 60 50 70 32.7 60 32.7 40Z" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/>'
-    + '<g stroke="currentColor" stroke-width="6" stroke-linecap="round">'
+    + '<circle class="g-core" cx="50" cy="50" r="25" fill="currentColor"/>'
+    + '<g class="g-blades" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">'
+    + '<path d="M50 30 67.3 40 67.3 60 50 70 32.7 60 32.7 40Z"/>'
     + '<path d="M50 30 83.6 26.5"/><path d="M67.3 40 87.2 67.3"/><path d="M67.3 60 53.6 90.8"/>'
     + '<path d="M50 70 16.4 73.5"/><path d="M32.7 60 12.8 32.7"/><path d="M32.7 40 46.4 9.2"/>'
     + '</g></svg>';
@@ -163,6 +168,26 @@
     + '.yc-live::after{content:"";position:absolute;inset:-5px;border-radius:50%;'
     + 'border:2px solid rgba(18,183,106,.5);animation:ycPulse 2.4s ease-out infinite}'
     + '@keyframes ycPulse{0%{transform:scale(.6);opacity:1}70%,100%{transform:scale(1.25);opacity:0}}'
+    /* ── aperture bloom ── the blades open like a lens letting light in */
+    + '.yc-ap .g-blades{transform-box:fill-box;transform-origin:center;'
+    + 'transition:transform .55s cubic-bezier(.34,1.3,.5,1),opacity .4s ease}'
+    + '.yc-ap .g-core{opacity:0;transition:opacity .45s ease .08s}'
+    + '.yc-cmark{width:27px;height:27px;flex:none;display:flex;align-items:center;justify-content:center}'
+    + '.yc-cmark .yc-ap{width:100%;height:100%;display:block}'
+    + '.yc-cta:hover .g-blades,.yc-cta:focus-visible .g-blades,.yc-cta:active .g-blades{'
+    + 'transform:rotate(42deg) scale(.55);opacity:.25}'
+    + '.yc-cta:hover .g-core,.yc-cta:focus-visible .g-core,.yc-cta:active .g-core{opacity:.22}'
+    /* ── Iris's face ── same rig, three states. Blink when idle… */
+    + '.yc-panel.on .yc-av .g-blades{animation:ycBlink 7s ease-in-out 3s infinite}'
+    + '@keyframes ycBlink{0%,91%,100%{transform:scale(1)}94%{transform:scale(.55)}97%{transform:scale(1)}}'
+    /* …spin while thinking (declared later so it wins over the blink)… */
+    + '.yc-panel.thinking .yc-av .g-blades{animation:ycThink 1.5s linear infinite}'
+    + '@keyframes ycThink{to{transform:rotate(360deg)}}'
+    /* …and one quick pulse when the answer lands */
+    + '.yc-panel.speak .yc-av{animation:ycSpeak .55s cubic-bezier(.34,1.3,.5,1)}'
+    + '@keyframes ycSpeak{35%{transform:scale(1.14)}}'
+    + '.yc-typing .yc-ap{width:17px;height:17px;color:rgba(244,237,226,.75)}'
+    + '.yc-typing .g-blades{animation:ycThink 1.4s linear infinite}'
     + '.yc-chev{width:15px;height:15px;flex:none;transition:transform .3s cubic-bezier(.22,.61,.36,1)}'
     + '.yc-bar.open .yc-chev{transform:rotate(180deg)}'
     /* the channel card — each row says what you GET, not just where it goes */
@@ -305,6 +330,21 @@
 
   var CHEV = '<svg class="yc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 
+  /* The label knows what page it's on. "Ask about your wedding" on a
+     wedding page converts a browser into an enquirer far better than a
+     generic greeting — the button meets them mid-thought. */
+  function ctaLabel() {
+    var p = location.pathname;
+    if (p.indexOf('wedding') > -1) return 'Ask about your wedding';
+    if (p.indexOf('real-estate') > -1) return 'Ask about property films';
+    if (p.indexOf('fashion') > -1) return 'Ask about a fashion shoot';
+    if (p.indexOf('portrait') > -1 || p.indexOf('headshot') > -1) return 'Ask about portraits';
+    if (p.indexOf('/dubai') === 0) return 'Talk about a Dubai shoot';
+    if (p.indexOf('/india') === 0) return 'Talk about an India shoot';
+    if (p.indexOf('/blog') === 0) return 'Ask Iris anything';
+    return 'Let’s talk';
+  }
+
   var bar = document.createElement('div');
   bar.className = 'yc-bar';
   bar.innerHTML =
@@ -324,7 +364,7 @@
     + '</a>'
     + '</div>'
     + '<button class="yc-cta" aria-expanded="false" aria-controls="ycMenu">'
-    +   '<span class="yc-live" aria-hidden="true"></span>Let’s talk' + CHEV
+    +   '<span class="yc-cmark" aria-hidden="true">' + APERTURE + '</span>' + ctaLabel() + CHEV
     + '</button>';
   document.body.appendChild(bar);
 
@@ -419,12 +459,17 @@
   }
   function typing(on) {
     var t = log.querySelector('.yc-typing');
+    panel.classList.toggle('thinking', !!on);   // the avatar spins while she works
     if (on && !t) {
       var d = document.createElement('div');
       d.className = 'yc-msg bot yc-typing';
-      d.innerHTML = '<i></i><i></i><i></i>';
+      d.innerHTML = APERTURE;                   // a lens focusing, not three dots
       log.appendChild(d); log.scrollTop = log.scrollHeight;
     } else if (!on && t) { t.remove(); }
+  }
+  function speak() {
+    panel.classList.add('speak');
+    setTimeout(function () { panel.classList.remove('speak'); }, 620);
   }
   function setChips(list) {
     chips.innerHTML = '';
@@ -485,6 +530,7 @@
       .then(function (r) { return r.json(); })
       .then(function (j) {
         typing(false);
+        speak();
         var reply = j && j.reply ? j.reply
           : "Sorry — that one didn't reach me. Try again, or message Yedukrishna: " + WA_URL;
         add('bot', reply);
