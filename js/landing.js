@@ -219,3 +219,21 @@
     x0 = null;
   }, { passive: true });
 })();
+
+/* Warm the homepage on hover/tap intent — it's the heaviest page and the
+   most-tapped nav item, so start fetching it the instant a Home link is
+   touched or hovered, making the actual click feel near-instant. */
+(function () {
+  var done = false;
+  function warm() {
+    if (done) return; done = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = '/index.html';
+    document.head.appendChild(l);
+  }
+  var homeLinks = document.querySelectorAll('a[href="/index.html"], a[href="/"]');
+  homeLinks.forEach(function (a) {
+    a.addEventListener('pointerenter', warm, { once: true, passive: true });
+    a.addEventListener('touchstart', warm, { once: true, passive: true });
+  });
+})();
