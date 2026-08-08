@@ -15,18 +15,37 @@
 
   /* ── live stat counts in the hero (animated count-up) ── */
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function countUp(el, target) {
-    if (!el) return;
-    if (reduced || target === 0) { el.textContent = target; return; }
-    var t0 = null;
-    function step(ts) { if (t0 === null) t0 = ts; var p = Math.min(1, (ts - t0) / 900);
-      el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target); if (p < 1) requestAnimationFrame(step); }
-    requestAnimationFrame(step);
-  }
   var byCat = function (k) { return cards.filter(function (c) { return c.dataset.cat === k; }).length; };
-  countUp($('[data-count-models]'), byCat('model'));
-  countUp($('[data-count-influencers]'), byCat('influencer'));
-  countUp($('[data-count-actors]'), byCat('actor'));
+  var byRegion = function (k) { return cards.filter(function (c) { return c.dataset.region === k; }).length; };
+  // editorial index — static, zero-padded; a category with no talent is dropped from the line
+  function setCount(el, target) {
+    if (!el) return;
+    el.textContent = target < 10 ? '0' + target : String(target);
+    if (target === 0) {
+      var span = el.closest('span');
+      if (span) { span.hidden = true;
+        var sep = span.nextElementSibling;
+        if (sep && sep.tagName === 'I') sep.hidden = true;
+      }
+    }
+  }
+  setCount($('[data-count-models]'), byCat('model'));
+  setCount($('[data-count-influencers]'), byCat('influencer'));
+  setCount($('[data-count-actors]'), byCat('actor'));
+
+  // sparse roster: drop the filter bar until there's enough to filter, and hide
+  // any category / region chip that currently has no talent behind it
+  var filterBar = $('.tal-filters');
+  if (filterBar) {
+    if (cards.length <= 1) { filterBar.style.display = 'none'; }
+    else {
+      $$('.tal-chip', filterBar).forEach(function (chip) {
+        var v = chip.dataset.val; if (v === 'all') return;
+        var n = (chip.closest('.tal-fgroup').dataset.filter === 'region') ? byRegion(v) : byCat(v);
+        if (n === 0) chip.style.display = 'none';
+      });
+    }
+  }
 
   /* ── reveal cards on scroll (progressive: only hide once JS is running) ── */
   grid.classList.add('js-reveal');
@@ -115,7 +134,8 @@
   }
   cards.forEach(function (card) {
     var btn = $('.tal-open', card);
-    if (btn) btn.addEventListener('click', function () { openModal(card); });
+    // link cards (<a>) navigate to the full profile page; only button cards open the quick modal
+    if (btn && btn.tagName !== 'A') btn.addEventListener('click', function () { openModal(card); });
   });
   $('#talModalX').addEventListener('click', closeModal);
   modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
