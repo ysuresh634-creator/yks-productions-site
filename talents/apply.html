@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=10" />
-<link rel="stylesheet" href="/css/talents.css?v=6" />
+<link rel="stylesheet" href="/css/talents.css?v=7" />
 </head>
 <body>
 
@@ -49,7 +49,7 @@
   <div class="wrap">
     <p class="tal-kicker">Submissions — Open</p>
     <h1 class="pf-name" style="max-width:12ch">Join the <em>Edit</em></h1>
-    <p class="tal-stand">Model, actor or creator, in India or the UAE? Send your details and portfolio to be considered for the YKS roster. Everything stays private with YKS — clients only ever book you through us.</p>
+    <p class="tal-stand">Two minutes, no fees — ever. Add a few photos straight from your phone (any size — no resizing), tell us a little about yourself, and we'll build your profile. Your number and socials always stay private.</p>
   </div>
 </section>
 
@@ -66,45 +66,116 @@
 </section>
 
 <!-- FORM -->
-<section class="l-section">
+<section class="l-section ap-form-sec">
   <div class="wrap">
-    <div class="l-head">
-      <p class="tal-kicker">Your details</p>
-      <h2>Send your <em>portfolio</em></h2>
-    </div>
     <div class="tal-apply">
-      <form class="tal-form" id="talForm" data-subject="New talent application — YKS Talents">
-        <div class="row2">
-          <label>Full name<input type="text" name="name" placeholder="Your name" required /></label>
-          <label>Phone / WhatsApp<input type="tel" name="contact" placeholder="+91 / +971 …" required /></label>
+      <form class="tal-form ap-form" id="talForm" novalidate>
+
+        <!-- Your photos -->
+        <div class="ap-block">
+          <p class="ap-step">Your photos</p>
+          <p class="ap-hint">Add as many as you like — phone shots are perfect. Any size, straight from your camera roll. No resizing, no fuss.</p>
+          <div class="ap-drop" id="apDrop" role="button" tabindex="0" aria-label="Add photos">
+            <input type="file" id="apPhotos" accept="image/*" multiple hidden />
+            <div class="ap-drop-in">
+              <span class="ap-drop-ic">+</span>
+              <b id="apDropLabel">Add photos</b>
+              <small>Tap to choose, or drag them here</small>
+            </div>
+          </div>
+          <div class="ap-thumbs" id="apThumbs"></div>
         </div>
-        <div class="row2">
-          <label>I am a…
-            <select name="category" required>
-              <option value="" disabled selected>Choose one</option>
-              <option>Model</option><option>Influencer / Creator</option><option>Actor</option>
-            </select>
-          </label>
-          <label>Based in
-            <select name="region" required>
-              <option value="" disabled selected>Choose one</option>
-              <option>India</option><option>UAE</option>
-            </select>
-          </label>
+
+        <!-- Portfolio PDF -->
+        <div class="ap-block">
+          <p class="ap-step">Portfolio PDF <span class="ap-opt">optional</span></p>
+          <p class="ap-hint">Got a portfolio or comp card? Drop it in — any size, no need to compress it.</p>
+          <div class="ap-drop ap-drop-pdf" id="apPdfDrop" role="button" tabindex="0" aria-label="Add portfolio PDF">
+            <input type="file" id="apPdf" accept="application/pdf,.pdf" hidden />
+            <div class="ap-drop-in"><span class="ap-drop-ic">↑</span><b>Add portfolio PDF</b><small>Tap or drag</small></div>
+          </div>
+          <div class="ap-pdfname" id="apPdfName" hidden></div>
         </div>
-        <div class="row2">
-          <label>City<input type="text" name="city" placeholder="Bangalore, Dubai …" /></label>
-          <label>Instagram / social <span class="tal-priv">private</span><input type="text" name="socials" placeholder="@handle or link (only YKS sees this)" /></label>
+
+        <!-- About you + AI writer -->
+        <div class="ap-block">
+          <p class="ap-step">About you</p>
+          <p class="ap-hint">A few honest lines about you and your work. Not sure what to say? Let us draft it — you can edit every word.</p>
+          <button type="button" class="ap-ai-btn" id="apAiOpen">✨ Write it for me</button>
+          <div class="ap-ai" id="apAi" hidden>
+            <div class="ap-ai-row"><span>I'm a…</span><div class="ap-chips" data-k="role">
+              <button type="button" data-v="model">Model</button>
+              <button type="button" data-v="actor">Actor</button>
+              <button type="button" data-v="content creator">Content creator</button>
+              <button type="button" data-v="dancer">Dancer</button>
+            </div></div>
+            <div class="ap-ai-row"><span>Experience</span><div class="ap-chips" data-k="exp">
+              <button type="button" data-v="start">Just starting</button>
+              <button type="button" data-v="early">A couple of years</button>
+              <button type="button" data-v="several">Several years</button>
+              <button type="button" data-v="pro">Very experienced</button>
+            </div></div>
+            <div class="ap-ai-row"><span>I love being cast for</span><div class="ap-chips ap-multi" data-k="loves">
+              <button type="button" data-v="Fashion">Fashion</button>
+              <button type="button" data-v="Editorial">Editorial</button>
+              <button type="button" data-v="Beauty">Beauty</button>
+              <button type="button" data-v="Bridal">Bridal</button>
+              <button type="button" data-v="Commercial">Commercial</button>
+              <button type="button" data-v="Runway">Runway</button>
+              <button type="button" data-v="Film">Film</button>
+              <button type="button" data-v="Fitness">Fitness</button>
+            </div></div>
+            <label class="ap-ai-proud">One thing you're proud of <span class="ap-opt">optional</span>
+              <input type="text" id="apProud" placeholder="a brand, a shoot, a film, a skill…" />
+            </label>
+            <div class="ap-ai-row"><span>Tone</span><div class="ap-chips" data-k="tone">
+              <button type="button" data-v="warm" class="on">Warm</button>
+              <button type="button" data-v="confident">Confident</button>
+              <button type="button" data-v="playful">Playful</button>
+              <button type="button" data-v="minimal">Minimal</button>
+            </div></div>
+            <button type="button" class="btn ap-ai-go" id="apAiGo">Write my about →</button>
+          </div>
+          <textarea name="about" id="apAbout" rows="5" placeholder="e.g. Fashion &amp; editorial model based in Delhi. I love campaign and lookbook work, take direction well, and I'm just as comfortable on location as in studio."></textarea>
         </div>
-        <label>A line about you<textarea name="message" rows="3" placeholder="Your experience, notable brands / films, what you're open to…"></textarea></label>
-        <label class="tal-file">Portfolio PDF <span class="tal-priv">optional · max 5&nbsp;MB</span>
-          <input type="file" name="attachment" accept="application/pdf,.pdf,image/*" />
-          <span class="tal-file-hint">PDF or images. Bigger file? Send it on WhatsApp after applying.</span>
-        </label>
-        <button type="submit" class="btn btn-fill">Submit application →</button>
-        <p class="tal-form-note">🔒 Your number, email and socials are never shown publicly — they stay with YKS. Clients enquire, and we connect the booking.</p>
+
+        <!-- The basics -->
+        <div class="ap-block">
+          <p class="ap-step">The basics</p>
+          <div class="row2">
+            <label>Full name<input type="text" name="name" placeholder="Your name" required /></label>
+            <label>Phone / WhatsApp<input type="tel" name="contact" placeholder="+91 / +971 …" required /></label>
+          </div>
+          <div class="row2">
+            <label>I am a…
+              <select name="category" required>
+                <option value="" disabled selected>Choose one</option>
+                <option>Model</option><option>Influencer / Creator</option><option>Actor</option>
+              </select>
+            </label>
+            <label>Based in
+              <select name="region" required>
+                <option value="" disabled selected>Choose one</option>
+                <option>India</option><option>UAE</option>
+              </select>
+            </label>
+          </div>
+          <div class="row2">
+            <label>City<input type="text" name="city" placeholder="Delhi, Dubai …" required /></label>
+            <label>Instagram / social <span class="tal-priv">private</span><input type="text" name="socials" placeholder="@handle or link (only YKS sees this)" /></label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-fill ap-submit">Send my application →</button>
+        <p class="ap-progress" id="apProgress" hidden></p>
+        <p class="tal-form-note">🔒 Your number, email and socials are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
       </form>
-      <p class="l-form-ok" id="talOk">✓ Application received. If it's a fit, I'll be in touch — feel free to WhatsApp your portfolio too.</p>
+
+      <p class="l-form-ok" id="talOk">✓ Application received — thank you. If it's a fit, I'll be in touch personally.
+        <span id="apOkWa" hidden><br />One quick step: <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%20just%20applied%20to%20YKS%20Talents%20and%20I%27d%20like%20to%20send%20my%20photos%2Fportfolio." target="_blank" rel="noopener">send your photos on WhatsApp →</a></span>
+      </p>
+
+      <p class="ap-wa">Rather do it all over chat? <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%27d%20like%20to%20join%20the%20YKS%20talent%20roster." target="_blank" rel="noopener">Apply on WhatsApp →</a></p>
     </div>
   </div>
 </section>
@@ -125,6 +196,6 @@
 </footer>
 
 <script src="/js/landing.js?v=7"></script>
-<script src="/js/talents.js?v=6"></script>
+<script src="/js/talent-apply.js?v=1"></script>
 </body>
 </html>
