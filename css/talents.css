@@ -249,12 +249,20 @@ main{overflow:hidden}
   .tal-modal-gallery img:only-child{width:100%}
 }
 @media(max-width:560px){
-  .tal-hero{padding:112px 0 40px}
+  .tal-hero{padding:106px 0 38px}
   .mag-folio{flex-direction:column;gap:3px}
+  .tal-stand{padding-left:16px;font-size:1.06rem}
+  .tal-index{gap:6px 12px}
   .tal-grid{gap:30px 16px}
+  .tal:first-child{padding-top:24px}
   .tal:first-child .tal-media{max-width:100%}
+  .tal:first-child .tal-body::after{font-size:1.14rem;margin-top:18px}
+  .tal-hero-links{gap:12px 26px}
+  .tal-hero-links a{padding:8px 0}          /* larger touch target */
   .tal-filters{gap:12px 18px}
   .tal-fgroup[data-filter="region"]{margin-left:0}
+  .row2{grid-template-columns:1fr;gap:18px} /* stack form fields */
+  .tal-form{gap:18px}
   .tal-modal{padding:0}
   .tal-modal-inner{border:0;height:100vh;max-height:100vh}
   .tal-modal-info{padding:30px 24px 26px}
