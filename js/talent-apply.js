@@ -6,8 +6,8 @@
    ── ONE-TIME SETUP (YKS) ───────────────────────────────────────────
    Create a free Cloudinary account (no card), add an *unsigned* upload
    preset, then drop the two values in here: */
-   var CLOUDINARY_CLOUD  = '';   // your Cloudinary "cloud name" (shown on the dashboard)
-   var CLOUDINARY_PRESET = '';   // the unsigned upload preset name
+   var CLOUDINARY_CLOUD  = 'sn15r86h';     // your Cloudinary "cloud name"
+   var CLOUDINARY_PRESET = 'yks_talents';  // the unsigned upload preset name
 /* Until they're filled, details still submit and files fall back to
    WhatsApp — so the form is never broken. ─────────────────────────── */
 
