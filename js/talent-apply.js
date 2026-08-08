@@ -1,13 +1,14 @@
 /* YKS Talents — registration flow.
    Human-first: many photos of any size, an AI-assisted "About" writer,
-   autosave, and a WhatsApp fallback. Files upload straight to YKS's own
-   Google Drive (no email size cap); each applicant gets their own folder.
+   autosave, and a WhatsApp fallback. Files upload straight to Cloudinary
+   (no email size cap); the notification e-mail carries the links.
 
    ── ONE-TIME SETUP (YKS) ───────────────────────────────────────────
-   Deploy the Google Apps Script (provided in chat) as a Web App
-   ("Execute as: Me", "Who has access: Anyone"), then paste its URL here: */
-   var GDRIVE_ENDPOINT = '';   // e.g. 'https://script.google.com/macros/s/AKfy…/exec'
-/* Until it's filled, details still submit and files fall back to
+   Create a free Cloudinary account (no card), add an *unsigned* upload
+   preset, then drop the two values in here: */
+   var CLOUDINARY_CLOUD  = '';   // your Cloudinary "cloud name" (shown on the dashboard)
+   var CLOUDINARY_PRESET = '';   // the unsigned upload preset name
+/* Until they're filled, details still submit and files fall back to
    WhatsApp — so the form is never broken. ─────────────────────────── */
 
 (function () {
@@ -167,31 +168,22 @@
     } catch (e) {}
   });
 
-  /* ══ upload one file to YKS's Google Drive (Apps Script web app) ══ */
-  function readBase64(file) {
-    return new Promise(function (res, rej) {
-      var r = new FileReader();
-      r.onload = function () { var s = String(r.result); res(s.slice(s.indexOf(',') + 1)); };
-      r.onerror = rej; r.readAsDataURL(file);
-    });
-  }
+  /* ══ upload one file to Cloudinary (unsigned) with progress ══ */
   function upload(file, onProgress, folder) {
-    return readBase64(file).then(function (b64) {
-      return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', GDRIVE_ENDPOINT);
-        // text/plain keeps it a "simple" request — no CORS preflight, which Apps Script can't answer
-        xhr.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
-        xhr.upload.onprogress = function (e) { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
-        xhr.onload = function () {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try { var j = JSON.parse(xhr.responseText); j.url ? resolve(j.url) : reject(new Error(j.error || 'drive')); }
-            catch (er) { resolve(''); }   // file saved but response unreadable → the folder link in the email covers it
-          } else reject(new Error('upload ' + xhr.status));
-        };
-        xhr.onerror = function () { reject(new Error('network')); };
-        xhr.send(JSON.stringify({ applicant: folder || 'Applications', name: file.name, type: file.type || 'application/octet-stream', data: b64 }));
-      });
+    return new Promise(function (resolve, reject) {
+      var url = 'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/auto/upload';
+      var fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', CLOUDINARY_PRESET);
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', url);
+      xhr.upload.onprogress = function (e) { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) { try { resolve(JSON.parse(xhr.responseText).secure_url || ''); } catch (er) { resolve(''); } }
+        else reject(new Error('upload ' + xhr.status));
+      };
+      xhr.onerror = function () { reject(new Error('network')); };
+      xhr.send(fd);
     });
   }
 
@@ -203,7 +195,7 @@
     e.preventDefault();
     if (!form.checkValidity()) { form.reportValidity(); return; }
     var orig = submitBtn.textContent; submitBtn.disabled = true;
-    var configured = !!GDRIVE_ENDPOINT;
+    var configured = !!(CLOUDINARY_CLOUD && CLOUDINARY_PRESET);
     var folderName = (form.name.value || 'Applicant').trim() + ' — ' + new Date().toLocaleDateString('en-GB');
 
     var chain = Promise.resolve({ photos: [], pdf: '' });
@@ -233,12 +225,12 @@
         category: form.category.value, based_in: form.region.value,
         city: form.city.value, instagram_social: form.socials.value,
         about: form.about.value,
-        drive_folder: (configured && (photos.length || pdf)) ? folderName : '(none)',
+        files_folder: (configured && (photos.length || pdf)) ? folderName : '(none)',
         photos: configured
-          ? (up.photos.filter(Boolean).join('\n') || (photos.length ? photos.length + ' photo(s) — in the Drive folder above' : '(none)'))
+          ? (up.photos.filter(Boolean).join('\n') || (photos.length ? photos.length + ' photo(s) uploaded' : '(none)'))
           : (photos.length ? '(' + photos.length + ' photos — applicant will send on WhatsApp)' : '(none)'),
         portfolio_pdf: configured
-          ? (up.pdf || (pdf ? 'In the Drive folder above' : '(none)'))
+          ? (up.pdf || (pdf ? 'PDF uploaded' : '(none)'))
           : (pdf ? '(PDF — applicant will send on WhatsApp)' : '(none)')
       };
       return fetch('https://api.web3forms.com/submit', {
