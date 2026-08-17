@@ -46,7 +46,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/style.css?v=57" />
+<link rel="stylesheet" href="css/style.css?v=58" />
 <style>
 /* credibility stat band */
 .stat-band{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:0 0 56px;padding:0 0 46px;border-bottom:1px solid rgba(244,237,226,.12)}
@@ -498,7 +498,7 @@
   </section>
 
   <!-- ════════ WORK — every card opens a real page ════════ -->
-  <section class="act act-portfolio" id="act-portfolio">
+  <section class="act act-portfolio" id="act-portfolio" data-fx-trail>
     <div class="wrap">
       <p class="eyebrow">03 — The work</p>
       <h2 data-split="words">Pick a <em>thread.</em></h2>
@@ -816,6 +816,18 @@
     </div>
   </section>
 
+  <!-- ════════ INSTANT QUOTE ESTIMATOR — honest market ranges, mounted by js/lead.js ════════ -->
+  <section class="act act-quote" id="act-quote">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Pricing — no guessing</p>
+        <h2>What will it <em>actually cost?</em></h2>
+        <p class="quote-intro">Most people have to email three photographers and wait a day to find out. Tap through this instead — it gives you the honest market range in seconds, then I confirm one fixed all-in number for your actual shoot.</p>
+      </div>
+      <div data-quote></div>
+    </div>
+  </section>
+
   <!-- ════════ TESTIMONIALS — HIDDEN until real quotes are added.
        To go live: replace the 3 quotes + names below, then remove style="display:none". ════════ -->
   <section class="act act-book" id="act-book">
@@ -968,6 +980,8 @@
 <script src="js/cinema.js?v=35"></script>
 <script src="js/main.js?v=46"></script>
 <script src="js/landing.js?v=9"></script>
+<script src="/js/fx.js?v=2"></script>
+<script src="/js/lead.js?v=1"></script>
 <script>
 (function(){
   var form = document.getElementById('waitlistForm');
