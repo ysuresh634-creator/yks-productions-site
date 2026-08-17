@@ -146,13 +146,64 @@
 
 <section class="l-hero" data-bokeh style="padding-bottom:40px">
   <div class="wrap">
-    <p class="l-eyebrow">Quote Assistant</p>
-    <h1>Tell me about it, <em>get a real quote</em></h1>
-    <p class="l-lede">A few quick questions — about 60 seconds — and I'll have everything I need to send you availability and one all-in number. No call required, no obligation.</p>
+    <p class="l-eyebrow">Get a quote</p>
+    <h1>Tell me what you need, <em>get a real quote</em></h1>
+    <p class="l-lede">There's no one-size price — real estate, fashion, film, events and weddings each price differently. Tell me what you're after and I'll come back with availability and one all-in number for exactly that. No call required, no obligation.</p>
   </div>
 </section>
 
-<section class="l-section" style="padding-top:20px">
+<!-- EXPRESS — three taps straight to WhatsApp -->
+<section class="l-section" style="padding-top:24px;padding-bottom:0">
+  <div class="wrap">
+    <div class="xb">
+      <span class="xb-kicker">The fast way</span>
+      <h2 class="xb-title">Book in <em>under a minute</em></h2>
+      <p class="xb-sub">Three taps and I'm in your WhatsApp with the details. Every service is priced differently, so I'll come back with an all-in number for exactly what you pick — usually within a few hours.</p>
+
+      <div class="xb-q">
+        <span class="xb-label">1 · What do you need?</span>
+        <div class="xb-opts" data-group="what">
+          <button type="button" class="xb-opt" data-v="real estate">Real estate</button>
+          <button type="button" class="xb-opt" data-v="fashion">Fashion</button>
+          <button type="button" class="xb-opt" data-v="film &amp; BTS">Film / BTS</button>
+          <button type="button" class="xb-opt" data-v="brand reel">Brand reel</button>
+          <button type="button" class="xb-opt" data-v="event">Event</button>
+          <button type="button" class="xb-opt" data-v="wedding">Wedding</button>
+          <button type="button" class="xb-opt" data-v="portrait">Portrait</button>
+          <button type="button" class="xb-opt" data-v="">Something else</button>
+        </div>
+      </div>
+
+      <div class="xb-q">
+        <span class="xb-label">2 · Where?</span>
+        <div class="xb-opts" data-group="where">
+          <button type="button" class="xb-opt" data-v="Dubai" data-wa="971501955122">Dubai / UAE</button>
+          <button type="button" class="xb-opt" data-v="India" data-wa="919746679720">India</button>
+        </div>
+      </div>
+
+      <div class="xb-q">
+        <span class="xb-label">3 · When?</span>
+        <div class="xb-opts" data-group="when">
+          <button type="button" class="xb-opt" data-v="this month">This month</button>
+          <button type="button" class="xb-opt" data-v="in 1–3 months">1–3 months</button>
+          <button type="button" class="xb-opt" data-v="later this year">Later</button>
+          <button type="button" class="xb-opt" data-v="date's flexible">Flexible</button>
+        </div>
+      </div>
+
+      <a class="btn btn-fill xb-go" id="xbGo" href="https://wa.me/971501955122" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.4.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>
+        Message me on WhatsApp →
+      </a>
+      <p class="xb-or">Want it itemised? <a href="#qStart">Answer a few questions for a detailed brief ↓</a></p>
+    </div>
+  </div>
+</section>
+
+<div class="xb-div">or, the thorough way</div>
+
+<section class="l-section" id="qStart" style="padding-top:20px">
   <div class="wrap">
     <div class="q-wrap">
       <div class="q-bar"><i id="qBar"></i></div>
@@ -183,6 +234,34 @@
 </footer>
 
 <script>
+/* express lane — assemble a pre-filled WhatsApp link, routed by location */
+(function(){
+  var st={what:'',where:'',when:'',wa:'971501955122'};
+  var go=document.getElementById('xbGo');
+  if(go){
+    var build=function(){
+      var m='Hi Yedukrishna — I’d like '+(st.what?('a '+st.what+' shoot'):'to book a shoot');
+      if(st.where)m+=' in '+st.where;
+      if(st.when)m+=', '+st.when;
+      m+='. What would that cost, and are you available?';
+      go.href='https://wa.me/'+st.wa+'?text='+encodeURIComponent(m);
+    };
+    document.querySelectorAll('.xb-opts').forEach(function(grp){
+      var key=grp.getAttribute('data-group');
+      grp.querySelectorAll('.xb-opt').forEach(function(b){
+        b.addEventListener('click',function(){
+          grp.querySelectorAll('.xb-opt').forEach(function(x){x.classList.remove('on');});
+          b.classList.add('on');
+          st[key]=b.getAttribute('data-v')||'';
+          if(key==='where')st.wa=b.getAttribute('data-wa')||'971501955122';
+          build();
+        });
+      });
+    });
+    go.addEventListener('click',function(){if(window.gtag)gtag('event','generate_lead',{method:'whatsapp_express'});});
+    build();
+  }
+})();
 (function () {
   var KEY = 'fbf5d037-af64-46a1-8ddc-5777379ec179';
   var log = document.getElementById('qLog'), now = document.getElementById('qNow'), bar = document.getElementById('qBar');
@@ -313,15 +392,16 @@
     bar.style.width = '100%';
     var L = brief(), dl = '';
     L.forEach(function (r) { dl += '<dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd>'; });
-    now.innerHTML = '<div class="q-row"><div class="q-av">Y</div><div class="q-bub">Here\'s your brief. Look right? Send it and I\'ll come back with availability and an all-in quote — usually within a few hours.</div></div>'
+    now.innerHTML = '<div class="q-row"><div class="q-av">Y</div><div class="q-bub">Here\'s your brief. Look right? Every service prices differently, so send it and I\'ll come back with availability and one all-in number tailored to exactly this — usually within a few hours.</div></div>'
       + '<div class="q-sum" style="margin-top:14px"><dl>' + dl + '<dt>Name</dt><dd>' + esc(A.name) + '</dd><dt>Contact</dt><dd>' + esc(A.phone) + (A.email ? ' · ' + esc(A.email) : '') + '</dd></dl></div>'
       + '<div class="q-actions"><button class="btn btn-fill" id="sGo">Send my brief →</button>'
       + '<button class="btn btn-ghost" id="sWa">Send on WhatsApp instead</button></div>';
 
     var txt = L.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n');
+    var waNum = /india|bangalore|bengaluru/i.test(A.where || '') ? '919746679720' : '971501955122';
     document.getElementById('sWa').onclick = function () {
-      var m = "Hi Yedukrishna, I'd like a quote.\n\n" + txt + "\nName: " + A.name;
-      window.open('https://wa.me/971501955122?text=' + encodeURIComponent(m), '_blank');
+      var m = "Hi Yedukrishna, I'd like a quote — rates vary by service, so what would this run to?\n\n" + txt + "\nName: " + A.name;
+      window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(m), '_blank');
     };
     document.getElementById('sGo').onclick = function () {
       var b = document.getElementById('sGo'); b.textContent = 'Sending…'; b.disabled = true;
