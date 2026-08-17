@@ -56,6 +56,20 @@
 .stat-band .stat i{display:block;margin-top:11px;font-family:'Space Grotesk',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,237,226,.55);font-style:normal}
 @media(max-width:820px){.stat-band{grid-template-columns:repeat(2,1fr);row-gap:30px}}
 @media(max-width:520px){.stat-band{grid-template-columns:1fr 1fr}}
+/* selected-work mosaic */
+.work-wall{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:172px;gap:12px;grid-auto-flow:dense}
+.work-tile{position:relative;overflow:hidden;border-radius:14px;border:1px solid rgba(244,237,226,.08);display:block}
+.work-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.82);transition:transform .8s cubic-bezier(.2,.7,.2,1),filter .5s}
+.work-tile:hover img{transform:scale(1.07);filter:brightness(1.02)}
+.work-grad{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(7,6,10,.92));pointer-events:none}
+.work-cap{position:absolute;left:0;right:0;bottom:0;padding:15px 17px;z-index:2}
+.work-cap b{display:block;font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:clamp(15px,1.3vw,21px);color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+.work-cap i{display:block;margin-top:3px;font-family:'Space Grotesk',monospace;font-style:normal;font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:#ff8c3b}
+.work-tile.big{grid-column:span 2;grid-row:span 2}
+.work-tile.tall{grid-row:span 2}
+.work-tile.wide{grid-column:span 2}
+@media(max-width:820px){.work-wall{grid-template-columns:repeat(2,1fr);grid-auto-rows:150px}}
+@media(max-width:520px){.work-wall{grid-auto-rows:128px;gap:9px}}
 /* testimonials */
 .act-words{padding:120px 0}
 .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
@@ -380,7 +394,7 @@
           </a>
         </div>
         <div class="nav-mega-view" aria-hidden="true">
-          <img class="nav-mega-img" id="navMegaImg" src="/assets/navthumbs/nav-realestate.jpg" alt="Dubai real estate and commercial films" />
+          <img class="nav-mega-img" id="navMegaImg" src="/assets/navthumbs/nav-dubai.jpg" alt="Dubai real estate and commercial films" />
           <span class="nav-mega-label" id="navMegaLabel">Real estate</span>
           <span class="nav-mega-cue">View the set →</span>
         </div>
@@ -423,28 +437,6 @@
     </div>
   </section>
 
-  <!-- ════════ TICKER ════════ -->
-  <section class="ticker" id="strip" aria-label="Highlights">
-    <div class="ticker-track">
-      <span class="tk"><b>3.2M</b><i>views · top reel</i></span><em class="d1">✦</em>
-      <span class="tk"><b>Dubai</b><i>real-estate films</i></span><em class="d2">✦</em>
-      <span class="tk"><b>Soothravakyam</b><i>film stills</i></span><em class="d3">✦</em>
-      <span class="tk"><b>Reportage Properties</b><i>Dubai real-estate films</i></span><em class="d1">✦</em>
-      <span class="tk"><b>Marriott</b><i>brand campaign</i></span><em class="d2">✦</em>
-      <span class="tk"><b>Evantha Group</b><i>real estate</i></span><em class="d3">✦</em>
-      <span class="tk"><b>Rukmini Vasanth</b><i>portraits</i></span><em class="d1">✦</em>
-      <span class="tk"><b>FEFKA</b><i>still photographers union</i></span><em class="d3">✦</em>
-      <span class="tk"><b>3.2M</b><i>views · top reel</i></span><em class="d1">✦</em>
-      <span class="tk"><b>Dubai</b><i>real-estate films</i></span><em class="d2">✦</em>
-      <span class="tk"><b>Soothravakyam</b><i>film stills</i></span><em class="d3">✦</em>
-      <span class="tk"><b>Reportage Properties</b><i>Dubai real-estate films</i></span><em class="d1">✦</em>
-      <span class="tk"><b>Marriott</b><i>brand campaign</i></span><em class="d2">✦</em>
-      <span class="tk"><b>Evantha Group</b><i>real estate</i></span><em class="d3">✦</em>
-      <span class="tk"><b>Rukmini Vasanth</b><i>portraits</i></span><em class="d1">✦</em>
-      <span class="tk"><b>FEFKA</b><i>still photographers union</i></span><em class="d2">✦</em>
-    </div>
-  </section>
-
   <!-- ════════ 01 · CRAFT ════════ -->
   <section class="act act-services" id="act-services">
     <div class="wrap">
@@ -482,7 +474,7 @@
   <!-- ════════ MARKET — the split, as a door not a gate ════════ -->
   <section class="act act-market" id="act-market" data-bokeh>
     <div class="wrap">
-      <p class="eyebrow">Where are you shooting?</p>
+      <p class="eyebrow">02 — Where are you shooting?</p>
       <h2 data-split="words">Two bases, <em>one eye.</em></h2>
       <div class="market-grid">
         <a class="market-card" href="/dubai/" data-reveal>
@@ -494,11 +486,11 @@
           <span class="market-go">Dubai, Abu Dhabi, wider UAE →</span>
         </a>
         <a class="market-card" href="/india/" data-reveal>
-          <img class="market-img" src="/assets/craft/india-market.jpg" alt="Wedding &amp; film work across India" loading="lazy" />
+          <img class="market-img" src="/assets/behance/work-suman.jpg" alt="Fashion and film work across India" loading="lazy" />
           <span class="market-grad"></span>
           <span class="market-flag">India</span>
           <h3>Bangalore &amp; India</h3>
-          <p>Property films, brand and film work — based between Bangalore and Kerala, travelling nationwide.</p>
+          <p>Fashion, brand and film work — based between Bangalore and Kerala, travelling nationwide.</p>
           <span class="market-go">Bangalore, Kochi, Mumbai + 6 more →</span>
         </a>
       </div>
@@ -508,7 +500,7 @@
   <!-- ════════ WORK — every card opens a real page ════════ -->
   <section class="act act-portfolio" id="act-portfolio">
     <div class="wrap">
-      <p class="eyebrow">The work</p>
+      <p class="eyebrow">03 — The work</p>
       <h2 data-split="words">Pick a <em>thread.</em></h2>
       <div class="pf-grid">
         <a class="pf" href="/real-estate.html" data-tilt data-reveal>
@@ -553,7 +545,7 @@
   <!-- ════════ PROOF — numbers that travelled, all linked ════════ -->
   <section class="act act-proof" id="act-proof">
     <div class="wrap">
-      <p class="eyebrow">Numbers that travelled</p>
+      <p class="eyebrow">04 — Numbers that travelled</p>
       <h2 data-split="words">Proof, <em>in public.</em></h2>
       <div class="proof-bento">
         <figure class="pr">
@@ -582,7 +574,7 @@
 <section class="act act-featured" id="act-featured">
     <div class="wrap">
       <div class="sec-head">
-        <p class="eyebrow">10 — Featured faces</p>
+        <p class="eyebrow">05 — Featured faces</p>
         <h2 data-split="words">Stars who trusted this lens</h2>
       </div>
       <div class="feat-grid">
@@ -612,7 +604,7 @@
   <section class="act act-clients" id="act-clients">
     <div class="wrap">
       <div class="sec-head">
-        <p class="eyebrow">11 — Credits</p>
+        <p class="eyebrow">06 — Selected work</p>
         <h2 data-split="words">Names &amp; brands I've shot for</h2>
       </div>
       <div class="stat-band">
@@ -622,9 +614,52 @@
         <div class="stat"><b>8<span>+</span></b><i>Years behind the lens</i></div>
       </div>
 
-      <div class="roster" aria-label="Clients, actors and brands">
-        <div class="roster-row"><div class="roster-track"><span>Rukmini Vasanth</span><span>Ashika Ranganath</span><span>Shine Tom Chacko</span><span>Shanvi Sri</span><span>Sharmiela Mandre</span><span>Sonika Gowda</span><span>Divya Pandey</span><span>Samyakk Sarees</span><span>Rukmini Vasanth</span><span>Ashika Ranganath</span><span>Shine Tom Chacko</span><span>Shanvi Sri</span><span>Sharmiela Mandre</span><span>Sonika Gowda</span><span>Divya Pandey</span><span>Samyakk Sarees</span></div></div>
-        <div class="roster-row rev"><div class="roster-track"><span>Marriott</span><span>Reportage</span><span>Leezu&#39;s</span><span>Max Fashion India</span><span>Ranger Apparels</span><span>Evantha</span><span>Storeys Real Estate</span><span>Soothravakyam</span><span>Baby Girl</span><span>Marriott</span><span>Reportage</span><span>Leezu&#39;s</span><span>Max Fashion India</span><span>Ranger Apparels</span><span>Evantha</span><span>Storeys Real Estate</span><span>Soothravakyam</span><span>Baby Girl</span></div></div>
+      <div class="work-wall" aria-label="Selected work">
+        <a class="work-tile big" href="/real-estate.html">
+          <img src="/assets/work/atlantis-tower.jpg" alt="Atlantis The Royal — property film, Dubai" loading="lazy" />
+          <div class="work-grad"></div>
+          <div class="work-cap"><b>Atlantis The Royal</b><i>Property film · Dubai</i></div>
+        </a>
+        <a class="work-tile tall" href="/films.html">
+          <img src="/assets/babygirl/babygirl-title.jpg" alt="Baby Girl — feature film stills" loading="lazy" />
+          <div class="work-grad"></div>
+          <div class="work-cap"><b>Baby Girl</b><i>Feature film</i></div>
+        </a>
+        <a class="work-tile tall" href="/portraits.html">
+          <img src="/assets/behance/sonika-04.jpg" alt="Sonika Gowda — actor portfolio" loading="lazy" />
+          <div class="work-grad"></div>
+          <div class="work-cap"><b>Sonika Gowda</b><i>Actor portfolio</i></div>
+        </a>
+        <a class="work-tile wide" href="/films.html">
+          <img src="/assets/soothravakyam-bts.jpg" alt="Soothravakyam — film stills" loading="lazy" />
+          <div class="work-grad"></div>
+          <div class="work-cap"><b>Soothravakyam</b><i>Film stills</i></div>
+        </a>
+        <a class="work-tile" href="/portraits.html">
+          <img src="/assets/behance/work-divya.jpg" alt="Divya Pandey — portrait" loading="lazy" />
+          <div class="work-grad"></div>
+          <div class="work-cap"><b>Divya Pandey</b><i>Portrait</i></div>
+        </a>
+        <a class="work-tile" href="/fashion.html">
+          <img src="/assets/behance/shanvi-sri.jpg" alt="Shanvi Sri — editorial" loading="lazy" />
+          <div class="work-grad"></div>
+          <div class="work-cap"><b>Shanvi Sri</b><i>Editorial</i></div>
+        </a>
+        <a class="work-tile wide" href="/real-estate.html">
+          <img src="/assets/work/atlantis-sea.jpg" alt="Dubai · UAE real-estate films" loading="lazy" />
+          <div class="work-grad"></div>
+          <div class="work-cap"><b>Dubai · UAE</b><i>Real-estate films</i></div>
+        </a>
+        <a class="work-tile" href="/fashion.html">
+          <img src="/assets/behance/tun-sharmiela.jpg" alt="Sharmiela Mandre — editorial" loading="lazy" />
+          <div class="work-grad"></div>
+          <div class="work-cap"><b>Sharmiela Mandre</b><i>Editorial</i></div>
+        </a>
+        <a class="work-tile" href="/marriott.html">
+          <img src="/assets/posters/marriott-r7.jpg" alt="Marriott — brand campaign" loading="lazy" />
+          <div class="work-grad"></div>
+          <div class="work-cap"><b>Marriott</b><i>Brand campaign</i></div>
+        </a>
       </div>
     </div>
   </section>
@@ -633,7 +668,7 @@
   <section class="act act-store" id="act-store">
     <div class="wrap">
       <div class="sec-head">
-        <p class="eyebrow">12 — Studio Store</p>
+        <p class="eyebrow">07 — Studio Store</p>
         <h2 data-split="words">Take a piece of the craft <em>home.</em></h2>
       </div>
       <p class="store-intro" data-reveal>Four ways to be part of YKS beyond the shoot — whether you create, collect, or want to learn the craft yourself.</p>
@@ -730,7 +765,7 @@
         <figcaption class="mono">YEDUKRISHNA SURESH · FOUNDER &amp; MARKETING SPECIALIST · FEFKA MEMBER</figcaption>
       </figure>
       <div class="about-copy">
-        <p class="eyebrow">13 — The eye behind the lens</p>
+        <p class="eyebrow">08 — The eye behind the lens</p>
         <h2 class="about-lead" data-split="words">Every frame should feel like a moment you'd want to relive.</h2>
         <p class="about-p" data-reveal>I'm Yedukrishna Suresh. I grew up in Alappuzha — the backwater town on the Kerala coast where the light moves slow across the water and an ordinary afternoon already looks like a film. Kerala hands you cinema early, and Malayalam movies were the world I grew up inside long before I ever thought of standing behind a camera myself.</p>
         <p class="about-p" data-reveal>That pull carried me onto film sets — my craft comes from cinema. I've shot cinematography and on-set stills for the Malayalam features <em>Soothravakyam</em> and <em>Baby Girl</em>; on a set, the still is the film's first trailer, and the job is catching the single frame that makes you feel the whole story.</p>
@@ -757,7 +792,7 @@
   <!-- ════════ WHY ME — the reassurance band ════════ -->
   <section class="act act-why" id="act-why">
     <div class="wrap">
-      <p class="eyebrow">Why me</p>
+      <p class="eyebrow">09 — Why me</p>
       <h2 data-split="words">Booking me is <em>the safe call.</em></h2>
       <div class="why-grid">
         <div class="why" data-reveal><b>You own everything</b><span>Every file, full rights — no watermarks held hostage, no drip-feeding.</span></div>
@@ -771,7 +806,7 @@
   <!-- ════════ HOW IT WORKS — the 3-step ════════ -->
   <section class="act act-how" id="act-how">
     <div class="wrap">
-      <p class="eyebrow">How it works</p>
+      <p class="eyebrow">10 — How it works</p>
       <h2 data-split="words">Three steps, <em>no faff.</em></h2>
       <div class="how-grid">
         <div class="how" data-reveal><span class="how-n">01</span><b>Tell me the brief</b><span>Three taps or a WhatsApp — what, where, when. I come back with availability and one all-in number, usually the same day.</span></div>
@@ -825,7 +860,7 @@
     </div>
     <div class="wrap book-grid">
       <div class="book-left">
-        <p class="eyebrow">14 — Booking</p>
+        <p class="eyebrow">11 — Booking</p>
         <h2 data-split="words">Let's create something cinematic.</h2>
         <p class="book-sub" data-reveal>Tell me your date and what you have in mind — hitting send opens a pre-filled WhatsApp message straight to me. I'll confirm availability fast.</p>
         <p class="book-sub" data-reveal style="color:#ff8c3b;font-weight:500">⚡ WhatsApp the date and city — you'll have my answer today. Peak dates (Nov–Feb) go months early.</p>
@@ -932,7 +967,7 @@
 <script src="/js/lib/lenis.min.js"></script>
 <script src="js/cinema.js?v=35"></script>
 <script src="js/main.js?v=46"></script>
-<script src="js/landing.js?v=8"></script>
+<script src="js/landing.js?v=9"></script>
 <script>
 (function(){
   var form = document.getElementById('waitlistForm');
