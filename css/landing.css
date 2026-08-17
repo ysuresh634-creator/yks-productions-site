@@ -391,3 +391,53 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
   letter-spacing:.16em;text-transform:uppercase;color:var(--paper-dim);
   margin-top:18px;line-height:1.7;font-style:normal;
   background:none;-webkit-text-fill-color:currentColor}
+
+/* ═══════════════════════════════════════════════════════════════
+   THE CONTACT SHEET — one roll, shown the way a photographer
+   actually edits: strips of frames, numbered in the rebate, the
+   keepers ringed in grease pencil. Frames are real 3:2.
+   ═══════════════════════════════════════════════════════════════ */
+.cs{padding:96px 0;background:
+  radial-gradient(70% 55% at 15% 0,rgba(255,140,59,.07),transparent 60%),#08070a}
+.cs-head{max-width:720px;margin:0 auto 44px;text-align:center}
+.cs-head h2{font-size:clamp(30px,4.4vw,52px);line-height:1.04}
+.cs-head p{color:var(--paper-dim);font-size:1.03rem;line-height:1.75;margin-top:16px}
+.cs-sheet{display:flex;flex-direction:column;gap:26px}
+
+/* one strip of film */
+.cs-strip{position:relative;background:#100d0b;border-radius:3px;padding:22px 0;
+  box-shadow:0 24px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(244,237,226,.05);
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cs-strip::-webkit-scrollbar{display:none}
+/* sprocket rows — rounded holes, top and bottom rebate */
+.cs-strip::before,.cs-strip::after{content:"";position:absolute;left:0;right:0;height:13px;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='13'%3E%3Crect x='2' y='2' width='11' height='9' rx='2.5' fill='%23efe9df' fill-opacity='.88'/%3E%3C/svg%3E");
+  background-repeat:repeat-x;pointer-events:none;z-index:2}
+.cs-strip::before{top:2px}
+.cs-strip::after{bottom:2px}
+
+.cs-frames{display:flex;gap:5px;padding:0 8px;width:max-content}
+.cs-frame{position:relative;flex:none;width:214px;cursor:pointer;background:#000;
+  transition:filter .35s var(--ease),transform .35s var(--ease)}
+.cs-frame img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;
+  filter:saturate(.94) contrast(1.03)}
+.cs-frame:hover{transform:translateY(-2px);filter:brightness(1.12)}
+/* frame number, printed in the rebate like real film */
+.cs-frame::after{content:attr(data-n);position:absolute;left:3px;bottom:-15px;z-index:3;
+  font-family:var(--mono,monospace);font-size:8.5px;letter-spacing:.14em;
+  color:rgba(255,170,90,.85)}
+/* the keepers — grease-pencil ring */
+.cs-frame.pick::before{content:"";position:absolute;inset:-5px;z-index:4;pointer-events:none;
+  border:2.5px solid rgba(255,90,60,.9);border-radius:52% 48% 50% 50%/48% 52% 48% 52%;
+  transform:rotate(-1.4deg);filter:blur(.25px);opacity:.92}
+.cs-edge{position:absolute;right:12px;top:16px;z-index:3;font-family:var(--mono,monospace);
+  font-size:8px;letter-spacing:.34em;color:rgba(255,170,90,.45);text-transform:uppercase}
+.cs-note{text-align:center;margin-top:30px;font-family:var(--mono,monospace);font-size:10px;
+  letter-spacing:.22em;text-transform:uppercase;color:rgba(244,237,226,.4)}
+.cs-note b{color:rgba(255,90,60,.85);font-weight:400}
+
+@media(max-width:640px){
+  .cs{padding:62px 0}
+  .cs-frame{width:168px}
+  .cs-sheet{gap:20px}
+}
