@@ -952,9 +952,10 @@ img{display:block;max-width:100%}
 /* crop the iframe to the video only — Instagram's white header/footer chrome
    is clipped by the frame, leaving a crisp reel in our own dark card. The
    frame aspect (not a fixed height) keeps the crop correct at every width. */
-.pr-frame{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;
+.pr-frame{display:block;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;
   box-shadow:0 20px 48px rgba(0,0,0,.42);aspect-ratio:1/1.13}
-.pr-frame iframe{width:100%;height:920px;border:0;display:block;margin-top:-52px}
+.pr-frame img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}
+.pr:hover .pr-frame img{transform:scale(1.045)}
 /* photo + account cards */
 .pv-photo{grid-area:photo;aspect-ratio:3/4}
 .pv-wide{grid-area:acct;height:clamp(158px,20vw,200px)}
@@ -987,7 +988,6 @@ img{display:block;max-width:100%}
 }
 @media(max-width:560px){
   .proof-bento{grid-template-columns:1fr;grid-template-areas:"reel1" "reel2" "photo" "acct"}
-  .pr-frame iframe{height:560px}
   .pv-photo{aspect-ratio:4/5}
   .pv-wide{height:auto;aspect-ratio:16/10}
 }
