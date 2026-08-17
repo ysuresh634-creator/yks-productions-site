@@ -40,7 +40,11 @@
        fires (tab restored from background, prerender), the worst case is
        "no fade", never a stuck black screen over the site. */
     + '.fx-veil{position:fixed;inset:0;z-index:500;background:#07060a;pointer-events:none;opacity:0;transition:opacity .42s var(--fx-ease,cubic-bezier(.22,.61,.36,1))}'
-    + '.fx-veil.intro{animation:fxIntro .5s cubic-bezier(.22,.61,.36,1) both}'
+    /* NO fill-mode: `both`/`backwards` would hold the opaque `from` frame
+       whenever the animation has not run (hidden tab, prerender) — i.e. a
+       black screen over the site. With no fill the element falls back to
+       its own opacity:0, so the failure mode is "no fade", never a blackout. */
+    + '.fx-veil.intro{animation:fxIntro .5s cubic-bezier(.22,.61,.36,1)}'
     + '@keyframes fxIntro{from{opacity:1}to{opacity:0}}'
     + '.fx-veil.out{animation:none;opacity:1}'
     /* cursor trail */
