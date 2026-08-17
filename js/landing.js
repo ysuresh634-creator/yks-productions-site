@@ -257,3 +257,55 @@
     if (show !== shown) { shown = show; btn.classList.toggle('on', show); }
   }, { passive: true });
 })();
+
+/* ═══════════════════════════════════════════════════════════════
+   TRUST LAYER — the three promises + the human behind the lens.
+   The homepage already carries "Booking me is the safe call" and the
+   Alappuzha story; the 57 service pages carried neither. Injected here
+   once so every page gets the same reassurance right where people decide.
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  var cta = document.querySelector('.l-cta .wrap');
+  if (!cta || document.querySelector('.l-promise')) return;
+
+  /* ── the three promises — sit directly above the form, at the decision point ── */
+  var wrap = cta.querySelector('.l-form-wrap');
+  var promise = document.createElement('ul');
+  promise.className = 'l-promise';
+  promise.innerHTML =
+      '<li><b>Same day.</b> You get a reply today — not "we\'ll revert".</li>'
+    + '<li><b>One all-in number.</b> Nothing added later, no surprise line items.</li>'
+    + '<li><b>Preview in 48h.</b> First edited frames within two days of the shoot.</li>';
+  if (wrap) cta.insertBefore(promise, wrap); else cta.appendChild(promise);
+
+  /* ── micro-copy under the send button: removes the last hesitation ── */
+  var form = document.querySelector('.l-cta .l-form');
+  if (form) {
+    var micro = document.createElement('p');
+    micro.className = 'l-micro';
+    micro.textContent = 'No obligation and no sales call — just a straight answer and one number.';
+    form.appendChild(micro);
+  }
+})();
+
+/* Who's actually behind the camera — a face and a story before the ask.
+   People book people, and on a service page there was nothing human at all. */
+(function () {
+  var ctaSection = document.querySelector('section.l-cta');
+  if (!ctaSection || !document.querySelector('.l-cats') || document.querySelector('.l-who')) return;
+
+  var sec = document.createElement('section');
+  sec.className = 'l-section l-who-sec';
+  sec.innerHTML =
+      '<div class="wrap"><div class="l-who">'
+    + '<figure class="l-who-photo"><img src="/assets/yedu-portrait-2.jpg" alt="Yedukrishna Suresh, founder of YKS Productions" loading="lazy" decoding="async" /></figure>'
+    + '<div class="l-who-copy">'
+    + '<p class="l-eyebrow">The eye behind the lens</p>'
+    + '<h2>Why a frame is worth <em>slowing down for</em></h2>'
+    + '<p>I grew up in Alappuzha — the backwater town on the Kerala coast where the light moves slow across the water and an ordinary afternoon already looks like a film. Kerala hands you cinema early.</p>'
+    + '<p>That pull carried me onto film sets. I shoot stills and cinematography for Malayalam features, and on a set the still is the film\'s first trailer — your job is catching the one frame that makes someone feel the whole story. That\'s the eye I bring to your shoot.</p>'
+    + '<p class="l-who-honest"><strong>And the honest part:</strong> I\'m not the cheapest camera in the city. If the lowest quote is the only thing that matters, I\'m genuinely not your guy — and I\'d rather say that now than after. I\'m for people who care how they\'re remembered.</p>'
+    + '<p class="l-who-sign">— Yedukrishna Suresh<span>Founder, YKS Productions · FEFKA member</span></p>'
+    + '</div></div></div>';
+  ctaSection.parentNode.insertBefore(sec, ctaSection);
+})();
