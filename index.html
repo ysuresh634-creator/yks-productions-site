@@ -136,7 +136,8 @@
 /* motion hero — showreel loop over the nebula (nebula stays as the fallback) */
 .hero-video{position:absolute;inset:0;overflow:hidden;opacity:0;transition:opacity 1.1s ease;pointer-events:none}
 .hero-video.on{opacity:1}
-.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.6) saturate(1.06)}
+.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.46) saturate(1.08) contrast(1.02)}
+.hero-video::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,6,10,.5),rgba(7,6,10,.24) 42%,rgba(7,6,10,.68))}
 @media (prefers-reduced-motion: reduce){.hero-video{display:none !important}}
 </style>
 
@@ -428,7 +429,7 @@
       <canvas class="cinema-canvas" id="heroCanvas"></canvas>
       <div class="hero-video" id="heroVideo" aria-hidden="true">
         <video id="heroVid" autoplay muted loop playsinline preload="auto">
-          <source src="/assets/realestate/dubai-property-2.mp4" type="video/mp4" />
+          <source src="/assets/realestate/atlantis-hero.mp4" type="video/mp4" />
         </video>
       </div>
       <div class="hero-grade"></div>
@@ -1056,7 +1057,13 @@
     setTimeout(function(){ if(cv) cv.style.display='none'; }, 1300);
   }, {once:true});
   vid.addEventListener('error', function(){ hv.style.display='none'; if(cv) cv.style.display=''; }, {once:true});
-  var p = vid.play && vid.play(); if(p && p.catch) p.catch(function(){});
+  function tryPlay(){ if(vid.paused){ var p=vid.play(); if(p&&p.catch) p.catch(function(){}); } }
+  tryPlay();
+  vid.addEventListener('canplay', tryPlay);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) tryPlay(); });
+  ['touchstart','pointerdown','scroll','click'].forEach(function(ev){
+    window.addEventListener(ev, tryPlay, {once:true, passive:true});
+  });
 })();
 </script>
 <script src="/js/bokeh.js?v=2"></script>
