@@ -377,6 +377,13 @@
       }, { threshold: 0.35, rootMargin: '0px 0px -12% 0px' });
       steps.forEach(function (s) { io.observe(s); });
 
+      /* Safety net: the dimmed state is only ever applied by this script, but
+         if the observer never delivers (frozen tab, odd engine) the steps must
+         not sit greyed out forever. Light everything after a few seconds. */
+      setTimeout(function () {
+        steps.forEach(function (s) { s.classList.add('lit'); });
+      }, 4000);
+
       var tick = null;
       function progress() {
         tick = null;
