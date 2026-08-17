@@ -82,6 +82,25 @@
 .faq-list .fa p{margin:0 0 12px}
 .faq-list .fa p:last-child{margin:0}
 @media(max-width:640px){ .act-faq{padding:70px 0} .faq-list summary{padding:20px 34px 20px 0} }
+/* express WhatsApp booking — the fast lane on the homepage */
+.xbook{max-width:760px;margin:0 auto 30px;border:1px solid rgba(244,237,226,.12);border-radius:20px;
+  background:linear-gradient(180deg,rgba(255,140,59,.07),rgba(244,237,226,.015));padding:clamp(24px,3.6vw,32px)}
+.xbook-kick{font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#ff8c3b}
+.xbook h3{font-family:'Playfair Display',Georgia,serif;font-size:clamp(23px,3.2vw,34px);font-weight:600;line-height:1.04;margin:8px 0 8px;color:#f4ede2}
+.xbook h3 em{font-style:italic;color:#ff8c3b}
+.xbook-sub{color:rgba(244,237,226,.62);font-size:1rem;line-height:1.55;margin:0 0 22px;max-width:56ch}
+.xbq{margin-bottom:15px}
+.xbq-l{display:block;font-family:'Space Grotesk',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,237,226,.55);margin-bottom:9px}
+.xbo{display:flex;flex-wrap:wrap;gap:8px}
+.xbc{font-family:'Space Grotesk',monospace;font-size:12px;letter-spacing:.03em;border:1px solid rgba(244,237,226,.22);
+  background:transparent;color:#f4ede2;border-radius:40px;padding:11px 17px;cursor:pointer;transition:.22s ease}
+.xbc:hover{border-color:#ff8c3b;color:#ff8c3b;transform:translateY(-2px)}
+.xbc.on{background:#ff8c3b;border-color:#ff8c3b;color:#07060a;font-weight:500}
+.xbook-go{display:inline-flex;align-items:center;gap:10px;margin-top:12px;background:#ff8c3b;color:#07060a;
+  border:1px solid #ff8c3b;border-radius:40px;padding:15px 26px;font-family:'Space Grotesk',monospace;font-size:12px;
+  letter-spacing:.08em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:.25s ease}
+.xbook-go:hover{background:#ffa155;border-color:#ffa155;transform:translateY(-2px)}
+.xbook-go svg{width:19px;height:19px;flex:none}
 </style>
 
 <!-- ───────── Structured data: tells Google what YKS is + where it serves ───────── -->
@@ -724,6 +743,45 @@
   <!-- ════════ TESTIMONIALS — HIDDEN until real quotes are added.
        To go live: replace the 3 quotes + names below, then remove style="display:none". ════════ -->
   <section class="act act-book" id="act-book">
+    <div class="wrap">
+      <div class="xbook">
+        <span class="xbook-kick">⚡ The fast way</span>
+        <h3>Book in <em>three taps</em></h3>
+        <p class="xbook-sub">Pick what, where and when — one tap lands you in my WhatsApp with the details. Every service prices differently, so I'll reply with one all-in number for exactly what you need.</p>
+        <div class="xbq">
+          <span class="xbq-l">1 · What do you need?</span>
+          <div class="xbo" data-g="what">
+            <button type="button" class="xbc" data-v="real estate">Real estate</button>
+            <button type="button" class="xbc" data-v="fashion">Fashion</button>
+            <button type="button" class="xbc" data-v="film &amp; BTS">Film / BTS</button>
+            <button type="button" class="xbc" data-v="brand reel">Brand reel</button>
+            <button type="button" class="xbc" data-v="event">Event</button>
+            <button type="button" class="xbc" data-v="portrait">Portrait</button>
+            <button type="button" class="xbc" data-v="">Something else</button>
+          </div>
+        </div>
+        <div class="xbq">
+          <span class="xbq-l">2 · Where?</span>
+          <div class="xbo" data-g="where">
+            <button type="button" class="xbc" data-v="Dubai" data-wa="971501955122">Dubai / UAE</button>
+            <button type="button" class="xbc" data-v="India" data-wa="919746679720">India</button>
+          </div>
+        </div>
+        <div class="xbq">
+          <span class="xbq-l">3 · When?</span>
+          <div class="xbo" data-g="when">
+            <button type="button" class="xbc" data-v="this month">This month</button>
+            <button type="button" class="xbc" data-v="in 1–3 months">1–3 months</button>
+            <button type="button" class="xbc" data-v="later this year">Later</button>
+            <button type="button" class="xbc" data-v="date's flexible">Flexible</button>
+          </div>
+        </div>
+        <a class="xbook-go" id="xbookGo" href="https://wa.me/971501955122" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.4.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>
+          Message me on WhatsApp →
+        </a>
+      </div>
+    </div>
     <div class="wrap book-grid">
       <div class="book-left">
         <p class="eyebrow">14 — Booking</p>
@@ -849,6 +907,35 @@
     form.style.display = 'none';
     document.getElementById('wlSuccess').style.display = 'block';
   });
+})();
+</script>
+<script>
+/* homepage express booking — pre-fill a location-routed WhatsApp message */
+(function(){
+  var st={what:'',where:'',when:'',wa:'971501955122'};
+  var go=document.getElementById('xbookGo');
+  if(!go)return;
+  function build(){
+    var m='Hi Yedukrishna — I’d like '+(st.what?('a '+st.what+' shoot'):'to book a shoot');
+    if(st.where)m+=' in '+st.where;
+    if(st.when)m+=', '+st.when;
+    m+='. What would that cost, and are you available?';
+    go.href='https://wa.me/'+st.wa+'?text='+encodeURIComponent(m);
+  }
+  document.querySelectorAll('.xbo').forEach(function(grp){
+    var key=grp.getAttribute('data-g');
+    grp.querySelectorAll('.xbc').forEach(function(b){
+      b.addEventListener('click',function(){
+        grp.querySelectorAll('.xbc').forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on');
+        st[key]=b.getAttribute('data-v')||'';
+        if(key==='where')st.wa=b.getAttribute('data-wa')||'971501955122';
+        build();
+      });
+    });
+  });
+  go.addEventListener('click',function(){if(window.gtag)gtag('event','generate_lead',{method:'whatsapp_express_home'});});
+  build();
 })();
 </script>
 <script src="/js/bokeh.js?v=2"></script>
