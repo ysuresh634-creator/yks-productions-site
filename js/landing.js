@@ -237,3 +237,23 @@
     a.addEventListener('touchstart', warm, { once: true, passive: true });
   });
 })();
+
+/* Back-to-top button — landing/service pages only (the homepage has its own
+   scroll UI). Fades in after a screen of scrolling; smooth-scrolls to the top. */
+(function () {
+  if (!document.querySelector('.l-cats')) return;   // landing pages carry the category strip
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'to-top';
+  btn.setAttribute('aria-label', 'Back to top');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Top';
+  document.body.appendChild(btn);
+  btn.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  var shown = false;
+  window.addEventListener('scroll', function () {
+    var show = window.scrollY > window.innerHeight * 0.9;
+    if (show !== shown) { shown = show; btn.classList.toggle('on', show); }
+  }, { passive: true });
+})();
