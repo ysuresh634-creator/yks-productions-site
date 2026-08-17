@@ -12,6 +12,15 @@
   var WA_AE = '971501955122';
   var WA_IN = '919746679720';
 
+  /* ── YOUR DIARY ───────────────────────────────────────────────
+     Dates you are already booked or away. Add them as 'YYYY-MM-DD'
+     and they show as taken; everything else simply invites an enquiry.
+     Left empty on purpose — the calendar never invents availability,
+     it only ever says "ask me", so it can't promise a date you can't keep.
+     e.g. var BOOKED = ['2026-09-14', '2026-09-15'];
+     ─────────────────────────────────────────────────────────────── */
+  var BOOKED = [];
+
   /* ── shared styles ── */
   var css = ''
     + '.q-wrap{max-width:760px;margin:0 auto}'
@@ -41,7 +50,28 @@
     + '.cf-nav{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:20px;flex-wrap:wrap}'
     + '.cf-back{background:none;border:0;color:rgba(244,237,226,.5);font-family:var(--font-m,var(--mono,monospace));font-size:11px;'
     + 'letter-spacing:.18em;text-transform:uppercase;cursor:pointer;padding:8px}'
-    + '.cf-back:hover{color:#ff8c3b}';
+    + '.cf-back:hover{color:#ff8c3b}'
+    /* availability calendar */
+    + '.cal-wrap{max-width:760px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:34px}'
+    + '.cal-m{}'
+    + '.cal-h{font-family:var(--font-d,var(--serif,Georgia,serif));font-size:1.15rem;color:#f4ede2;margin-bottom:14px;text-align:center}'
+    + '.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}'
+    + '.cal-dow{font-family:var(--font-m,var(--mono,monospace));font-size:9px;letter-spacing:.1em;text-transform:uppercase;'
+    + 'color:rgba(244,237,226,.38);text-align:center;padding-bottom:6px}'
+    + '.cal-d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:12.5px;'
+    + 'border:1px solid transparent;color:rgba(244,237,226,.85);background:rgba(244,237,226,.04);cursor:pointer;'
+    + 'transition:background .2s,border-color .2s,color .2s;-webkit-tap-highlight-color:transparent}'
+    + '.cal-d:hover{border-color:#ff8c3b;color:#ff8c3b}'
+    + '.cal-d.pad{background:none;cursor:default;pointer-events:none}'
+    + '.cal-d.past{opacity:.22;pointer-events:none;background:none}'
+    + '.cal-d.taken{background:rgba(244,237,226,.03);color:rgba(244,237,226,.25);text-decoration:line-through;'
+    + 'pointer-events:none;border-color:transparent}'
+    + '.cal-key{display:flex;gap:18px;justify-content:center;margin-top:22px;flex-wrap:wrap;'
+    + 'font-family:var(--font-m,var(--mono,monospace));font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,237,226,.5)}'
+    + '.cal-key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:-1px}'
+    + '.cal-key .free i{background:rgba(244,237,226,.14);border:1px solid rgba(255,140,59,.6)}'
+    + '.cal-key .taken i{background:rgba(244,237,226,.05)}'
+    + '@media(max-width:640px){.cal-wrap{grid-template-columns:1fr;gap:26px}}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   /* ═══════════════════════════════════════════════════════
@@ -162,6 +192,64 @@
     }
 
     paintSvc(); paintScale(); paintExtras(); paintCity(); calc();
+  })();
+
+  /* ═══════════════════════════════════════════════════════
+     C · AVAILABILITY CALENDAR — two months, tap a date to ask.
+     Nothing is ever shown as "confirmed free": untouched dates
+     simply open a WhatsApp message about that day.
+     ═══════════════════════════════════════════════════════ */
+  (function calendar() {
+    var mount = document.querySelector('[data-calendar]');
+    if (!mount) return;
+
+    var india = /bangalore|india|bengaluru/i.test(document.title) ||
+                /919746679720/.test(document.body.innerHTML);
+    var WA = india ? WA_IN : WA_AE;
+
+    var DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    var MON = ['January', 'February', 'March', 'April', 'May', 'June',
+               'July', 'August', 'September', 'October', 'November', 'December'];
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+    function month(offset) {
+      var d = new Date(today.getFullYear(), today.getMonth() + offset, 1);
+      var y = d.getFullYear(), m = d.getMonth();
+      var first = (new Date(y, m, 1).getDay() + 6) % 7; /* Monday-first */
+      var days = new Date(y, m + 1, 0).getDate();
+
+      var html = '<div class="cal-m"><div class="cal-h">' + MON[m] + ' ' + y + '</div><div class="cal-g">';
+      DOW.forEach(function (d2) { html += '<span class="cal-dow">' + d2 + '</span>'; });
+      for (var i = 0; i < first; i++) html += '<span class="cal-d pad"></span>';
+      for (var day = 1; day <= days; day++) {
+        var iso = y + '-' + pad(m + 1) + '-' + pad(day);
+        var dt = new Date(y, m, day);
+        var cls = 'cal-d';
+        if (dt < today) cls += ' past';
+        else if (BOOKED.indexOf(iso) > -1) cls += ' taken';
+        html += '<span class="' + cls + '" data-iso="' + iso + '" role="button" tabindex="0">' + day + '</span>';
+      }
+      return html + '</div></div>';
+    }
+
+    mount.innerHTML =
+      '<div class="cal-wrap">' + month(0) + month(1) + '</div>' +
+      '<div class="cal-key">' +
+        '<span class="free"><i></i>Tap a date to ask</span>' +
+        '<span class="taken"><i></i>Already booked</span>' +
+      '</div>';
+
+    mount.addEventListener('click', function (e) {
+      var d = e.target.closest('.cal-d[data-iso]');
+      if (!d || d.classList.contains('taken') || d.classList.contains('past')) return;
+      var iso = d.dataset.iso;
+      var pretty = new Date(iso + 'T00:00:00').toLocaleDateString('en-GB',
+        { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      var msg = 'Hi Yedukrishna, are you free on ' + pretty + '? I\'d like to talk about a shoot.';
+      window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+    });
   })();
 
   /* ═══════════════════════════════════════════════════════

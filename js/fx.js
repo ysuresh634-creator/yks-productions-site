@@ -64,7 +64,25 @@
     + 'box-shadow:0 8px 24px rgba(0,0,0,.5);pointer-events:none}'
     + '.fx-ba-tag{position:absolute;bottom:14px;font-family:var(--font-m,var(--mono,monospace));font-size:9.5px;letter-spacing:.22em;'
     + 'text-transform:uppercase;color:#f4ede2;text-shadow:0 2px 10px rgba(0,0,0,.9);pointer-events:none}'
-    + '.fx-ba-tag.l{left:16px}.fx-ba-tag.r{right:16px}';
+    + '.fx-ba-tag.l{left:16px}.fx-ba-tag.r{right:16px}'
+    /* scroll-driven steps */
+    + '.fx-story{position:relative}'
+    + '.fx-story::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:rgba(244,237,226,.14)}'
+    + '.fx-story::after{content:"";position:absolute;left:0;top:0;height:1px;width:var(--fx-progress,0%);'
+    + 'background:linear-gradient(90deg,#ff8c3b,#ffc9a3);transition:width .25s linear;box-shadow:0 0 12px rgba(255,140,59,.5)}'
+    + '.fx-story .l-step,.fx-story .step{opacity:.32;transform:translateY(10px);'
+    + 'transition:opacity .6s var(--fx-ease,cubic-bezier(.22,.61,.36,1)),transform .6s var(--fx-ease,cubic-bezier(.22,.61,.36,1))}'
+    + '.fx-story .l-step.lit,.fx-story .step.lit{opacity:1;transform:none}'
+    /* director's cut */
+    + 'html.fx-dc .cinema-stage,html.fx-dc .l-hero{position:relative}'
+    + 'html.fx-dc body::before,html.fx-dc body::after{content:"";position:fixed;left:0;right:0;height:7vh;background:#000;z-index:290;pointer-events:none}'
+    + 'html.fx-dc body::before{top:0}html.fx-dc body::after{bottom:0}'
+    + 'html.fx-dc img,html.fx-dc video{filter:contrast(1.08) saturate(.82) sepia(.08)}'
+    + '.fx-dc-toast{position:fixed;left:50%;bottom:12vh;transform:translateX(-50%) translateY(14px);z-index:320;'
+    + 'background:rgba(10,8,14,.92);border:1px solid rgba(255,140,59,.5);color:#f4ede2;padding:14px 22px;border-radius:999px;'
+    + 'font-family:var(--font-m,var(--mono,monospace));font-size:11px;letter-spacing:.2em;text-transform:uppercase;'
+    + 'opacity:0;transition:opacity .4s,transform .4s;pointer-events:none}'
+    + '.fx-dc-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}';
 
   var st = document.createElement('style');
   st.textContent = css;
@@ -81,10 +99,13 @@
       '.mosaic img', '.grid-gallery img', '[data-zoom] img', 'img[data-zoom]'
     ].join(',');
 
+    /* js/landing.js ships its own lightbox (.lbx) for these galleries.
+       Binding them here too would open two overlays on one tap, so we
+       hand those images over and only cover what it does not. */
+    var OWNED_BY_LANDING = '.l-gallery img, .nights-wide img, .l-feature > img, .l-hero-gallery img';
+
     var imgs = $$(SEL).filter(function (im) {
-      // skip tiny thumbs, logos and anything inside a link (link wins)
-      return im.naturalWidth !== 0 || true;
-    }).filter(function (im) {
+      if (im.matches && im.matches(OWNED_BY_LANDING)) return false;
       return !im.closest('a') && !im.closest('.fx-ba') && im.clientWidth > 60;
     });
     if (!imgs.length) return;
@@ -331,6 +352,81 @@
         if (e.key === 'ArrowRight') { set(cur + 4); e.preventDefault(); }
       });
       set(50);
+    });
+  })();
+
+  /* ─────────────────────────────────────────────────────────────
+     7 · SCROLL-DRIVEN STORY — the process reads like a sequence:
+     a progress line fills and each step lights as it is reached.
+     Upgrades the existing .l-steps markup, so no page edits needed.
+     ───────────────────────────────────────────────────────────── */
+  (function story() {
+    if (!('IntersectionObserver' in window)) return;
+    var rails = $$('.l-steps, .how-steps, [data-story]');
+    if (!rails.length) return;
+
+    rails.forEach(function (rail) {
+      rail.classList.add('fx-story');
+      var steps = $$('.l-step, .step, [data-step]', rail);
+      if (!steps.length) return;
+
+      if (REDUCED) { steps.forEach(function (s) { s.classList.add('lit'); }); return; }
+
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('lit'); });
+      }, { threshold: 0.35, rootMargin: '0px 0px -12% 0px' });
+      steps.forEach(function (s) { io.observe(s); });
+
+      var tick = null;
+      function progress() {
+        tick = null;
+        var r = rail.getBoundingClientRect();
+        var vh = window.innerHeight || 1;
+        /* 0% as the rail enters, 100% once its end passes the middle */
+        var p = (vh * 0.75 - r.top) / (r.height + vh * 0.25);
+        rail.style.setProperty('--fx-progress', Math.max(0, Math.min(1, p)) * 100 + '%');
+      }
+      window.addEventListener('scroll', function () {
+        if (!tick) tick = requestAnimationFrame(progress);
+      }, { passive: true });
+      progress();
+    });
+  })();
+
+  /* ─────────────────────────────────────────────────────────────
+     8 · DIRECTOR'S CUT — type "cut" (or ↑↑↓↓ on the classic code)
+     to letterbox the whole site and grade it like a film print.
+     Persists for the session so it survives page transitions.
+     ───────────────────────────────────────────────────────────── */
+  (function directorsCut() {
+    var toast = null;
+    function say(msg) {
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'fx-dc-toast';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      requestAnimationFrame(function () { toast.classList.add('on'); });
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { toast.classList.remove('on'); }, 2600);
+    }
+    function apply(on, announce) {
+      document.documentElement.classList.toggle('fx-dc', on);
+      try { sessionStorage.setItem('yksDC', on ? '1' : '0'); } catch (e) {}
+      if (announce) say(on ? '● Director\'s cut — on' : 'Director\'s cut — off');
+    }
+    try { if (sessionStorage.getItem('yksDC') === '1') apply(true, false); } catch (e) {}
+
+    var buf = '';
+    document.addEventListener('keydown', function (e) {
+      if (/^(INPUT|TEXTAREA)$/.test((e.target.tagName || '')) || e.target.isContentEditable) return;
+      if (!e.key || e.key.length !== 1) return;
+      buf = (buf + e.key.toLowerCase()).slice(-3);
+      if (buf === 'cut') {
+        apply(!document.documentElement.classList.contains('fx-dc'), true);
+        buf = '';
+      }
     });
   })();
 
