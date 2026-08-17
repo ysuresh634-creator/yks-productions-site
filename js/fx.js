@@ -182,8 +182,18 @@
   (function transitions() {
     if (REDUCED) return;
     var veil = document.createElement('div');
-    veil.className = 'fx-veil intro';
+    veil.className = 'fx-veil';
     document.body.appendChild(veil);
+
+    /* Only fade in when the page is actually visible. A hidden/backgrounded
+       tab freezes the document timeline, so a running animation would sit on
+       its opaque first frame indefinitely — a black screen. Skipping the
+       intro there costs nothing (nobody is looking) and can never blackout.
+       The class is stripped afterwards so no animation state lingers. */
+    if (!document.hidden) {
+      veil.classList.add('intro');
+      setTimeout(function () { veil.classList.remove('intro'); }, 900);
+    }
 
     document.addEventListener('click', function (e) {
       var a = e.target.closest ? e.target.closest('a') : null;
