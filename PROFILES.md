@@ -22,8 +22,14 @@ Dubai 🇦🇪 · Bangalore 🇮🇳
 Property films · Weddings · Fashion · Brands
 ```
 
-**Link:** `yksproductions.com` — the site, not the Linktree.
-The Linktree adds a hop, splits the signal, and keeps the credit for itself.
+**Link:**
+```
+yksproductions.com/links
+```
+Your own bio page, on your own domain — everything Linktree did, one hop
+shorter, and the traffic and the ranking signal stay with you. Add
+`?utm_source=instagram&utm_medium=bio` on the end if you want to see it
+separated out in GA4.
 
 ---
 
@@ -96,11 +102,11 @@ that has nothing your site doesn't.
 
 | Platform | Set the link to |
 |---|---|
-| Instagram bio | `yksproductions.com` |
+| Instagram bio | `yksproductions.com/links` |
 | Behance A (yedusuresha14c) | `https://yksproductions.com` |
 | Behance B (ysuresh634f0a1) | `https://yksproductions.com` |
 | Vimeo | `https://yksproductions.com` |
-| Linktree — top link | `https://yksproductions.com` |
+| Linktree — top link | `https://yksproductions.com/links` |
 
 **Already done on the site:** it no longer links out to Linktree from the
 social row or the footer — those were sending visitors away to a page

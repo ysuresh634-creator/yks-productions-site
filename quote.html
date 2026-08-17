@@ -71,6 +71,27 @@
 .q-done .tick{width:60px;height:60px;border-radius:50%;background:rgba(255,140,59,.15);border:1px solid var(--amber);
   display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-size:28px;color:var(--amber)}
 @media(max-width:600px){.q-bub{max-width:100%}.q-opt{font-size:11px;padding:12px 16px}}
+/* express WhatsApp booking — the fast lane */
+.xb{max-width:720px;margin:0 auto;border:1px solid var(--line);border-radius:20px;
+  background:linear-gradient(180deg,rgba(255,140,59,.07),rgba(244,237,226,.015));padding:clamp(24px,4vw,34px) clamp(22px,3.5vw,32px)}
+.xb-kicker{font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--amber)}
+.xb-title{font-family:'Playfair Display',Georgia,serif;font-size:clamp(25px,4.4vw,40px);font-weight:600;line-height:1.03;margin:9px 0 9px}
+.xb-title em{font-style:italic}
+.xb-sub{color:var(--paper-dim);font-size:1rem;line-height:1.55;margin:0 0 24px;max-width:50ch}
+.xb-q{margin-bottom:17px}
+.xb-label{display:block;font-family:'Space Grotesk',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:10px}
+.xb-opts{display:flex;flex-wrap:wrap;gap:8px}
+.xb-opt{font-family:'Space Grotesk',monospace;font-size:12px;letter-spacing:.03em;
+  border:1px solid rgba(244,237,226,.22);background:transparent;color:var(--paper);border-radius:40px;padding:11px 17px;cursor:pointer;transition:.22s var(--ease)}
+.xb-opt:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.xb-opt.on{background:var(--amber);border-color:var(--amber);color:#07060a;font-weight:500}
+.xb-go{display:inline-flex;align-items:center;gap:10px;margin-top:14px}
+.xb-go svg{width:19px;height:19px;flex:none}
+.xb-or{margin:15px 0 0;font-size:.9rem;color:var(--paper-dim)}
+.xb-or a{color:var(--amber);border-bottom:1px solid rgba(255,140,59,.4)}
+.xb-div{max-width:720px;margin:36px auto 4px;display:flex;align-items:center;gap:16px;color:var(--paper-dim);
+  font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase}
+.xb-div::before,.xb-div::after{content:"";flex:1;height:1px;background:var(--line)}
 </style>
 
 <script type="application/ld+json">
