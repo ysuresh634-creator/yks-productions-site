@@ -103,8 +103,17 @@
       .replace(/[+(]?\d[\d\s().\-]{6,}\d/g, '')                            // phone numbers
       .replace(/\s{2,}/g, ' ').replace(/^[\s·|,\-]+|[\s·|,\-]+$/g, '').trim();
   }
-  var CATS = ['Portrait', 'Full length', 'Fashion', 'Commercial', 'Beauty', 'Digitals', 'Other'];
-  var activeCat = 'Portrait';   // new photos land in the selected category
+  // casting-relevant sections, each with a "what casting wants" tip
+  var SECTIONS = [
+    { k: 'Headshots',   tip: 'Face &amp; expression. Natural light, minimal retouch, eyes to camera.' },
+    { k: 'Full length', tip: 'Head-to-toe — it shows your frame and proportions.' },
+    { k: 'Fashion',     tip: 'Editorial / campaign energy — proof you can perform to camera.' },
+    { k: 'Commercial',  tip: 'Approachable, a real smile — the bookable, relatable you.' },
+    { k: 'Beauty',      tip: 'Close and clean — skin, features, detail.' },
+    { k: 'Digitals',    tip: 'Front, profile &amp; full-length in plain light, minimal makeup — casting specifically asks for these.' }
+  ];
+  var CATS = SECTIONS.map(function (s) { return s.k; });   // thumbnails still tag by section
+  var activeCat = 'Headshots';   // new photos land in the selected section
 
   /* ══ photos: pick / drop / preview / reorder / remove ══ */
   var photoInput = $('#apPhotos'), photoDrop = $('#apDrop'), thumbs = $('#apThumbs');
@@ -168,22 +177,48 @@
       fig.addEventListener('drop', function (e) { e.preventDefault(); var from = idxOf(+e.dataTransfer.getData('text/plain')), to = idxOf(item.id); if (from < 0 || to < 0 || from === to) return; photos.splice(to, 0, photos.splice(from, 1)[0]); renderThumbs(); });
       thumbs.appendChild(fig);
     });
-    reflectPhotoCount(); if (typeof renderTemplates === 'function') renderTemplates(); updatePreview();
+    reflectPhotoCount(); renderCover(); renderStrength(); if (typeof renderTemplates === 'function') renderTemplates(); updatePreview();
   }
   function reflectPhotoCount() {
     var b = $('#apDropLabel');
-    if (b) b.textContent = photos.length ? photos.length + (photos.length === 1 ? ' photo — first is your cover' : ' photos — first is your cover') : 'Add ' + activeCat + ' photos';
+    if (b) b.textContent = photos.length ? ('Add more — ' + activeCat) : ('Add your ' + activeCat);
+  }
+  function showSecTip(cat) {
+    var el = $('#apSecTip'); if (!el) return;
+    var s = SECTIONS.filter(function (x) { return x.k === cat; })[0];
+    el.innerHTML = s ? ('<b>' + esc(cat) + '</b> — ' + s.tip) : '';
   }
   (function buildCatChips() {
     var wrap = $('#apCats'); if (!wrap) return;
     CATS.forEach(function (c) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-catchip' + (c === activeCat ? ' on' : ''); b.textContent = c;
       b.addEventListener('click', function () {
-        activeCat = c; $$('.ap-catchip', wrap).forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on'); reflectPhotoCount();
+        activeCat = c; $$('.ap-catchip', wrap).forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on'); reflectPhotoCount(); showSecTip(c);
       });
       wrap.appendChild(b);
     });
+    showSecTip(activeCat);
   })();
+  // the hero cover (first photo) shown prominently — the frame a client sees first
+  function renderCover() {
+    var pic = $('#apCoverPic'); if (!pic) return;
+    if (photos[0]) { pic.innerHTML = '<img src="' + (photos[0].edited || photos[0].url) + '" alt="cover">'; pic.classList.add('has'); }
+    else { pic.innerHTML = '<span class="ap-cover-star">★</span>'; pic.classList.remove('has'); }
+  }
+  // casting-ready strength meter — which sections are covered, nudging a well-rounded book
+  function renderStrength() {
+    var el = $('#apStrength'); if (!el) return;
+    if (!photos.length) { el.hidden = true; return; }
+    el.hidden = false;
+    var have = {}; photos.forEach(function (p) { if (p.cat) have[p.cat] = true; });
+    var done = SECTIONS.filter(function (s) { return have[s.k]; }).length, pct = Math.round(done / SECTIONS.length * 100);
+    var missing = SECTIONS.filter(function (s) { return !have[s.k]; }).map(function (s) { return s.k; });
+    var chips = SECTIONS.map(function (s) { return '<span class="ap-str-chip' + (have[s.k] ? ' on' : '') + '">' + (have[s.k] ? '✓ ' : '') + esc(s.k) + '</span>'; }).join('');
+    el.innerHTML = '<div class="ap-str-head"><b>Portfolio strength</b><span>' + done + ' / ' + SECTIONS.length + ' sections' +
+      (done < SECTIONS.length ? '  ·  add ' + missing.slice(0, 2).join(', ') : '  ·  well-rounded ✓') + '</span></div>' +
+      '<div class="ap-str-bar"><i style="width:' + pct + '%"></i></div><div class="ap-str-chips">' + chips + '</div>';
+  }
+  renderCover();
 
   /* ══ per-photo crop / adjust editor — Fill (crop) or Fit (show the whole photo) ══ */
   var cropModal = $('#apCrop'), cropImg = $('#apCropImg'), cropBlur = $('#apCropBlur'), cropFrame = $('#apCropFrame'), cropZoom = $('#apCropZoom');
