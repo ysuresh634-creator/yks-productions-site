@@ -32,7 +32,9 @@
     { k: 'editorial', label: 'Editorial', note: 'Framed hero + profile' },
     { k: 'lookbook',  label: 'Lookbook',  note: 'Full-bleed, photo-first' },
     { k: 'compcard',  label: 'Comp Card', note: 'Agency standard · 2 pages' },
-    { k: 'minimal',   label: 'Minimal',   note: 'Airy, one shot a page' }
+    { k: 'minimal',   label: 'Minimal',   note: 'Airy, one shot a page' },
+    { k: 'grid',      label: 'Grid',      note: 'Contact sheet · shows range' },
+    { k: 'feature',   label: 'Feature',   note: 'Magazine spread' }
   ];
   /* photo "look": a single grade applied to EVERY image so the book feels
      shot as one story — the thing that separates a pro portfolio from a phone roll */
@@ -403,11 +405,23 @@
     preview.innerHTML = html;
   }
   function mark(wrap, btn) { $$('button', wrap).forEach(function (x) { x.classList.remove('on'); }); btn.classList.add('on'); }
+  // little visual diagram of each template's layout, so a talent picks by sight
+  function tplMini(k) {
+    var m = {
+      editorial: '<i class="tm-ph"></i><i class="tm-l tm-l1"></i><i class="tm-l tm-l2"></i>',
+      lookbook:  '<i class="tm-full"></i><i class="tm-ov"></i>',
+      compcard:  '<i class="tm-ph tm-ph-sm"></i><span class="tm-grid"><em></em><em></em><em></em><em></em></span>',
+      minimal:   '<i class="tm-cph"></i><i class="tm-l tm-cl"></i>',
+      grid:      '<span class="tm-g"><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em></span>',
+      feature:   '<span class="tm-fe"><i class="tm-big"></i><span class="tm-side"><i class="tm-sl"></i><i class="tm-sml"></i></span></span>'
+    };
+    return '<span class="tm tm--' + k + '">' + (m[k] || '') + '</span>';
+  }
   (function buildControls() {
     var pW = $('#apTemplates');
     if (pW) TEMPLATES.forEach(function (t) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-tpl' + (t.k === CFG.template ? ' on' : ''); b.title = t.note || '';
-      b.innerHTML = '<b>' + t.label + '</b>' + (t.note ? '<i>' + t.note + '</i>' : '');
+      b.innerHTML = tplMini(t.k) + '<b>' + t.label + '</b>' + (t.note ? '<i>' + t.note + '</i>' : '');
       b.addEventListener('click', function () { CFG.template = t.k; mark(pW, b); updatePreview(); }); pW.appendChild(b);
     });
     var tW = $('#apThemes');
@@ -772,9 +786,62 @@
       }
       foot();
     }
+    // shared profile page (used by Grid + Feature)
+    function profilePage() {
+      doc.addPage(); fill(); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('PROFILE', M, 58);
+      doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text(NM, W - M, 58, { align: 'right' }); ruleY(70);
+      doc.setFont(F, 'bold'); doc.setFontSize(26); ct(TX); doc.text(name, M, 108);
+      doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(SUB); doc.text([cat, city].filter(Boolean).join('   ·   ').toUpperCase(), M, 126);
+      var ay = 162;
+      if (about) { doc.setFont(F, 'normal'); doc.setFontSize(11); ct(TX); var ln = doc.splitTextToSize(about, CW).slice(0, 10); doc.text(ln, M, ay); ay += ln.length * 15 + 24; }
+      if (STATS.length) { doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MEASUREMENTS', M, ay); ay += 16; STATS.forEach(function (r) { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text(r[0].toUpperCase(), M, ay); doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text(r[1], M + 230, ay, { align: 'right' }); doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.4); doc.line(M, ay + 6, M + 230, ay + 6); ay += 20; }); }
+      foot();
+    }
+    /* ── TEMPLATE: Grid (contact sheet — shows range) ── */
+    function tplGrid() {
+      fill(); place(imgs[0], M, 76, CW); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(12); ct(TX); doc.text('YKS', M, 58);
+      doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('TALENT PORTFOLIO', W - M, 58, { align: 'right' });
+      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), M, 732);
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 22 : 27); ct(TX); doc.text(NM, M, 766);
+      if (TAG) { doc.setFont(F, 'normal'); doc.setFontSize(10); ct(AC); doc.text(TAG, M, 786); }
+      else { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('EDITION 2026 · EXCLUSIVE · YKS', M, 786); }
+      var rest = imgs.slice(1), cols = 3, gap = 12, cw = (CW - gap * (cols - 1)) / cols, ch = cw / 0.8, per = 9, rgap = 22;
+      for (var i = 0; i < rest.length; i += per) {
+        doc.addPage(); fill(); watermark();
+        doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('SELECTED WORK', M, 58);
+        doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text(NM, W - M, 58, { align: 'right' }); ruleY(70);
+        rest.slice(i, i + per).forEach(function (im, k) { doc.addImage(im.data, 'JPEG', M + (k % cols) * (cw + gap), 88 + Math.floor(k / cols) * (ch + rgap), cw, ch); });
+        foot();
+      }
+    }
+    /* ── TEMPLATE: Feature (magazine spread — big image + typographic sidebar + a companion) ── */
+    function tplFeature() {
+      fill(); bleed(imgs[0], 0, 0, W, H); shade(H - 200, 200, 0.6); watermark(true);
+      doc.setFont(F, 'bold'); doc.setFontSize(9); ct([255, 255, 255]); doc.text('YKS · TALENT PORTFOLIO', M, 52);
+      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), M, H - 90);
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 26 : 34); ct([255, 255, 255]); doc.text(NM, M, H - 52);
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct([232, 227, 217]); doc.text(TAG || 'EDITION 2026 · EXCLUSIVE · YKS', M, H - 34);
+      var rest = imgs.slice(1), pn = 1;
+      for (var i = 0; i < rest.length; i += 2) {
+        doc.addPage(); fill(); watermark();
+        var big = rest[i], small = rest[i + 1], bw = CW * 0.60, by = 96, bh = bw / 0.8;
+        place(big, M, by, bw);
+        var sx = M + bw + 22, sw = CW - bw - 22;
+        doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('PLATE ' + ('0' + (pn++)).slice(-2), sx, by + 12);
+        doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text((big.cat || cat).toUpperCase(), sx, by + 28);
+        doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.6); doc.line(sx, by + 40, sx + sw, by + 40);
+        doc.setFont(F, 'bold'); doc.setFontSize(15); ct(TX); doc.text(doc.splitTextToSize(name, sw), sx, by + 66);
+        if (small) { var sh = sw / 0.8; place(small, sx, by + bh - sh, sw); }
+        foot();
+      }
+    }
     if (cfg.template === 'lookbook') { tplLookbook(); doc.save(SAVE); return; }
     if (cfg.template === 'compcard') { tplCompCard(); doc.save(SAVE); return; }
     if (cfg.template === 'minimal') { tplMinimal(); doc.save(SAVE); return; }
+    if (cfg.template === 'grid') { tplGrid(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
+    if (cfg.template === 'feature') { tplFeature(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
 
     // ── COVER ── (Editorial, default)
     fill(); place(imgs[0], M, 76, CW); watermark();

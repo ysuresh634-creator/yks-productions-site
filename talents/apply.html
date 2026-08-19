@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=17" />
+<link rel="stylesheet" href="/css/talents.css?v=19" />
 </head>
 <body>
 
@@ -132,11 +132,11 @@
 
         <!-- Portfolio PDF -->
         <div class="ap-block">
-          <p class="ap-step">Portfolio PDF <span class="ap-opt">optional</span></p>
-          <p class="ap-hint">Got a portfolio or comp card? Drop it in — any size, no need to compress it.</p>
-          <div class="ap-drop ap-drop-pdf" id="apPdfDrop" role="button" tabindex="0" aria-label="Add portfolio PDF">
+          <p class="ap-step">Already have a portfolio? <span class="ap-opt">optional</span></p>
+          <p class="ap-hint">If you already have a comp card or portfolio, attach it here — it gives me a head start on you. <b>No portfolio yet? Skip this</b> — you'll build a fresh, YKS-branded one further down, free.</p>
+          <div class="ap-drop ap-drop-pdf" id="apPdfDrop" role="button" tabindex="0" aria-label="Attach your existing portfolio PDF">
             <input type="file" id="apPdf" accept="application/pdf,.pdf" hidden />
-            <div class="ap-drop-in"><span class="ap-drop-ic">↑</span><b>Add portfolio PDF</b><small>Tap or drag</small></div>
+            <div class="ap-drop-in"><span class="ap-drop-ic">↑</span><b>Attach your portfolio</b><small>PDF · tap or drag · any size</small></div>
           </div>
           <div class="ap-pdfname" id="apPdfName" hidden></div>
         </div>
@@ -254,10 +254,13 @@
           <p class="ap-step">Build your portfolio <span class="ap-opt">free · make it yours</span></p>
           <p class="ap-hint">Reorder your photos above (the first is your cover), choose a look, then download a full YKS portfolio PDF. The <b>YKS Productions watermark &amp; branding stay on every page</b>, and every booking routes through YKS — never your own contact.</p>
           <button type="button" class="ap-surprise" id="apSurprise">✨ Surprise me — design it for me</button>
+          <div class="ap-pick">
+            <p class="ap-pick-lbl">Pick a design <span>— tap one to see it</span></p>
+            <div class="ap-tpls" id="apTemplates"></div>
+          </div>
           <div class="ap-build-grid">
             <div class="ap-controls">
-              <div class="ap-ctl"><span>Template</span><div class="ap-tpls" id="apTemplates"></div></div>
-              <div class="ap-ctl"><span>Look</span><div class="ap-looks" id="apLooks"></div></div>
+              <div class="ap-ctl"><span>Photo look</span><div class="ap-looks" id="apLooks"></div></div>
               <div class="ap-ctl"><span>Theme</span><div class="ap-swatches" id="apThemes"></div></div>
               <div class="ap-ctl"><span>Font</span><div class="ap-fonts" id="apFonts"></div></div>
               <div class="ap-ctl"><span>Accent</span><div class="ap-accents" id="apAccents"></div></div>
@@ -316,6 +319,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=21"></script>
+<script src="/js/talent-apply.js?v=23"></script>
 </body>
 </html>

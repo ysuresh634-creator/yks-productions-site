@@ -562,14 +562,42 @@ main{overflow:hidden}
 .ap-thumb-cat option{background:var(--mag-paper-2);color:var(--mag-ink)}
 
 /* ── template selector + preview variants ── */
-.ap-tpls{display:flex;flex-wrap:wrap;gap:8px}
-.ap-tpl{display:flex;flex-direction:column;gap:2px;text-align:left;color:var(--mag-soft);
-  background:none;border:1px solid var(--mag-line-2);border-radius:8px;padding:9px 13px;cursor:pointer;transition:.2s}
-.ap-tpl b{font-family:var(--mag-mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-.ap-tpl i{font-style:normal;font-size:10px;letter-spacing:.02em;opacity:.7}
-.ap-tpl:hover{color:var(--mag-ink);border-color:var(--mag-accent)}
-.ap-tpl.on{background:var(--mag-accent);border-color:var(--mag-accent);color:#0a0810}
-.ap-tpl.on i{opacity:.85}
+/* ── template chooser: visual "pick a design" cards ── */
+.ap-pick{margin:2px 0 24px}
+.ap-pick-lbl{font-family:var(--mag-mono);font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mag-ink);margin:0 0 14px}
+.ap-pick-lbl span{color:var(--mag-soft);text-transform:none;letter-spacing:.01em;font-weight:400}
+.ap-tpls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ap-tpl{display:flex;flex-direction:column;gap:9px;text-align:left;color:var(--mag-soft);
+  background:rgba(244,237,226,.02);border:1px solid var(--mag-line-2);border-radius:12px;padding:10px;cursor:pointer;transition:.22s}
+.ap-tpl:hover{color:var(--mag-ink);border-color:rgba(255,140,59,.5);transform:translateY(-2px)}
+.ap-tpl.on{border-color:var(--mag-accent);background:rgba(255,140,59,.07);box-shadow:inset 0 0 0 1px var(--mag-accent)}
+.ap-tpl b{font-family:var(--mag-mono);font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mag-ink)}
+.ap-tpl.on b{color:var(--mag-accent)}
+.ap-tpl i{font-style:normal;font-size:10px;letter-spacing:.01em;opacity:.72;line-height:1.32}
+/* mini layout diagrams (so the choice is visual, not words) */
+.tm{display:block;width:100%;aspect-ratio:4/5;border-radius:6px;background:#0f0d14;border:1px solid var(--mag-line);position:relative;overflow:hidden;padding:8px}
+.tm .tm-ph{display:block;height:54%;border-radius:2px;background:radial-gradient(120% 90% at 70% 10%,rgba(255,140,59,.32),transparent 55%),linear-gradient(150deg,#3a3140,#161119)}
+.tm .tm-ph-sm{height:40%}
+.tm .tm-l{display:block;border-radius:2px;margin-top:8px}
+.tm .tm-l1{height:6px;width:72%;background:var(--mag-ink-2)}
+.tm .tm-l2{height:3px;width:42%;background:var(--mag-accent);margin-top:5px}
+.tm--lookbook{padding:0}
+.tm--lookbook .tm-full{position:absolute;inset:0;background:radial-gradient(120% 80% at 60% 20%,rgba(255,140,59,.34),transparent 55%),linear-gradient(150deg,#3a3140,#120f18)}
+.tm--lookbook .tm-ov{position:absolute;left:9px;bottom:10px;height:6px;width:58%;background:#fff;border-radius:2px;opacity:.92}
+.tm--compcard .tm-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:7px}
+.tm--compcard .tm-grid em{display:block;aspect-ratio:1;border-radius:2px;background:#2a2430}
+.tm--minimal{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px}
+.tm--minimal .tm-cph{width:46%;aspect-ratio:4/5;border-radius:2px;background:radial-gradient(120% 90% at 70% 10%,rgba(255,140,59,.3),transparent 55%),linear-gradient(150deg,#3a3140,#161119)}
+.tm--minimal .tm-cl{height:4px;width:40%;background:var(--mag-ink-2);margin:0}
+.tm--grid .tm-g{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.tm--grid .tm-g em{display:block;aspect-ratio:4/5;border-radius:1.5px;background:#2a2430}
+.tm--feature{padding:8px}
+.tm--feature .tm-fe{display:flex;gap:5px;height:100%}
+.tm--feature .tm-big{flex:0 0 58%;border-radius:2px;background:radial-gradient(120% 90% at 70% 10%,rgba(255,140,59,.3),transparent 55%),linear-gradient(150deg,#3a3140,#161119)}
+.tm--feature .tm-side{flex:1;display:flex;flex-direction:column;gap:5px}
+.tm--feature .tm-sl{height:4px;width:82%;background:var(--mag-accent);border-radius:2px;margin-top:2px}
+.tm--feature .tm-sml{flex:1;border-radius:2px;background:linear-gradient(150deg,#332b38,#161119)}
+@media(max-width:760px){ .ap-tpls{grid-template-columns:repeat(2,1fr);gap:10px} }
 .ap-looks{display:flex;flex-wrap:wrap;gap:8px}
 .ap-look{font-family:var(--mag-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mag-soft);
   background:none;border:1px solid var(--mag-line-2);border-radius:20px;padding:7px 14px;cursor:pointer;transition:.2s}
