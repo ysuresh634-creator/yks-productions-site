@@ -27,14 +27,30 @@
   var uid = 0;
 
   /* ── portfolio customiser: the talent's own theme / font / accent / look ── */
-  var CFG = { theme: 'noir', font: 'playfair', accent: '#d47a3a', template: 'editorial', look: 'none' };
+  var CFG = { theme: 'noir', font: 'playfair', accent: '#d47a3a', template: 'editorial', layout: 'editorial', look: 'none' };
+  // each template is a whole design kit — its own font, theme, accent & photo look (all still overridable)
   var TEMPLATES = [
-    { k: 'editorial', label: 'Editorial', note: 'Framed hero + profile' },
-    { k: 'lookbook',  label: 'Lookbook',  note: 'Full-bleed, photo-first' },
-    { k: 'compcard',  label: 'Comp Card', note: 'Agency standard · 2 pages' },
-    { k: 'minimal',   label: 'Minimal',   note: 'Airy, one shot a page' },
-    { k: 'grid',      label: 'Grid',      note: 'Contact sheet · shows range' },
-    { k: 'feature',   label: 'Feature',   note: 'Magazine spread' }
+    { k: 'editorial', label: 'Editorial', note: 'Framed hero + profile',     kit: { font: 'playfair', theme: 'noir',      accent: '#d47a3a', look: 'none' } },
+    { k: 'lookbook',  label: 'Lookbook',  note: 'Full-bleed, photo-first',   kit: { font: 'oswald',   theme: 'noir',      accent: '#d47a3a', look: 'film' } },
+    { k: 'compcard',  label: 'Comp Card', note: 'Agency standard · 2 pages', kit: { font: 'oswald',   theme: 'charcoal',  accent: '#c0392b', look: 'none' } },
+    { k: 'minimal',   label: 'Minimal',   note: 'Airy, one shot a page',     kit: { font: 'sans',     theme: 'ivory',     accent: '#b0552b', look: 'none' } },
+    { k: 'grid',      label: 'Grid',      note: 'Contact sheet · shows range', kit: { font: 'sans',    theme: 'slate',     accent: '#3b6fd4', look: 'none' } },
+    { k: 'feature',   label: 'Feature',   note: 'Magazine spread',           kit: { font: 'playfair', theme: 'noir',      accent: '#d47a3a', look: 'warm' } },
+    { k: 'swiss',     label: 'Swiss',     note: 'Grid & bold type',          kit: { font: 'sans',     theme: 'porcelain', accent: '#c0392b', look: 'none' } },
+    { k: 'luxe',      label: 'Luxe',      note: 'Type-led, elegant',         kit: { font: 'playfair', theme: 'noir',      accent: '#c9a24b', look: 'warm' } },
+    { k: 'classic',   label: 'Classic',   note: 'Neo-classical, refined',    kit: { font: 'serif',    theme: 'ivory',     accent: '#b0552b', look: 'none' } },
+    { k: 'ethereal',  label: 'Ethereal',  note: 'Soft, airy, light',         kit: { font: 'serif',    theme: 'blush',     accent: '#d16a8a', look: 'fade' } },
+    { k: 'wabi',      label: 'Wabi-Sabi', note: 'Quiet, natural, muted',     kit: { font: 'serif',    theme: 'sand',      accent: '#7a8b3a', look: 'fade' } },
+    { k: 'bento',     label: 'Bento',     note: 'Modular grid',              kit: { font: 'sans',     theme: 'charcoal',  accent: '#2a9d8f', look: 'none' } },
+    // more styles — each reuses a layout with its own kit, so it's a distinct look
+    { k: 'maximal',   label: 'Maximal',   note: 'Bold & dense',       layout: 'grid',     kit: { font: 'oswald',   theme: 'noir',      accent: '#d16a8a', look: 'none' } },
+    { k: 'brutalist', label: 'Brutalist', note: 'Raw, stark, mono',   layout: 'swiss',    kit: { font: 'mono',     theme: 'porcelain', accent: '#c0392b', look: 'bw' } },
+    { k: 'bohemian',  label: 'Bohemian',  note: 'Warm & earthy',      layout: 'feature',  kit: { font: 'serif',    theme: 'sand',      accent: '#b0552b', look: 'warm' } },
+    { k: 'victorian', label: 'Victorian', note: 'Ornate, vintage',    layout: 'classic',  kit: { font: 'serif',    theme: 'ivory',     accent: '#7d4b7d', look: 'none' } },
+    { k: 'gothic',    label: 'Gothic',    note: 'Dark & dramatic',    layout: 'luxe',     kit: { font: 'playfair', theme: 'noir',      accent: '#8a7fd6', look: 'cool' } },
+    { k: 'noir',      label: 'Noir',      note: 'B&W, cinematic',     layout: 'lookbook', kit: { font: 'oswald',   theme: 'noir',      accent: '#e2ddd3', look: 'bw' } },
+    { k: 'mono',      label: 'Mono',      note: 'Monospace, clean',   layout: 'minimal',  kit: { font: 'mono',     theme: 'porcelain', accent: '#3b6fd4', look: 'none' } },
+    { k: 'sepia',     label: 'Sepia',     note: 'Warm vintage film',  layout: 'classic',  kit: { font: 'serif',    theme: 'sand',      accent: '#b0552b', look: 'film' } }
   ];
   /* photo "look": a single grade applied to EVERY image so the book feels
      shot as one story — the thing that separates a pro portfolio from a phone roll */
@@ -371,7 +387,7 @@
   var preview = $('#apPreview');
   function updatePreview() {
     if (!preview) return;
-    var th = THEMES[CFG.theme], ff = FONTS[CFG.font].css, ac = CFG.accent, tpl = CFG.template;
+    var th = THEMES[CFG.theme], ff = FONTS[CFG.font].css, ac = CFG.accent, tpl = CFG.layout;
     var nm = esc((form.name.value || 'Your name').trim().toUpperCase());
     var cat = (form.category.value || 'Model').trim();
     var disc = esc((DISC[cat] || 'Fashion · Editorial · Commercial').toUpperCase());
@@ -382,12 +398,12 @@
     var imgTag = cover ? '<img src="' + cover + '" alt="" style="filter:' + lkCss + '">' + wm : '';
     var empty = '<div class="ap-cv-img ap-cv-empty" style="border-color:' + th.sub + '">Add a photo</div>';
     var html;
-    if (tpl === 'lookbook') {
+    if (tpl === 'lookbook' || tpl === 'luxe' || tpl === 'feature') {
       html = '<div class="ap-cover ap-cv-bleed" style="font-family:' + ff + ';background:' + th.bg + '">' +
         (cover ? '<div class="ap-cv-full">' + imgTag + '</div>' : empty) +
         '<div class="ap-cv-overlay"><div class="ap-cv-disc" style="color:' + ac + '">' + disc + '</div><div class="ap-cv-name" style="color:#fff">' + nm + '</div>' +
         (tag ? '<div class="ap-cv-tag" style="color:#e8e3d9">' + tag + '</div>' : '') + '</div></div>';
-    } else if (tpl === 'minimal') {
+    } else if (tpl === 'minimal' || tpl === 'ethereal' || tpl === 'classic') {
       html = '<div class="ap-cover ap-cv-min" style="background:' + th.bg + ';color:' + th.text + ';font-family:' + ff + '">' +
         '<div class="ap-cv-top" style="justify-content:center"><i style="color:' + th.sub + '">YKS · TALENT PORTFOLIO</i></div>' +
         (cover ? '<div class="ap-cv-img ap-cv-minimg">' + imgTag + '</div>' : empty) +
@@ -405,24 +421,48 @@
     preview.innerHTML = html;
   }
   function mark(wrap, btn) { $$('button', wrap).forEach(function (x) { x.classList.remove('on'); }); btn.classList.add('on'); }
-  // little visual diagram of each template's layout, so a talent picks by sight
-  function tplMini(k) {
+  // little visual diagram of each template's layout, tinted with its kit palette, so a talent picks by sight
+  function tplMini(layout, kit) {
     var m = {
       editorial: '<i class="tm-ph"></i><i class="tm-l tm-l1"></i><i class="tm-l tm-l2"></i>',
       lookbook:  '<i class="tm-full"></i><i class="tm-ov"></i>',
       compcard:  '<i class="tm-ph tm-ph-sm"></i><span class="tm-grid"><em></em><em></em><em></em><em></em></span>',
       minimal:   '<i class="tm-cph"></i><i class="tm-l tm-cl"></i>',
       grid:      '<span class="tm-g"><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em></span>',
-      feature:   '<span class="tm-fe"><i class="tm-big"></i><span class="tm-side"><i class="tm-sl"></i><i class="tm-sml"></i></span></span>'
+      feature:   '<span class="tm-fe"><i class="tm-big"></i><span class="tm-side"><i class="tm-sl"></i><i class="tm-sml"></i></span></span>',
+      swiss:     '<span class="tm-sw"><i class="tm-sw-blk"></i><i class="tm-sw-ph"></i><i class="tm-l tm-sw-nm"></i></span>',
+      luxe:      '<i class="tm-full"></i><span class="tm-lx"><i></i><i></i></span>',
+      classic:   '<i class="tm-l tm-cc-r"></i><i class="tm-cph"></i><i class="tm-l tm-cl"></i>',
+      ethereal:  '<span class="tm-eth"><i class="tm-cph"></i><i class="tm-l tm-cl"></i></span>',
+      wabi:      '<i class="tm-wb-ph"></i><i class="tm-l tm-wb-l"></i>',
+      bento:     '<span class="tm-bento"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></span>'
     };
-    return '<span class="tm tm--' + k + '">' + (m[k] || '') + '</span>';
+    var th = kit && THEMES[kit.theme], st = '';
+    if (th) st += 'background:' + th.bg + ';border-color:rgba(0,0,0,.12);--tmi:' + th.text + ';';
+    if (kit && kit.accent) st += '--tma:' + kit.accent + ';';
+    return '<span class="tm tm--' + layout + '" style="' + st + '">' + (m[layout] || '') + '</span>';
+  }
+  function syncControls() {
+    function sync(sel, test) { $$(sel).forEach(function (b) { b.classList.toggle('on', test(b)); }); }
+    sync('#apThemes .ap-sw', function (b) { return b.title === THEMES[CFG.theme].label; });
+    sync('#apFonts .ap-fontchip', function (b) { return b.title === FONTS[CFG.font].label; });
+    sync('#apAccents .ap-dot', function (b) { return b.style.background && hexToRgbStr(b.style.background) === hexToRgbStr(CFG.accent); });
+    sync('#apLooks .ap-look', function (b) { return b.textContent === LOOKS[CFG.look].label; });
+  }
+  function applyKit(kit) {   // a template's whole look — font, theme, accent, photo grade — in one tap
+    if (!kit) return;
+    if (kit.font) CFG.font = kit.font;
+    if (kit.theme) CFG.theme = kit.theme;
+    if (kit.accent) CFG.accent = kit.accent;
+    if (kit.look) CFG.look = kit.look;
+    syncControls();
   }
   (function buildControls() {
     var pW = $('#apTemplates');
     if (pW) TEMPLATES.forEach(function (t) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-tpl' + (t.k === CFG.template ? ' on' : ''); b.title = t.note || '';
-      b.innerHTML = tplMini(t.k) + '<b>' + t.label + '</b>' + (t.note ? '<i>' + t.note + '</i>' : '');
-      b.addEventListener('click', function () { CFG.template = t.k; mark(pW, b); updatePreview(); }); pW.appendChild(b);
+      b.innerHTML = tplMini(t.layout || t.k, t.kit) + '<b>' + t.label + '</b>' + (t.note ? '<i>' + t.note + '</i>' : '');
+      b.addEventListener('click', function () { CFG.template = t.k; CFG.layout = t.layout || t.k; applyKit(t.kit); mark(pW, b); updatePreview(); }); pW.appendChild(b);
     });
     var tW = $('#apThemes');
     if (tW) Object.keys(THEMES).forEach(function (k) {
@@ -445,20 +485,14 @@
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-look' + (k === CFG.look ? ' on' : ''); b.textContent = LOOKS[k].label;
       b.addEventListener('click', function () { CFG.look = k; mark(lW, b); updatePreview(); }); lW.appendChild(b);
     });
-    // ✨ Surprise me — one tap picks a tasteful, cohesive combination (kills choice paralysis)
+    // ✨ Surprise me — one tap picks a whole design (a real template kit) + a fresh accent/look
     var sB = $('#apSurprise');
     if (sB) sB.addEventListener('click', function () {
-      var tk = ['editorial', 'lookbook', 'compcard', 'minimal'];
-      var thk = Object.keys(THEMES), fk = Object.keys(FONTS), lkk = Object.keys(LOOKS);
       function rnd(a) { return a[Math.floor(Math.random() * a.length)]; }
-      CFG.template = rnd(tk); CFG.theme = rnd(thk); CFG.font = rnd(fk); CFG.accent = rnd(ACCENTS); CFG.look = rnd(lkk);
-      // re-sync the visible "on" state across every control group
-      function sync(sel, test) { $$(sel).forEach(function (b) { b.classList.toggle('on', test(b)); }); }
-      sync('#apTemplates .ap-tpl', function (b) { return (b.querySelector('b') || b).textContent === TEMPLATES.filter(function (t) { return t.k === CFG.template; })[0].label; });
-      sync('#apThemes .ap-sw', function (b) { return b.title === THEMES[CFG.theme].label; });
-      sync('#apFonts .ap-fontchip', function (b) { return b.title === FONTS[CFG.font].label; });
-      sync('#apAccents .ap-dot', function (b) { return b.style.background && hexToRgbStr(b.style.background) === hexToRgbStr(CFG.accent); });
-      sync('#apLooks .ap-look', function (b) { return b.textContent === LOOKS[CFG.look].label; });
+      var t = rnd(TEMPLATES);
+      CFG.template = t.k; CFG.layout = t.layout || t.k; applyKit(t.kit);
+      CFG.accent = rnd(ACCENTS); CFG.look = rnd(Object.keys(LOOKS)); syncControls();
+      $$('#apTemplates .ap-tpl').forEach(function (b) { b.classList.toggle('on', (b.querySelector('b') || b).textContent === t.label); });
       updatePreview();
     });
   })();
@@ -620,7 +654,7 @@
         }))
           .then(function (imgs) {
             var th = THEMES[CFG.theme];
-            buildPortfolio(JsPDF, imgs, name, { bg: hexRgb(th.bg), text: hexRgb(th.text), sub: hexRgb(th.sub), accent: hexRgb(CFG.accent), font: FONTS[CFG.font].pdf, template: CFG.template });
+            buildPortfolio(JsPDF, imgs, name, { bg: hexRgb(th.bg), text: hexRgb(th.text), sub: hexRgb(th.sub), accent: hexRgb(CFG.accent), font: FONTS[CFG.font].pdf, template: CFG.layout });
           });
       })
       .then(function () { dlBtn.textContent = 'Downloaded ✓'; setTimeout(function () { dlBtn.textContent = orig; dlBtn.disabled = false; }, 2500); })
@@ -837,11 +871,139 @@
         foot();
       }
     }
+    /* ── TEMPLATE: Swiss (international style — strict grid, flush-left, bold, accent blocks) ── */
+    function tplSwiss() {
+      fill();
+      doc.setDrawColor.apply(doc, TX); doc.setLineWidth(1.5); doc.line(M, 64, W - M, 64);
+      doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text('YKS', M, 56);
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text('TALENT / 2026', W - M, 56, { align: 'right' });
+      doc.setFillColor.apply(doc, AC); doc.rect(M, 88, 150, 58, 'F');
+      doc.setFont(F, 'bold'); doc.setFontSize(10); ct([255, 255, 255]); doc.text((disc.split(' · ')[0] || cat).toUpperCase(), M + 12, 122);
+      var pw = CW * 0.6; place(imgs[0], W - M - pw, 88, pw); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 14 ? 34 : 46); ct(TX); doc.text(NM, M, H - 92);
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text(disc.toUpperCase(), M, H - 68);
+      doc.setDrawColor.apply(doc, TX); doc.setLineWidth(1.5); doc.line(M, H - 56, W - M, H - 56);
+      doc.setFont(F, 'normal'); doc.setFontSize(7.5); ct(SUB); doc.text('REPRESENTED BY YKS PRODUCTIONS', M, H - 42); doc.text('+91 97466 79720', W - M, H - 42, { align: 'right' });
+      var rest = imgs.slice(1);
+      for (var i = 0; i < rest.length; i += 2) {
+        doc.addPage(); fill(); watermark();
+        doc.setDrawColor.apply(doc, TX); doc.setLineWidth(1.5); doc.line(M, 64, W - M, 64);
+        doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text('SELECTED WORK', M, 56);
+        doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text(NM, W - M, 56, { align: 'right' });
+        var cw = (CW - 18) / 2;
+        [rest[i], rest[i + 1]].forEach(function (im, k) { if (im) { place(im, M + k * (cw + 18), 92, cw); doc.setFont(F, 'bold'); doc.setFontSize(8); ct(AC); doc.text(('0' + (i + k + 1)).slice(-2) + ' / ' + ((im.cat || cat)).toUpperCase(), M + k * (cw + 18), 92 + cw / 0.8 + 16); } });
+        foot();
+      }
+    }
+    /* ── TEMPLATE: Luxe (luxury typography — type-led, full-bleed, elegant hairlines) ── */
+    function tplLuxe() {
+      fill(); bleed(imgs[0], 0, 0, W, H); shade(0, H, 0.3); watermark(true);
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct([255, 255, 255]); doc.text('YKS  ·  TALENT', M, 60);
+      doc.setDrawColor(255, 255, 255); doc.setLineWidth(0.4); doc.line(M, H / 2 - 72, M + 66, H / 2 - 72);
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(AC); doc.text(disc.toUpperCase(), M, H / 2 - 54);
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 14 ? 38 : 52); ct([255, 255, 255]); doc.text(NM, M, H / 2 + 6);
+      if (TAG) { doc.setFont(F, 'normal'); doc.setFontSize(11); ct([232, 227, 217]); doc.text(TAG, M, H / 2 + 38); }
+      imgs.slice(1, 7).forEach(function (im) {
+        doc.addPage(); fill(); watermark();
+        var pw = CW * 0.7, px = (W - pw) / 2; place(im, px, 96, pw);
+        doc.setDrawColor.apply(doc, AC); doc.setLineWidth(0.4); doc.line(px, 74, px + 40, 74);
+        doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text((im.cat || cat).toUpperCase(), px, 66);
+        doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text(NM, W - M, 66, { align: 'right' });
+        foot();
+      });
+    }
+    /* ── TEMPLATE: Classic (neo-classical — symmetrical, centred, decorative double rules) ── */
+    function tplClassic() {
+      var CX = W / 2;
+      function drule(y, w) { doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(1.1); doc.line(CX - w / 2, y, CX + w / 2, y); doc.setLineWidth(0.4); doc.line(CX - w / 2, y + 3, CX + w / 2, y + 3); }
+      fill(); watermark();
+      doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text('YKS · TALENT PORTFOLIO', CX, 62, { align: 'center' });
+      drule(78, 120);
+      var pw = 300; place(imgs[0], CX - pw / 2, 106, pw);
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 26 : 34); ct(TX); doc.text(NM, CX, 106 + pw / 0.8 + 50, { align: 'center' });
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(AC); doc.text(disc.toUpperCase(), CX, 106 + pw / 0.8 + 72, { align: 'center' });
+      drule(106 + pw / 0.8 + 90, 90);
+      imgs.slice(1, 7).forEach(function (im) {
+        doc.addPage(); fill(); watermark(); drule(70, 90);
+        var w = 360; place(im, CX - w / 2, 92, w);
+        doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text((im.cat || cat).toUpperCase(), CX, 92 + w / 0.8 + 22, { align: 'center' });
+        foot();
+      });
+    }
+    /* ── TEMPLATE: Ethereal (soft, airy, light — delicate type, generous air, faint wash) ── */
+    function tplEthereal() {
+      var CX = W / 2;
+      fill();
+      if (doc.setGState) { doc.saveGraphicsState(); doc.setGState(new doc.GState({ opacity: 0.06 })); doc.setFillColor.apply(doc, AC); doc.rect(0, 0, W, H * 0.55, 'F'); doc.restoreGraphicsState(); }
+      watermark();
+      doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('yks   ·   talent   ·   2026', CX, 74, { align: 'center' });
+      var pw = 264; place(imgs[0], CX - pw / 2, 120, pw);
+      doc.setFont(F, 'normal'); doc.setFontSize(NM.length > 16 ? 24 : 30); ct(TX); doc.text(NM, CX, 120 + pw / 0.8 + 56, { align: 'center' });
+      doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), CX, 120 + pw / 0.8 + 80, { align: 'center' });
+      if (TAG) { doc.setFont(F, 'normal'); doc.setFontSize(10); ct(SUB); doc.text(TAG, CX, 120 + pw / 0.8 + 100, { align: 'center' }); }
+      imgs.slice(1, 7).forEach(function (im) {
+        doc.addPage(); fill(); watermark();
+        var w = 320; place(im, CX - w / 2, 112, w);
+        doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text((im.cat || cat).toLowerCase(), CX, 112 + w / 0.8 + 24, { align: 'center' });
+        foot();
+      });
+    }
+    /* ── TEMPLATE: Wabi-Sabi (quiet, natural, muted, asymmetric, imperfect) ── */
+    function tplWabi() {
+      fill(); watermark();
+      doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('YKS · TALENT', M, 64);
+      var pw = CW * 0.56; place(imgs[0], M, 96, pw);
+      var ny = 96 + pw / 0.8 + 42;
+      doc.setFont(F, 'normal'); doc.setFontSize(NM.length > 16 ? 24 : 30); ct(TX); doc.text(NM, W - M, ny, { align: 'right' });
+      doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), W - M, ny + 20, { align: 'right' });
+      doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.5); doc.line(W - M - 120, ny + 34, W - M, ny + 34);
+      imgs.slice(1, 7).forEach(function (im, idx) {
+        doc.addPage(); fill(); watermark();
+        var w = CW * 0.64, x = (idx % 2 === 0) ? M : (W - M - w);
+        place(im, x, 104, w);
+        doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text((im.cat || cat).toUpperCase(), x, 104 + w / 0.8 + 22);
+        foot();
+      });
+    }
+    /* ── TEMPLATE: Bento (modular grid — a designed composition of varied cells) ── */
+    function tplBento() {
+      fill(); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text('YKS', M, 56);
+      doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('TALENT PORTFOLIO', W - M, 56, { align: 'right' });
+      var hw = 300, hh = hw / 0.8; place(imgs[0], M, 76, hw);
+      var rx = M + hw + 12, rw = CW - hw - 12;
+      doc.setFillColor.apply(doc, AC); doc.rect(rx, 76, rw, 118, 'F');
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 12 ? 15 : 19); ct([255, 255, 255]); doc.text(doc.splitTextToSize(NM, rw - 22), rx + 12, 108);
+      doc.setFont(F, 'normal'); doc.setFontSize(7); ct([255, 255, 255]); doc.text((disc.split(' · ')[0] || cat).toUpperCase(), rx + 12, 180);
+      if (imgs[1]) place(imgs[1], rx, 206, rw);
+      var sy = 76 + hh + 14;
+      doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(1); doc.roundedRect(M, sy, CW, 64, 6, 6, 'S');
+      if (STATS.length) { var per = Math.min(STATS.length, 5), stw = CW / per; STATS.slice(0, per).forEach(function (r, k) { var x = M + k * stw + 14; doc.setFont(F, 'normal'); doc.setFontSize(7); ct(SUB); doc.text(r[0].toUpperCase(), x, sy + 25); doc.setFont(F, 'bold'); doc.setFontSize(12); ct(TX); doc.text(r[1], x, sy + 45); }); }
+      else { doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text([cat, city].filter(Boolean).join('   ·   ').toUpperCase(), M + 14, sy + 38); }
+      var by = sy + 64 + 14, mw = (CW - 24) / 3;
+      [imgs[2], imgs[3], imgs[4]].forEach(function (im, k) { if (im) place(im, M + k * (mw + 12), by, mw); });
+      foot();
+      var rest = imgs.slice(5);
+      for (var i = 0; i < rest.length; i += 4) {
+        doc.addPage(); fill(); watermark();
+        doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MORE', M, 58);
+        doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text(NM, W - M, 58, { align: 'right' }); ruleY(70);
+        var cw = (CW - 14) / 2;
+        rest.slice(i, i + 4).forEach(function (im, k) { place(im, M + (k % 2) * (cw + 14), 88 + Math.floor(k / 2) * (cw / 0.8 + 16), cw); });
+        foot();
+      }
+    }
     if (cfg.template === 'lookbook') { tplLookbook(); doc.save(SAVE); return; }
     if (cfg.template === 'compcard') { tplCompCard(); doc.save(SAVE); return; }
     if (cfg.template === 'minimal') { tplMinimal(); doc.save(SAVE); return; }
     if (cfg.template === 'grid') { tplGrid(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
     if (cfg.template === 'feature') { tplFeature(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
+    if (cfg.template === 'swiss') { tplSwiss(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
+    if (cfg.template === 'luxe') { tplLuxe(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
+    if (cfg.template === 'classic') { tplClassic(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
+    if (cfg.template === 'ethereal') { tplEthereal(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
+    if (cfg.template === 'wabi') { tplWabi(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
+    if (cfg.template === 'bento') { tplBento(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
 
     // ── COVER ── (Editorial, default)
     fill(); place(imgs[0], M, 76, CW); watermark();
