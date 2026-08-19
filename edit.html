@@ -347,11 +347,20 @@ const FRAME_JS=`
     }
     return false;
   }
+  function onScreen(el){
+    if(el.closest('script,style,head,noscript,select,template')) return false;
+    var r=el.getBoundingClientRect();
+    if(r.width<4||r.height<4) return false;
+    var cs=getComputedStyle(el);
+    return cs.display!=='none' && cs.visibility!=='hidden' && parseFloat(cs.opacity)>0.05;
+  }
   function targets(){
-    if(mode==='text')  return [].slice.call(document.querySelectorAll(TEXT)).filter(hasOwnText);
-    if(mode==='photo') return [].slice.call(document.querySelectorAll('img'));
-    if(mode==='link')  return [].slice.call(document.querySelectorAll('a[href]'));
-    return [];
+    var list;
+    if(mode==='text')       list=[].slice.call(document.querySelectorAll(TEXT)).filter(hasOwnText);
+    else if(mode==='photo') list=[].slice.call(document.querySelectorAll('img'));
+    else if(mode==='link')  list=[].slice.call(document.querySelectorAll('a[href]'));
+    else return [];
+    return list.filter(onScreen);
   }
   function paint(){
     [].slice.call(document.querySelectorAll('[data-yks-hot]')).forEach(function(e){e.removeAttribute('data-yks-hot');});
@@ -379,7 +388,11 @@ const FRAME_JS=`
         }
       }
 
-      // 2. scroll-reveal content left at opacity 0 because the observer never fired
+      // 2. scroll-reveal content left at opacity 0 because the observer never fired.
+      //    Skip positioned elements — dropdowns, tooltips and modals are hidden
+      //    on purpose and would otherwise pop open and cover the page.
+      if(cs.position==='absolute'||cs.position==='fixed'||cs.position==='sticky') return;
+      if(el.closest('nav,[role="menu"],[class*="dropdown"],[class*="submenu"],[class*="modal"],[class*="tooltip"],dialog')) return;
       if(parseFloat(cs.opacity)<0.05 && (el.textContent||'').trim().length>0){
         el.style.setProperty('opacity','1','important');
         el.style.setProperty('visibility','visible','important');
