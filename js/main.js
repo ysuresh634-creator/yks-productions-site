@@ -10,28 +10,7 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mobile = matchMedia('(max-width: 768px)').matches;
 
-  /* ── blur halos — each .pf card gets a blurred clone sitting behind it,
-     bleeding past the card boundary (Fuel-style liquid edge) ── */
-  if (!reduced) {
-    $$('.pf').forEach(function (card) {
-      var first = card.querySelector('.pf-frame');
-      if (!first || card.closest('.pf-wrap')) return;
-      var wrap = document.createElement('div');
-      wrap.className = 'pf-wrap';
-      card.parentNode.insertBefore(wrap, card);
-      wrap.appendChild(card);
-      var halo = document.createElement('div');
-      halo.className = 'pf-halo';
-      var img = document.createElement('img');
-      img.src = first.src;
-      img.alt = '';
-      img.setAttribute('aria-hidden', 'true');
-      img.setAttribute('loading', 'lazy');
-      img.setAttribute('decoding', 'async');
-      halo.appendChild(img);
-      wrap.insertBefore(halo, card);
-    });
-  }
+
 
   /* ─────────── smooth scroll ───────────
      Desktop gets Lenis (smooth wheel). Phones use NATIVE scroll — it's the
