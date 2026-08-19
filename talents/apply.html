@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=33" />
+<link rel="stylesheet" href="/css/talents.css?v=34" />
 </head>
 <body>
 
@@ -144,6 +144,22 @@
           <div class="ap-strength" id="apStrength" hidden></div>
 
           <div class="ap-thumbs" id="apThumbs"></div>
+        </div>
+
+        <!-- Your videos -->
+        <div class="ap-block">
+          <p class="ap-step">Your videos <span class="ap-opt">optional</span></p>
+          <p class="ap-hint">A self-tape, a reel, a runway walk, a 360° turn — movement shows what a still can't, and casting asks for it. These go <b>straight to me</b> for casting (they're not printed in your PDF).</p>
+          <div class="ap-vid-link">
+            <input type="url" id="apVidUrl" inputmode="url" autocomplete="off" placeholder="Paste a link — Instagram reel, YouTube, Drive…" />
+            <button type="button" id="apVidAdd">Add link</button>
+          </div>
+          <div class="ap-vid-or"><span>or upload a clip</span></div>
+          <div class="ap-drop ap-vid-drop" id="apVidDrop" role="button" tabindex="0" aria-label="Add a video clip">
+            <input type="file" id="apVideos" accept="video/*" multiple hidden />
+            <div class="ap-drop-in"><span class="ap-drop-ic">▶</span><b>Add a clip</b><small>Tap or drag · short clips work best</small></div>
+          </div>
+          <div class="ap-vids" id="apVids"></div>
         </div>
 
         <!-- Portfolio PDF -->
@@ -331,7 +347,7 @@
         <p class="ap-progress" id="apProgress" hidden></p>
         <p class="tal-form-note">🔒 Your number, email and socials are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
         <p class="l-form-ok" id="talOk">✓ Application received — thank you. If it's a fit, I'll be in touch personally.
-          <span id="apOkWa" hidden><br />One quick step: <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%20just%20applied%20to%20YKS%20Talents%20and%20I%27d%20like%20to%20send%20my%20photos%2Fportfolio." target="_blank" rel="noopener">send your photos on WhatsApp →</a></span>
+          <span id="apOkWa" hidden><br />One quick step: <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%20just%20applied%20to%20YKS%20Talents%20and%20I%27d%20like%20to%20send%20my%20photos%2Fvideos." target="_blank" rel="noopener">send your photos &amp; videos on WhatsApp →</a></span>
         </p>
         <p class="ap-wa">Rather do it all over chat? <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%27d%20like%20to%20join%20the%20YKS%20talent%20roster." target="_blank" rel="noopener">Apply on WhatsApp →</a></p>
       </div>
@@ -374,6 +390,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=35"></script>
+<script src="/js/talent-apply.js?v=36"></script>
 </body>
 </html>

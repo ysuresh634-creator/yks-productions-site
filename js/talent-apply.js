@@ -235,6 +235,64 @@
     build();
   })();
 
+  /* ══ videos: self-tapes / reels / runway — submitted to YKS for casting, NOT printed in the PDF ══ */
+  var videos = [];   // { id, kind:'file'|'link', file?, url?, name, big? }
+  var vids = $('#apVids'), vidInput = $('#apVideos'), vidDrop = $('#apVidDrop'), vidUrl = $('#apVidUrl'), vidAdd = $('#apVidAdd');
+  var VID_MAX = 95 * 1024 * 1024;   // ~95MB — above this we hand the clip to WhatsApp instead of choking a free upload
+  function isVideoFile(f) { return /^video\//.test(f.type) || /\.(mp4|mov|m4v|webm|avi|mkv|3gp|hevc)$/i.test(f.name); }
+  function humanSize(b) { return b >= 1048576 ? (b / 1048576).toFixed(b >= 10485760 ? 0 : 1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function linkName(u) { return u.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '').slice(0, 46); }
+  function addVideoFiles(list) {
+    Array.prototype.slice.call(list).filter(isVideoFile).forEach(function (f) {
+      videos.push({ id: ++uid, kind: 'file', file: f, name: f.name, big: f.size > VID_MAX });
+    });
+    renderVids();
+  }
+  function addVideoLink() {
+    var u = (vidUrl && vidUrl.value || '').trim();
+    if (u && !/^https?:\/\//i.test(u)) u = 'https://' + u;
+    if (!u || !/^https?:\/\/[^\s.]+\.[^\s]{2,}/i.test(u)) {
+      if (vidUrl) { vidUrl.classList.add('ap-vu-bad'); vidUrl.focus(); setTimeout(function () { vidUrl.classList.remove('ap-vu-bad'); }, 1000); }
+      return;
+    }
+    var dup = videos.some(function (v) { return v.kind === 'link' && v.url === u; });
+    if (dup) { if (vidUrl) vidUrl.value = ''; return; }
+    videos.push({ id: ++uid, kind: 'link', url: u, name: linkName(u) });
+    if (vidUrl) vidUrl.value = '';
+    renderVids(); persistDraft();
+  }
+  function removeVideo(id) {
+    for (var i = 0; i < videos.length; i++) if (videos[i].id === id) { videos.splice(i, 1); break; }
+    renderVids(); persistDraft();
+  }
+  function renderVids() {
+    if (!vids) return;
+    vids.innerHTML = '';
+    videos.forEach(function (v) {
+      var chip = document.createElement('div'); chip.className = 'ap-vid' + (v.kind === 'link' ? ' is-link' : '');
+      var ic = document.createElement('span'); ic.className = 'ap-vid-ic'; ic.textContent = v.kind === 'link' ? '🔗' : '▶';
+      var nm = document.createElement('span'); nm.className = 'ap-vid-nm'; nm.textContent = v.name;
+      chip.appendChild(ic); chip.appendChild(nm);
+      if (v.kind === 'file') {
+        var sz = document.createElement('small'); sz.className = 'ap-vid-sz' + (v.big ? ' big' : '');
+        sz.textContent = humanSize(v.file.size) + (v.big ? ' · I’ll grab this on WhatsApp' : '');
+        chip.appendChild(sz);
+      }
+      var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'ap-vid-rm'; rm.setAttribute('aria-label', 'Remove'); rm.textContent = '×';
+      rm.addEventListener('click', function () { removeVideo(v.id); });
+      chip.appendChild(rm);
+      vids.appendChild(chip);
+    });
+  }
+  if (vidInput) vidInput.addEventListener('change', function () { addVideoFiles(vidInput.files); vidInput.value = ''; });
+  if (vidDrop) {
+    vidDrop.addEventListener('click', function () { vidInput && vidInput.click(); });
+    vidDrop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); vidInput && vidInput.click(); } });
+    dropZone(vidDrop, function (files) { addVideoFiles(files); });
+  }
+  if (vidAdd) vidAdd.addEventListener('click', addVideoLink);
+  if (vidUrl) vidUrl.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addVideoLink(); } });
+
   /* ══ per-photo crop / adjust editor — Fill (crop) or Fit (show the whole photo) ══ */
   var cropModal = $('#apCrop'), cropImg = $('#apCropImg'), cropBlur = $('#apCropBlur'), cropFrame = $('#apCropFrame'), cropZoom = $('#apCropZoom');
   var cropNote = $('#apCropNote'), modeFillBtn = $('#apModeFill'), modeFitBtn = $('#apModeFit');
@@ -429,18 +487,24 @@
     aboutBox.focus();
   });
 
-  /* ══ autosave draft (text only) ══ */
+  /* ══ autosave draft (text + video links; uploaded files can't persist across reloads) ══ */
   var textNames = ['name', 'contact', 'category', 'region', 'city', 'socials', 'about'];
+  function persistDraft() {
+    try {
+      var d = {}; textNames.forEach(function (n) { if (form[n] != null) d[n] = form[n].value; });
+      d.vlinks = videos.filter(function (v) { return v.kind === 'link'; }).map(function (v) { return v.url; });
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+    } catch (e) {}
+  }
   try {
     var saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
     textNames.forEach(function (n) { if (form[n] != null && saved[n] != null) form[n].value = saved[n]; });
+    if (Array.isArray(saved.vlinks) && saved.vlinks.length) {
+      saved.vlinks.forEach(function (u) { videos.push({ id: ++uid, kind: 'link', url: u, name: linkName(u) }); });
+      renderVids();
+    }
   } catch (e) {}
-  form.addEventListener('input', function () {
-    try {
-      var d = {}; textNames.forEach(function (n) { if (form[n] != null) d[n] = form[n].value; });
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
-    } catch (e) {}
-  });
+  form.addEventListener('input', persistDraft);
 
   /* ── live cover preview + theme / font / accent controls ── */
   var preview = $('#apPreview');
@@ -1158,7 +1222,10 @@
   }
 
   /* ══ submit ══ */
-  var progress = $('#apProgress'), submitBtn = form.querySelector('button[type="submit"]');
+  // submit button lives OUTSIDE the form (associated via form="talForm"), so search the whole document, not just the form
+  var progress = $('#apProgress');
+  var submitBtn = form.querySelector('button[type="submit"]') ||
+    document.querySelector('button[type="submit"][form="' + form.id + '"]') || $('.ap-submit');
   function say(msg) { if (progress) { progress.hidden = !msg; progress.textContent = msg || ''; } }
 
   form.addEventListener('submit', function (e) {
@@ -1168,10 +1235,15 @@
     var configured = !!(CLOUDINARY_CLOUD && CLOUDINARY_PRESET);
     var folderName = (form.name.value || 'Applicant').trim() + ' — ' + new Date().toLocaleDateString('en-GB');
 
-    var chain = Promise.resolve({ photos: [], pdf: '' });
-    if (configured && (photos.length || pdf)) {
+    var vidFiles = videos.filter(function (v) { return v.kind === 'file' && !v.big; });   // try to upload these
+    var waVideos = videos.filter(function (v) { return v.kind === 'file' && v.big; });     // too big → WhatsApp
+    var vidLinks = videos.filter(function (v) { return v.kind === 'link'; }).map(function (v) { return v.url; });
+    var out = { photos: [], pdf: '', videos: [] };
+
+    var chain = Promise.resolve(out);
+    if (configured && (photos.length || pdf || vidFiles.length)) {
       submitBtn.textContent = 'Uploading…';
-      var total = photos.length + (pdf ? 1 : 0), done = 0;
+      var total = photos.length + (pdf ? 1 : 0) + vidFiles.length, done = 0;
       var step = function () { done++; say('Uploading your files… ' + done + ' / ' + total); };
       say('Uploading your files… 0 / ' + total);
       chain = Promise.all(
@@ -1180,9 +1252,17 @@
           return upload(p.file, function (r) { if (fig) fig.style.transform = 'scaleX(' + r + ')'; }, folderName).then(function (u) { step(); return u; });
         })
       ).then(function (urls) {
-        if (!pdf) return { photos: urls, pdf: '' };
-        return upload(pdf, null, folderName).then(function (pu) { step(); return { photos: urls, pdf: pu }; });
-      });
+        out.photos = urls;
+        if (!pdf) return;
+        return upload(pdf, null, folderName).then(function (pu) { step(); out.pdf = pu; });
+      }).then(function () {
+        // videos: a failed/rejected clip just routes to WhatsApp — it must never abort the whole application
+        return Promise.all(vidFiles.map(function (v) {
+          return upload(v.file, null, folderName)
+            .then(function (u) { step(); if (u) out.videos.push(u); else waVideos.push(v); })
+            .catch(function () { step(); waVideos.push(v); });
+        }));
+      }).then(function () { return out; });
     }
 
     chain.then(function (up) {
@@ -1195,13 +1275,16 @@
         category: form.category.value, based_in: form.region.value,
         city: form.city.value, instagram_social: form.socials.value,
         about: form.about.value,
-        files_folder: (configured && (photos.length || pdf)) ? folderName : '(none)',
+        files_folder: (configured && (photos.length || pdf || vidFiles.length)) ? folderName : '(none)',
         photos: configured
           ? (up.photos.filter(Boolean).join('\n') || (photos.length ? photos.length + ' photo(s) uploaded' : '(none)'))
           : (photos.length ? '(' + photos.length + ' photos — applicant will send on WhatsApp)' : '(none)'),
         portfolio_pdf: configured
           ? (up.pdf || (pdf ? 'PDF uploaded' : '(none)'))
-          : (pdf ? '(PDF — applicant will send on WhatsApp)' : '(none)')
+          : (pdf ? '(PDF — applicant will send on WhatsApp)' : '(none)'),
+        videos: (up.videos && up.videos.filter(Boolean).join('\n')) ||
+          (waVideos.length ? '(' + waVideos.length + ' clip(s) — applicant will send on WhatsApp)' : '(none)'),
+        video_links: vidLinks.length ? vidLinks.join('\n') : '(none)'
       };
       return fetch('https://api.web3forms.com/submit', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -1213,8 +1296,8 @@
         form.style.display = 'none';
         var ok = $('#talOk'); if (ok) ok.style.display = 'block';
         if (window.gtag) gtag('event', 'talent_apply');
-        // photos couldn't upload (not configured yet) → hand them to WhatsApp so nothing is lost
-        if (!configured && (photos.length || pdf)) {
+        // anything that couldn't upload (not configured yet, or a clip too big/rejected) → hand to WhatsApp so nothing is lost
+        if ((!configured && (photos.length || pdf)) || waVideos.length) {
           var waWrap = $('#apOkWa'); if (waWrap) waWrap.hidden = false;
         }
       });

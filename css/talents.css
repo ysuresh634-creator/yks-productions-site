@@ -655,6 +655,27 @@ main{overflow-x:clip}
 }
 @media(prefers-reduced-motion:reduce){.ap-shoot-cta{transition:none}}
 
+/* ══ videos: link + upload ══ */
+.ap-vid-link{display:flex;gap:8px;margin:0 0 12px}
+.ap-vid-link input{flex:1 1 auto;min-width:0;font-size:14px;color:var(--mag-ink);background:rgba(244,237,226,.04);border:1px solid var(--mag-line-2);border-radius:9px;padding:12px 14px}
+.ap-vid-link input::placeholder{color:var(--mag-soft)}
+.ap-vid-link input:focus{outline:none;border-color:var(--mag-accent)}
+.ap-vid-link input.ap-vu-bad{border-color:#e5533d;animation:apShake .32s}
+@keyframes apShake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.ap-vid-link button{flex:0 0 auto;font-family:var(--mag-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:#0a0810;background:var(--mag-accent);border:0;border-radius:9px;padding:0 18px;cursor:pointer;transition:filter .15s ease}
+.ap-vid-link button:hover{filter:brightness(1.08)}
+.ap-vid-or{display:flex;align-items:center;gap:12px;margin:0 0 12px;color:var(--mag-soft);font-family:var(--mag-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.ap-vid-or::before,.ap-vid-or::after{content:"";flex:1;height:1px;background:var(--mag-line)}
+.ap-vids{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ap-vid{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--mag-line-2);border-radius:10px;background:rgba(244,237,226,.03)}
+.ap-vid.is-link{border-style:dashed}
+.ap-vid-ic{flex:0 0 auto;font-size:12px;color:var(--mag-accent)}
+.ap-vid-nm{flex:1 1 auto;min-width:0;font-size:13px;color:var(--mag-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ap-vid-sz{flex:0 0 auto;font-family:var(--mag-mono);font-size:10px;color:var(--mag-soft);white-space:nowrap}
+.ap-vid-sz.big{color:var(--mag-accent)}
+.ap-vid-rm{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid var(--mag-line-2);background:none;color:var(--mag-soft);cursor:pointer;font-size:15px;line-height:1;padding:0}
+.ap-vid-rm:hover{color:var(--mag-ink);border-color:var(--mag-soft)}
+
 .ap-thumb{display:flex;flex-direction:column;gap:6px;aspect-ratio:auto;overflow:visible;border:0;background:none;border-radius:0}
 .ap-thumb-media{position:relative;aspect-ratio:4/5;border-radius:9px;overflow:hidden;border:1px solid var(--mag-line);background:#16131c;cursor:grab}
 .ap-thumb-media:active{cursor:grabbing}
