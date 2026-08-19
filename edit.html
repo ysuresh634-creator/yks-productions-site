@@ -312,11 +312,14 @@ function renderFrame(){
   const style=pv.createElement('style');
   style.textContent=`
     html{scroll-behavior:auto!important}
+    html,body{overflow:visible!important;height:auto!important;position:static!important}
     *,*::before,*::after{animation:none!important;transition:none!important}
+    /* preloaders / splash screens never clear because we disable the page's JS */
+    #loader,.loader,#preloader,.preloader,.page-loader,.site-loader,
+    .splash,.intro,.intro-overlay,#intro,.curtain,.page-transition{display:none!important}
     [data-yks-hot]{outline:2px dashed rgba(201,169,110,.85)!important;outline-offset:2px;cursor:pointer!important}
     [data-yks-hot]:hover{outline-style:solid!important;background:rgba(201,169,110,.14)!important}
     [data-yks-dirty]{outline:2px solid #7EC88B!important;outline-offset:2px}
-    [data-yks-reveal],.reveal,[class*="fade"]{opacity:1!important;transform:none!important;visibility:visible!important;clip-path:none!important}
   `;
   pv.head.appendChild(style);
   const script=pv.createElement('script');
@@ -347,6 +350,39 @@ const FRAME_JS=`
     [].slice.call(document.querySelectorAll('[data-yks-hot]')).forEach(function(e){e.removeAttribute('data-yks-hot');});
     if(mode==='off') return;
     targets().forEach(function(e){e.setAttribute('data-yks-hot','1');});
+  }
+
+  // The page's own JS is disabled here, so anything it would normally clear or
+  // reveal stays stuck. Undo the two common cases.
+  function unstick(){
+    var vw=innerWidth, vh=innerHeight, hidden=0, shown=0;
+    [].slice.call(document.querySelectorAll('body *')).forEach(function(el){
+      var cs=getComputedStyle(el);
+      if(cs.display==='none') return;
+
+      // 1. opaque full-viewport overlays that never got dismissed
+      if(cs.position==='fixed'){
+        var r=el.getBoundingClientRect();
+        var bg=cs.backgroundColor||'';
+        var m=bg.match(/rgba?\\(([^)]+)\\)/);
+        var alpha=m ? (m[1].split(',')[3]===undefined ? 1 : parseFloat(m[1].split(',')[3])) : 0;
+        var z=parseInt(cs.zIndex,10); if(isNaN(z)) z=0;
+        if(r.width>vw*0.75 && r.height>vh*0.6 && alpha>0.75 && z>=5 && !el.querySelector('img')){
+          el.style.setProperty('display','none','important'); hidden++; return;
+        }
+      }
+
+      // 2. scroll-reveal content left at opacity 0 because the observer never fired
+      if(parseFloat(cs.opacity)<0.05 && (el.textContent||'').trim().length>0){
+        el.style.setProperty('opacity','1','important');
+        el.style.setProperty('visibility','visible','important');
+        if(/matrix|translate/.test(cs.transform||'')) el.style.setProperty('transform','none','important');
+        shown++;
+      }
+    });
+    document.documentElement.style.setProperty('overflow','visible','important');
+    document.body.style.setProperty('overflow','visible','important');
+    parent.postMessage({yks:'unstuck', hidden:hidden, shown:shown},'*');
   }
   document.addEventListener('click',function(e){
     if(mode==='off') return;
@@ -381,6 +417,7 @@ const FRAME_JS=`
     }
     if(d.yks==='undirty'){ var q=document.querySelector('[data-yks-id="'+d.id+'"]'); if(q) q.removeAttribute('data-yks-dirty'); }
   });
+  unstick();
   paint();
   parent.postMessage({yks:'ready'},'*');
 })();
@@ -391,6 +428,7 @@ window.addEventListener('message',e=>{
   const d=e.data||{};
   if(d.yks==='ready') sendMode();
   if(d.yks==='pick') onPick(d);
+  if(d.yks==='unstuck' && d.hidden) console.log('[editor] cleared '+d.hidden+' stuck overlay(s), revealed '+d.shown);
 });
 function sendMode(){ const f=$('frame').contentWindow; if(f) f.postMessage({yks:'mode',mode},'*'); }
 function patch(o){ const f=$('frame').contentWindow; if(f) f.postMessage({yks:'patch',...o},'*'); }
