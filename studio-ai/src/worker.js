@@ -72,7 +72,7 @@ async function websiteEdit({ file_path, instruction, file_content }, key) {
 File: ${file_path}
 Instruction: ${instruction}
 
-Return ONLY a JSON object (no markdown, no code fences) in this exact format:
+Return ONLY a raw JSON object — no markdown, no code fences, nothing else. Exact format:
 {"edits":[{"find":"exact verbatim text to find","replace":"replacement text"},...],"commit_message":"short description"}
 
 Rules:
@@ -88,17 +88,23 @@ ${file_content}`;
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: 'application/json' },
     }),
   });
 
-  const data = await res.json();
-  if (!res.ok) return err(data.error?.message || 'Gemini error');
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    return err(data.error?.message || `Gemini HTTP ${res.status}`);
+  }
 
-  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+  const data = await res.json();
+  let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+  // Strip markdown code fences if present
+  raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+
   try {
     return ok(JSON.parse(raw));
   } catch {
-    return err('Failed to parse AI response: ' + raw.slice(0, 200));
+    return err('AI response was not valid JSON: ' + raw.slice(0, 300));
   }
 }
