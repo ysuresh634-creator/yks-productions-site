@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=14" />
+<link rel="stylesheet" href="/css/talents.css?v=15" />
 </head>
 <body>
 
@@ -187,6 +187,14 @@
         <div class="ap-block">
           <p class="ap-step">Your stats <span class="ap-opt">optional · for your portfolio</span></p>
           <p class="ap-hint">Add whatever applies — these become a measurements page in your portfolio, just like a proper comp card. Leave blank if you'd rather not.</p>
+          <button type="button" class="ap-ai-btn" id="apStatsAiOpen">✨ Paste your stats — I'll sort them</button>
+          <div class="ap-statspaste" id="apStatsPaste" hidden>
+            <textarea id="apStatsRaw" rows="3" placeholder="Paste anything — from your comp card, agency profile, or a message. e.g. Height 5'6, 34-26-36, shoe 38 EU, black hair, brown eyes, medium skin"></textarea>
+            <div class="ap-statspaste-row">
+              <button type="button" class="ap-statspaste-go" id="apStatsFill">Sort into my stats →</button>
+              <span class="ap-mini" id="apStatsMsg"></span>
+            </div>
+          </div>
           <div class="ap-stats">
             <label>Height<input type="text" name="stat_height" placeholder="5&#39;6&quot;" /></label>
             <label>Bust / Chest<input type="text" name="stat_bust" placeholder="34" /></label>
@@ -266,6 +274,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=17"></script>
+<script src="/js/talent-apply.js?v=20"></script>
 </body>
 </html>
