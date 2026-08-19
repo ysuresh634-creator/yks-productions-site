@@ -502,6 +502,25 @@
     });
   })();
 
+  /* ══ interactive "how it works" — the timeline walks itself; hover/tap to steer ══ */
+  (function () {
+    var flow = $('#apFlow'); if (!flow) return;
+    var steps = $$('.ap-flow-step', flow); if (steps.length < 2) return;
+    flow.classList.add('is-enhanced');
+    var active = 0, timer = null;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var touch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    function set(i) { active = i; steps.forEach(function (s, k) { var on = k === i; s.classList.toggle('is-open', on); s.setAttribute('aria-expanded', on ? 'true' : 'false'); }); }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    steps.forEach(function (s, k) {
+      s.setAttribute('aria-expanded', 'false');
+      s.addEventListener('click', function () { stop(); set(k); });
+      if (!touch) s.addEventListener('mouseenter', function () { stop(); set(k); });
+    });
+    set(0);
+    if (!reduce) timer = setInterval(function () { set((active + 1) % steps.length); }, 4200);
+  })();
+
   /* ══ downloadable portfolio — a full, watermarked YKS PDF built from their photos + details ══ */
   function ensureJsPDF() {
     return new Promise(function (res, rej) {

@@ -127,17 +127,26 @@ main{overflow:hidden}
 /* ═══ HOW TO BOOK ═══ */
 .l-section{padding:70px 0}
 .l-section.alt{background:var(--mag-paper-2)}
-.tal-how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.tal-how>div{border:1px solid var(--mag-line-2);border-radius:14px;padding:26px 24px 28px;position:relative;overflow:hidden;
-  background:linear-gradient(180deg,rgba(244,237,226,.02),transparent);transition:transform .22s,border-color .22s}
-.tal-how>div::before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;
-  background:linear-gradient(90deg,var(--mag-accent),transparent 70%);opacity:.5;transition:opacity .22s}
-.tal-how>div:hover{transform:translateY(-4px);border-color:rgba(255,140,59,.4)}
-.tal-how>div:hover::before{opacity:1}
-.tal-how-n{font-family:var(--mag-display);font-style:italic;font-weight:500;font-size:38px;color:var(--mag-accent);
-  display:block;line-height:1;margin-bottom:14px}
-.tal-how b{display:block;font-family:var(--mag-display);font-size:21px;font-weight:500;color:var(--mag-ink);margin-bottom:8px}
-.tal-how p{margin:0;font-size:14px;color:var(--mag-soft);line-height:1.62}
+/* interactive "how it works" — a timeline that walks itself; hover/tap to steer */
+.ap-flow-intro{font-family:var(--mag-display);font-size:clamp(1.3rem,2.6vw,1.7rem);color:var(--mag-ink-2);max-width:30ch;margin:0 0 30px;line-height:1.35}
+.ap-flow{position:relative;max-width:720px;display:flex;flex-direction:column;gap:4px}
+.ap-flow::before{content:"";position:absolute;left:27px;top:36px;bottom:36px;width:2px;background:var(--mag-line);z-index:0}
+.ap-flow-step{position:relative;z-index:1;display:grid;grid-template-columns:56px 1fr;gap:20px;align-items:start;
+  background:none;border:0;text-align:left;width:100%;padding:14px 12px;cursor:pointer;border-radius:12px;transition:background .25s}
+.ap-flow-step:hover{background:rgba(244,237,226,.03)}
+.ap-flow-node{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;
+  font-family:var(--mag-display);font-style:italic;font-weight:500;font-size:23px;color:var(--mag-soft);
+  border:1.5px solid var(--mag-line-2);background:var(--mag-paper);transition:.35s cubic-bezier(.2,.8,.2,1)}
+.ap-flow-title{display:block;font-family:var(--mag-display);font-weight:500;font-size:clamp(1.25rem,2.3vw,1.5rem);
+  color:var(--mag-soft);transition:color .3s;padding-top:11px}
+.ap-flow-detail{display:block;font-size:15px;line-height:1.62;color:var(--mag-soft);margin-top:10px;max-width:50ch}
+/* enhanced by JS → accordion: only the open step shows its line, its node lights up */
+.ap-flow.is-enhanced .ap-flow-detail{max-height:0;opacity:0;margin-top:0;overflow:hidden;
+  transition:max-height .45s cubic-bezier(.2,.8,.2,1),opacity .3s,margin-top .3s}
+.ap-flow.is-enhanced .ap-flow-step.is-open .ap-flow-detail{max-height:150px;opacity:1;margin-top:12px}
+.ap-flow.is-enhanced .ap-flow-step.is-open .ap-flow-title{color:var(--mag-ink)}
+.ap-flow.is-enhanced .ap-flow-step.is-open .ap-flow-node{color:#0a0810;background:var(--mag-accent);border-color:var(--mag-accent);
+  box-shadow:0 0 0 6px rgba(255,140,59,.13);transform:scale(1.04)}
 
 /* ═══ ROSTER ═══ */
 .l-head{max-width:760px;margin-bottom:30px}
@@ -289,7 +298,9 @@ main{overflow:hidden}
   .tal-grid{grid-template-columns:repeat(2,1fr);gap:40px 22px}
   .tal:first-child .tal-open{grid-template-columns:1fr;gap:22px}
   .tal:first-child .tal-media{max-width:70%}
-  .tal-how{grid-template-columns:1fr;gap:12px}
+  .ap-flow-step{grid-template-columns:48px 1fr;gap:16px;padding:12px 6px}
+  .ap-flow-node{width:46px;height:46px;font-size:20px}
+  .ap-flow::before{left:23px}
   .tal-modal-inner{grid-template-columns:1fr;height:min(92vh,none);max-height:92vh}
   .tal-modal-gallery{flex-direction:row;overflow-x:auto;max-height:46vh;scroll-snap-type:x mandatory}
   .tal-modal-gallery img{flex:0 0 auto;width:80%;height:auto;max-height:46vh;scroll-snap-align:center}

@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=16" />
+<link rel="stylesheet" href="/css/talents.css?v=17" />
 </head>
 <body>
 
@@ -79,11 +79,30 @@
 <!-- HOW IT WORKS FOR TALENT -->
 <section class="l-section alt">
   <div class="wrap">
-    <p class="tal-kicker" style="margin-bottom:30px">How it works</p>
-    <div class="tal-how">
-      <div><span class="tal-how-n">01</span><b>Send your details</b><p>A few phone photos, your stats, a line about you — build your own free portfolio right here as you go.</p></div>
-      <div><span class="tal-how-n">02</span><b>We review</b><p>If you're a fit for the roster, I'll be in touch personally to shape your profile.</p></div>
-      <div><span class="tal-how-n">03</span><b>Get booked</b><p>Clients enquire through YKS — your number and socials always stay private.</p></div>
+    <p class="tal-kicker" style="margin-bottom:14px">How it works</p>
+    <p class="ap-flow-intro">It's me on the other end — no fees, no runaround. Here's exactly how it goes.</p>
+    <div class="ap-flow" id="apFlow">
+      <button class="ap-flow-step" type="button" data-i="0">
+        <span class="ap-flow-node">01</span>
+        <span class="ap-flow-body">
+          <span class="ap-flow-title">You send a few photos</span>
+          <span class="ap-flow-detail">Straight from your phone — any size, any format. Then build your own portfolio right here as you go. Free, and yours to keep.</span>
+        </span>
+      </button>
+      <button class="ap-flow-step" type="button" data-i="1">
+        <span class="ap-flow-node">02</span>
+        <span class="ap-flow-body">
+          <span class="ap-flow-title">I take a proper look</span>
+          <span class="ap-flow-detail">Every submission lands with me, not a bot. If you're right for the roster, you hear back from me — personally.</span>
+        </span>
+      </button>
+      <button class="ap-flow-step" type="button" data-i="2">
+        <span class="ap-flow-node">03</span>
+        <span class="ap-flow-body">
+          <span class="ap-flow-title">You get booked — through me</span>
+          <span class="ap-flow-detail">Clients come to me and I put you forward. Your number and socials never go public. Always.</span>
+        </span>
+      </button>
     </div>
   </div>
 </section>
@@ -297,6 +316,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=20"></script>
+<script src="/js/talent-apply.js?v=21"></script>
 </body>
 </html>
