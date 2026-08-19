@@ -31,9 +31,9 @@
 <link rel="apple-touch-icon" href="/assets/favicon-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=8" />
+<link rel="stylesheet" href="/css/talents.css?v=9" />
 </head>
 <body>
 
@@ -131,10 +131,21 @@
             <div class="ap-ai-row"><span>Tone</span><div class="ap-chips" data-k="tone">
               <button type="button" data-v="warm" class="on">Warm</button>
               <button type="button" data-v="confident">Confident</button>
+              <button type="button" data-v="editorial">Editorial</button>
+              <button type="button" data-v="bold">Bold</button>
+              <button type="button" data-v="elegant">Elegant</button>
               <button type="button" data-v="playful">Playful</button>
               <button type="button" data-v="minimal">Minimal</button>
             </div></div>
-            <button type="button" class="btn ap-ai-go" id="apAiGo">Write my about →</button>
+            <div class="ap-ai-row"><span>Length</span><div class="ap-chips" data-k="length">
+              <button type="button" data-v="short">Short</button>
+              <button type="button" data-v="medium" class="on">Medium</button>
+              <button type="button" data-v="long">Long</button>
+            </div></div>
+            <div class="ap-ai-actions">
+              <button type="button" class="btn ap-ai-go" id="apAiGo">Write my about →</button>
+              <button type="button" class="ap-ai-regen" id="apAiRegen" hidden>↻ Another version</button>
+            </div>
           </div>
           <textarea name="about" id="apAbout" rows="5" placeholder="e.g. Fashion &amp; editorial model based in Delhi. I love campaign and lookbook work, take direction well, and I'm just as comfortable on location as in studio."></textarea>
         </div>
@@ -163,6 +174,22 @@
           <div class="row2">
             <label>City<input type="text" name="city" placeholder="Delhi, Dubai …" required /></label>
             <label>Instagram / social <span class="tal-priv">private</span><input type="text" name="socials" placeholder="@handle or link (only YKS sees this)" /></label>
+          </div>
+        </div>
+
+        <!-- Stats & details (optional, mostly models) -->
+        <div class="ap-block">
+          <p class="ap-step">Your stats <span class="ap-opt">optional · for your portfolio</span></p>
+          <p class="ap-hint">Add whatever applies — these become a measurements page in your portfolio, just like a proper comp card. Leave blank if you'd rather not.</p>
+          <div class="ap-stats">
+            <label>Height<input type="text" name="stat_height" placeholder="5&#39;6&quot;" /></label>
+            <label>Bust / Chest<input type="text" name="stat_bust" placeholder="34" /></label>
+            <label>Waist<input type="text" name="stat_waist" placeholder="26" /></label>
+            <label>Hips<input type="text" name="stat_hips" placeholder="36" /></label>
+            <label>Shoe<input type="text" name="stat_shoe" placeholder="38 EU" /></label>
+            <label>Hair<input type="text" name="stat_hair" placeholder="Black" /></label>
+            <label>Eyes<input type="text" name="stat_eyes" placeholder="Brown" /></label>
+            <label>Skin<input type="text" name="stat_skin" placeholder="Medium" /></label>
           </div>
         </div>
 
@@ -197,6 +224,20 @@
 
 </main>
 
+<!-- photo crop / adjust editor -->
+<div class="ap-crop" id="apCrop" hidden>
+  <div class="ap-crop-box">
+    <p class="ap-crop-title">Adjust your photo <span>drag to move · slide to zoom</span></p>
+    <div class="ap-crop-frame" id="apCropFrame"><img id="apCropImg" alt="" draggable="false" /></div>
+    <label class="ap-crop-zoom">Zoom<input type="range" id="apCropZoom" min="1" max="3" step="0.01" value="1" /></label>
+    <div class="ap-crop-btns">
+      <button type="button" id="apCropReset">Reset</button>
+      <button type="button" id="apCropCancel">Cancel</button>
+      <button type="button" class="btn btn-fill" id="apCropSave">Save crop</button>
+    </div>
+  </div>
+</div>
+
 <footer class="l-foot">
   <div class="wrap">
     <div class="l-foot-inner">
@@ -211,6 +252,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=8"></script>
+<script src="/js/talent-apply.js?v=9"></script>
 </body>
 </html>

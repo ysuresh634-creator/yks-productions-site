@@ -27,19 +27,25 @@
   var uid = 0;
 
   /* ── portfolio customiser: the talent's own theme / font / accent ── */
-  var CFG = { theme: 'noir', font: 'sans', accent: '#d47a3a' };
+  var CFG = { theme: 'noir', font: 'playfair', accent: '#d47a3a' };
   var THEMES = {
-    noir:     { bg: '#14111a', text: '#f4ede2', sub: '#b0a892', label: 'Noir' },
-    ivory:    { bg: '#f1e9da', text: '#1a1510', sub: '#7a7264', label: 'Ivory' },
-    charcoal: { bg: '#26242b', text: '#f0ece5', sub: '#a8a29a', label: 'Charcoal' },
-    blush:    { bg: '#f3e6df', text: '#2a1c1c', sub: '#8a6f6f', label: 'Blush' }
+    noir:      { bg: '#14111a', text: '#f4ede2', sub: '#b0a892', label: 'Noir' },
+    charcoal:  { bg: '#26242b', text: '#f0ece5', sub: '#a8a29a', label: 'Charcoal' },
+    slate:     { bg: '#1b2230', text: '#eef1f6', sub: '#94a0b4', label: 'Slate' },
+    forest:    { bg: '#162019', text: '#eef0e8', sub: '#93a693', label: 'Forest' },
+    ivory:     { bg: '#f1e9da', text: '#1a1510', sub: '#7a7264', label: 'Ivory' },
+    sand:      { bg: '#e8dcc6', text: '#241d12', sub: '#8a7a5c', label: 'Sand' },
+    blush:     { bg: '#f3e6df', text: '#2a1c1c', sub: '#8a6f6f', label: 'Blush' },
+    porcelain: { bg: '#ffffff', text: '#14110d', sub: '#8a8078', label: 'Porcelain' }
   };
   var FONTS = {
-    sans:  { css: "'Inter',system-ui,sans-serif", pdf: 'helvetica', label: 'Sans' },
-    serif: { css: "Georgia,'Times New Roman',serif", pdf: 'times', label: 'Serif' },
-    mono:  { css: "'Space Grotesk',ui-monospace,monospace", pdf: 'courier', label: 'Mono' }
+    playfair: { css: "'Playfair Display',Georgia,serif", pdf: 'Playfair', embed: true, label: 'Didone' },
+    serif:    { css: "Georgia,'Times New Roman',serif", pdf: 'times', label: 'Serif' },
+    oswald:   { css: "'Oswald',sans-serif", pdf: 'Oswald', embed: true, label: 'Display' },
+    sans:     { css: "'Inter',system-ui,sans-serif", pdf: 'helvetica', label: 'Sans' },
+    mono:     { css: "'Space Grotesk',ui-monospace,monospace", pdf: 'courier', label: 'Mono' }
   };
-  var ACCENTS = ['#d47a3a', '#c0392b', '#b8912e', '#2a9d8f', '#8a7fd6', '#e2ddd3'];
+  var ACCENTS = ['#d47a3a', '#c0392b', '#b8912e', '#2a9d8f', '#8a7fd6', '#d16a8a', '#3b6fd4', '#7a8b3a', '#b0552b', '#7d4b7d', '#c9a24b', '#e2ddd3'];
   var DISC = { 'Model': 'Fashion · Editorial · Runway · Commercial', 'Influencer / Creator': 'Content · Campaign · Reels', 'Actor': 'Film · Ad · Editorial · Screen' };
   function hexRgb(h) { h = h.replace('#', ''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -58,7 +64,10 @@
     thumbs.innerHTML = '';
     photos.forEach(function (item, idx) {
       var fig = document.createElement('div'); fig.className = 'ap-thumb'; fig.dataset.id = item.id; fig.draggable = true;
-      var img = document.createElement('img'); img.src = item.url; img.alt = ''; fig.appendChild(img);
+      var img = document.createElement('img'); img.src = item.edited || item.url; img.alt = '';
+      img.addEventListener('click', function () { openCrop(item); }); fig.appendChild(img);
+      var ed = document.createElement('span'); ed.className = 'ap-edit-hint'; ed.textContent = '✎ Adjust';
+      ed.addEventListener('click', function () { openCrop(item); }); fig.appendChild(ed);
       if (idx === 0) { var bd = document.createElement('span'); bd.className = 'ap-cover-badge'; bd.textContent = 'COVER'; fig.appendChild(bd); }
       else {
         var mk = document.createElement('button'); mk.type = 'button'; mk.className = 'ap-mkcover'; mk.textContent = 'Set cover';
@@ -80,6 +89,57 @@
   function reflectPhotoCount() {
     var b = $('#apDropLabel');
     if (b) b.textContent = photos.length ? photos.length + (photos.length === 1 ? ' photo — first is your cover' : ' photos — first is your cover') : 'Add photos';
+  }
+
+  /* ══ per-photo crop / adjust editor (pan + zoom) ══ */
+  var cropModal = $('#apCrop'), cropImg = $('#apCropImg'), cropFrame = $('#apCropFrame'), cropZoom = $('#apCropZoom');
+  var cropS = null;
+  function openCrop(item) {
+    if (!cropModal) return;
+    cropModal.hidden = false; document.documentElement.style.overflow = 'hidden';
+    var nat = new Image();
+    nat.onload = function () {
+      var fw = cropFrame.clientWidth || 300, fh = cropFrame.clientHeight || 375;
+      var base = Math.max(fw / nat.width, fh / nat.height);
+      cropS = { item: item, nat: nat, fw: fw, fh: fh, base: base, zoom: 1 };
+      cropS.tx = (fw - nat.width * base) / 2; cropS.ty = (fh - nat.height * base) / 2;
+      cropImg.src = nat.src; cropZoom.value = 1; applyCrop();
+    };
+    nat.src = item.url;
+  }
+  function applyCrop() {
+    if (!cropS) return;
+    var s = cropS.base * cropS.zoom, w = cropS.nat.width * s, h = cropS.nat.height * s;
+    cropS.tx = Math.min(0, Math.max(cropS.fw - w, cropS.tx));
+    cropS.ty = Math.min(0, Math.max(cropS.fh - h, cropS.ty));
+    cropImg.style.width = w + 'px'; cropImg.style.height = h + 'px';
+    cropImg.style.transform = 'translate(' + cropS.tx + 'px,' + cropS.ty + 'px)';
+  }
+  function closeCrop() { if (cropModal) cropModal.hidden = true; document.documentElement.style.overflow = ''; cropS = null; }
+  if (cropModal) {
+    cropZoom.addEventListener('input', function () { if (cropS) { cropS.zoom = parseFloat(cropZoom.value) || 1; applyCrop(); } });
+    var drag = false, dx, dy, otx, oty;
+    var cdown = function (x, y) { if (!cropS) return; drag = true; dx = x; dy = y; otx = cropS.tx; oty = cropS.ty; };
+    var cmove = function (x, y) { if (!drag) return; cropS.tx = otx + (x - dx); cropS.ty = oty + (y - dy); applyCrop(); };
+    cropFrame.addEventListener('mousedown', function (e) { e.preventDefault(); cdown(e.clientX, e.clientY); });
+    window.addEventListener('mousemove', function (e) { cmove(e.clientX, e.clientY); });
+    window.addEventListener('mouseup', function () { drag = false; });
+    cropFrame.addEventListener('touchstart', function (e) { cdown(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+    cropFrame.addEventListener('touchmove', function (e) { cmove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+    cropFrame.addEventListener('touchend', function () { drag = false; });
+    $('#apCropSave').addEventListener('click', function () {
+      if (!cropS) return;
+      var s = cropS.base * cropS.zoom;
+      var sx = -cropS.tx / s, sy = -cropS.ty / s, sw = cropS.fw / s, sh = cropS.fh / s;
+      var outW = 900, outH = Math.round(outW * cropS.fh / cropS.fw);
+      var c = document.createElement('canvas'); c.width = outW; c.height = outH;
+      c.getContext('2d').drawImage(cropS.nat, sx, sy, sw, sh, 0, 0, outW, outH);
+      cropS.item.edited = c.toDataURL('image/jpeg', 0.85);
+      closeCrop(); renderThumbs();
+    });
+    $('#apCropReset').addEventListener('click', function () { if (cropS) { cropS.item.edited = null; closeCrop(); renderThumbs(); } });
+    $('#apCropCancel').addEventListener('click', closeCrop);
+    cropModal.addEventListener('click', function (e) { if (e.target === cropModal) closeCrop(); });
   }
   if (photoInput) {
     photoDrop.addEventListener('click', function () { photoInput.click(); });
@@ -115,7 +175,7 @@
 
   /* ══ AI-assisted "About" writer ══ */
   var aiPanel = $('#apAi'), aboutBox = $('#apAbout');
-  var pick = { role: '', exp: '', tone: 'warm', loves: [] };
+  var pick = { role: '', exp: '', tone: 'warm', length: 'medium', loves: [], seed: 0 };
   var openBtn = $('#apAiOpen');
   if (openBtn) openBtn.addEventListener('click', function () {
     aiPanel.hidden = !aiPanel.hidden;
@@ -141,50 +201,61 @@
     if (arr.length <= 1) return arr.join('');
     var last = arr.pop(); return arr.join(', ') + ' and ' + last;
   }
+  function pickV(arr, seed) { return arr[Math.abs(seed) % arr.length]; }
   function compose() {
-    var role = (pick.role || (form.category && form.category.value) || 'model');
-    role = role.toLowerCase().replace('influencer / creator', 'content creator');
+    var seed = pick.seed || 0;
+    var role = (pick.role || (form.category && form.category.value) || 'model').toLowerCase().replace('influencer / creator', 'content creator');
     var city = (form.city && form.city.value || '').trim();
     var loves = pick.loves.slice(0, 3);
-    var tone = pick.tone || 'warm';
+    var tone = pick.tone || 'warm', length = pick.length || 'medium';
     var proud = ($('#apProud') && $('#apProud').value || '').trim();
-
     var desc = loves.length ? list(loves).toLowerCase() + ' ' : '';
     var s1 = cap(desc + role) + (city ? ' based in ' + city : '') + '.';
-
     var expMap = {
-      start: "I'm just starting out and bring real energy to every set",
-      early: "I've spent a couple of years in front of the camera",
-      several: "I've got several years of shoots behind me",
-      pro: "I'm very comfortable on any kind of set"
+      start: ["I'm just starting out and bring real energy to every set", "new to the industry and hungry for great work"],
+      early: ["I've spent a couple of years in front of the camera", "with a couple of years of shoots behind me"],
+      several: ["I've got several years of shoots behind me", "with several years on set"],
+      pro: ["I'm very comfortable on any kind of set", "seasoned on set, across studio and location"]
     };
-    var style = {
-      warm: ". I take direction easily and love the collaborative side of a shoot.",
-      confident: ". I take direction well, work fast, and can hold a look for as long as the frame needs.",
-      playful: ". I take direction, bring good energy, and I'm always up for trying something new.",
-      minimal: " — reliable, quick to take direction, easy to work with."
+    var styleMap = {
+      warm: [". I take direction easily and love the collaborative side of a shoot.", ". I'm easy to work with and love a set that feels like a team."],
+      confident: [". I take direction well, work fast, and hold a look for as long as the frame needs.", ". Precise, quick and reliable, frame to frame."],
+      editorial: [". I read light and lines instinctively and give an editor plenty to cut from.", ". Strong on pose and story — made for the page."],
+      bold: [". I bring presence and never shy from a strong concept.", ". Big energy, sharp looks, unafraid of a bold brief."],
+      elegant: [". Poised and precise, with a clean, timeless quality on camera.", ". Refined and composed, at home in a quiet, elevated frame."],
+      playful: [". I bring good energy, take direction, and I'm always up for something new.", ". Fun on set, expressive, and game for anything."],
+      minimal: [" — reliable, quick to take direction, easy to work with.", " — clean, professional, low-fuss on set."]
     };
-    var s2 = (expMap[pick.exp] || expMap.several) + (style[tone] || style.warm);
-
-    var s3 = '';
-    if (proud) {
-      var lead = { warm: 'A recent highlight — ', confident: 'Recent work includes ', playful: 'Proudest bit so far — ', minimal: 'Selected: ' };
-      s3 = ' ' + (lead[tone] || lead.warm) + proud + (/[.!?]$/.test(proud) ? '' : '.');
-    }
-    var closer = {
-      warm: " I'd love to be part of your next shoot.",
-      confident: " Ready for your next campaign.",
-      playful: " Let's make something good together.",
+    var closerMap = {
+      warm: " I'd love to be part of your next shoot.", confident: " Ready for your next campaign.",
+      editorial: " Open to editorial, campaign and lookbook work.", bold: " Bring me your boldest brief.",
+      elegant: " Available for considered, elevated work.", playful: " Let's make something good together.",
       minimal: " Available for bookings."
     };
-    return (s1 + ' ' + s2 + s3 + (closer[tone] || closer.warm)).replace(/\s+/g, ' ').trim();
+    var s2 = cap(pickV(expMap[pick.exp] || expMap.several, seed)) + pickV(styleMap[tone] || styleMap.warm, seed);
+    var s3 = '';
+    if (proud) {
+      var lead = { warm: 'A recent highlight — ', confident: 'Recent work includes ', editorial: 'Selected work — ', bold: 'Proudest moment — ', elegant: 'Recently — ', playful: 'Proudest bit so far — ', minimal: 'Selected: ' };
+      s3 = ' ' + (lead[tone] || lead.warm) + proud + (/[.!?]$/.test(proud) ? '' : '.');
+    }
+    var closer = closerMap[tone] || closerMap.warm;
+    var out = (length === 'short') ? (s1 + s3 + closer) : (s1 + ' ' + s2 + s3 + closer);
+    return out.replace(/\s+/g, ' ').trim();
   }
-  var goBtn = $('#apAiGo');
+  var goBtn = $('#apAiGo'), regenBtn = $('#apAiRegen');
   if (goBtn) goBtn.addEventListener('click', function () {
+    pick.seed = 0;
     aboutBox.value = compose();
     aboutBox.dispatchEvent(new Event('input'));
     aboutBox.focus();
-    goBtn.textContent = 'Rewrite ↻';
+    goBtn.textContent = 'Rewrite →';
+    if (regenBtn) regenBtn.hidden = false;
+  });
+  if (regenBtn) regenBtn.addEventListener('click', function () {
+    pick.seed = (pick.seed || 0) + 1;
+    aboutBox.value = compose();
+    aboutBox.dispatchEvent(new Event('input'));
+    aboutBox.focus();
   });
 
   /* ══ autosave draft (text only) ══ */
@@ -208,7 +279,7 @@
     var nm = esc((form.name.value || 'Your name').trim().toUpperCase());
     var cat = (form.category.value || 'Model').trim();
     var disc = esc((DISC[cat] || 'Fashion · Editorial · Commercial').toUpperCase());
-    var cover = photos[0] ? photos[0].url : '';
+    var cover = photos[0] ? (photos[0].edited || photos[0].url) : '';
     preview.innerHTML =
       '<div class="ap-cover" style="background:' + th.bg + ';color:' + th.text + ';font-family:' + ff + '">' +
         '<div class="ap-cv-top"><b>YKS</b><i style="color:' + th.sub + '">TALENT PORTFOLIO</i></div>' +
@@ -252,6 +323,22 @@
       document.head.appendChild(s);
     });
   }
+  function ensureFonts() {
+    return new Promise(function (res) {
+      if (window.YKS_FONTS) return res(window.YKS_FONTS);
+      var s = document.createElement('script'); s.src = '/js/vendor/fonts.js';
+      s.onload = function () { res(window.YKS_FONTS || null); };
+      s.onerror = function () { res(null); };   // fonts optional — falls back to built-ins
+      document.head.appendChild(s);
+    });
+  }
+  function registerFonts(doc) {
+    if (!window.YKS_FONTS) return;
+    try {
+      doc.addFileToVFS('YKSPlayfair.ttf', window.YKS_FONTS.Playfair); doc.addFont('YKSPlayfair.ttf', 'Playfair', 'normal'); doc.addFont('YKSPlayfair.ttf', 'Playfair', 'bold');
+      doc.addFileToVFS('YKSOswald.ttf', window.YKS_FONTS.Oswald); doc.addFont('YKSOswald.ttf', 'Oswald', 'normal'); doc.addFont('YKSOswald.ttf', 'Oswald', 'bold');
+    } catch (e) {}
+  }
   function prepImg(file, ar, outW) {   // centre-crop to aspect `ar` (w/h) + downscale — so plates fill edge-to-edge
     return new Promise(function (res, rej) {
       var img = new Image();
@@ -273,9 +360,10 @@
     var name = (form.name.value || '').trim();
     if (!name) { alert('Add your name first.'); if (form.name) form.name.focus(); return; }
     var orig = dlBtn.textContent; dlBtn.disabled = true; dlBtn.textContent = 'Building your portfolio…';
-    ensureJsPDF()
-      .then(function (JsPDF) {
-        return Promise.all(photos.slice(0, 8).map(function (p) { return prepImg(p.file, 0.8, 900); }))
+    Promise.all([ensureJsPDF(), ensureFonts()])
+      .then(function (rr) {
+        var JsPDF = rr[0];
+        return Promise.all(photos.slice(0, 8).map(function (p) { return p.edited ? Promise.resolve({ data: p.edited, w: 900, h: 1125 }) : prepImg(p.file, 0.8, 1000); }))
           .then(function (imgs) {
             var th = THEMES[CFG.theme];
             buildPortfolio(JsPDF, imgs, name, { bg: hexRgb(th.bg), text: hexRgb(th.text), sub: hexRgb(th.sub), accent: hexRgb(CFG.accent), font: FONTS[CFG.font].pdf });
@@ -286,10 +374,14 @@
   });
   function buildPortfolio(JsPDF, imgs, name, cfg) {
     var doc = new JsPDF({ unit: 'pt', format: 'a4', compress: true });
+    registerFonts(doc);
     var W = 595.28, H = 841.89, M = 48, CW = W - 2 * M;
     var BG = cfg.bg, TX = cfg.text, SUB = cfg.sub, AC = cfg.accent, F = cfg.font;
+    if ((F === 'Playfair' || F === 'Oswald') && !doc.getFontList()[F]) F = 'helvetica';   // font failed to load → safe fallback
     var cat = (form.category.value || 'Model').trim(), city = (form.city.value || '').trim(), about = (form.about.value || '').trim();
     var disc = DISC[cat] || 'Fashion · Editorial · Commercial', NM = name.toUpperCase();
+    function st(k) { var el = form['stat_' + k]; return el && el.value.trim() ? el.value.trim() : ''; }
+    var STATS = [['Height', st('height')], ['Bust', st('bust')], ['Waist', st('waist')], ['Hips', st('hips')], ['Shoe', st('shoe')], ['Hair', st('hair')], ['Eyes', st('eyes')], ['Skin', st('skin')]].filter(function (r) { return r[1]; });
     function fill() { doc.setFillColor.apply(doc, BG); doc.rect(0, 0, W, H, 'F'); }
     function ct(c) { doc.setTextColor.apply(doc, c); }
     function place(im, x, y, w) { doc.addImage(im.data, 'JPEG', x, y, w, w / 0.8); }   // imgs are pre-cropped 4:5
@@ -327,7 +419,16 @@
     doc.setFont(F, 'normal'); doc.setFontSize(10); ct(TX);
     var tx = M, ty = ay + 24;
     disc.split(' · ').forEach(function (t) { var tw = doc.getTextWidth(t) + 22; if (tx + tw > M + colW) { tx = M; ty += 30; } doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.8); doc.roundedRect(tx, ty - 14, tw, 24, 3, 3, 'S'); doc.text(t, tx + 11, ty + 2); tx += tw + 8; });
-    if (imgs[1]) place(imgs[1], W - M - 170, 148, 170);
+    var rx = W - M - 170, ry = 148;
+    if (imgs[1]) { place(imgs[1], rx, ry, 170); ry += 170 / 0.8 + 22; }
+    if (STATS.length) {
+      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MEASUREMENTS', rx, ry);
+      STATS.forEach(function (r) {
+        ry += 17; doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.5); doc.line(rx, ry - 11, rx + 170, ry - 11);
+        doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text(r[0].toUpperCase(), rx, ry);
+        doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text(r[1], rx + 170, ry, { align: 'right' });
+      });
+    }
     foot();
     // ── PLATES ──
     var plates = imgs.slice(imgs[1] ? 2 : 1, 8), pn = 1;
