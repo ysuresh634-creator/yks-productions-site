@@ -9,7 +9,7 @@
 :root{
   --bg:#0D0B11;--card:#181521;--card2:#1C1929;--gold:#C9A96E;--gold-lt:#3A3020;
   --text:#F8F4EF;--sub:#A89F98;--border:#2A2535;--peach:#E8B89A;--red:#C0392B;
-  --input:#13111A;
+  --green:#7EC88B;--input:#13111A;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;font-size:15px}
@@ -33,9 +33,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .screen.active{display:block}
 
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
-.nav-btn{flex:1;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--sub);cursor:pointer;font-size:10px;letter-spacing:.5px;text-transform:uppercase}
+.nav-btn{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--sub);cursor:pointer;font-size:9px;letter-spacing:.5px;text-transform:uppercase}
 .nav-btn.active{color:var(--gold)}
-.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+.nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
 
 .hdr{background:var(--card);border-bottom:1px solid var(--border);padding:16px 20px 14px;position:sticky;top:0;z-index:50}
 .hdr-inner{display:flex;justify-content:space-between;align-items:center}
@@ -73,6 +73,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .form-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--sub);text-transform:uppercase;margin-bottom:6px;display:block}
 .form-input{width:100%;background:var(--input);border:1px solid var(--border);border-radius:8px;padding:11px 12px;color:var(--text);font-size:14px;outline:none;-webkit-appearance:none}
 .form-input:focus{border-color:var(--gold)}
+select.form-input{cursor:pointer}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .form-field{margin-bottom:10px}
 .form-field:last-child{margin-bottom:0}
@@ -99,6 +100,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .advance-amt{font-size:13px;color:var(--sub)}
 .btn-generate{width:100%;padding:16px;background:var(--gold);color:#0D0B11;font-size:15px;font-weight:700;letter-spacing:1px;border:none;border-radius:10px;cursor:pointer;margin-top:16px}
 .btn-generate:active{opacity:.9}
+.btn-generate:disabled{opacity:.5;cursor:not-allowed}
 
 /* PREVIEW */
 .preview-toolbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;gap:10px;position:sticky;top:0;z-index:50}
@@ -144,77 +146,45 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
 
 /* SETTINGS */
 .settings-wrap{padding:16px}
-.api-key-note{font-size:10px;color:var(--sub);margin-top:5px;line-height:1.5}
+.field-note{font-size:10px;color:var(--sub);margin-top:5px;line-height:1.5}
+
+/* ── WEBSITE EDITOR ── */
+.web-file-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.file-chip{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--sub);cursor:pointer;transition:all .15s}
+.file-chip.active{background:var(--gold-lt);border-color:rgba(201,169,110,.4);color:var(--gold)}
+.file-chip:active{opacity:.8}
+.w-log-entry{padding:12px 14px;border-radius:8px;margin-bottom:8px;font-size:12px;line-height:1.6}
+.w-log-entry.info{background:var(--card2);color:var(--sub);border:1px solid var(--border)}
+.w-log-entry.success{background:rgba(126,200,139,.08);color:var(--green);border:1px solid rgba(126,200,139,.2)}
+.w-log-entry.error{background:rgba(192,57,43,.08);color:var(--red);border:1px solid rgba(192,57,43,.2)}
+.w-log-entry.working{background:rgba(201,169,110,.06);color:var(--gold);border:1px solid rgba(201,169,110,.15)}
+.w-examples{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.w-example{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--sub);cursor:pointer;transition:border-color .15s}
+.w-example:active{border-color:var(--gold);color:var(--gold)}
+.w-example strong{color:var(--text);display:block;margin-bottom:2px;font-size:11px;letter-spacing:.5px}
 
 /* ── AI CHAT ── */
-.ai-float-btn{
-  position:fixed;bottom:86px;right:16px;background:var(--gold);color:#0D0B11;
-  border:none;border-radius:50px;padding:11px 18px;font-size:12px;font-weight:700;
-  letter-spacing:1px;cursor:pointer;box-shadow:0 4px 20px rgba(201,169,110,.35);
-  z-index:90;display:none;align-items:center;gap:5px;transition:opacity .2s
-}
+.ai-float-btn{position:fixed;bottom:86px;right:16px;background:var(--gold);color:#0D0B11;border:none;border-radius:50px;padding:11px 18px;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;box-shadow:0 4px 20px rgba(201,169,110,.35);z-index:90;display:none;align-items:center;gap:5px;transition:opacity .2s}
 .ai-float-btn.visible{display:flex}
 .ai-float-btn:active{opacity:.85}
-
-.ai-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;
-  opacity:0;pointer-events:none;transition:opacity .25s
-}
+.ai-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;opacity:0;pointer-events:none;transition:opacity .25s}
 .ai-overlay.open{opacity:1;pointer-events:all}
-
-.ai-panel{
-  position:fixed;bottom:0;left:0;right:0;background:var(--card);
-  border-top:2px solid var(--gold);border-radius:20px 20px 0 0;
-  z-index:195;display:flex;flex-direction:column;
-  max-height:72vh;transform:translateY(110%);transition:transform .28s cubic-bezier(.4,0,.2,1)
-}
+.ai-panel{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--gold);border-radius:20px 20px 0 0;z-index:195;display:flex;flex-direction:column;max-height:72vh;transform:translateY(110%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
 .ai-panel.open{transform:translateY(0)}
-
-.ai-panel-hdr{
-  padding:14px 18px 10px;display:flex;justify-content:space-between;
-  align-items:center;border-bottom:1px solid var(--border);flex-shrink:0
-}
+.ai-panel-hdr{padding:14px 18px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0}
 .ai-panel-title{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gold)}
 .ai-panel-hint{font-size:10px;color:var(--sub);margin-top:1px}
 .ai-close-btn{background:none;border:none;color:var(--sub);font-size:22px;cursor:pointer;line-height:1;padding:0 2px}
-
-.ai-messages{
-  flex:1;overflow-y:auto;padding:14px 16px;
-  display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch
-}
-.ai-msg{
-  max-width:88%;padding:10px 14px;border-radius:14px;
-  font-size:13px;line-height:1.55;word-break:break-word
-}
-.ai-msg.user{
-  background:var(--gold-lt);color:var(--gold);
-  align-self:flex-end;border-radius:14px 14px 4px 14px
-}
-.ai-msg.ai{
-  background:var(--card2);color:var(--text);
-  align-self:flex-start;border-radius:14px 14px 14px 4px
-}
-.ai-msg.ai.done{color:#7EC88B}
-.ai-msg.loading{
-  background:var(--card2);color:var(--sub);
-  align-self:flex-start;border-radius:14px 14px 14px 4px
-}
-
-.ai-input-row{
-  display:flex;gap:8px;padding:10px 16px;
-  padding-bottom:calc(10px + env(safe-area-inset-bottom));
-  border-top:1px solid var(--border);flex-shrink:0
-}
-.ai-input{
-  flex:1;background:var(--input);border:1px solid var(--border);
-  border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;
-  outline:none;-webkit-appearance:none
-}
+.ai-messages{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.ai-msg{max-width:88%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.55;word-break:break-word}
+.ai-msg.user{background:var(--gold-lt);color:var(--gold);align-self:flex-end;border-radius:14px 14px 4px 14px}
+.ai-msg.ai{background:var(--card2);color:var(--text);align-self:flex-start;border-radius:14px 14px 14px 4px}
+.ai-msg.ai.done{color:var(--green)}
+.ai-msg.loading{background:var(--card2);color:var(--sub);align-self:flex-start;border-radius:14px 14px 14px 4px}
+.ai-input-row{display:flex;gap:8px;padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--border);flex-shrink:0}
+.ai-input{flex:1;background:var(--input);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;-webkit-appearance:none}
 .ai-input:focus{border-color:var(--gold)}
-.ai-send{
-  background:var(--gold);color:#0D0B11;border:none;border-radius:10px;
-  width:44px;font-size:20px;cursor:pointer;font-weight:700;flex-shrink:0
-}
+.ai-send{background:var(--gold);color:#0D0B11;border:none;border-radius:10px;width:44px;font-size:20px;cursor:pointer;font-weight:700;flex-shrink:0}
 .ai-send:active{opacity:.85}
 .ai-send:disabled{opacity:.4;cursor:not-allowed}
 
@@ -337,6 +307,52 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
   <div id="doc-preview-content"></div>
 </div>
 
+<!-- ══ WEBSITE EDITOR ══ -->
+<div id="screen-website" class="screen">
+  <div class="hdr">
+    <div class="hdr-inner">
+      <div><div class="brand">Website Editor</div><div class="hdr-sub">YKSPRODUCTIONS.COM</div></div>
+      <a href="https://yksproductions.com" target="_blank" style="font-size:10px;color:var(--gold);text-decoration:none;letter-spacing:1px">LIVE ↗</a>
+    </div>
+  </div>
+  <div class="form-wrap">
+
+    <!-- File picker -->
+    <div class="form-section">
+      <label class="form-label">Which page?</label>
+      <div class="web-file-chips" id="file-chips">
+        <button class="file-chip active" onclick="selectFile('index.html',this)">Main Site</button>
+        <button class="file-chip" onclick="selectFile('talents.html',this)">Talents</button>
+        <button class="file-chip" onclick="selectFile('talents/apply.html',this)">Apply Form</button>
+        <button class="file-chip" onclick="selectFile('contact-sheet.html',this)">Contact Sheet</button>
+        <button class="file-chip" onclick="selectFile('content-creator-bangalore.html',this)">Blr SEO</button>
+        <button class="file-chip" onclick="selectFile('content-creator-dubai.html',this)">Dubai SEO</button>
+        <button class="file-chip" onclick="selectFile('studio.html',this)">Studio</button>
+      </div>
+      <input class="form-input" id="w-custom-path" placeholder="Or type a file path… e.g. blog/my-post.html" oninput="onCustomPath(this.value)" style="margin-top:4px">
+      <div id="w-selected-file" style="font-size:10px;color:var(--gold);margin-top:6px;letter-spacing:1px">● index.html</div>
+    </div>
+
+    <!-- Instruction -->
+    <div class="form-section">
+      <label class="form-label">What do you want to change?</label>
+      <textarea class="form-input" id="w-instruction" rows="4" placeholder="Describe the change in plain English…" style="resize:none;line-height:1.6"></textarea>
+      <div class="w-examples">
+        <div class="w-example" onclick="fillExample(this)"><strong>TEXT</strong>Change my tagline to "Visual storytelling for brands that dare to be different"</div>
+        <div class="w-example" onclick="fillExample(this)"><strong>PHONE / CONTACT</strong>Update my India phone number to +91 98765 43210</div>
+        <div class="w-example" onclick="fillExample(this)"><strong>ABOUT / BIO</strong>Rewrite the About section to focus more on my Dubai work and brand films</div>
+        <div class="w-example" onclick="fillExample(this)"><strong>SERVICES / PRICING</strong>Add "Drone Videography" as a new service under the existing list</div>
+        <div class="w-example" onclick="fillExample(this)"><strong>SEO / META</strong>Update the page title and meta description to include "brand photographer Bangalore"</div>
+      </div>
+    </div>
+
+    <button id="w-apply-btn" class="btn-generate" onclick="applyWebsiteEdit()">Apply Change →</button>
+
+    <!-- Log -->
+    <div id="w-log" style="margin-top:16px"></div>
+  </div>
+</div>
+
 <!-- ══ SETTINGS ══ -->
 <div id="screen-settings" class="screen">
   <div class="hdr"><div class="hdr-inner"><div class="brand">Settings</div></div></div>
@@ -351,11 +367,11 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
       <div class="form-field"><label class="form-label">Instagram</label><input class="form-input" id="s-ig" type="text" placeholder="@yks_photoworks"></div>
     </div>
     <div class="form-section">
-      <label class="form-label">AI Assistant</label>
+      <label class="form-label">Website Editor</label>
       <div class="form-field">
-        <label class="form-label">Anthropic API Key</label>
-        <input class="form-input" id="s-apikey" type="password" placeholder="sk-ant-api03-...">
-        <p class="api-key-note">Stored only in your browser. Powers the ✦ Ask AI button on the New Document screen — type commands like "change photography to ₹18,000" or "remove the fuel item".</p>
+        <label class="form-label">GitHub Personal Access Token</label>
+        <input class="form-input" id="s-ghtoken" type="password" placeholder="ghp_...">
+        <p class="field-note">Create at github.com/settings/tokens → Fine-grained → select yks-productions-site repo → Contents: Read & Write. Stored only in your browser.</p>
       </div>
     </div>
     <div class="form-section">
@@ -387,7 +403,11 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
   </button>
   <button class="nav-btn" id="nav-new" onclick="showScreen('new')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-    New
+    Invoice
+  </button>
+  <button class="nav-btn" id="nav-website" onclick="showScreen('website')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    Website
   </button>
   <button class="nav-btn" id="nav-settings" onclick="showScreen('settings')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -395,7 +415,7 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
   </button>
 </nav>
 
-<!-- ══ AI CHAT ══ -->
+<!-- ══ AI CHAT (Invoice) ══ -->
 <button id="ai-float" class="ai-float-btn no-print" onclick="toggleAI()">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
   Ask AI
@@ -406,7 +426,7 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
 <div id="ai-panel" class="ai-panel no-print">
   <div class="ai-panel-hdr">
     <div>
-      <div class="ai-panel-title">✦ STUDIO AI</div>
+      <div class="ai-panel-title">✦ INVOICE AI</div>
       <div class="ai-panel-hint">Edits your document instantly</div>
     </div>
     <button class="ai-close-btn" onclick="closeAI()">×</button>
@@ -429,13 +449,10 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
 // ── PIN ────────────────────────────────────────────────────────────────────
 const DEFAULT_PIN='1234';
 let pinBuf='';
-
 function getPin(){ return localStorage.getItem('yks_pin')||DEFAULT_PIN; }
-
 function pinKey(k){
   if(pinBuf.length>=4) return;
-  pinBuf+=k;
-  updateDots();
+  pinBuf+=k; updateDots();
   if(pinBuf.length===4) setTimeout(checkPin,120);
 }
 function pinDel(){
@@ -444,9 +461,7 @@ function pinDel(){
   updateDots();
 }
 function updateDots(){
-  for(let i=0;i<4;i++){
-    document.getElementById('dot'+i).classList.toggle('filled',i<pinBuf.length);
-  }
+  for(let i=0;i<4;i++) document.getElementById('dot'+i).classList.toggle('filled',i<pinBuf.length);
 }
 function checkPin(){
   if(pinBuf===getPin()){
@@ -454,8 +469,7 @@ function checkPin(){
     sessionStorage.setItem('yks_unlocked','1');
   } else {
     document.getElementById('pin-error').textContent='Wrong PIN. Try again.';
-    pinBuf='';
-    updateDots();
+    pinBuf=''; updateDots();
   }
 }
 function lockApp(){
@@ -466,32 +480,29 @@ function lockApp(){
   closeAI();
 }
 
-// ── State ─────────────────────────────────────────────────────────────────
+// ── State ──────────────────────────────────────────────────────────────────
 let currentType='INVOICE';
+let selectedFilePath='index.html';
 
-// ── Settings ──────────────────────────────────────────────────────────────
+// ── Settings ───────────────────────────────────────────────────────────────
 const DEFAULTS={name:'Yedukrishna Suresh',company:'YKS Productions',
   phoneIn:'+91 XXXXX XXXXX',phoneAe:'+971 XX XXX XXXX',
   web:'yksproductions.com',ig:'@yks_photoworks'};
-
 function getSettings(){ return JSON.parse(localStorage.getItem('yks_settings')||'null')||DEFAULTS; }
-
 function loadSettingsForm(){
   const s=getSettings(); const c=getCounters();
   set('s-name',s.name); set('s-company',s.company);
   set('s-phone-in',s.phoneIn); set('s-phone-ae',s.phoneAe);
   set('s-web',s.web); set('s-ig',s.ig);
   set('s-inv-num',c.inv); set('s-quo-num',c.quo);
-  const k=localStorage.getItem('yks_apikey')||'';
-  if(k) document.getElementById('s-apikey').value=k;
+  if(localStorage.getItem('yks_ghtoken')) document.getElementById('s-ghtoken').value=localStorage.getItem('yks_ghtoken');
 }
 function saveSettings(){
   const np=v('s-pin'), np2=v('s-pin2');
   if(np){ if(np.length!==4||!/^\d+$/.test(np)){alert('PIN must be 4 digits');return;}
     if(np!==np2){alert('PINs do not match');return;}
     localStorage.setItem('yks_pin',np); }
-  const ak=v('s-apikey');
-  if(ak) localStorage.setItem('yks_apikey',ak);
+  const gh=v('s-ghtoken'); if(gh) localStorage.setItem('yks_ghtoken',gh);
   const s={name:v('s-name')||DEFAULTS.name,company:v('s-company')||DEFAULTS.company,
     phoneIn:v('s-phone-in')||DEFAULTS.phoneIn,phoneAe:v('s-phone-ae')||DEFAULTS.phoneAe,
     web:v('s-web')||DEFAULTS.web,ig:v('s-ig')||DEFAULTS.ig};
@@ -525,12 +536,7 @@ function showScreen(name){
   if(name==='history') renderHistory();
   if(name==='settings') loadSettingsForm();
   if(name!=='new') closeAI();
-  updateAIBtn(name);
-}
-
-function updateAIBtn(name){
-  const btn=document.getElementById('ai-float');
-  btn.classList.toggle('visible', name==='new');
+  document.getElementById('ai-float').classList.toggle('visible', name==='new');
 }
 
 // ── Type ───────────────────────────────────────────────────────────────────
@@ -543,7 +549,7 @@ function setType(t){
   document.getElementById('f-date2').value=d.toISOString().split('T')[0];
 }
 
-// ── Items ─────────────────────────────────────────────────────────────────
+// ── Items ──────────────────────────────────────────────────────────────────
 function addItem(desc='',rate=''){
   const id='i'+Date.now()+Math.floor(Math.random()*999);
   const div=document.createElement('div');
@@ -563,8 +569,6 @@ function getItems(){
     return{desc:ins[0].value.trim(),rate:parseFloat(ins[1].value)||0};
   }).filter(r=>r.desc||r.rate);
 }
-
-// ── Totals ─────────────────────────────────────────────────────────────────
 function calcTotals(){
   let sub=0;
   document.querySelectorAll('#items-container .item-row').forEach(row=>{
@@ -583,8 +587,7 @@ function generateDoc(){
   if(!items.length){alert('Please add at least one service');return;}
   const num=bumpCounter(currentType);
   const prefix=currentType==='INVOICE'?'INV':'QUO';
-  const fy='2526';
-  const docId=`${prefix}-${fy}-${String(num).padStart(3,'0')}`;
+  const docId=`${prefix}-2526-${String(num).padStart(3,'0')}`;
   const doc={id:docId,type:currentType,num,
     client:{name:v('f-client'),phone:v('f-phone'),event:v('f-event')},
     date:v('f-date'),date2:v('f-date2'),items,
@@ -614,7 +617,7 @@ function buildDocHTML(doc){
     'Cancellations within 48 hours of the event: advance is non-refundable.',
     'Edited photos & films delivered within 30 working days.'
   ];
-  const itemRows=doc.items.map((it,i)=>`<tr><td>${i+1}</td><td>${esc(it.desc)}</td><td style="text-align:right">${fmt(it.rate)}</td><td style="text-align:right">${fmt(it.rate)}</td></tr>`).join('');
+  const rows=doc.items.map((it,i)=>`<tr><td>${i+1}</td><td>${esc(it.desc)}</td><td style="text-align:right">${fmt(it.rate)}</td><td style="text-align:right">${fmt(it.rate)}</td></tr>`).join('');
   return`<div class="doc-preview">
     <div class="dp-header">
       <div class="dp-hdr-row">
@@ -644,7 +647,7 @@ function buildDocHTML(doc){
       <div class="dp-divider"></div>
       <table class="dp-table">
         <thead><tr><th style="width:28px">#</th><th>Description</th><th style="text-align:right;width:80px">Rate</th><th style="text-align:right;width:80px">Amount</th></tr></thead>
-        <tbody>${itemRows}</tbody>
+        <tbody>${rows}</tbody>
       </table>
       <div class="dp-totals">
         <div class="dp-total-row"><span class="dp-total-lbl">Subtotal</span><span class="dp-total-val">${fmt(sub)}</span></div>
@@ -662,7 +665,7 @@ function buildDocHTML(doc){
 function renderHistory(){
   const docs=getDocs(); const list=document.getElementById('history-list');
   if(!docs.length){
-    list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><p>No documents yet.<br>Tap <b>New</b> to create your first.</p></div>`;
+    list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><p>No documents yet.<br>Tap <b>Invoice</b> to create your first.</p></div>`;
     return;
   }
   const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
@@ -692,65 +695,26 @@ function goBack(){ showScreen('history'); }
 function v(id){ return(document.getElementById(id)||{}).value||''; }
 function set(id,val){ const el=document.getElementById(id); if(el) el.value=val; }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function b64decode(b64){ return decodeURIComponent(escape(atob(b64.replace(/\n/g,'')))); }
+function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
 
-// ── AI CHAT ────────────────────────────────────────────────────────────────
-const AI_TOOLS=[
-  {name:'add_item',description:'Add a line item/service to the document',
-    input_schema:{type:'object',properties:{
-      description:{type:'string',description:'Service name/description'},
-      rate:{type:'number',description:'Amount in INR'}
-    },required:['description','rate']}},
-  {name:'remove_item',description:'Remove a line item by 0-based index',
-    input_schema:{type:'object',properties:{
-      index:{type:'integer',description:'0-based index of the item to remove'}
-    },required:['index']}},
-  {name:'update_item',description:'Update description and/or rate of a line item by 0-based index',
-    input_schema:{type:'object',properties:{
-      index:{type:'integer'},
-      description:{type:'string'},
-      rate:{type:'number'}
-    },required:['index']}},
-  {name:'set_client',description:'Set client name, phone, and/or event details',
-    input_schema:{type:'object',properties:{
-      name:{type:'string'},phone:{type:'string'},event:{type:'string'}
-    }}},
-  {name:'set_advance',description:'Set the advance percentage (0-100)',
-    input_schema:{type:'object',properties:{
-      pct:{type:'number',description:'Advance percentage'}
-    },required:['pct']}},
-  {name:'set_notes',description:'Set or update the notes field',
-    input_schema:{type:'object',properties:{
-      text:{type:'string'}
-    },required:['text']}},
-  {name:'set_type',description:'Switch between INVOICE and QUOTATION',
-    input_schema:{type:'object',properties:{
-      type:{type:'string',enum:['INVOICE','QUOTATION']}
-    },required:['type']}},
-  {name:'clear_items',description:'Remove all line items',
-    input_schema:{type:'object',properties:{}}}
-];
+// ── AI WORKER ─────────────────────────────────────────────────────────────
+const AI_WORKER = 'https://yks-studio-ai.ysuresh634.workers.dev';
 
-let aiOpen=false;
-let aiHistory=[];
-
-function toggleAI(){
-  if(aiOpen) closeAI(); else openAI();
-}
+// ── INVOICE AI CHAT ────────────────────────────────────────────────────────
+let aiOpen=false, aiHistory=[];
+function toggleAI(){ aiOpen?closeAI():openAI(); }
 function openAI(){
   aiOpen=true;
   document.getElementById('ai-panel').classList.add('open');
   document.getElementById('ai-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('ai-input').focus(),300);
-  if(!localStorage.getItem('yks_apikey')){
-    appendAIMsg('ai','⚠️ No API key found. Go to Settings → AI Assistant and add your Anthropic API key (sk-ant-...) to get started.');
-  }
 }
 function closeAI(){
   aiOpen=false;
   document.getElementById('ai-panel').classList.remove('open');
   document.getElementById('ai-overlay').classList.remove('open');
 }
-
 function appendAIMsg(role,text,isDone){
   const box=document.getElementById('ai-messages');
   const el=document.createElement('div');
@@ -760,150 +724,158 @@ function appendAIMsg(role,text,isDone){
   box.scrollTop=box.scrollHeight;
   return el;
 }
-
 function getFormContext(){
   const rows=Array.from(document.querySelectorAll('#items-container .item-row'));
-  const items=rows.map((r,i)=>{
-    const ins=r.querySelectorAll('input');
-    return{index:i,description:ins[0].value.trim(),rate:parseFloat(ins[1].value)||0};
-  });
-  return{
-    document_type:currentType,
-    client_name:v('f-client'),client_phone:v('f-phone'),event:v('f-event'),
-    date:v('f-date'),date2:v('f-date2'),
-    items,
-    advance_pct:parseFloat(v('f-adv'))||50,
-    subtotal:items.reduce((a,i)=>a+i.rate,0),
-    notes:v('f-notes')
-  };
+  const items=rows.map((r,i)=>{const ins=r.querySelectorAll('input');return{index:i,description:ins[0].value.trim(),rate:parseFloat(ins[1].value)||0};});
+  return{document_type:currentType,client_name:v('f-client'),client_phone:v('f-phone'),event:v('f-event'),date:v('f-date'),date2:v('f-date2'),items,advance_pct:parseFloat(v('f-adv'))||50,subtotal:items.reduce((a,i)=>a+i.rate,0),notes:v('f-notes')};
 }
-
-function executeAITool(name,input){
+function execInvoiceTool(name,input){
   switch(name){
-    case 'add_item':
-      addItem(input.description,input.rate);
-      break;
-    case 'remove_item':{
-      const rows=document.querySelectorAll('#items-container .item-row');
-      if(rows[input.index]) removeItem(rows[input.index].id);
-      break;
-    }
-    case 'update_item':{
-      const rows=document.querySelectorAll('#items-container .item-row');
-      const row=rows[input.index];
-      if(row){
-        const ins=row.querySelectorAll('input');
-        if(input.description!==undefined) ins[0].value=input.description;
-        if(input.rate!==undefined) ins[1].value=input.rate;
-        calcTotals();
-      }
-      break;
-    }
-    case 'set_client':
-      if(input.name!==undefined) set('f-client',input.name);
-      if(input.phone!==undefined) set('f-phone',input.phone);
-      if(input.event!==undefined) set('f-event',input.event);
-      break;
-    case 'set_advance':
-      set('f-adv',input.pct);
-      calcTotals();
-      break;
-    case 'set_notes':
-      set('f-notes',input.text);
-      break;
-    case 'set_type':
-      setType(input.type);
-      break;
-    case 'clear_items':
-      document.getElementById('items-container').innerHTML='';
-      calcTotals();
-      break;
+    case 'add_item': addItem(input.description,input.rate); break;
+    case 'remove_item':{const rows=document.querySelectorAll('#items-container .item-row');if(rows[input.index])removeItem(rows[input.index].id);break;}
+    case 'update_item':{const rows=document.querySelectorAll('#items-container .item-row');const row=rows[input.index];if(row){const ins=row.querySelectorAll('input');if(input.description!==undefined)ins[0].value=input.description;if(input.rate!==undefined)ins[1].value=input.rate;calcTotals();}break;}
+    case 'set_client': if(input.name!==undefined)set('f-client',input.name);if(input.phone!==undefined)set('f-phone',input.phone);if(input.event!==undefined)set('f-event',input.event);break;
+    case 'set_advance': set('f-adv',input.pct);calcTotals();break;
+    case 'set_notes': set('f-notes',input.text);break;
+    case 'set_type': setType(input.type);break;
+    case 'clear_items': document.getElementById('items-container').innerHTML='';calcTotals();break;
   }
 }
-
 async function sendAI(){
-  const apiKey=localStorage.getItem('yks_apikey')||'';
   const inputEl=document.getElementById('ai-input');
   const sendBtn=document.getElementById('ai-send');
-  const msg=inputEl.value.trim();
-  if(!msg) return;
-
-  if(!apiKey){
-    appendAIMsg('ai','⚠️ Please add your Anthropic API key in Settings first.');
-    return;
-  }
-
-  inputEl.value='';
-  sendBtn.disabled=true;
+  const msg=inputEl.value.trim(); if(!msg)return;
+  inputEl.value=''; sendBtn.disabled=true;
   appendAIMsg('user',msg);
-  const loadingEl=appendAIMsg('loading','✦  thinking...');
+  const loadEl=appendAIMsg('loading','✦  thinking...');
+  try{
+    const res=await fetch(AI_WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'invoice_ai',context:getFormContext(),message:msg})});
+    const data=await res.json(); loadEl.remove(); sendBtn.disabled=false;
+    if(!res.ok){appendAIMsg('ai','Error: '+(data.error||'AI worker error. Is it deployed?'));return;}
+    const toolsUsed=[];
+    for(const tc of(data.tool_calls||[])){execInvoiceTool(tc.name,tc.input);toolsUsed.push(tc.name.replace(/_/g,' '));}
+    const reply=data.text||(toolsUsed.length?'Done — '+toolsUsed.join(', ')+' ✓':'Done ✓');
+    appendAIMsg('ai',reply,toolsUsed.length>0&&!data.text);
+  }catch(err){
+    loadEl.remove(); sendBtn.disabled=false;
+    appendAIMsg('ai','Connection error. Is the AI worker deployed?');
+  }
+}
 
-  const ctx=getFormContext();
-  const sys=`You are a smart assistant built into YKS Studio — a private invoice and quotation builder for Yedukrishna Suresh (YKS Productions), a professional cinematographer and photographer in Bangalore and Dubai.
+// ── WEBSITE EDITOR ────────────────────────────────────────────────────────
+const GH_OWNER='ysuresh634-creator';
+const GH_REPO='yks-productions-site';
+const GH_BRANCH='main';
 
-Current document:
-${JSON.stringify(ctx,null,2)}
+function selectFile(path, chipEl){
+  selectedFilePath=path;
+  document.querySelectorAll('.file-chip').forEach(c=>c.classList.remove('active'));
+  if(chipEl) chipEl.classList.add('active');
+  document.getElementById('w-selected-file').textContent='● '+path;
+  document.getElementById('w-custom-path').value='';
+}
+function onCustomPath(val){
+  if(!val.trim()) return;
+  selectedFilePath=val.trim();
+  document.querySelectorAll('.file-chip').forEach(c=>c.classList.remove('active'));
+  document.getElementById('w-selected-file').textContent='● '+selectedFilePath;
+}
+function fillExample(el){
+  document.getElementById('w-instruction').value=el.textContent.replace(/^[A-Z /]+\n/,'').trim();
+  document.getElementById('w-instruction').focus();
+}
 
-When the user asks to make a change, use the appropriate tool to edit the form directly. Be brief in text replies. All currency is INR (₹). Items use 0-based indexing.`;
+function wLog(msg, type='info'){
+  const log=document.getElementById('w-log');
+  const el=document.createElement('div');
+  el.className='w-log-entry '+type;
+  el.textContent=msg;
+  log.prepend(el);
+}
 
-  const msgs=[...aiHistory,{role:'user',content:msg}];
+async function fetchGHFile(path){
+  const token=localStorage.getItem('yks_ghtoken')||'';
+  const res=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}?ref=${GH_BRANCH}`,{
+    headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github.v3+json'}
+  });
+  if(!res.ok){const t=await res.text();throw new Error(`GitHub ${res.status}: ${t.slice(0,200)}`);}
+  const data=await res.json();
+  return{content:b64decode(data.content),sha:data.sha};
+}
+
+async function commitGHFile(path,content,sha,message){
+  const token=localStorage.getItem('yks_ghtoken')||'';
+  const res=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`,{
+    method:'PUT',
+    headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
+    body:JSON.stringify({message,content:b64encode(content),sha,branch:GH_BRANCH})
+  });
+  if(!res.ok){const t=await res.text();throw new Error(`GitHub commit ${res.status}: ${t.slice(0,200)}`);}
+  return res.json();
+}
+
+
+async function applyWebsiteEdit(){
+  const ghToken=localStorage.getItem('yks_ghtoken')||'';
+  const instruction=v('w-instruction').trim();
+
+  if(!ghToken){wLog('⚠️ GitHub token not set. Go to Settings → Website Editor.','error');return;}
+  if(!instruction){wLog('⚠️ Please describe what you want to change.','error');return;}
+
+  const btn=document.getElementById('w-apply-btn');
+  btn.disabled=true; btn.textContent='Fetching file…';
+  document.getElementById('w-log').innerHTML='';
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':apiKey,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({
-        model:'claude-haiku-4-5-20251001',
-        max_tokens:1024,
-        system:sys,
-        messages:msgs,
-        tools:AI_TOOLS
-      })
-    });
+    wLog(`Fetching ${selectedFilePath}…`,'working');
+    const{content,sha}=await fetchGHFile(selectedFilePath);
+    const kb=Math.round(content.length/1024);
+    wLog(`Loaded ${selectedFilePath} (${kb} KB). Asking AI to make changes…`,'working');
+    btn.textContent='AI editing…';
 
+    const res=await fetch(AI_WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'website_edit',file_path:selectedFilePath,instruction,file_content:content})});
     const data=await res.json();
-    loadingEl.remove();
-    sendBtn.disabled=false;
+    if(!res.ok)throw new Error(data.error||'AI worker error. Is it deployed?');
 
-    if(!res.ok){
-      appendAIMsg('ai','Error: '+(data.error?.message||'API error. Check your key in Settings.'));
-      return;
-    }
+    const edits=data.edits||[];
+    const commitMsg=data.commit_message||`Update ${selectedFilePath} via YKS Studio`;
+    let modified=content, applied=0, failed=0;
 
-    aiHistory.push({role:'user',content:msg});
-
-    let textOut='';
-    const toolsUsed=[];
-    for(const block of data.content){
-      if(block.type==='text') textOut+=block.text;
-      else if(block.type==='tool_use'){
-        executeAITool(block.name,block.input);
-        toolsUsed.push(block.name.replace(/_/g,' '));
+    for(const edit of edits){
+      if(modified.includes(edit.find)){
+        modified=modified.split(edit.find).join(edit.replace);
+        applied++;
+      } else {
+        wLog(`⚠️ Couldn't find: "${String(edit.find).substring(0,80)}…"`, 'error');
+        failed++;
       }
     }
 
-    const reply=textOut||(toolsUsed.length?'Done — '+toolsUsed.join(', ')+' ✓':'Done ✓');
-    appendAIMsg('ai',reply,toolsUsed.length>0&&!textOut);
-    aiHistory.push({role:'assistant',content:data.content});
-    if(aiHistory.length>12) aiHistory=aiHistory.slice(-12);
+    if(applied===0){
+      wLog('No edits applied. Try rephrasing with more specific text that appears in the file.','error');
+      btn.disabled=false; btn.textContent='Apply Change →'; return;
+    }
+
+    btn.textContent='Pushing to GitHub…';
+    wLog(`Applied ${applied} edit(s)${failed?`, ${failed} failed`:''}. Committing…`,'working');
+    await commitGHFile(selectedFilePath,modified,sha,commitMsg);
+
+    wLog(`✓ "${commitMsg}"`, 'success');
+    wLog(`✓ ${applied} change(s) live on yksproductions.com in ~60 seconds.`, 'success');
+    document.getElementById('w-instruction').value='';
 
   }catch(err){
-    loadingEl.remove();
-    sendBtn.disabled=false;
-    appendAIMsg('ai','Connection error. Check internet or your API key.');
+    wLog('Error: '+err.message,'error');
   }
+  btn.disabled=false; btn.textContent='Apply Change →';
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
 (function init(){
-  if(sessionStorage.getItem('yks_unlocked')==='1'){
+  if(sessionStorage.getItem('yks_unlocked')==='1')
     document.getElementById('lock-screen').classList.add('hidden');
-  }
   const today=new Date(); const due=new Date(); due.setDate(due.getDate()+14);
   document.getElementById('f-date').value=today.toISOString().split('T')[0];
   document.getElementById('f-date2').value=due.toISOString().split('T')[0];
