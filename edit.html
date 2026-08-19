@@ -393,7 +393,9 @@ const FRAME_JS=`
       //    on purpose and would otherwise pop open and cover the page.
       if(cs.position==='absolute'||cs.position==='fixed'||cs.position==='sticky') return;
       if(el.closest('nav,[role="menu"],[class*="dropdown"],[class*="submenu"],[class*="modal"],[class*="tooltip"],dialog')) return;
-      if(parseFloat(cs.opacity)<0.05 && (el.textContent||'').trim().length>0){
+      var carriesContent = (el.textContent||'').trim().length>0
+                        || el.tagName==='IMG' || el.querySelector('img,picture,video,svg');
+      if(parseFloat(cs.opacity)<0.05 && carriesContent){
         el.style.setProperty('opacity','1','important');
         el.style.setProperty('visibility','visible','important');
         if(/matrix|translate/.test(cs.transform||'')) el.style.setProperty('transform','none','important');
