@@ -62,25 +62,19 @@
     }
   `;
 
-  /* ── ACT I · HERO — volcanic nebula, scroll = camera push-in.
-        The nebula is dragged along a curved flow field and accumulated,
-        so the colour smears into liquid streaks instead of sitting still. ── */
-  const HERO_TAPS = MOBILE ? 4 : 7;   // smear samples — the whole cost of the effect
+  /* ── ACT I · HERO — volcanic nebula, scroll = camera push-in ── */
   const HERO_FRAG = NOISE_LIB + `
-    // cheap 3-octave fbm — the smear takes many samples, so each must be light
-    float fbm3(vec2 p){
-      float v=0.,a=.5;
-      mat2 r=mat2(.8,.6,-.6,.8);
-      for(int i=0;i<3;i++){v+=a*noise(p);p=r*p*2.04;a*=.52;}
-      return v;
-    }
+    void main(){
+      vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;
+      float s=u_scroll;
+      float zoom=1.+s*0.85;                      // gentle push-in — stays in rich detail, never blows out the centre
+      vec2 p=(uv+u_point*.05)/zoom;              // the nebula leans a few degrees toward the hand
+      float t=u_time*.05+s*2.2;
 
-    // one sample of the nebula, its domain squashed along the flow so
-    // features stretch into long streaks the way dragged paint does
-    vec3 nebulaAt(vec2 p,float t,float s,vec2 tang,vec2 nrm){
-      vec2 ps=tang*dot(p,tang)*.30+nrm*dot(p,nrm);
-      vec2 q=vec2(fbm3(ps*2.4+t), fbm3(ps*2.4+vec2(5.2,1.3)-t*.7));
-      float f=fbm3(ps*2.4+3.4*q+vec2(1.7,9.2));
+      // domain-warped nebula
+      vec2 q=vec2(fbm(p*2.4+t), fbm(p*2.4+vec2(5.2,1.3)-t*.7));
+      vec2 r2=vec2(fbm(p*2.4+3.5*q+vec2(1.7,9.2)), fbm(p*2.4+3.5*q+vec2(8.3,2.8)+t*.4));
+      float f=fbm(p*2.4+3.2*r2);
 
       // incredible colours: ember → magenta → violet → teal
       vec3 ember =vec3(1.00,.45,.16);
@@ -90,52 +84,12 @@
       vec3 teal  =vec3(.10,.83,.78);
       vec3 deep  =vec3(.030,.024,.055);
 
-      // thresholds sit high on purpose: the smear averages 7 samples, so a
-      // field that looks right un-smeared comes out washed once accumulated
       vec3 col=deep;
-      col=mix(col,viol, smoothstep(.40,.86,f)*.82);
-      col=mix(col,mag,  smoothstep(.52,.95,q.y)*.55);
-      col=mix(col,ember,smoothstep(.54,.97,q.x)*.95);
-      col=mix(col,peach,smoothstep(.72,1.05,f*q.x)*.75);
-      col=mix(col,teal, smoothstep(.62,.98,q.x*(1.-f))*.38*(1.-s*.5));
-      return col;
-    }
-
-    void main(){
-      vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;
-      float s=u_scroll;
-      float zoom=1.+s*0.85;                      // gentle push-in — stays in rich detail, never blows out the centre
-      vec2 p=(uv+u_point*.05)/zoom;              // the nebula leans a few degrees toward the hand
-      float t=u_time*.05+s*2.2;
-
-      // ── flow field: the direction the paint gets dragged, biased into a
-      //    slow horizontal whip so the streaks read as one motion ──
-      float fang=fbm(p*1.05+vec2(t*.22,-t*.15))*2.2*6.2831;
-      vec2 fdir=normalize(vec2(cos(fang)*.55+.92, sin(fang)*.95));
-      vec2 nrm=vec2(-fdir.y,fdir.x);
-
-      // flow lines curve rather than run straight — that's what melts it
-      float curl=(noise(p*1.7+vec2(t*.30,4.1))-.5)*2.;
-      float ca=cos(curl*.22), sa=sin(curl*.22);
-      mat2 rot=mat2(ca,-sa,sa,ca);
-
-      // ── advect + accumulate along the flow: the liquid smear ──
-      float reach=(.30+s*.10)/float(${HERO_TAPS} - 1);
-      vec2 sp=p; vec2 dir=fdir;
-      vec3 col=vec3(0.); float wsum=0.;
-      for(int i=0;i<${HERO_TAPS};i++){
-        float w=pow(1.-float(i)/float(${HERO_TAPS}),.6);   // front-weighted → streaks, not ghosting
-        col+=nebulaAt(sp,t,s,fdir,nrm)*w;
-        wsum+=w;
-        sp+=dir*reach; dir=rot*dir;
-      }
-      col/=wsum;
-
-      // averaging flattens the field and lifts the blacks — put the richness
-      // back, then crush the darks so the type keeps something to sit on
-      float lum0=dot(col,vec3(.299,.587,.114));
-      col=mix(vec3(lum0),col,1.20);
-      col=col*(.40+.60*col);
+      col=mix(col,viol, smoothstep(.18,.78,f)*.85);
+      col=mix(col,mag,  smoothstep(.34,.9,q.y)*.6);
+      col=mix(col,ember,smoothstep(.42,.95,r2.x)*.95);
+      col=mix(col,peach,smoothstep(.62,1.,f*r2.x)*.8);
+      col=mix(col,teal, smoothstep(.55,.95,q.x*(1.-f))*.4*(1.-s*.5));
 
       // grade shifts cooler/violet as we push deeper
       col=mix(col,col.bgr*vec3(.9,.7,1.25),s*.20);
@@ -145,20 +99,16 @@
       vec2 d=uv-lp;
       float ang=atan(d.y,d.x);
       float ray=pow(max(0.,sin(ang*7.+t*2.)*.5+.5),3.)*exp(-length(d)*2.2);
-      col+=vec3(1.,.62,.3)*ray*.30*(1.-s*.4);
-      col+=vec3(1.,.7,.45)*exp(-length(d)*3.4)*.24;
+      col+=vec3(1.,.62,.3)*ray*.34*(1.-s*.4);
+      col+=vec3(1.,.7,.45)*exp(-length(d)*3.4)*.38;
 
-      // dust particles, 3 parallax layers — stretched along the flow and
-      // dimmed, so they read as motes caught in the drift, not crisp stars
+      // dust particles, 3 parallax layers
       for(int i=1;i<=3;i++){
         float fi=float(i);
         vec2 gp=uv*(5.+fi*4.)+vec2(t*(.4+fi*.22),fi*7.3+t*.1);
         vec2 cell=fract(gp)-.5; float id=hash(floor(gp));
-        vec2 off=cell+(vec2(id,fract(id*7.))-.5)*.6;
-        // squash across the flow direction → the mote becomes a short streak
-        vec2 el=fdir*dot(off,fdir)*.34+nrm*dot(off,nrm);
-        float star=smoothstep(.05+.04*fi,.0,length(el));
-        col+=star*step(.80,id)*vec3(1.,.8,.6)*.30/fi;
+        float star=smoothstep(.05+.04*fi,.0,length(cell+(vec2(id,fract(id*7.))-.5)*.6));
+        col+=star*step(.75,id)*vec3(1.,.8,.6)*.5/fi;
       }
 
       // anamorphic flare on key light
