@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>YKS Studio</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{
+  --bg:#0D0B11;--card:#181521;--card2:#1C1929;--gold:#C9A96E;--gold-lt:#3A3020;
+  --text:#F8F4EF;--sub:#A89F98;--border:#2A2535;--peach:#E8B89A;--red:#C0392B;
+  --input:#13111A;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;font-size:15px}
+
+/* ── PIN LOCK ── */
+#lock-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:40px 30px}
+#lock-screen.hidden{display:none}
+.lock-brand{font-size:20px;font-weight:700;letter-spacing:3px;color:var(--gold);margin-bottom:6px}
+.lock-sub{font-size:10px;color:var(--sub);letter-spacing:2px;margin-bottom:48px}
+.pin-dots{display:flex;gap:16px;margin-bottom:32px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:background .15s}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold)}
+.pin-error{font-size:12px;color:var(--red);height:18px;text-align:center;margin-bottom:12px}
+.pin-pad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}
+.pin-key{width:72px;height:72px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:22px;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none;transition:background .1s}
+.pin-key:active{background:var(--gold-lt);color:var(--gold)}
+.pin-key.del{font-size:16px;color:var(--sub)}
+
+/* ── APP ── */
+.screen{display:none;min-height:100vh;padding-bottom:80px}
+.screen.active{display:block}
+
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--sub);cursor:pointer;font-size:10px;letter-spacing:.5px;text-transform:uppercase}
+.nav-btn.active{color:var(--gold)}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+.hdr{background:var(--card);border-bottom:1px solid var(--border);padding:16px 20px 14px;position:sticky;top:0;z-index:50}
+.hdr-inner{display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:15px;font-weight:700;letter-spacing:2px;color:var(--gold)}
+.hdr-sub{font-size:9px;color:var(--sub);letter-spacing:1px;margin-top:2px}
+
+/* HISTORY */
+.history-header{padding:20px 20px 10px;display:flex;justify-content:space-between;align-items:center}
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--sub);text-transform:uppercase}
+.empty-state{text-align:center;padding:60px 30px;color:var(--sub)}
+.empty-state svg{width:48px;height:48px;stroke:var(--border);fill:none;stroke-width:1.5;margin-bottom:16px}
+.empty-state p{font-size:13px}
+.doc-card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin:0 16px 10px;padding:14px 16px;cursor:pointer;transition:border-color .2s}
+.doc-card:active{border-color:var(--gold)}
+.doc-card-top{display:flex;justify-content:space-between;align-items:flex-start}
+.doc-num{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:1px}
+.doc-badge{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:20px}
+.badge-inv{background:rgba(201,169,110,.15);color:var(--gold)}
+.badge-quo{background:rgba(232,184,154,.15);color:var(--peach)}
+.doc-client{font-size:14px;font-weight:600;margin-top:4px}
+.doc-meta{font-size:11px;color:var(--sub);margin-top:3px}
+.doc-total{font-size:16px;font-weight:700;color:var(--text);margin-top:8px}
+.doc-actions{display:flex;gap:8px;margin-top:10px}
+.btn-sm{padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer}
+.btn-view{background:var(--gold-lt);color:var(--gold)}
+.btn-del{background:rgba(192,57,43,.1);color:var(--red)}
+
+/* FORM */
+.form-wrap{padding:16px}
+.type-toggle{display:flex;background:var(--card2);border-radius:10px;padding:4px;margin-bottom:20px}
+.type-btn{flex:1;padding:10px;border:none;border-radius:7px;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;background:none;color:var(--sub);transition:all .2s}
+.type-btn.active-inv{background:var(--gold);color:#0D0B11}
+.type-btn.active-quo{background:var(--peach);color:#0D0B11}
+.form-section{background:var(--card);border-radius:10px;padding:16px;margin-bottom:12px;border:1px solid var(--border)}
+.form-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--sub);text-transform:uppercase;margin-bottom:6px;display:block}
+.form-input{width:100%;background:var(--input);border:1px solid var(--border);border-radius:8px;padding:11px 12px;color:var(--text);font-size:14px;outline:none;-webkit-appearance:none}
+.form-input:focus{border-color:var(--gold)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-field{margin-bottom:10px}
+.form-field:last-child{margin-bottom:0}
+.items-header{display:grid;grid-template-columns:1fr 72px 36px;gap:6px;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--sub);text-transform:uppercase;margin-bottom:8px;padding:0 2px}
+.item-row{display:grid;grid-template-columns:1fr 72px 36px;gap:6px;margin-bottom:8px;align-items:center}
+.item-row .form-input{padding:9px 10px;font-size:13px}
+.item-remove{background:rgba(192,57,43,.12);border:none;color:var(--red);border-radius:6px;width:32px;height:38px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.quick-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.quick-btn{background:var(--gold-lt);color:var(--gold);border:1px solid rgba(201,169,110,.2);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer}
+.quick-btn:active{background:rgba(201,169,110,.3)}
+.btn-add-item{width:100%;padding:11px;background:none;border:1px dashed var(--border);border-radius:8px;color:var(--sub);font-size:13px;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-add-item:active{border-color:var(--gold);color:var(--gold)}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.total-row:last-child{border-bottom:none}
+.total-lbl{font-size:12px;color:var(--sub)}
+.total-val{font-size:13px;font-weight:600}
+.total-grand{padding:14px 0 0;display:flex;justify-content:space-between;align-items:center}
+.total-grand .total-lbl{font-size:14px;font-weight:700;color:var(--gold)}
+.total-grand .total-val{font-size:22px;font-weight:700;color:var(--gold)}
+.advance-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border);margin-top:4px}
+.advance-lbl{font-size:12px;color:var(--sub)}
+.advance-input-wrap{display:flex;align-items:center;gap:6px}
+.advance-pct-input{width:56px;background:var(--input);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;text-align:center;outline:none}
+.advance-amt{font-size:13px;color:var(--sub)}
+.btn-generate{width:100%;padding:16px;background:var(--gold);color:#0D0B11;font-size:15px;font-weight:700;letter-spacing:1px;border:none;border-radius:10px;cursor:pointer;margin-top:16px}
+.btn-generate:active{opacity:.9}
+
+/* PREVIEW */
+.preview-toolbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;gap:10px;position:sticky;top:0;z-index:50}
+.btn-back{background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer}
+.btn-print{background:var(--gold);color:#0D0B11;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;flex:1}
+
+/* DOCUMENT */
+.doc-preview{background:#fff;margin:16px;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.dp-header{background:#0D0B11;padding:22px 24px 18px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dp-brand{font-size:22px;font-weight:700;letter-spacing:2px;color:#C9A96E}
+.dp-tagline{font-size:8px;color:#8C8480;letter-spacing:2px;margin-top:3px;text-transform:uppercase}
+.dp-hdr-row{display:flex;justify-content:space-between;align-items:flex-start}
+.dp-badge{font-size:18px;font-weight:700;color:#E8B89A;letter-spacing:2px}
+.dp-badge.inv{color:#C9A96E}
+.dp-contact{font-size:8px;color:#8C8480;margin-top:10px;letter-spacing:.5px}
+.dp-gold-line{height:3px;background:#C9A96E}
+.dp-body{padding:18px 24px;background:#fff}
+.dp-meta{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.dp-meta-lbl{font-size:8px;font-weight:700;letter-spacing:1.5px;color:#8C8480;text-transform:uppercase;margin-bottom:3px}
+.dp-meta-val{font-size:13px;font-weight:700;color:#1A1720}
+.dp-meta-val.red{color:#C0392B}
+.dp-meta-val.gold{color:#C9A96E}
+.dp-client-name{font-size:16px;font-weight:700;color:#1A1720;margin-bottom:2px}
+.dp-client-sub{font-size:11px;color:#8C8480}
+.dp-divider{height:1px;background:#E8DDD0;margin:14px 0}
+table.dp-table{width:100%;border-collapse:collapse;font-size:12px}
+table.dp-table th{background:#181521;color:#C9A96E;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 10px;text-align:left;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+table.dp-table th:last-child,table.dp-table td:last-child{text-align:right}
+table.dp-table td{padding:9px 10px;color:#1A1720;border-bottom:1px solid #F0EAE0}
+table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dp-totals{margin-top:12px;border-top:2px solid #C9A96E;padding-top:10px}
+.dp-total-row{display:flex;justify-content:flex-end;gap:16px;padding:4px 0;font-size:12px}
+.dp-total-lbl{color:#8C8480;width:120px;text-align:right}
+.dp-total-val{color:#1A1720;font-weight:600;width:80px;text-align:right}
+.dp-grand{background:#0D0B11;margin:10px -24px -18px;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dp-grand-lbl{font-size:11px;font-weight:700;letter-spacing:1px;color:#C9A96E}
+.dp-grand-val{font-size:20px;font-weight:700;color:#C9A96E}
+.dp-footer{background:#0D0B11;padding:6px 24px 14px;font-size:8px;color:#8C8480;font-style:italic;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dp-terms{background:#0D0B11;padding:12px 24px 18px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dp-terms-title{font-size:8px;font-weight:700;letter-spacing:1.5px;color:#C9A96E;margin-bottom:8px;text-transform:uppercase}
+.dp-term{font-size:9px;color:#8C8480;margin-bottom:4px;padding-left:10px;position:relative}
+.dp-term::before{content:'·';position:absolute;left:0;color:#C9A96E}
+
+/* SETTINGS */
+.settings-wrap{padding:16px}
+
+@media print{
+  #lock-screen,.nav,.preview-toolbar,.no-print{display:none!important}
+  .screen{padding:0;display:none}
+  #screen-preview{display:block!important}
+  .doc-preview{margin:0;border-radius:0;box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ PIN LOCK ══ -->
+<div id="lock-screen">
+  <div class="lock-brand">YKS STUDIO</div>
+  <div class="lock-sub">PRIVATE · INTERNAL TOOL</div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="dot0"></div>
+    <div class="pin-dot" id="dot1"></div>
+    <div class="pin-dot" id="dot2"></div>
+    <div class="pin-dot" id="dot3"></div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-pad">
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <button class="pin-key" style="visibility:hidden"></button>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinDel()">⌫</button>
+  </div>
+</div>
+
+<!-- ══ HISTORY ══ -->
+<div id="screen-history" class="screen active">
+  <div class="hdr">
+    <div class="hdr-inner">
+      <div><div class="brand">YKS STUDIO</div><div class="hdr-sub">INVOICE & QUOTE BUILDER</div></div>
+      <button onclick="lockApp()" style="background:none;border:none;color:var(--sub);font-size:11px;cursor:pointer;letter-spacing:1px">LOCK</button>
+    </div>
+  </div>
+  <div class="history-header"><span class="section-title">Your Documents</span></div>
+  <div id="history-list"></div>
+</div>
+
+<!-- ══ NEW DOC ══ -->
+<div id="screen-new" class="screen">
+  <div class="hdr"><div class="hdr-inner"><div class="brand">New Document</div></div></div>
+  <div class="form-wrap">
+    <div class="type-toggle">
+      <button class="type-btn active-inv" id="type-invoice" onclick="setType('INVOICE')">INVOICE</button>
+      <button class="type-btn" id="type-quote" onclick="setType('QUOTATION')">QUOTATION</button>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Client Details</label>
+      <div class="form-field"><input class="form-input" id="f-client" placeholder="Client name" type="text" autocomplete="off"></div>
+      <div class="form-field"><input class="form-input" id="f-phone" placeholder="Phone number" type="tel"></div>
+      <div class="form-field"><input class="form-input" id="f-event" placeholder="Event / Project" type="text"></div>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Dates</label>
+      <div class="form-row">
+        <div><label class="form-label">Date</label><input class="form-input" id="f-date" type="date"></div>
+        <div><label class="form-label" id="date2-lbl">Due Date</label><input class="form-input" id="f-date2" type="date"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Services</label>
+      <div class="items-header"><span>Description</span><span style="text-align:right">Rate (₹)</span><span></span></div>
+      <div id="items-container"></div>
+      <button class="btn-add-item" onclick="addItem()">
+        <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add line item
+      </button>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="quickAdd('Photography')">📷 Photography</button>
+        <button class="quick-btn" onclick="quickAdd('Videography')">🎥 Videography</button>
+        <button class="quick-btn" onclick="quickAdd('Event Film with Reel')">🎬 Event Film</button>
+        <button class="quick-btn" onclick="quickAdd('50 Photos — Edited & Delivered')">🖼 50 Edited Photos</button>
+        <button class="quick-btn" onclick="quickAdd('Fuel & Travel Expenses')">⛽ Fuel</button>
+        <button class="quick-btn" onclick="quickAdd('Equipment Rental')">🔦 Equipment</button>
+        <button class="quick-btn" onclick="quickAdd('Reel / Short Film')">📱 Reel</button>
+        <button class="quick-btn" onclick="quickAdd('Studio Rental')">🏠 Studio</button>
+      </div>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Summary</label>
+      <div class="total-row"><span class="total-lbl">Subtotal</span><span class="total-val" id="t-sub">₹0</span></div>
+      <div class="advance-row">
+        <span class="advance-lbl">Advance %</span>
+        <div class="advance-input-wrap">
+          <input class="advance-pct-input" id="f-adv" type="number" value="50" min="0" max="100" oninput="calcTotals()">
+          <span style="font-size:12px;color:var(--sub)">%</span>
+          <span class="advance-amt" id="t-adv">= ₹0</span>
+        </div>
+      </div>
+      <div class="total-grand"><span class="total-lbl">TOTAL</span><span class="total-val" id="t-total">₹0</span></div>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Notes (optional)</label>
+      <textarea class="form-input" id="f-notes" rows="2" placeholder="Thank you for your business!" style="resize:none;line-height:1.5"></textarea>
+    </div>
+    <button class="btn-generate" onclick="generateDoc()">Generate →</button>
+  </div>
+</div>
+
+<!-- ══ PREVIEW ══ -->
+<div id="screen-preview" class="screen">
+  <div class="preview-toolbar no-print">
+    <button class="btn-back" onclick="goBack()">← Back</button>
+    <button class="btn-print" onclick="window.print()">Export PDF</button>
+  </div>
+  <div id="doc-preview-content"></div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div id="screen-settings" class="screen">
+  <div class="hdr"><div class="hdr-inner"><div class="brand">Settings</div></div></div>
+  <div class="settings-wrap">
+    <div class="form-section">
+      <label class="form-label">Your Details</label>
+      <div class="form-field"><label class="form-label">Your Name</label><input class="form-input" id="s-name" type="text" placeholder="Yedukrishna Suresh"></div>
+      <div class="form-field"><label class="form-label">Company</label><input class="form-input" id="s-company" type="text" placeholder="YKS Productions"></div>
+      <div class="form-field"><label class="form-label">India Phone</label><input class="form-input" id="s-phone-in" type="tel" placeholder="+91 XXXXX XXXXX"></div>
+      <div class="form-field"><label class="form-label">UAE Phone</label><input class="form-input" id="s-phone-ae" type="tel" placeholder="+971 XX XXX XXXX"></div>
+      <div class="form-field"><label class="form-label">Website</label><input class="form-input" id="s-web" type="text" placeholder="yksproductions.com"></div>
+      <div class="form-field"><label class="form-label">Instagram</label><input class="form-input" id="s-ig" type="text" placeholder="@yks_photoworks"></div>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Change PIN</label>
+      <div class="form-row">
+        <div><label class="form-label">New PIN (4 digits)</label><input class="form-input" id="s-pin" type="password" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+        <div><label class="form-label">Confirm PIN</label><input class="form-input" id="s-pin2" type="password" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Document Counters</label>
+      <div class="form-row">
+        <div><label class="form-label">Next Invoice #</label><input class="form-input" id="s-inv-num" type="number" min="1"></div>
+        <div><label class="form-label">Next Quote #</label><input class="form-input" id="s-quo-num" type="number" min="1"></div>
+      </div>
+    </div>
+    <button class="btn-generate" onclick="saveSettings()">Save Settings</button>
+    <div style="margin-top:12px">
+      <button onclick="clearAll()" style="width:100%;padding:14px;background:none;border:1px solid var(--red);color:var(--red);border-radius:10px;font-size:14px;cursor:pointer">Delete All Documents</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav class="nav no-print">
+  <button class="nav-btn active" id="nav-history" onclick="showScreen('history')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="13" y2="13"/></svg>
+    History
+  </button>
+  <button class="nav-btn" id="nav-new" onclick="showScreen('new')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    New
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="showScreen('settings')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<script>
+// ── PIN ────────────────────────────────────────────────────────────────────
+const DEFAULT_PIN='1234'; // change in Settings after first login
+let pinBuf='';
+
+function getPin(){ return localStorage.getItem('yks_pin')||DEFAULT_PIN; }
+
+function pinKey(k){
+  if(pinBuf.length>=4) return;
+  pinBuf+=k;
+  updateDots();
+  if(pinBuf.length===4) setTimeout(checkPin,120);
+}
+function pinDel(){
+  pinBuf=pinBuf.slice(0,-1);
+  document.getElementById('pin-error').textContent='';
+  updateDots();
+}
+function updateDots(){
+  for(let i=0;i<4;i++){
+    document.getElementById('dot'+i).classList.toggle('filled',i<pinBuf.length);
+  }
+}
+function checkPin(){
+  if(pinBuf===getPin()){
+    document.getElementById('lock-screen').classList.add('hidden');
+    sessionStorage.setItem('yks_unlocked','1');
+  } else {
+    document.getElementById('pin-error').textContent='Wrong PIN. Try again.';
+    pinBuf='';
+    updateDots();
+  }
+}
+function lockApp(){
+  sessionStorage.removeItem('yks_unlocked');
+  pinBuf=''; updateDots();
+  document.getElementById('pin-error').textContent='';
+  document.getElementById('lock-screen').classList.remove('hidden');
+}
+
+// ── State ─────────────────────────────────────────────────────────────────
+let currentType='INVOICE';
+
+// ── Settings ──────────────────────────────────────────────────────────────
+const DEFAULTS={name:'Yedukrishna Suresh',company:'YKS Productions',
+  phoneIn:'+91 XXXXX XXXXX',phoneAe:'+971 XX XXX XXXX',
+  web:'yksproductions.com',ig:'@yks_photoworks'};
+
+function getSettings(){ return JSON.parse(localStorage.getItem('yks_settings')||'null')||DEFAULTS; }
+
+function loadSettingsForm(){
+  const s=getSettings(); const c=getCounters();
+  set('s-name',s.name); set('s-company',s.company);
+  set('s-phone-in',s.phoneIn); set('s-phone-ae',s.phoneAe);
+  set('s-web',s.web); set('s-ig',s.ig);
+  set('s-inv-num',c.inv); set('s-quo-num',c.quo);
+}
+function saveSettings(){
+  const np=v('s-pin'), np2=v('s-pin2');
+  if(np){ if(np.length!==4||!/^\d+$/.test(np)){alert('PIN must be 4 digits');return;}
+    if(np!==np2){alert('PINs do not match');return;}
+    localStorage.setItem('yks_pin',np); }
+  const s={name:v('s-name')||DEFAULTS.name,company:v('s-company')||DEFAULTS.company,
+    phoneIn:v('s-phone-in')||DEFAULTS.phoneIn,phoneAe:v('s-phone-ae')||DEFAULTS.phoneAe,
+    web:v('s-web')||DEFAULTS.web,ig:v('s-ig')||DEFAULTS.ig};
+  localStorage.setItem('yks_settings',JSON.stringify(s));
+  const c=getCounters();
+  c.inv=parseInt(v('s-inv-num'))||c.inv;
+  c.quo=parseInt(v('s-quo-num'))||c.quo;
+  localStorage.setItem('yks_ctrs',JSON.stringify(c));
+  alert('Saved!');
+}
+
+// ── Counters ───────────────────────────────────────────────────────────────
+function getCounters(){ return JSON.parse(localStorage.getItem('yks_ctrs')||'{"inv":1,"quo":1}'); }
+function bumpCounter(type){
+  const c=getCounters(); const k=type==='INVOICE'?'inv':'quo';
+  const n=c[k]; c[k]=n+1; localStorage.setItem('yks_ctrs',JSON.stringify(c)); return n;
+}
+
+// ── Docs ───────────────────────────────────────────────────────────────────
+function getDocs(){ return JSON.parse(localStorage.getItem('yks_docs')||'[]'); }
+function saveDoc(doc){ const docs=getDocs(); docs.unshift(doc); localStorage.setItem('yks_docs',JSON.stringify(docs)); }
+function deleteDoc(id){ localStorage.setItem('yks_docs',JSON.stringify(getDocs().filter(d=>d.id!==id))); renderHistory(); }
+
+// ── Nav ────────────────────────────────────────────────────────────────────
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  const nb=document.getElementById('nav-'+name);
+  if(nb) nb.classList.add('active');
+  if(name==='history') renderHistory();
+  if(name==='settings') loadSettingsForm();
+}
+
+// ── Type ───────────────────────────────────────────────────────────────────
+function setType(t){
+  currentType=t;
+  document.getElementById('type-invoice').className='type-btn'+(t==='INVOICE'?' active-inv':'');
+  document.getElementById('type-quote').className='type-btn'+(t==='QUOTATION'?' active-quo':'');
+  document.getElementById('date2-lbl').textContent=t==='INVOICE'?'Due Date':'Valid Until';
+  const d=new Date(); d.setDate(d.getDate()+(t==='INVOICE'?14:30));
+  document.getElementById('f-date2').value=d.toISOString().split('T')[0];
+}
+
+// ── Items ─────────────────────────────────────────────────────────────────
+function addItem(desc='',rate=''){
+  const id='i'+Date.now()+Math.floor(Math.random()*999);
+  const div=document.createElement('div');
+  div.className='item-row'; div.id=id;
+  div.innerHTML=`
+    <input class="form-input" placeholder="Service description" value="${esc(desc)}" oninput="calcTotals()">
+    <input class="form-input" placeholder="0" type="number" value="${rate||''}" min="0" style="text-align:right" oninput="calcTotals()">
+    <button class="item-remove" onclick="removeItem('${id}')">×</button>`;
+  document.getElementById('items-container').appendChild(div);
+  calcTotals();
+}
+function quickAdd(desc){ addItem(desc,''); const rows=document.querySelectorAll('#items-container .item-row'); const last=rows[rows.length-1]; if(last) last.querySelectorAll('input')[1].focus(); }
+function removeItem(id){ const el=document.getElementById(id); if(el){el.remove();calcTotals();} }
+function getItems(){
+  return Array.from(document.querySelectorAll('#items-container .item-row')).map(row=>{
+    const ins=row.querySelectorAll('input');
+    return{desc:ins[0].value.trim(),rate:parseFloat(ins[1].value)||0};
+  }).filter(r=>r.desc||r.rate);
+}
+
+// ── Totals ─────────────────────────────────────────────────────────────────
+function calcTotals(){
+  let sub=0;
+  document.querySelectorAll('#items-container .item-row').forEach(row=>{
+    const ins=row.querySelectorAll('input'); sub+=parseFloat(ins[1].value)||0;
+  });
+  const adv=parseFloat(document.getElementById('f-adv').value)||0;
+  document.getElementById('t-sub').textContent='₹'+sub.toLocaleString('en-IN');
+  document.getElementById('t-adv').textContent='= ₹'+Math.round(sub*adv/100).toLocaleString('en-IN');
+  document.getElementById('t-total').textContent='₹'+sub.toLocaleString('en-IN');
+}
+
+// ── Generate ───────────────────────────────────────────────────────────────
+function generateDoc(){
+  const items=getItems();
+  if(!v('f-client').trim()){alert('Please enter client name');return;}
+  if(!items.length){alert('Please add at least one service');return;}
+  const num=bumpCounter(currentType);
+  const prefix=currentType==='INVOICE'?'INV':'QUO';
+  const fy='2526';
+  const docId=`${prefix}-${fy}-${String(num).padStart(3,'0')}`;
+  const doc={id:docId,type:currentType,num,
+    client:{name:v('f-client'),phone:v('f-phone'),event:v('f-event')},
+    date:v('f-date'),date2:v('f-date2'),items,
+    notes:v('f-notes'),advPct:parseFloat(v('f-adv'))||50,createdAt:Date.now()};
+  saveDoc(doc); previewDoc(doc);
+}
+
+// ── Preview ────────────────────────────────────────────────────────────────
+function previewDoc(doc){
+  document.getElementById('doc-preview-content').innerHTML=buildDocHTML(doc);
+  showScreen('preview');
+}
+function buildDocHTML(doc){
+  const s=getSettings();
+  const sub=doc.items.reduce((a,i)=>a+i.rate,0);
+  const adv=Math.round(sub*(doc.advPct/100));
+  const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
+  const fmtD=d=>{if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});};
+  const isInv=doc.type==='INVOICE';
+  const terms=isInv?[
+    'Payment is due on or before the date mentioned above.',
+    'Images remain property of YKS Productions until full payment is received.',
+    'Cancellations within 48 hours of shoot: full fee applies.'
+  ]:[
+    'This quotation is valid for 30 days from the date of issue.',
+    '50% advance required to confirm the booking. Balance due on event day.',
+    'Cancellations within 48 hours of the event: advance is non-refundable.',
+    'Edited photos & films delivered within 30 working days.'
+  ];
+  const itemRows=doc.items.map((it,i)=>`<tr><td>${i+1}</td><td>${esc(it.desc)}</td><td style="text-align:right">${fmt(it.rate)}</td><td style="text-align:right">${fmt(it.rate)}</td></tr>`).join('');
+  return`<div class="doc-preview">
+    <div class="dp-header">
+      <div class="dp-hdr-row">
+        <div><div class="dp-brand">${esc(s.company)}</div><div class="dp-tagline">Cinematography · Film Stills · Brand Films</div></div>
+        <div class="dp-badge ${isInv?'inv':''}">${doc.type}</div>
+      </div>
+      <div class="dp-contact">${esc(s.web)} · ${esc(s.ig)} · ${esc(s.phoneIn)}</div>
+    </div>
+    <div class="dp-gold-line"></div>
+    <div class="dp-body">
+      <div class="dp-meta">
+        <div>
+          <div class="dp-meta-lbl">Bill To</div>
+          <div class="dp-client-name">${esc(doc.client.name)}</div>
+          ${doc.client.phone?`<div class="dp-client-sub">Ph: ${esc(doc.client.phone)}</div>`:''}
+          ${doc.client.event?`<div class="dp-client-sub">${esc(doc.client.event)}</div>`:''}
+        </div>
+        <div style="text-align:right">
+          <div class="dp-meta-lbl">${isInv?'Invoice':'Quote'} No.</div>
+          <div class="dp-meta-val gold">${doc.id}</div><br>
+          <div class="dp-meta-lbl">Date</div>
+          <div class="dp-meta-val">${fmtD(doc.date)}</div><br>
+          <div class="dp-meta-lbl">${isInv?'Due Date':'Valid Until'}</div>
+          <div class="dp-meta-val red">${fmtD(doc.date2)}</div>
+        </div>
+      </div>
+      <div class="dp-divider"></div>
+      <table class="dp-table">
+        <thead><tr><th style="width:28px">#</th><th>Description</th><th style="text-align:right;width:80px">Rate</th><th style="text-align:right;width:80px">Amount</th></tr></thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+      <div class="dp-totals">
+        <div class="dp-total-row"><span class="dp-total-lbl">Subtotal</span><span class="dp-total-val">${fmt(sub)}</span></div>
+        ${doc.advPct?`<div class="dp-total-row"><span class="dp-total-lbl">Advance (${doc.advPct}%)</span><span class="dp-total-val">${fmt(adv)}</span></div>`:''}
+      </div>
+      ${doc.notes?`<div style="background:#FAF7F3;padding:10px;border-radius:6px;margin-top:10px;font-size:10px;color:#8C8480;font-style:italic">${esc(doc.notes)}</div>`:''}
+    </div>
+    <div class="dp-grand"><span class="dp-grand-lbl">${isInv?'TOTAL DUE':'TOTAL'}</span><span class="dp-grand-val">${fmt(sub)}</span></div>
+    <div class="dp-footer">Currency: INR (₹) · All amounts are inclusive</div>
+    <div class="dp-terms"><div class="dp-terms-title">Terms & Conditions</div>${terms.map(t=>`<div class="dp-term">${t}</div>`).join('')}</div>
+  </div>`;
+}
+
+// ── History ────────────────────────────────────────────────────────────────
+function renderHistory(){
+  const docs=getDocs(); const list=document.getElementById('history-list');
+  if(!docs.length){
+    list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><p>No documents yet.<br>Tap <b>New</b> to create your first.</p></div>`;
+    return;
+  }
+  const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
+  const fmtD=d=>{if(!d)return'';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});};
+  list.innerHTML=docs.map(doc=>{
+    const sub=doc.items.reduce((a,i)=>a+i.rate,0);
+    const isInv=doc.type==='INVOICE';
+    return`<div class="doc-card">
+      <div class="doc-card-top">
+        <div><div class="doc-num">${doc.id}</div><div class="doc-client">${esc(doc.client.name)}</div><div class="doc-meta">${esc(doc.client.event||'')}${doc.date?' · '+fmtD(doc.date):''}</div></div>
+        <span class="doc-badge ${isInv?'badge-inv':'badge-quo'}">${doc.type}</span>
+      </div>
+      <div class="doc-total">${fmt(sub)}</div>
+      <div class="doc-actions">
+        <button class="btn-sm btn-view" onclick="openDoc('${doc.id}')">View / Print</button>
+        <button class="btn-sm btn-del" onclick="confirmDelete('${doc.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openDoc(id){ const doc=getDocs().find(d=>d.id===id); if(doc) previewDoc(doc); }
+function confirmDelete(id){ if(confirm('Delete this document?')) deleteDoc(id); }
+function clearAll(){ if(confirm('Delete ALL documents? Cannot be undone.')){ localStorage.removeItem('yks_docs'); renderHistory(); showScreen('history'); } }
+function goBack(){ showScreen('history'); }
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function v(id){ return(document.getElementById(id)||{}).value||''; }
+function set(id,val){ const el=document.getElementById(id); if(el) el.value=val; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Init ───────────────────────────────────────────────────────────────────
+(function init(){
+  // Check session
+  if(sessionStorage.getItem('yks_unlocked')==='1'){
+    document.getElementById('lock-screen').classList.add('hidden');
+  }
+  // Dates
+  const today=new Date(); const due=new Date(); due.setDate(due.getDate()+14);
+  document.getElementById('f-date').value=today.toISOString().split('T')[0];
+  document.getElementById('f-date2').value=due.toISOString().split('T')[0];
+  // First item
+  addItem();
+  renderHistory();
+})();
+</script>
+</body>
+</html>
