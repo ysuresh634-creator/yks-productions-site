@@ -49,35 +49,65 @@
   var DISC = { 'Model': 'Fashion · Editorial · Runway · Commercial', 'Influencer / Creator': 'Content · Campaign · Reels', 'Actor': 'Film · Ad · Editorial · Screen' };
   function hexRgb(h) { h = h.replace('#', ''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var CATS = ['Portrait', 'Full length', 'Fashion', 'Commercial', 'Beauty', 'Other'];
+  var activeCat = 'Portrait';   // new photos land in the selected category
 
   /* ══ photos: pick / drop / preview / reorder / remove ══ */
   var photoInput = $('#apPhotos'), photoDrop = $('#apDrop'), thumbs = $('#apThumbs');
-  function addPhotos(list) {
-    Array.prototype.forEach.call(list, function (f) {
-      if (!/^image\//.test(f.type)) return;
-      photos.push({ file: f, id: ++uid, url: URL.createObjectURL(f) });
+  function isImageFile(f) { return /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|bmp|tiff?|avif|heic|heif)$/i.test(f.name); }
+  function isHeic(f) { return /image\/hei[cf]/i.test(f.type) || /\.(heic|heif)$/i.test(f.name); }
+  function ensureHeic() {
+    return new Promise(function (res, rej) {
+      if (window.heic2any) return res(window.heic2any);
+      var s = document.createElement('script'); s.src = '/js/vendor/heic2any.min.js';
+      s.onload = function () { window.heic2any ? res(window.heic2any) : rej(new Error('heic')); };
+      s.onerror = function () { rej(new Error('heic')); }; document.head.appendChild(s);
     });
-    renderThumbs();
+  }
+  function normalizeFile(f) {   // iPhone HEIC → JPEG so it renders on canvas / in the PDF
+    if (!isHeic(f)) return Promise.resolve(f);
+    return ensureHeic().then(function (h) {
+      return h({ blob: f, toType: 'image/jpeg', quality: 0.92 }).then(function (out) {
+        var blob = Array.isArray(out) ? out[0] : out;
+        return new File([blob], f.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+      });
+    }).catch(function () { return f; });   // if convert fails, keep original (still uploads fine)
+  }
+  function addPhotos(list) {
+    var arr = Array.prototype.slice.call(list).filter(isImageFile);
+    if (!arr.length) return;
+    var lbl = $('#apDropLabel');
+    if (lbl && arr.some(isHeic)) lbl.textContent = 'Converting photos…';
+    Promise.all(arr.map(normalizeFile)).then(function (files) {
+      files.forEach(function (f) { photos.push({ file: f, id: ++uid, url: URL.createObjectURL(f), cat: activeCat }); });
+      renderThumbs();
+    });
   }
   function idxOf(id) { for (var i = 0; i < photos.length; i++) if (photos[i].id === id) return i; return -1; }
   function renderThumbs() {
     thumbs.innerHTML = '';
     photos.forEach(function (item, idx) {
       var fig = document.createElement('div'); fig.className = 'ap-thumb'; fig.dataset.id = item.id; fig.draggable = true;
+      var media = document.createElement('div'); media.className = 'ap-thumb-media';
       var img = document.createElement('img'); img.src = item.edited || item.url; img.alt = '';
-      img.addEventListener('click', function () { openCrop(item); }); fig.appendChild(img);
+      img.addEventListener('click', function () { openCrop(item); }); media.appendChild(img);
       var ed = document.createElement('span'); ed.className = 'ap-edit-hint'; ed.textContent = '✎ Adjust';
-      ed.addEventListener('click', function () { openCrop(item); }); fig.appendChild(ed);
-      if (idx === 0) { var bd = document.createElement('span'); bd.className = 'ap-cover-badge'; bd.textContent = 'COVER'; fig.appendChild(bd); }
+      ed.addEventListener('click', function () { openCrop(item); }); media.appendChild(ed);
+      if (idx === 0) { var bd = document.createElement('span'); bd.className = 'ap-cover-badge'; bd.textContent = 'COVER'; media.appendChild(bd); }
       else {
         var mk = document.createElement('button'); mk.type = 'button'; mk.className = 'ap-mkcover'; mk.textContent = 'Set cover';
         mk.addEventListener('click', function () { var i = idxOf(item.id); if (i > 0) { photos.unshift(photos.splice(i, 1)[0]); renderThumbs(); } });
-        fig.appendChild(mk);
+        media.appendChild(mk);
       }
       var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'ap-rm'; rm.setAttribute('aria-label', 'Remove photo'); rm.textContent = '×';
       rm.addEventListener('click', function () { var i = idxOf(item.id); if (i >= 0) { URL.revokeObjectURL(photos[i].url); photos.splice(i, 1); renderThumbs(); } });
-      fig.appendChild(rm);
-      var bar = document.createElement('span'); bar.className = 'ap-thumb-bar'; fig.appendChild(bar);
+      media.appendChild(rm);
+      var bar = document.createElement('span'); bar.className = 'ap-thumb-bar'; media.appendChild(bar);
+      fig.appendChild(media);
+      var sel = document.createElement('select'); sel.className = 'ap-thumb-cat';
+      CATS.forEach(function (c) { var o = document.createElement('option'); o.value = c; o.textContent = c; if (c === (item.cat || CATS[0])) o.selected = true; sel.appendChild(o); });
+      sel.addEventListener('change', function () { item.cat = sel.value; updatePreview(); });
+      fig.appendChild(sel);
       fig.addEventListener('dragstart', function (e) { e.dataTransfer.setData('text/plain', String(item.id)); fig.classList.add('dragging'); });
       fig.addEventListener('dragend', function () { fig.classList.remove('dragging'); });
       fig.addEventListener('dragover', function (e) { e.preventDefault(); });
@@ -88,8 +118,18 @@
   }
   function reflectPhotoCount() {
     var b = $('#apDropLabel');
-    if (b) b.textContent = photos.length ? photos.length + (photos.length === 1 ? ' photo — first is your cover' : ' photos — first is your cover') : 'Add photos';
+    if (b) b.textContent = photos.length ? photos.length + (photos.length === 1 ? ' photo — first is your cover' : ' photos — first is your cover') : 'Add ' + activeCat + ' photos';
   }
+  (function buildCatChips() {
+    var wrap = $('#apCats'); if (!wrap) return;
+    CATS.forEach(function (c) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-catchip' + (c === activeCat ? ' on' : ''); b.textContent = c;
+      b.addEventListener('click', function () {
+        activeCat = c; $$('.ap-catchip', wrap).forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on'); reflectPhotoCount();
+      });
+      wrap.appendChild(b);
+    });
+  })();
 
   /* ══ per-photo crop / adjust editor (pan + zoom) ══ */
   var cropModal = $('#apCrop'), cropImg = $('#apCropImg'), cropFrame = $('#apCropFrame'), cropZoom = $('#apCropZoom');
@@ -363,7 +403,10 @@
     Promise.all([ensureJsPDF(), ensureFonts()])
       .then(function (rr) {
         var JsPDF = rr[0];
-        return Promise.all(photos.slice(0, 8).map(function (p) { return p.edited ? Promise.resolve({ data: p.edited, w: 900, h: 1125 }) : prepImg(p.file, 0.8, 1000); }))
+        return Promise.all(photos.slice(0, 8).map(function (p) {
+          var pr = p.edited ? Promise.resolve({ data: p.edited, w: 900, h: 1125 }) : prepImg(p.file, 0.8, 1000);
+          return pr.then(function (im) { im.cat = p.cat || ''; return im; });
+        }))
           .then(function (imgs) {
             var th = THEMES[CFG.theme];
             buildPortfolio(JsPDF, imgs, name, { bg: hexRgb(th.bg), text: hexRgb(th.text), sub: hexRgb(th.sub), accent: hexRgb(CFG.accent), font: FONTS[CFG.font].pdf });
@@ -439,7 +482,7 @@
       watermark();
       doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('SELECTED WORK', M, 58);
       doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text(NM, W - M, 58, { align: 'right' }); ruleY(70);
-      [plates[i], plates[i + 1]].forEach(function (im, k) { if (im) { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('PLATE ' + ('0' + (pn++)).slice(-2) + '   ·   ' + cat.toUpperCase(), M + k * (cw + 20), y + cw / 0.8 + 16); } });
+      [plates[i], plates[i + 1]].forEach(function (im, k) { if (im) { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('PLATE ' + ('0' + (pn++)).slice(-2) + '   ·   ' + ((im.cat || cat)).toUpperCase(), M + k * (cw + 20), y + cw / 0.8 + 16); } });
       foot();
     }
     // ── BOOK ──

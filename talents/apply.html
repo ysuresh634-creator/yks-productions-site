@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=9" />
+<link rel="stylesheet" href="/css/talents.css?v=10" />
 </head>
 <body>
 
@@ -74,9 +74,10 @@
         <!-- Your photos -->
         <div class="ap-block">
           <p class="ap-step">Your photos</p>
-          <p class="ap-hint">Add as many as you like — phone shots are perfect. Any size, straight from your camera roll. No resizing, no fuss.</p>
+          <p class="ap-hint">Add as many as you like — phone shots are perfect. Any format (iPhone HEIC included), any size, straight from your camera roll. No resizing, no converting, no fuss.</p>
+          <div class="ap-cats-row"><span>Adding to</span><div class="ap-cats" id="apCats"></div></div>
           <div class="ap-drop" id="apDrop" role="button" tabindex="0" aria-label="Add photos">
-            <input type="file" id="apPhotos" accept="image/*" multiple hidden />
+            <input type="file" id="apPhotos" accept="image/*,.heic,.heif,.avif" multiple hidden />
             <div class="ap-drop-in">
               <span class="ap-drop-ic">+</span>
               <b id="apDropLabel">Add photos</b>
@@ -252,6 +253,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=9"></script>
+<script src="/js/talent-apply.js?v=11"></script>
 </body>
 </html>
