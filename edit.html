@@ -122,7 +122,11 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 </div>
 
 <div class="stage">
-  <iframe id="frame" sandbox="allow-scripts"></iframe>
+  <!-- Both flags are required: allow-scripts runs the editor, allow-same-origin
+       is needed or the page's stylesheets never apply and it renders blank.
+       Safe here because the content is our own repo, with every <script>
+       disabled and all inline on* handlers stripped before rendering. -->
+  <iframe id="frame" sandbox="allow-scripts allow-same-origin"></iframe>
   <div class="stage-msg" id="stagemsg">Pick a page above to start editing.</div>
 
   <!-- first-run setup -->
