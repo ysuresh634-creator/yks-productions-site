@@ -445,6 +445,15 @@
       document.head.appendChild(s);
     });
   }
+  function ensureQR() {
+    return new Promise(function (res) {
+      if (window.qrcode) return res(window.qrcode);
+      var s = document.createElement('script'); s.src = '/js/vendor/qrcode.min.js';
+      s.onload = function () { res(window.qrcode || null); };
+      s.onerror = function () { res(null); };   // QR optional — book page still renders without it
+      document.head.appendChild(s);
+    });
+  }
   function registerFonts(doc) {
     if (!window.YKS_FONTS) return;
     try {
@@ -492,7 +501,7 @@
     var name = (form.name.value || '').trim();
     if (!name) { alert('Add your name first.'); if (form.name) form.name.focus(); return; }
     var orig = dlBtn.textContent; dlBtn.disabled = true; dlBtn.textContent = 'Building your portfolio…';
-    Promise.all([ensureJsPDF(), ensureFonts()])
+    Promise.all([ensureJsPDF(), ensureFonts(), ensureQR()])
       .then(function (rr) {
         var JsPDF = rr[0];
         return Promise.all(photos.slice(0, 8).map(function (p) {
@@ -538,6 +547,26 @@
     function coverFill(im, x, y, bw, bh) { var s = Math.max(bw / im.w, bh / im.h), w = im.w * s, h = im.h * s; doc.addImage(im.data, 'JPEG', x + (bw - w) / 2, y + (bh - h) / 2, w, h); }
     function shade(y, hgt, op) { if (doc.setGState) { doc.saveGraphicsState(); doc.setGState(new doc.GState({ opacity: op })); doc.setFillColor(8, 6, 12); doc.rect(0, y, W, hgt, 'F'); doc.restoreGraphicsState(); } }
     var SAVE = (name.replace(/[^a-z0-9 ]/gi, '').trim() || 'YKS') + ' — YKS Portfolio.pdf';
+    // scan-to-book: a QR straight to YKS's WhatsApp, name pre-filled — booking always routes through YKS
+    var bookURL = 'https://wa.me/919746679720?text=' + encodeURIComponent('Hi YKS, I’d like to book ' + name + ' — saw their YKS portfolio.');
+    function drawQR(url, x, y, size) {
+      if (!window.qrcode) return 0;
+      var qr; try { qr = window.qrcode(0, 'M'); qr.addData(url); qr.make(); } catch (e) { return 0; }
+      var n = qr.getModuleCount(), quiet = 4, mod = size / (n + quiet * 2);
+      doc.setFillColor(255, 255, 255); doc.roundedRect(x, y, size, size, 5, 5, 'F');
+      doc.setFillColor(17, 17, 17);
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) doc.rect(x + (c + quiet) * mod, y + (r + quiet) * mod, mod + 0.35, mod + 0.35, 'F');
+      return size;
+    }
+    // shared closing "BOOK" page — big CTA + scan-to-book QR (editorial & lookbook)
+    function bookPage() {
+      doc.addPage(); fill(); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('BOOKINGS', M, 58);
+      doc.setFont(F, 'bold'); doc.setFontSize(30); ct(TX); doc.text('BOOK', M, H / 2 - 16); doc.text(NM, M, H / 2 + 22);
+      doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(SUB); doc.text('Represented exclusively by YKS Productions.', M, H / 2 + 60); doc.text('+91 97466 79720     ·     yksproductions.com', M, H / 2 + 80);
+      var qs = 128, qx = W - M - qs, qy = H / 2 - 44;
+      if (drawQR(bookURL, qx, qy, qs)) { doc.setFont(F, 'normal'); doc.setFontSize(7.5); ct(SUB); doc.text('SCAN TO BOOK THROUGH YKS', qx + qs / 2, qy + qs + 15, { align: 'center' }); }
+    }
 
     /* ── TEMPLATE: Lookbook (full-bleed, photo-forward) ── */
     function tplLookbook() {
@@ -560,6 +589,7 @@
       if (about) { doc.setFont(F, 'normal'); doc.setFontSize(11); ct(TX); var ln = doc.splitTextToSize(about, CW).slice(0, 9); doc.text(ln, M, ay); ay += ln.length * 15 + 26; }
       if (STATS.length) { doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MEASUREMENTS', M, ay); ay += 16; STATS.forEach(function (r) { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text(r[0].toUpperCase(), M, ay); doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text(r[1], M + 230, ay, { align: 'right' }); doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.4); doc.line(M, ay + 6, M + 230, ay + 6); ay += 20; }); }
       foot();
+      bookPage();
     }
     /* ── TEMPLATE: Minimal (airy, centred, one photo per page) ── */
     function tplMinimal() {
@@ -583,8 +613,10 @@
         doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text((im.cat || cat).toUpperCase(), CX, 92 + w / 0.8 + 22, { align: 'center' });
       });
       doc.addPage(); fill(); watermark();
-      doc.setFont(F, 'bold'); doc.setFontSize(26); ct(TX); doc.text('BOOK ' + NM, CX, H / 2, { align: 'center' });
-      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text('Represented exclusively by YKS Productions', CX, H / 2 + 28, { align: 'center' }); doc.text('+91 97466 79720   ·   yksproductions.com', CX, H / 2 + 46, { align: 'center' });
+      doc.setFont(F, 'bold'); doc.setFontSize(26); ct(TX); doc.text('BOOK ' + NM, CX, H / 2 - 60, { align: 'center' });
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text('Represented exclusively by YKS Productions', CX, H / 2 - 34, { align: 'center' }); doc.text('+91 97466 79720   ·   yksproductions.com', CX, H / 2 - 18, { align: 'center' });
+      var mqs = 132;
+      if (drawQR(bookURL, CX - mqs / 2, H / 2 + 6, mqs)) { doc.setFont(F, 'normal'); doc.setFontSize(7.5); ct(SUB); doc.text('SCAN TO BOOK THROUGH YKS', CX, H / 2 + 6 + mqs + 16, { align: 'center' }); }
     }
     /* ── TEMPLATE: Comp Card (agency standard — face front, grid + stats back) ── */
     function tplCompCard() {
@@ -595,6 +627,8 @@
       doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text(disc.toUpperCase(), M, H - 92);
       doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 30 : 40); ct([255, 255, 255]); doc.text(NM, M, H - 54);
       doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(TAG ? AC : [232, 227, 217]); doc.text(TAG || [cat, city].filter(Boolean).join('   ·   ').toUpperCase(), M, H - 34);
+      var cqs = 78, cqx = W - M - cqs, cqy = H - 40 - cqs;
+      if (drawQR(bookURL, cqx, cqy, cqs)) { doc.setFont(F, 'normal'); doc.setFontSize(6.5); ct([232, 227, 217]); doc.text('SCAN TO BOOK', cqx + cqs / 2, cqy - 5, { align: 'center' }); }
       // BACK — 2×2 grid of varied shots + measurements band + booking
       doc.addPage(); fill(); watermark();
       doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text(NM, M, 54);
@@ -664,11 +698,8 @@
       foot();
     }
     // ── BOOK ──
-    doc.addPage(); fill(); watermark();
-    doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('BOOKINGS', M, 58);
-    doc.setFont(F, 'bold'); doc.setFontSize(30); ct(TX); doc.text('BOOK', M, H / 2 - 16); doc.text(NM, M, H / 2 + 22);
-    doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(SUB); doc.text('Represented exclusively by YKS Productions.', M, H / 2 + 60); doc.text('+91 97466 79720     ·     yksproductions.com', M, H / 2 + 80);
-    doc.save((name.replace(/[^a-z0-9 ]/gi, '').trim() || 'YKS') + ' — YKS Portfolio.pdf');
+    bookPage();
+    doc.save(SAVE);
   }
 
   /* ══ upload one file to Cloudinary (unsigned) with progress ══ */
