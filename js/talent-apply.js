@@ -220,6 +220,21 @@
   }
   renderCover();
 
+  // Book-a-shoot CTA — quietly personalise the WhatsApp opener with their name (feels 1:1, not a form)
+  (function wireShootCta() {
+    var cta = $('#apShootCta'); if (!cta) return;
+    var nameEl = document.querySelector('#talForm [name="name"]');
+    function build() {
+      var nm = ((nameEl && nameEl.value) || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+      var msg = nm
+        ? "Hi Yedukrishna, I'm " + nm + " — I built my portfolio on your site and I want to book a real shoot with you. When can we do it?"
+        : "Hi Yedukrishna, I just built my portfolio on your site and I want to book a real shoot with you. When can we do it?";
+      cta.href = 'https://wa.me/919746679720?text=' + encodeURIComponent(msg);
+    }
+    if (nameEl) nameEl.addEventListener('input', build);
+    build();
+  })();
+
   /* ══ per-photo crop / adjust editor — Fill (crop) or Fit (show the whole photo) ══ */
   var cropModal = $('#apCrop'), cropImg = $('#apCropImg'), cropBlur = $('#apCropBlur'), cropFrame = $('#apCropFrame'), cropZoom = $('#apCropZoom');
   var cropNote = $('#apCropNote'), modeFillBtn = $('#apModeFill'), modeFitBtn = $('#apModeFit');
