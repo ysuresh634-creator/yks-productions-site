@@ -28,8 +28,8 @@
 
   /* ── portfolio customiser: the talent's own theme / font / accent / look ── */
   var CFG = { theme: 'noir', font: 'playfair', accent: '#d47a3a', template: 'editorial', layout: 'editorial', look: 'none' };
-  // a real YKS editorial frame — stands in as the demo cover until the talent adds their own photos
-  var SAMPLE_COVER = '/assets/behance/fash-olivia.jpg';
+  // a premium abstract editorial frame — the demo cover until the talent adds their own photos
+  var SAMPLE_COVER = '/assets/studio-cover.svg';
   // each template is a whole design kit — its own font, theme, accent & photo look (all still overridable)
   var TEMPLATES = [
     { k: 'editorial', label: 'Editorial', note: 'Framed hero + profile',     kit: { font: 'playfair', theme: 'noir',      accent: '#d47a3a', look: 'none' } },

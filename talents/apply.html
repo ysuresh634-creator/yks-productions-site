@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=25" />
+<link rel="stylesheet" href="/css/talents.css?v=28" />
 </head>
 <body>
 
@@ -111,7 +111,6 @@
 <section class="l-section ap-form-sec">
   <div class="wrap">
     <div class="tal-apply">
-      <div class="ap-layout">
       <form class="tal-form ap-form" id="talForm" novalidate>
 
         <!-- Your photos -->
@@ -251,22 +250,13 @@
         </div>
 
       </form>
-      <aside class="ap-live" aria-label="Live portfolio preview">
-        <div class="ap-live-sticky">
-          <p class="ap-live-lbl">Your portfolio <b>· live</b></p>
-          <div class="ap-live-frame"><div class="ap-preview" id="apPreviewLive"></div></div>
-          <p class="ap-live-meta" id="apLiveMeta">Add a photo — watch it come alive →</p>
-          <p class="ap-live-hint">This is your cover. The download builds the full multi-page book.</p>
-        </div>
-      </aside>
-      </div>
 
       <!-- ══ DESIGN STUDIO — full-width: live preview + controls | template gallery ══ -->
       <section class="ap-studio" aria-label="Portfolio designer">
         <p class="ap-step">Design your portfolio <span class="ap-opt">free · make it yours</span></p>
         <p class="ap-hint">Pick a design and the preview shows exactly how your cover lands — then fine-tune the look. The <b>YKS watermark &amp; branding stay on every page</b>, and booking always routes through YKS.</p>
         <div class="ap-studio-grid">
-          <div class="ap-studio-side">
+          <div class="ap-studio-side"><div class="ap-studio-side-inner">
             <button type="button" class="ap-surprise" id="apSurprise">✨ Surprise me — design it for me</button>
             <div class="ap-live-frame ap-studio-preview"><div class="ap-preview" id="apPreview"></div></div>
             <p class="ap-live-meta" id="apStudioMeta">Pick a design to preview →</p>
@@ -277,7 +267,7 @@
               <div class="ap-ctl"><span>Accent</span><div class="ap-accents" id="apAccents"></div></div>
             </div>
             <button type="button" class="btn btn-ghost ap-dl" id="apDownload">↓ Download my portfolio (PDF)</button>
-          </div>
+          </div></div>
           <div class="ap-studio-main">
             <p class="ap-pick-lbl">Pick a design <span>— tap one to preview it</span></p>
             <div class="ap-tpls" id="apTemplates"></div>
@@ -333,6 +323,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=30"></script>
+<script src="/js/talent-apply.js?v=31"></script>
 </body>
 </html>
