@@ -486,10 +486,23 @@ main{overflow:hidden}
 
 /* ── template selector + preview variants ── */
 .ap-tpls{display:flex;flex-wrap:wrap;gap:8px}
-.ap-tpl{font-family:var(--mag-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mag-soft);
-  background:none;border:1px solid var(--mag-line-2);border-radius:8px;padding:9px 14px;cursor:pointer;transition:.2s}
+.ap-tpl{display:flex;flex-direction:column;gap:2px;text-align:left;color:var(--mag-soft);
+  background:none;border:1px solid var(--mag-line-2);border-radius:8px;padding:9px 13px;cursor:pointer;transition:.2s}
+.ap-tpl b{font-family:var(--mag-mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.ap-tpl i{font-style:normal;font-size:10px;letter-spacing:.02em;opacity:.7}
 .ap-tpl:hover{color:var(--mag-ink);border-color:var(--mag-accent)}
 .ap-tpl.on{background:var(--mag-accent);border-color:var(--mag-accent);color:#0a0810}
+.ap-tpl.on i{opacity:.85}
+.ap-looks{display:flex;flex-wrap:wrap;gap:8px}
+.ap-look{font-family:var(--mag-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mag-soft);
+  background:none;border:1px solid var(--mag-line-2);border-radius:20px;padding:7px 14px;cursor:pointer;transition:.2s}
+.ap-look:hover{color:var(--mag-ink);border-color:var(--mag-accent)}
+.ap-look.on{background:var(--mag-accent);border-color:var(--mag-accent);color:#0a0810}
+.ap-surprise{display:inline-flex;align-items:center;gap:8px;margin:0 0 18px;font-family:var(--mag-mono);font-size:12px;
+  letter-spacing:.05em;color:var(--mag-ink);background:linear-gradient(120deg,rgba(255,140,59,.16),rgba(255,140,59,.04));
+  border:1px solid var(--mag-accent);border-radius:24px;padding:11px 20px;cursor:pointer;transition:.2s}
+.ap-surprise:hover{background:var(--mag-accent);color:#0a0810;transform:translateY(-1px)}
+.ap-surprise:active{transform:translateY(0)}
 .ap-cv-bleed{padding:0;position:relative;overflow:hidden}
 .ap-cv-full{position:absolute;inset:0}
 .ap-cv-full img{width:100%;height:100%;object-fit:cover;display:block}

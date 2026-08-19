@@ -26,9 +26,24 @@
   var pdf = null;    // File
   var uid = 0;
 
-  /* ── portfolio customiser: the talent's own theme / font / accent ── */
-  var CFG = { theme: 'noir', font: 'playfair', accent: '#d47a3a', template: 'editorial' };
-  var TEMPLATES = [{ k: 'editorial', label: 'Editorial' }, { k: 'lookbook', label: 'Lookbook' }, { k: 'minimal', label: 'Minimal' }];
+  /* ── portfolio customiser: the talent's own theme / font / accent / look ── */
+  var CFG = { theme: 'noir', font: 'playfair', accent: '#d47a3a', template: 'editorial', look: 'none' };
+  var TEMPLATES = [
+    { k: 'editorial', label: 'Editorial', note: 'Framed hero + profile' },
+    { k: 'lookbook',  label: 'Lookbook',  note: 'Full-bleed, photo-first' },
+    { k: 'compcard',  label: 'Comp Card', note: 'Agency standard · 2 pages' },
+    { k: 'minimal',   label: 'Minimal',   note: 'Airy, one shot a page' }
+  ];
+  /* photo "look": a single grade applied to EVERY image so the book feels
+     shot as one story — the thing that separates a pro portfolio from a phone roll */
+  var LOOKS = {
+    none:  { label: 'True',  css: 'none' },
+    bw:    { label: 'B&W',   css: 'grayscale(1) contrast(1.06)' },
+    warm:  { label: 'Warm',  css: 'saturate(1.05) sepia(.22) contrast(1.03) brightness(1.02)' },
+    film:  { label: 'Film',  css: 'contrast(1.12) saturate(.9) brightness(1.03) sepia(.08)' },
+    cool:  { label: 'Editorial', css: 'saturate(.86) contrast(1.08) brightness(1.02) hue-rotate(-6deg)' },
+    fade:  { label: 'Matte', css: 'contrast(.92) saturate(.92) brightness(1.06)' }
+  };
   var THEMES = {
     noir:      { bg: '#14111a', text: '#f4ede2', sub: '#b0a892', label: 'Noir' },
     charcoal:  { bg: '#26242b', text: '#f0ece5', sub: '#a8a29a', label: 'Charcoal' },
@@ -321,8 +336,9 @@
     var cat = (form.category.value || 'Model').trim();
     var disc = esc((DISC[cat] || 'Fashion · Editorial · Commercial').toUpperCase());
     var cover = photos[0] ? (photos[0].edited || photos[0].url) : '';
+    var lkCss = (LOOKS[CFG.look] && LOOKS[CFG.look].css) || 'none';
     var wm = '<span class="ap-cv-wm">YKS PRODUCTIONS</span>';
-    var imgTag = cover ? '<img src="' + cover + '" alt="">' + wm : '';
+    var imgTag = cover ? '<img src="' + cover + '" alt="" style="filter:' + lkCss + '">' + wm : '';
     var empty = '<div class="ap-cv-img ap-cv-empty" style="border-color:' + th.sub + '">Add a photo</div>';
     var html;
     if (tpl === 'lookbook') {
@@ -348,7 +364,8 @@
   (function buildControls() {
     var pW = $('#apTemplates');
     if (pW) TEMPLATES.forEach(function (t) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-tpl' + (t.k === CFG.template ? ' on' : ''); b.textContent = t.label;
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-tpl' + (t.k === CFG.template ? ' on' : ''); b.title = t.note || '';
+      b.innerHTML = '<b>' + t.label + '</b>' + (t.note ? '<i>' + t.note + '</i>' : '');
       b.addEventListener('click', function () { CFG.template = t.k; mark(pW, b); updatePreview(); }); pW.appendChild(b);
     });
     var tW = $('#apThemes');
@@ -367,7 +384,29 @@
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-dot' + (hex === CFG.accent ? ' on' : ''); b.style.background = hex;
       b.addEventListener('click', function () { CFG.accent = hex; mark(aW, b); updatePreview(); }); aW.appendChild(b);
     });
+    var lW = $('#apLooks');
+    if (lW) Object.keys(LOOKS).forEach(function (k) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-look' + (k === CFG.look ? ' on' : ''); b.textContent = LOOKS[k].label;
+      b.addEventListener('click', function () { CFG.look = k; mark(lW, b); updatePreview(); }); lW.appendChild(b);
+    });
+    // ✨ Surprise me — one tap picks a tasteful, cohesive combination (kills choice paralysis)
+    var sB = $('#apSurprise');
+    if (sB) sB.addEventListener('click', function () {
+      var tk = ['editorial', 'lookbook', 'compcard', 'minimal'];
+      var thk = Object.keys(THEMES), fk = Object.keys(FONTS), lkk = Object.keys(LOOKS);
+      function rnd(a) { return a[Math.floor(Math.random() * a.length)]; }
+      CFG.template = rnd(tk); CFG.theme = rnd(thk); CFG.font = rnd(fk); CFG.accent = rnd(ACCENTS); CFG.look = rnd(lkk);
+      // re-sync the visible "on" state across every control group
+      function sync(sel, test) { $$(sel).forEach(function (b) { b.classList.toggle('on', test(b)); }); }
+      sync('#apTemplates .ap-tpl', function (b) { return (b.querySelector('b') || b).textContent === TEMPLATES.filter(function (t) { return t.k === CFG.template; })[0].label; });
+      sync('#apThemes .ap-sw', function (b) { return b.title === THEMES[CFG.theme].label; });
+      sync('#apFonts .ap-fontchip', function (b) { return b.title === FONTS[CFG.font].label; });
+      sync('#apAccents .ap-dot', function (b) { return b.style.background && hexToRgbStr(b.style.background) === hexToRgbStr(CFG.accent); });
+      sync('#apLooks .ap-look', function (b) { return b.textContent === LOOKS[CFG.look].label; });
+      updatePreview();
+    });
   })();
+  function hexToRgbStr(h) { if (/^rgb/.test(h)) return h.replace(/\s+/g, ''); var c = hexRgb(h); return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')'; }
   form.addEventListener('input', updatePreview);
   updatePreview();
 
@@ -406,11 +445,30 @@
         if (sar > ar) { ch = ih; cw = ih * ar; } else { cw = iw; ch = iw / ar; }
         var oW = outW, oH = Math.round(outW / ar);
         var c = document.createElement('canvas'); c.width = oW; c.height = oH;
-        c.getContext('2d').drawImage(img, (iw - cw) / 2, (ih - ch) / 2, cw, ch, 0, 0, oW, oH);
+        var ctx = c.getContext('2d');
+        var lk = LOOKS[CFG.look]; if (lk && lk.css !== 'none' && 'filter' in ctx) ctx.filter = lk.css;
+        ctx.drawImage(img, (iw - cw) / 2, (ih - ch) / 2, cw, ch, 0, 0, oW, oH);
         res({ data: c.toDataURL('image/jpeg', 0.82), w: oW, h: oH });
         URL.revokeObjectURL(img.src);
       };
       img.onerror = rej; img.src = URL.createObjectURL(file);
+    });
+  }
+  // apply the chosen look to an already-prepared dataURL (used for hand-cropped photos)
+  function gradeDataURL(dataUrl) {
+    var lk = LOOKS[CFG.look];
+    if (!lk || lk.css === 'none') return Promise.resolve(dataUrl);
+    return new Promise(function (res) {
+      var img = new Image();
+      img.onload = function () {
+        var c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+        var ctx = c.getContext('2d');
+        if ('filter' in ctx) ctx.filter = lk.css;
+        ctx.drawImage(img, 0, 0);
+        res(c.toDataURL('image/jpeg', 0.9));
+      };
+      img.onerror = function () { res(dataUrl); };
+      img.src = dataUrl;
     });
   }
   var dlBtn = $('#apDownload');
@@ -423,7 +481,7 @@
       .then(function (rr) {
         var JsPDF = rr[0];
         return Promise.all(photos.slice(0, 8).map(function (p) {
-          var pr = p.edited ? Promise.resolve({ data: p.edited, w: 900, h: 1125 }) : prepImg(p.file, 0.8, 1000);
+          var pr = p.edited ? gradeDataURL(p.edited).then(function (d) { return { data: d, w: 900, h: 1125 }; }) : prepImg(p.file, 0.8, 1000);
           return pr.then(function (im) { im.cat = p.cat || ''; return im; });
         }))
           .then(function (imgs) {
@@ -511,7 +569,37 @@
       doc.setFont(F, 'bold'); doc.setFontSize(26); ct(TX); doc.text('BOOK ' + NM, CX, H / 2, { align: 'center' });
       doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text('Represented exclusively by YKS Productions', CX, H / 2 + 28, { align: 'center' }); doc.text('+91 97466 79720   ·   yksproductions.com', CX, H / 2 + 46, { align: 'center' });
     }
+    /* ── TEMPLATE: Comp Card (agency standard — face front, grid + stats back) ── */
+    function tplCompCard() {
+      // FRONT — one hero headshot, name, agency mark
+      fill(); coverFill(imgs[0], 0, 0, W, H); shade(0, 108, 0.4); shade(H - 188, 188, 0.62); watermark(true);
+      doc.setFont(F, 'bold'); doc.setFontSize(11); ct([255, 255, 255]); doc.text('YKS  ·  TALENT', M, 50);
+      doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct([232, 227, 217]); doc.text('COMP CARD', W - M, 50, { align: 'right' });
+      doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text(disc.toUpperCase(), M, H - 92);
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 30 : 40); ct([255, 255, 255]); doc.text(NM, M, H - 54);
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct([232, 227, 217]); doc.text([cat, city].filter(Boolean).join('   ·   ').toUpperCase(), M, H - 34);
+      // BACK — 2×2 grid of varied shots + measurements band + booking
+      doc.addPage(); fill(); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text(NM, M, 54);
+      doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text(disc.toUpperCase(), W - M, 54, { align: 'right' }); ruleY(66);
+      var grid = imgs.slice(1, 5); if (!grid.length) grid = imgs.slice(0, 1);
+      var gap = 18, cw = 214, ch = cw / 0.8, gridW = cw * 2 + gap, gx0 = (W - gridW) / 2, gy0 = 84;
+      grid.forEach(function (im, k) { doc.addImage(im.data, 'JPEG', gx0 + (k % 2) * (cw + gap), gy0 + Math.floor(k / 2) * (ch + gap), cw, ch); });
+      var sy = 662;
+      if (STATS.length) {
+        doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MEASUREMENTS', M, sy);
+        doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.5); doc.line(M, sy + 8, W - M, sy + 8);
+        var half = Math.ceil(STATS.length / 2), colW = CW / 2 - 12;
+        STATS.forEach(function (r, k) {
+          var col = k < half ? 0 : 1, row = k < half ? k : k - half, x = M + col * (CW / 2 + 12), y = sy + 26 + row * 18;
+          doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text(r[0].toUpperCase(), x, y);
+          doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text(r[1], x + colW, y, { align: 'right' });
+        });
+      }
+      foot();
+    }
     if (cfg.template === 'lookbook') { tplLookbook(); doc.save(SAVE); return; }
+    if (cfg.template === 'compcard') { tplCompCard(); doc.save(SAVE); return; }
     if (cfg.template === 'minimal') { tplMinimal(); doc.save(SAVE); return; }
 
     // ── COVER ── (Editorial, default)
