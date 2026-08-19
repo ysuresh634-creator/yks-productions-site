@@ -603,34 +603,17 @@ main{overflow-x:clip}
 .ap-tpl b{font-family:var(--mag-mono);font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mag-ink)}
 .ap-tpl.on b{color:var(--mag-accent)}
 .ap-tpl i{font-style:normal;font-size:10px;letter-spacing:.01em;opacity:.72;line-height:1.32}
-/* realistic mini-cover preview — the actual look, scaled with container-query units */
-.mc{display:block;width:100%;aspect-ratio:4/5;border-radius:8px;overflow:hidden;position:relative;padding:7cqw;
-  border:1px solid rgba(0,0,0,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
-.mc-photo{display:block;width:100%;border-radius:1.5cqw;
+/* ONE unified mini-cover — identical structure on every card; only palette + font change (classy & consistent) */
+.mc{display:flex;flex-direction:column;width:100%;aspect-ratio:4/5;border-radius:9px;overflow:hidden;padding:7.5cqw 8cqw 8cqw;
+  border:1px solid rgba(0,0,0,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.mc-kick{display:block;font-size:3.2cqw;font-weight:600;letter-spacing:.18em;text-transform:uppercase;opacity:.56;flex:none}
+.mc-photo{flex:1 1 auto;min-height:0;margin:6cqw 0 0;border-radius:2cqw;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='70' height='70' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"),
-    radial-gradient(72% 56% at 30% 16%,rgba(255,236,214,.36),transparent 58%),
+    radial-gradient(72% 56% at 30% 16%,rgba(255,236,214,.34),transparent 58%),
     linear-gradient(158deg,#6f6169 0%,#3b3039 42%,#14101a 100%);
   background-size:70px 70px,cover,cover;background-blend-mode:overlay,normal,normal}
-.mc-nm{display:block;font-weight:600;line-height:.96;white-space:nowrap;letter-spacing:-.01em}
-.mc-rule{display:block;height:1.6cqw;width:26cqw;border-radius:1cqw}
-/* framed */
-.mc-framed .mc-kick{display:flex;justify-content:space-between;align-items:baseline;font-size:3.4cqw;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
-.mc-framed .mc-photo{height:54%;margin-top:5cqw}
-.mc-framed .mc-nm{font-size:13.5cqw;margin-top:5.5cqw}
-.mc-framed .mc-rule{margin-top:3.5cqw}
-/* bleed */
-.mc-bleed{padding:0}
-.mc-bleed .mc-photo{position:absolute;inset:0;height:100%;border-radius:0}
-.mc-bleed .mc-wm{position:absolute;top:7cqw;left:7cqw;font-size:3.2cqw;font-weight:700;letter-spacing:.14em;color:#fff;opacity:.82}
-.mc-bleed .mc-ov{position:absolute;left:0;right:0;bottom:0;padding:7cqw;background:linear-gradient(transparent,rgba(0,0,0,.76) 64%)}
-.mc-bleed .mc-nm{font-size:14cqw}
-.mc-bleed .mc-rule{margin-bottom:3cqw;width:22cqw}
-/* centered */
-.mc-center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.mc-center .mc-kick{font-size:2.9cqw;letter-spacing:.18em;text-transform:uppercase;opacity:.5}
-.mc-center .mc-photo{width:52%;aspect-ratio:4/5;margin:5.5cqw 0 0}
-.mc-center .mc-nm{font-size:12.5cqw;margin-top:4.5cqw}
-.mc-center .mc-rule{margin:4cqw auto 0}
+.mc-nm{display:block;flex:none;font-weight:600;font-size:13cqw;line-height:.98;margin-top:5.5cqw;white-space:nowrap;letter-spacing:-.01em}
+.mc-rule{display:block;flex:none;height:1.6cqw;width:24cqw;margin-top:3.5cqw;border-radius:1cqw}
 /* caption under the mini-cover */
 .ap-tpl-cap{display:flex;flex-direction:column;gap:2px}
 @media(max-width:760px){ .ap-tpls{grid-template-columns:repeat(2,1fr);gap:10px} }

@@ -435,28 +435,18 @@
     $$('.ap-live-meta').forEach(function (m) { m.textContent = metaTxt; });
   }
   function mark(wrap, btn) { $$('button', wrap).forEach(function (x) { x.classList.remove('on'); }); btn.classList.add('on'); }
-  // realistic mini-cover of each design (real type + palette + a portrait) so a talent picks by seeing the actual look
-  function archOf(l) {
-    if ((' lookbook luxe feature ').indexOf(' ' + l + ' ') >= 0) return 'bleed';
-    if ((' minimal ethereal classic ').indexOf(' ' + l + ' ') >= 0) return 'center';
-    return 'framed';
-  }
+  // ONE unified mini-cover for every design — identical structure, differs only by palette + font (neat, classy, consistent)
   function tplMini(layout, kit, label, photoUrl) {
     var th = kit ? THEMES[kit.theme] : THEMES.noir, ac = (kit && kit.accent) || '#d47a3a', ff = FONTS[(kit && kit.font) || 'playfair'].css;
     var lk = (kit && LOOKS[kit.look] && LOOKS[kit.look].css) || 'none';
     var ps = photoUrl ? ' style="background:#241f2a url(&quot;' + photoUrl + '&quot;) center 22%/cover;background-blend-mode:normal;filter:' + lk + '"' : '';
-    var arch = archOf(layout), nm = esc(label || ''), photo = '<span class="mc-photo"' + ps + '></span>';
-    var st = 'background:' + th.bg + ';color:' + th.text + ';font-family:' + ff, rule = '<span class="mc-rule" style="background:' + ac + '"></span>';
-    if (arch === 'bleed') {
-      return '<span class="mc mc-bleed" style="' + st + '">' + photo + '<span class="mc-wm">YKS · PORTFOLIO</span>' +
-        '<span class="mc-ov">' + rule + '<span class="mc-nm" style="color:#fff">' + nm + '</span></span></span>';
-    }
-    if (arch === 'center') {
-      return '<span class="mc mc-center" style="' + st + '"><span class="mc-kick">YKS · PORTFOLIO</span>' + photo +
-        '<span class="mc-nm">' + nm + '</span>' + rule + '</span>';
-    }
-    return '<span class="mc mc-framed" style="' + st + '"><span class="mc-kick">YKS · PORTFOLIO</span>' + photo +
-      '<span class="mc-nm">' + nm + '</span>' + rule + '</span>';
+    var st = 'background:' + th.bg + ';color:' + th.text + ';font-family:' + ff;
+    return '<span class="mc" style="' + st + '">' +
+      '<span class="mc-kick">YKS · PORTFOLIO</span>' +
+      '<span class="mc-photo"' + ps + '></span>' +
+      '<span class="mc-nm">' + esc(label || '') + '</span>' +
+      '<span class="mc-rule" style="background:' + ac + '"></span>' +
+    '</span>';
   }
   function syncControls() {
     function sync(sel, test) { $$(sel).forEach(function (b) { b.classList.toggle('on', test(b)); }); }
