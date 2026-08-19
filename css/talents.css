@@ -79,13 +79,62 @@ main{overflow:hidden}
   color:var(--mag-ink);padding-bottom:4px;border-bottom:1.5px solid var(--mag-ink);transition:.25s}
 .tal-hero-links a:hover{color:var(--mag-accent);border-color:var(--mag-accent)}
 
+/* ═══ SUBMISSIONS HERO v2 — split editorial + portfolio-cover mock ═══ */
+.ap-hero2{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,5vw,72px);align-items:center}
+.ap-hero2-txt .tal-kicker{margin-bottom:20px}
+.ap-hero2-txt .pf-name{font-size:clamp(2.6rem,6.4vw,5rem);margin:0}
+.ap-hero2-sub{max-width:34ch;font-size:1.08rem;line-height:1.68;color:var(--mag-ink-2);margin:24px 0 0}
+.ap-hero2-sub b{color:var(--mag-ink);font-weight:600}
+.ap-hero2-chips{list-style:none;display:flex;flex-wrap:wrap;gap:9px;margin:26px 0 0;padding:0}
+.ap-hero2-chips li{font-family:var(--mag-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mag-ink-2);
+  border:1px solid var(--mag-line-2);border-radius:20px;padding:7px 14px}
+.ap-hero2-chips li::before{content:"✓";color:var(--mag-accent);margin-right:7px}
+.ap-hero2-cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;margin-top:30px}
+.ap-hero2-cta{display:inline-flex;align-items:center;font-family:var(--mag-mono);font-size:13px;letter-spacing:.06em;
+  color:#0a0810;background:var(--mag-accent);border-radius:28px;padding:14px 26px;transition:.2s;white-space:nowrap}
+.ap-hero2-cta:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.ap-hero2-note{font-family:var(--mag-mono);font-size:11px;letter-spacing:.05em;color:var(--mag-soft)}
+/* the "this is what you get" cover mock */
+.ap-hero2-mock{position:relative;justify-self:center;width:min(330px,78vw);aspect-ratio:3/4;animation:apFloat 7s ease-in-out infinite}
+.ap-mock-card{position:absolute;inset:0;border-radius:14px;border:1px solid var(--mag-line-2);background:var(--mag-paper-2);overflow:hidden}
+.ap-mock-back{transform:rotate(-6deg) translate(-16%,4%);padding:20px 18px;background:#100e15}
+.ap-mock-lbl{font-family:var(--mag-mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--mag-accent)}
+.ap-mock-stats{display:grid;grid-template-columns:1fr 1fr;gap:11px 14px;margin:16px 0 18px}
+.ap-mock-stats span{font-family:var(--mag-mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--mag-soft);display:flex;flex-direction:column;gap:3px;border-bottom:1px solid var(--mag-line);padding-bottom:6px}
+.ap-mock-stats b{font-family:var(--mag-display);font-size:15px;color:var(--mag-ink);letter-spacing:0}
+.ap-mock-rows{display:flex;flex-direction:column;gap:9px}
+.ap-mock-rows i{height:1px;background:var(--mag-line);display:block}
+.ap-mock-rows i:nth-child(2){width:80%}.ap-mock-rows i:nth-child(3){width:62%}
+.ap-mock-front{z-index:2;display:flex;flex-direction:column;padding:16px 16px 18px;box-shadow:0 30px 60px -24px rgba(0,0,0,.7)}
+.ap-mock-top{display:flex;justify-content:space-between;align-items:baseline}
+.ap-mock-top b{font-family:var(--mag-display);font-size:15px;color:var(--mag-ink)}
+.ap-mock-top span{font-family:var(--mag-mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--mag-soft)}
+.ap-mock-photo{flex:1;margin:12px 0;border-radius:4px;position:relative;overflow:hidden;
+  background:radial-gradient(120% 90% at 70% 10%,rgba(255,140,59,.22),transparent 55%),linear-gradient(155deg,#2c2532,#141019 70%)}
+.ap-mock-wm{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);white-space:nowrap;
+  font-family:var(--mag-display);font-weight:700;font-size:15px;letter-spacing:.04em;color:#fff;opacity:.1}
+.ap-mock-disc{font-family:var(--mag-mono);font-size:8.5px;font-weight:600;letter-spacing:.14em;color:var(--mag-accent)}
+.ap-mock-name{font-family:var(--mag-display);font-weight:600;font-size:28px;line-height:1;color:var(--mag-ink);margin:5px 0 6px}
+.ap-mock-ed{font-family:var(--mag-mono);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--mag-soft)}
+@keyframes apFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@media(prefers-reduced-motion:reduce){.ap-hero2-mock{animation:none}}
+@media(max-width:820px){
+  .ap-hero2{grid-template-columns:1fr;gap:40px}
+  .ap-hero2-mock{order:-1;margin:0 auto;width:min(270px,66vw)}
+  .ap-hero2-sub{max-width:none}
+}
+
 /* ═══ HOW TO BOOK ═══ */
 .l-section{padding:70px 0}
 .l-section.alt{background:var(--mag-paper-2)}
-.tal-how{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1.5px solid var(--mag-ink)}
-.tal-how>div{border-left:1px solid var(--mag-line);padding:26px 26px 30px;position:relative}
-.tal-how>div:first-child{border-left:0;padding-left:0}
-.tal-how-n{font-family:var(--mag-display);font-style:italic;font-weight:500;font-size:34px;color:var(--mag-accent);
+.tal-how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tal-how>div{border:1px solid var(--mag-line-2);border-radius:14px;padding:26px 24px 28px;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,rgba(244,237,226,.02),transparent);transition:transform .22s,border-color .22s}
+.tal-how>div::before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;
+  background:linear-gradient(90deg,var(--mag-accent),transparent 70%);opacity:.5;transition:opacity .22s}
+.tal-how>div:hover{transform:translateY(-4px);border-color:rgba(255,140,59,.4)}
+.tal-how>div:hover::before{opacity:1}
+.tal-how-n{font-family:var(--mag-display);font-style:italic;font-weight:500;font-size:38px;color:var(--mag-accent);
   display:block;line-height:1;margin-bottom:14px}
 .tal-how b{display:block;font-family:var(--mag-display);font-size:21px;font-weight:500;color:var(--mag-ink);margin-bottom:8px}
 .tal-how p{margin:0;font-size:14px;color:var(--mag-soft);line-height:1.62}
@@ -240,9 +289,7 @@ main{overflow:hidden}
   .tal-grid{grid-template-columns:repeat(2,1fr);gap:40px 22px}
   .tal:first-child .tal-open{grid-template-columns:1fr;gap:22px}
   .tal:first-child .tal-media{max-width:70%}
-  .tal-how{grid-template-columns:1fr;border-top:1.5px solid var(--mag-ink)}
-  .tal-how>div{border-left:0;border-bottom:1px solid var(--mag-line);padding:22px 0}
-  .tal-how>div:last-child{border-bottom:0}
+  .tal-how{grid-template-columns:1fr;gap:12px}
   .tal-modal-inner{grid-template-columns:1fr;height:min(92vh,none);max-height:92vh}
   .tal-modal-gallery{flex-direction:row;overflow-x:auto;max-height:46vh;scroll-snap-type:x mandatory}
   .tal-modal-gallery img{flex:0 0 auto;width:80%;height:auto;max-height:46vh;scroll-snap-align:center}
