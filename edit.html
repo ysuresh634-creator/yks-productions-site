@@ -122,7 +122,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 </div>
 
 <div class="stage">
-  <iframe id="frame" sandbox="allow-same-origin"></iframe>
+  <iframe id="frame" sandbox="allow-scripts"></iframe>
   <div class="stage-msg" id="stagemsg">Pick a page above to start editing.</div>
 
   <!-- first-run setup -->
@@ -304,8 +304,11 @@ function stampIds(doc){ uid=0; doc.querySelectorAll('*').forEach(el=>el.setAttri
 // ══ RENDER PREVIEW ══
 function renderFrame(){
   const pv=masterDoc.cloneNode(true);
-  // neutralise the page's own scripts so they don't fight the editor
+  // neutralise the page's own scripts + inline handlers so they don't fight the editor
   pv.querySelectorAll('script').forEach(s=>s.setAttribute('type','text/x-disabled'));
+  pv.querySelectorAll('*').forEach(el=>{
+    [...el.attributes].forEach(a=>{ if(/^on/i.test(a.name)) el.removeAttribute(a.name); });
+  });
   // resolve relative assets against the live site
   let base=pv.querySelector('base'); if(!base){ base=pv.createElement('base'); pv.head.insertBefore(base,pv.head.firstChild); }
   base.setAttribute('href',SITE);
@@ -348,8 +351,8 @@ const FRAME_JS=`
   }
   function paint(){
     [].slice.call(document.querySelectorAll('[data-yks-hot]')).forEach(function(e){e.removeAttribute('data-yks-hot');});
-    if(mode==='off') return;
-    targets().forEach(function(e){e.setAttribute('data-yks-hot','1');});
+    if(mode!=='off') targets().forEach(function(e){e.setAttribute('data-yks-hot','1');});
+    parent.postMessage({yks:'painted',mode:mode,hot:document.querySelectorAll('[data-yks-hot]').length},'*');
   }
 
   // The page's own JS is disabled here, so anything it would normally clear or
@@ -428,7 +431,9 @@ window.addEventListener('message',e=>{
   const d=e.data||{};
   if(d.yks==='ready') sendMode();
   if(d.yks==='pick') onPick(d);
-  if(d.yks==='unstuck' && d.hidden) console.log('[editor] cleared '+d.hidden+' stuck overlay(s), revealed '+d.shown);
+  if(d.yks==='unstuck'){ window.__diag={...(window.__diag||{}),hidden:d.hidden,shown:d.shown}; }
+  if(d.yks==='painted'){ window.__diag={...(window.__diag||{}),mode:d.mode,hot:d.hot};
+    if(d.hot===0 && d.mode!=='off') toast('Nothing editable found in this mode'); }
 });
 function sendMode(){ const f=$('frame').contentWindow; if(f) f.postMessage({yks:'mode',mode},'*'); }
 function patch(o){ const f=$('frame').contentWindow; if(f) f.postMessage({yks:'patch',...o},'*'); }
