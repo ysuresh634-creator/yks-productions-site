@@ -324,9 +324,14 @@ function renderFrame(){
     /* preloaders / splash screens never clear because we disable the page's JS */
     #loader,.loader,#preloader,.preloader,.page-loader,.site-loader,
     .splash,.intro,.intro-overlay,#intro,.curtain,.page-transition{display:none!important}
-    [data-yks-hot]{outline:2px dashed rgba(201,169,110,.85)!important;outline-offset:2px;cursor:pointer!important}
+    [data-yks-hot]{outline:2px dashed rgba(201,169,110,.85)!important;outline-offset:-2px;cursor:pointer!important}
     [data-yks-hot]:hover{outline-style:solid!important;background:rgba(201,169,110,.14)!important}
-    [data-yks-dirty]{outline:2px solid #7EC88B!important;outline-offset:2px}
+    /* images often sit inside overflow:hidden cards, which clips an outline —
+       use an inset shadow so the highlight is always visible */
+    img[data-yks-hot]{outline:none!important;box-shadow:inset 0 0 0 3px rgba(201,169,110,.95)!important}
+    img[data-yks-hot]:hover{box-shadow:inset 0 0 0 5px #C9A96E!important;filter:brightness(1.12)!important}
+    [data-yks-dirty]{outline:2px solid #7EC88B!important;outline-offset:-2px}
+    img[data-yks-dirty]{outline:none!important;box-shadow:inset 0 0 0 4px #7EC88B!important}
   `;
   pv.head.appendChild(style);
   const script=pv.createElement('script');
