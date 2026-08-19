@@ -854,10 +854,20 @@ img{display:block;max-width:100%}
 .pf:focus-visible,.market-card:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 /* ── Fuel liquid glow — warm amber washes up from below on hover ── */
 .pf::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:inherit;
-  background:radial-gradient(ellipse at 50% 110%,rgba(255,140,59,.28) 0%,rgba(255,100,20,.06) 48%,transparent 65%);
+  background:radial-gradient(ellipse at 50% 110%,rgba(255,140,59,.18) 0%,rgba(255,100,20,.04) 48%,transparent 65%);
   opacity:0;transition:opacity .55s var(--ease);mix-blend-mode:screen}
 .pf:hover::after{opacity:1}
-@media(prefers-reduced-motion:reduce){.pf-frame:not(:first-child){display:none}}
+/* ── Fuel blur halo — always-on blurred image sits BEHIND the card, bleeds outside ── */
+.pf-wrap{position:relative;aspect-ratio:4/5}
+.pf-wrap>.pf{position:absolute;inset:0;aspect-ratio:unset;width:100%;height:100%}
+.pf-halo{position:absolute;inset:-22px;border-radius:22px;overflow:hidden;
+  filter:blur(18px);opacity:.58;pointer-events:none;z-index:0;
+  transition:opacity .5s var(--ease),transform .7s var(--ease)}
+.pf-halo img{width:100%;height:100%;object-fit:cover;object-position:50% 32%;
+  display:block;filter:brightness(.8) saturate(1.15)}
+.pf-wrap:hover .pf-halo{opacity:.88;transform:scale(1.04)}
+@media(prefers-reduced-motion:reduce){.pf-frame:not(:first-child){display:none}
+  .pf-halo{display:none}}
 
 /* ── client roster — a flowing marquee, not a dead grid of names ──
    Two rows drift in opposite directions; hover pauses. Replaces the
