@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=13" />
+<link rel="stylesheet" href="/css/talents.css?v=14" />
 </head>
 <body>
 
@@ -237,12 +237,17 @@
 <div class="ap-crop" id="apCrop" hidden>
   <div class="ap-crop-box">
     <p class="ap-crop-title">Adjust your photo <span>drag to move · slide to zoom</span></p>
-    <div class="ap-crop-frame" id="apCropFrame"><img id="apCropImg" alt="" draggable="false" /></div>
+    <div class="ap-crop-modes">
+      <button type="button" class="ap-crop-mode on" id="apModeFill">▣ Fill frame</button>
+      <button type="button" class="ap-crop-mode" id="apModeFit">◱ Fit whole</button>
+    </div>
+    <div class="ap-crop-frame" id="apCropFrame"><img id="apCropBlur" alt="" aria-hidden="true" draggable="false" /><img id="apCropImg" alt="" draggable="false" /></div>
+    <p class="ap-crop-note" id="apCropNote">Drag to reposition — the frame is what shows in your portfolio.</p>
     <label class="ap-crop-zoom">Zoom<input type="range" id="apCropZoom" min="1" max="3" step="0.01" value="1" /></label>
     <div class="ap-crop-btns">
       <button type="button" id="apCropReset">Reset</button>
       <button type="button" id="apCropCancel">Cancel</button>
-      <button type="button" class="btn btn-fill" id="apCropSave">Save crop</button>
+      <button type="button" class="btn btn-fill" id="apCropSave">Save</button>
     </div>
   </div>
 </div>
@@ -261,6 +266,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=16"></script>
+<script src="/js/talent-apply.js?v=17"></script>
 </body>
 </html>

@@ -158,8 +158,9 @@
     });
   })();
 
-  /* ══ per-photo crop / adjust editor (pan + zoom) ══ */
-  var cropModal = $('#apCrop'), cropImg = $('#apCropImg'), cropFrame = $('#apCropFrame'), cropZoom = $('#apCropZoom');
+  /* ══ per-photo crop / adjust editor — Fill (crop) or Fit (show the whole photo) ══ */
+  var cropModal = $('#apCrop'), cropImg = $('#apCropImg'), cropBlur = $('#apCropBlur'), cropFrame = $('#apCropFrame'), cropZoom = $('#apCropZoom');
+  var cropNote = $('#apCropNote'), modeFillBtn = $('#apModeFill'), modeFitBtn = $('#apModeFit');
   var cropS = null;
   function openCrop(item) {
     if (!cropModal) return;
@@ -167,23 +168,58 @@
     var nat = new Image();
     nat.onload = function () {
       var fw = cropFrame.clientWidth || 300, fh = cropFrame.clientHeight || 375;
-      var base = Math.max(fw / nat.width, fh / nat.height);
-      cropS = { item: item, nat: nat, fw: fw, fh: fh, base: base, zoom: 1 };
-      cropS.tx = (fw - nat.width * base) / 2; cropS.ty = (fh - nat.height * base) / 2;
-      cropImg.src = nat.src; cropZoom.value = 1; applyCrop();
+      cropS = { item: item, nat: nat, fw: fw, fh: fh, mode: item.fit ? 'fit' : 'fill', zoom: 1 };
+      cropImg.src = nat.src; cropBlur.src = nat.src;
+      setMode(cropS.mode, true);
     };
     nat.src = item.url;
+  }
+  function baseFor(mode) { return mode === 'fit' ? Math.min(cropS.fw / cropS.nat.width, cropS.fh / cropS.nat.height) : Math.max(cropS.fw / cropS.nat.width, cropS.fh / cropS.nat.height); }
+  function setMode(mode, recenter) {
+    if (!cropS) return;
+    cropS.mode = mode; cropS.base = baseFor(mode);
+    if (recenter) { cropS.zoom = 1; cropZoom.value = 1; cropS.tx = (cropS.fw - cropS.nat.width * cropS.base) / 2; cropS.ty = (cropS.fh - cropS.nat.height * cropS.base) / 2; }
+    cropBlur.style.display = mode === 'fit' ? 'block' : 'none';
+    if (modeFillBtn) modeFillBtn.classList.toggle('on', mode === 'fill');
+    if (modeFitBtn) modeFitBtn.classList.toggle('on', mode === 'fit');
+    if (cropNote) cropNote.textContent = mode === 'fit'
+      ? 'Your whole photo shows — nothing is cut. The soft edges fill the frame.'
+      : 'Drag to reposition — the frame is what shows in your portfolio.';
+    applyCrop();
   }
   function applyCrop() {
     if (!cropS) return;
     var s = cropS.base * cropS.zoom, w = cropS.nat.width * s, h = cropS.nat.height * s;
-    cropS.tx = Math.min(0, Math.max(cropS.fw - w, cropS.tx));
-    cropS.ty = Math.min(0, Math.max(cropS.fh - h, cropS.ty));
+    if (cropS.mode === 'fill') {   // must always cover the frame — clamp so no empty edges
+      cropS.tx = Math.min(0, Math.max(cropS.fw - w, cropS.tx));
+      cropS.ty = Math.min(0, Math.max(cropS.fh - h, cropS.ty));
+    }
     cropImg.style.width = w + 'px'; cropImg.style.height = h + 'px';
     cropImg.style.transform = 'translate(' + cropS.tx + 'px,' + cropS.ty + 'px)';
   }
   function closeCrop() { if (cropModal) cropModal.hidden = true; document.documentElement.style.overflow = ''; cropS = null; }
+  function saveCrop() {
+    if (!cropS) return;
+    var outW = 900, outH = Math.round(outW * cropS.fh / cropS.fw), k = outW / cropS.fw;
+    var c = document.createElement('canvas'); c.width = outW; c.height = outH; var ctx = c.getContext('2d');
+    if (cropS.mode === 'fit') {
+      var nat = cropS.nat, bs = Math.max(outW / nat.width, outH / nat.height);   // blurred backdrop fills — no bars
+      if ('filter' in ctx) ctx.filter = 'blur(24px) brightness(.6)';
+      ctx.drawImage(nat, (outW - nat.width * bs) / 2, (outH - nat.height * bs) / 2, nat.width * bs, nat.height * bs);
+      if ('filter' in ctx) ctx.filter = 'none';
+      var s = cropS.base * cropS.zoom;                                            // whole photo, positioned
+      ctx.drawImage(nat, cropS.tx * k, cropS.ty * k, nat.width * s * k, nat.height * s * k);
+      cropS.item.edited = c.toDataURL('image/jpeg', 0.86); cropS.item.fit = true;
+    } else {
+      var s2 = cropS.base * cropS.zoom, sx = -cropS.tx / s2, sy = -cropS.ty / s2, sw = cropS.fw / s2, sh = cropS.fh / s2;
+      ctx.drawImage(cropS.nat, sx, sy, sw, sh, 0, 0, outW, outH);
+      cropS.item.edited = c.toDataURL('image/jpeg', 0.85); cropS.item.fit = false;
+    }
+    closeCrop(); renderThumbs();
+  }
   if (cropModal) {
+    if (modeFillBtn) modeFillBtn.addEventListener('click', function () { setMode('fill', true); });
+    if (modeFitBtn) modeFitBtn.addEventListener('click', function () { setMode('fit', true); });
     cropZoom.addEventListener('input', function () { if (cropS) { cropS.zoom = parseFloat(cropZoom.value) || 1; applyCrop(); } });
     var drag = false, dx, dy, otx, oty;
     var cdown = function (x, y) { if (!cropS) return; drag = true; dx = x; dy = y; otx = cropS.tx; oty = cropS.ty; };
@@ -194,17 +230,8 @@
     cropFrame.addEventListener('touchstart', function (e) { cdown(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
     cropFrame.addEventListener('touchmove', function (e) { cmove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
     cropFrame.addEventListener('touchend', function () { drag = false; });
-    $('#apCropSave').addEventListener('click', function () {
-      if (!cropS) return;
-      var s = cropS.base * cropS.zoom;
-      var sx = -cropS.tx / s, sy = -cropS.ty / s, sw = cropS.fw / s, sh = cropS.fh / s;
-      var outW = 900, outH = Math.round(outW * cropS.fh / cropS.fw);
-      var c = document.createElement('canvas'); c.width = outW; c.height = outH;
-      c.getContext('2d').drawImage(cropS.nat, sx, sy, sw, sh, 0, 0, outW, outH);
-      cropS.item.edited = c.toDataURL('image/jpeg', 0.85);
-      closeCrop(); renderThumbs();
-    });
-    $('#apCropReset').addEventListener('click', function () { if (cropS) { cropS.item.edited = null; closeCrop(); renderThumbs(); } });
+    $('#apCropSave').addEventListener('click', saveCrop);
+    $('#apCropReset').addEventListener('click', function () { if (cropS) { cropS.item.edited = null; cropS.item.fit = false; closeCrop(); renderThumbs(); } });
     $('#apCropCancel').addEventListener('click', closeCrop);
     cropModal.addEventListener('click', function (e) { if (e.target === cropModal) closeCrop(); });
   }
@@ -506,7 +533,7 @@
         var JsPDF = rr[0];
         return Promise.all(photos.slice(0, 8).map(function (p) {
           var pr = p.edited ? gradeDataURL(p.edited).then(function (d) { return { data: d, w: 900, h: 1125 }; }) : prepImg(p.file, 0.8, 1000);
-          return pr.then(function (im) { im.cat = p.cat || ''; return im; });
+          return pr.then(function (im) { im.cat = p.cat || ''; im.fit = !!p.fit; return im; });
         }))
           .then(function (imgs) {
             var th = THEMES[CFG.theme];
@@ -553,6 +580,11 @@
       doc.text('BOOKINGS  +91 97466 79720   ·   YKSPRODUCTIONS.COM', W - M, H - 40, { align: 'right' });
     }
     function coverFill(im, x, y, bw, bh) { var s = Math.max(bw / im.w, bh / im.h), w = im.w * s, h = im.h * s; doc.addImage(im.data, 'JPEG', x + (bw - w) / 2, y + (bh - h) / 2, w, h); }
+    // full-bleed placement that respects a photo's "fit whole" choice — fit = show the entire photo (never cropped)
+    function bleed(im, x, y, bw, bh) {
+      if (im.fit) { doc.setFillColor.apply(doc, BG); doc.rect(x, y, bw, bh, 'F'); var s = Math.min(bw / im.w, bh / im.h), w = im.w * s, h = im.h * s; doc.addImage(im.data, 'JPEG', x + (bw - w) / 2, y + (bh - h) / 2, w, h); }
+      else { coverFill(im, x, y, bw, bh); }
+    }
     function shade(y, hgt, op) { if (doc.setGState) { doc.saveGraphicsState(); doc.setGState(new doc.GState({ opacity: op })); doc.setFillColor(8, 6, 12); doc.rect(0, y, W, hgt, 'F'); doc.restoreGraphicsState(); } }
     var SAVE = (name.replace(/[^a-z0-9 ]/gi, '').trim() || 'YKS') + ' — YKS Portfolio.pdf';
     // scan-to-book: a QR straight to YKS's WhatsApp, name pre-filled — booking always routes through YKS
@@ -590,13 +622,13 @@
 
     /* ── TEMPLATE: Lookbook (full-bleed, photo-forward) ── */
     function tplLookbook() {
-      fill(); coverFill(imgs[0], 0, 0, W, H); shade(H - 210, 210, 0.55); watermark(true);
+      fill(); bleed(imgs[0], 0, 0, W, H); shade(H - 210, 210, 0.55); watermark(true);
       doc.setFont(F, 'bold'); doc.setFontSize(9); ct([255, 255, 255]); doc.text('YKS  ·  TALENT PORTFOLIO', M, 52);
       doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), M, H - 92);
       doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 26 : 34); ct([255, 255, 255]); doc.text(NM, M, H - 54);
       doc.setFont(F, 'normal'); doc.setFontSize(TAG ? 9.5 : 8); ct(TAG ? [255, 255, 255] : [232, 227, 217]); doc.text(TAG || 'EDITION 2026 · EXCLUSIVE · YKS', M, H - 36);
       imgs.slice(1, 8).forEach(function (im) {
-        doc.addPage(); fill(); coverFill(im, 0, 0, W, H); shade(H - 64, 64, 0.5); watermark(true);
+        doc.addPage(); fill(); bleed(im, 0, 0, W, H); shade(H - 64, 64, 0.5); watermark(true);
         doc.setFont(F, 'normal'); doc.setFontSize(8); ct([255, 255, 255]);
         doc.text((im.cat || cat).toUpperCase(), M, H - 28); doc.text(NM, W - M, H - 28, { align: 'right' });
       });
@@ -643,7 +675,7 @@
     /* ── TEMPLATE: Comp Card (agency standard — face front, grid + stats back) ── */
     function tplCompCard() {
       // FRONT — one hero headshot, name, agency mark
-      fill(); coverFill(imgs[0], 0, 0, W, H); shade(0, 108, 0.4); shade(H - 188, 188, 0.62); watermark(true);
+      fill(); bleed(imgs[0], 0, 0, W, H); shade(0, 108, 0.4); shade(H - 188, 188, 0.62); watermark(true);
       doc.setFont(F, 'bold'); doc.setFontSize(11); ct([255, 255, 255]); doc.text('YKS  ·  TALENT', M, 50);
       doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct([232, 227, 217]); doc.text('COMP CARD', W - M, 50, { align: 'right' });
       doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text(disc.toUpperCase(), M, H - 92);
