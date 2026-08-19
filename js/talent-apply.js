@@ -50,7 +50,14 @@
     { k: 'gothic',    label: 'Gothic',    note: 'Dark & dramatic',    layout: 'luxe',     kit: { font: 'playfair', theme: 'noir',      accent: '#8a7fd6', look: 'cool' } },
     { k: 'noir',      label: 'Noir',      note: 'B&W, cinematic',     layout: 'lookbook', kit: { font: 'oswald',   theme: 'noir',      accent: '#e2ddd3', look: 'bw' } },
     { k: 'mono',      label: 'Mono',      note: 'Monospace, clean',   layout: 'minimal',  kit: { font: 'mono',     theme: 'porcelain', accent: '#3b6fd4', look: 'none' } },
-    { k: 'sepia',     label: 'Sepia',     note: 'Warm vintage film',  layout: 'classic',  kit: { font: 'serif',    theme: 'sand',      accent: '#b0552b', look: 'film' } }
+    { k: 'sepia',     label: 'Sepia',     note: 'Warm vintage film',  layout: 'classic',  kit: { font: 'serif',    theme: 'sand',      accent: '#b0552b', look: 'film' } },
+    { k: 'duo',       label: 'Duo',       note: 'Diptych · paired shots',                     kit: { font: 'playfair', theme: 'noir',      accent: '#d47a3a', look: 'none' } },
+    { k: 'beauty',    label: 'Beauty',    note: 'Soft & close',       layout: 'feature',  kit: { font: 'serif',    theme: 'porcelain', accent: '#d16a8a', look: 'warm' } },
+    { k: 'bridal',    label: 'Bridal',    note: 'Cream & gold',       layout: 'classic',  kit: { font: 'serif',    theme: 'ivory',     accent: '#c9a24b', look: 'fade' } },
+    { k: 'fitness',   label: 'Fitness',   note: 'Bold & dynamic',     layout: 'lookbook', kit: { font: 'oswald',   theme: 'charcoal',  accent: '#3b6fd4', look: 'none' } },
+    { k: 'street',    label: 'Street',    note: 'Candid, documentary', layout: 'grid',    kit: { font: 'mono',     theme: 'slate',     accent: '#b8912e', look: 'film' } },
+    { k: 'runway',    label: 'Runway',    note: 'Sequential, editorial', layout: 'feature', kit: { font: 'oswald',  theme: 'noir',      accent: '#d47a3a', look: 'none' } },
+    { k: 'commercial',label: 'Commercial',note: 'Clean & bright',     layout: 'compcard', kit: { font: 'sans',     theme: 'porcelain', accent: '#3b6fd4', look: 'none' } }
   ];
   /* photo "look": a single grade applied to EVERY image so the book feels
      shot as one story — the thing that separates a pro portfolio from a phone roll */
@@ -1000,7 +1007,28 @@
         foot();
       }
     }
+    /* ── TEMPLATE: Duo (diptych — two photos paired per page) ── */
+    function tplDuo() {
+      fill(); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(12); ct(TX); doc.text('YKS', M, 58);
+      doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('TALENT PORTFOLIO', W - M, 58, { align: 'right' });
+      var cw = (CW - 14) / 2; place(imgs[0], M, 76, cw); if (imgs[1]) place(imgs[1], M + cw + 14, 76, cw);
+      var ny = 76 + cw / 0.8 + 34;
+      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), M, ny);
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 22 : 27); ct(TX); doc.text(NM, M, ny + 30);
+      if (TAG) { doc.setFont(F, 'normal'); doc.setFontSize(10); ct(AC); doc.text(TAG, M, ny + 50); }
+      var rest = imgs.slice(2), pn = 1;
+      for (var i = 0; i < rest.length; i += 2) {
+        doc.addPage(); fill(); watermark();
+        doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('SELECTED WORK', M, 58);
+        doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text(NM, W - M, 58, { align: 'right' }); ruleY(70);
+        var w = (CW - 14) / 2, y = 96;
+        [rest[i], rest[i + 1]].forEach(function (im, k) { if (im) { place(im, M + k * (w + 14), y, w); doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('PLATE ' + ('0' + (pn++)).slice(-2) + '  ·  ' + ((im.cat || cat)).toUpperCase(), M + k * (w + 14), y + w / 0.8 + 16); } });
+        foot();
+      }
+    }
     if (cfg.template === 'lookbook') { tplLookbook(); doc.save(SAVE); return; }
+    if (cfg.template === 'duo') { tplDuo(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
     if (cfg.template === 'compcard') { tplCompCard(); doc.save(SAVE); return; }
     if (cfg.template === 'minimal') { tplMinimal(); doc.save(SAVE); return; }
     if (cfg.template === 'grid') { tplGrid(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
