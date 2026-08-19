@@ -65,6 +65,17 @@
   var DISC = { 'Model': 'Fashion · Editorial · Runway · Commercial', 'Influencer / Creator': 'Content · Campaign · Reels', 'Actor': 'Film · Ad · Editorial · Screen' };
   function hexRgb(h) { h = h.replace('#', ''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // enforce "it's all YKS": scrub any contact a talent might slip into free text (tagline)
+  function stripContact(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/\S+@\S+\.\S+/g, '')                                        // emails
+      .replace(/\b(?:https?:\/\/|www\.)\S+/gi, '')                         // urls
+      .replace(/@[\w.]+/g, '')                                             // @handles
+      .replace(/\b[a-z0-9-]+\.(?:com|in|net|co|org|me|link|io|to|xyz)\b/gi, '') // bare domains
+      .replace(/[+(]?\d[\d\s().\-]{6,}\d/g, '')                            // phone numbers
+      .replace(/\s{2,}/g, ' ').replace(/^[\s·|,\-]+|[\s·|,\-]+$/g, '').trim();
+  }
   var CATS = ['Portrait', 'Full length', 'Fashion', 'Commercial', 'Beauty', 'Other'];
   var activeCat = 'Portrait';   // new photos land in the selected category
 
@@ -337,6 +348,7 @@
     var disc = esc((DISC[cat] || 'Fashion · Editorial · Commercial').toUpperCase());
     var cover = photos[0] ? (photos[0].edited || photos[0].url) : '';
     var lkCss = (LOOKS[CFG.look] && LOOKS[CFG.look].css) || 'none';
+    var tag = esc(stripContact((form.tagline && form.tagline.value || '').trim()));
     var wm = '<span class="ap-cv-wm">YKS PRODUCTIONS</span>';
     var imgTag = cover ? '<img src="' + cover + '" alt="" style="filter:' + lkCss + '">' + wm : '';
     var empty = '<div class="ap-cv-img ap-cv-empty" style="border-color:' + th.sub + '">Add a photo</div>';
@@ -344,19 +356,22 @@
     if (tpl === 'lookbook') {
       html = '<div class="ap-cover ap-cv-bleed" style="font-family:' + ff + ';background:' + th.bg + '">' +
         (cover ? '<div class="ap-cv-full">' + imgTag + '</div>' : empty) +
-        '<div class="ap-cv-overlay"><div class="ap-cv-disc" style="color:' + ac + '">' + disc + '</div><div class="ap-cv-name" style="color:#fff">' + nm + '</div></div></div>';
+        '<div class="ap-cv-overlay"><div class="ap-cv-disc" style="color:' + ac + '">' + disc + '</div><div class="ap-cv-name" style="color:#fff">' + nm + '</div>' +
+        (tag ? '<div class="ap-cv-tag" style="color:#e8e3d9">' + tag + '</div>' : '') + '</div></div>';
     } else if (tpl === 'minimal') {
       html = '<div class="ap-cover ap-cv-min" style="background:' + th.bg + ';color:' + th.text + ';font-family:' + ff + '">' +
         '<div class="ap-cv-top" style="justify-content:center"><i style="color:' + th.sub + '">YKS · TALENT PORTFOLIO</i></div>' +
         (cover ? '<div class="ap-cv-img ap-cv-minimg">' + imgTag + '</div>' : empty) +
         '<div class="ap-cv-name" style="text-align:center">' + nm + '</div>' +
-        '<div class="ap-cv-disc" style="color:' + ac + ';text-align:center">' + disc + '</div></div>';
+        '<div class="ap-cv-disc" style="color:' + ac + ';text-align:center">' + disc + '</div>' +
+        (tag ? '<div class="ap-cv-tag" style="color:' + th.sub + ';text-align:center">' + tag + '</div>' : '') + '</div>';
     } else {
       html = '<div class="ap-cover" style="background:' + th.bg + ';color:' + th.text + ';font-family:' + ff + '">' +
         '<div class="ap-cv-top"><b>YKS</b><i style="color:' + th.sub + '">TALENT PORTFOLIO</i></div>' +
         (cover ? '<div class="ap-cv-img">' + imgTag + '</div>' : empty) +
         '<div class="ap-cv-disc" style="color:' + ac + '">' + disc + '</div><div class="ap-cv-name">' + nm + '</div>' +
-        '<div class="ap-cv-ed" style="color:' + th.sub + '">EDITION 2026 · EXCLUSIVE · YKS</div></div>';
+        (tag ? '<div class="ap-cv-tag" style="color:' + ac + '">' + tag + '</div>'
+             : '<div class="ap-cv-ed" style="color:' + th.sub + '">EDITION 2026 · EXCLUSIVE · YKS</div>') + '</div>';
     }
     preview.innerHTML = html;
   }
@@ -500,6 +515,7 @@
     if ((F === 'Playfair' || F === 'Oswald') && !doc.getFontList()[F]) F = 'helvetica';   // font failed to load → safe fallback
     var cat = (form.category.value || 'Model').trim(), city = (form.city.value || '').trim(), about = (form.about.value || '').trim();
     var disc = DISC[cat] || 'Fashion · Editorial · Commercial', NM = name.toUpperCase();
+    var TAG = stripContact((form.tagline && form.tagline.value || '').trim());   // signature line, contact scrubbed
     function st(k) { var el = form['stat_' + k]; return el && el.value.trim() ? el.value.trim() : ''; }
     var STATS = [['Height', st('height')], ['Bust', st('bust')], ['Waist', st('waist')], ['Hips', st('hips')], ['Shoe', st('shoe')], ['Hair', st('hair')], ['Eyes', st('eyes')], ['Skin', st('skin')]].filter(function (r) { return r[1]; });
     function fill() { doc.setFillColor.apply(doc, BG); doc.rect(0, 0, W, H, 'F'); }
@@ -529,7 +545,7 @@
       doc.setFont(F, 'bold'); doc.setFontSize(9); ct([255, 255, 255]); doc.text('YKS  ·  TALENT PORTFOLIO', M, 52);
       doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), M, H - 92);
       doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 26 : 34); ct([255, 255, 255]); doc.text(NM, M, H - 54);
-      doc.setFont(F, 'normal'); doc.setFontSize(8); ct([232, 227, 217]); doc.text('EDITION 2026 · EXCLUSIVE · YKS', M, H - 36);
+      doc.setFont(F, 'normal'); doc.setFontSize(TAG ? 9.5 : 8); ct(TAG ? [255, 255, 255] : [232, 227, 217]); doc.text(TAG || 'EDITION 2026 · EXCLUSIVE · YKS', M, H - 36);
       imgs.slice(1, 8).forEach(function (im) {
         doc.addPage(); fill(); coverFill(im, 0, 0, W, H); shade(H - 64, 64, 0.5); watermark(true);
         doc.setFont(F, 'normal'); doc.setFontSize(8); ct([255, 255, 255]);
@@ -553,6 +569,7 @@
       doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('YKS  ·  TALENT PORTFOLIO', CX, 72, { align: 'center' });
       doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 22 : 28); ct(TX); doc.text(NM, CX, 128 + 375 + 46, { align: 'center' });
       doc.setFont(F, 'normal'); doc.setFontSize(9); ct(AC); doc.text(disc.toUpperCase(), CX, 128 + 375 + 68, { align: 'center' });
+      if (TAG) { doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text(TAG, CX, 128 + 375 + 88, { align: 'center' }); }
       doc.addPage(); fill(); watermark();
       doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text('PROFILE', CX, 122, { align: 'center' });
       doc.setFont(F, 'bold'); doc.setFontSize(24); ct(TX); doc.text(name, CX, 158, { align: 'center' });
@@ -577,7 +594,7 @@
       doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct([232, 227, 217]); doc.text('COMP CARD', W - M, 50, { align: 'right' });
       doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text(disc.toUpperCase(), M, H - 92);
       doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 30 : 40); ct([255, 255, 255]); doc.text(NM, M, H - 54);
-      doc.setFont(F, 'normal'); doc.setFontSize(9); ct([232, 227, 217]); doc.text([cat, city].filter(Boolean).join('   ·   ').toUpperCase(), M, H - 34);
+      doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(TAG ? AC : [232, 227, 217]); doc.text(TAG || [cat, city].filter(Boolean).join('   ·   ').toUpperCase(), M, H - 34);
       // BACK — 2×2 grid of varied shots + measurements band + booking
       doc.addPage(); fill(); watermark();
       doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text(NM, M, 54);
@@ -608,7 +625,8 @@
     doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('TALENT PORTFOLIO', W - M, 58, { align: 'right' });
     doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), M, 732);
     doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 22 : 27); ct(TX); doc.text(NM, M, 766);
-    doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('EDITION 2026 / 01     ·     EXCLUSIVE     ·     YKS', M, 786);
+    if (TAG) { doc.setFont(F, 'normal'); doc.setFontSize(10); ct(AC); doc.text(TAG, M, 786); }
+    else { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('EDITION 2026 / 01     ·     EXCLUSIVE     ·     YKS', M, 786); }
     // ── PROFILE ──
     doc.addPage(); fill(); watermark();
     doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('PROFILE', M, 58);
