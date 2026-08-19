@@ -46,7 +46,10 @@ select.page-sel{flex:1;min-width:0;background:var(--input);border:1px solid var(
 /* ── STAGE ── */
 .stage{flex:1;position:relative;background:#000;overflow:hidden}
 #frame{width:100%;height:100%;border:none;background:#fff}
-.stage-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:13px;text-align:center;padding:30px;pointer-events:none}
+.stage-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);font-size:13px;text-align:center;padding:30px;pointer-events:none;line-height:1.7}
+.setup{position:absolute;inset:0;background:var(--bg);display:none;align-items:flex-start;justify-content:center;padding:26px 18px;overflow-y:auto}
+.setup.on{display:flex}
+.setup-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 22px;max-width:420px;width:100%;text-align:center}
 
 /* ── SHEETS ── */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:190;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -121,6 +124,28 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 <div class="stage">
   <iframe id="frame" sandbox="allow-same-origin"></iframe>
   <div class="stage-msg" id="stagemsg">Pick a page above to start editing.</div>
+
+  <!-- first-run setup -->
+  <div class="setup" id="setup">
+    <div class="setup-card">
+      <div style="font-size:34px;margin-bottom:10px">🔑</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">One-time setup</div>
+      <p class="hint" style="margin-bottom:16px">
+        Paste your GitHub token below. It is saved only in this browser and
+        never leaves your device except to talk to GitHub.
+      </p>
+      <div class="fld">
+        <input class="inp" type="password" id="setup-tok" placeholder="github_pat_… or ghp_…" autocomplete="off" spellcheck="false">
+      </div>
+      <button class="btn btn-save" style="width:100%;padding:13px" onclick="saveToken()">Save &amp; Continue</button>
+      <div id="setup-msg" style="margin-top:12px"></div>
+      <p class="hint" style="margin-top:14px">
+        No token yet? Make one at <b>github.com → Settings → Developer settings →
+        Personal access tokens → Fine-grained</b>, scoped to
+        <b>yks-productions-site</b> with <b>Contents: Read&nbsp;and&nbsp;write</b>.
+      </p>
+    </div>
+  </div>
 </div>
 
 <div class="ov" id="ov" onclick="closeSheets()"></div>
@@ -228,8 +253,27 @@ async function gh(path, opts={}){
 }
 
 // ══ BOOT ══
+async function saveToken(){
+  const t=$('setup-tok').value.trim();
+  const msg=$('setup-msg');
+  if(!t){ msg.innerHTML='<div class="log bad">Paste your token first.</div>'; return; }
+  if(!/^(github_pat_|ghp_)/.test(t)){ msg.innerHTML='<div class="log bad">That does not look like a GitHub token.</div>'; return; }
+  msg.innerHTML='<div class="log work">Checking access…</div>';
+  try{
+    const r=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}`,{headers:{Authorization:`Bearer ${t}`,Accept:'application/vnd.github+json'}});
+    if(!r.ok) throw new Error(r.status===401?'Token rejected by GitHub.':`GitHub returned ${r.status}.`);
+    const d=await r.json();
+    if(!d.permissions||!d.permissions.push) throw new Error('This token can read but not write. It needs Contents: Read and write.');
+    localStorage.setItem('yks_ghtoken',t);
+    $('setup-tok').value='';
+    msg.innerHTML='<div class="log ok">✓ Connected to '+esc(d.full_name)+'</div>';
+    setTimeout(()=>{ $('setup').classList.remove('on'); boot(); },800);
+  }catch(e){ msg.innerHTML='<div class="log bad">'+esc(e.message)+'</div>'; }
+}
+
 async function boot(){
-  if(!ghToken()){ $('stagemsg').innerHTML='⚠️ No GitHub token saved.<br><br>Open <b>Studio → Settings → Website Editor</b>,<br>paste your token, then come back.'; return; }
+  if(!ghToken()){ $('setup').classList.add('on'); $('stagemsg').style.display='none'; return; }
+  $('setup').classList.remove('on'); $('stagemsg').style.display='';
   try{
     const tree=await gh(`git/trees/${GH_BRANCH}?recursive=1`);
     const pages=tree.tree.filter(n=>n.type==='blob'&&/\.html$/i.test(n.path)&&!n.path.startsWith('_')&&!/^google[0-9a-f]+\.html$/i.test(n.path)).map(n=>n.path).sort();
