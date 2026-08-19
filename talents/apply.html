@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=24" />
+<link rel="stylesheet" href="/css/talents.css?v=25" />
 </head>
 <body>
 
@@ -250,30 +250,6 @@
           </div>
         </div>
 
-        <!-- Portfolio builder — customise + download, built on the page -->
-        <div class="ap-block ap-build">
-          <p class="ap-step">Build your portfolio <span class="ap-opt">free · make it yours</span></p>
-          <p class="ap-hint">Reorder your photos above (the first is your cover), choose a look, then download a full YKS portfolio PDF. The <b>YKS Productions watermark &amp; branding stay on every page</b>, and every booking routes through YKS — never your own contact.</p>
-          <button type="button" class="ap-surprise" id="apSurprise">✨ Surprise me — design it for me</button>
-          <div class="ap-pick">
-            <p class="ap-pick-lbl">Pick a design <span>— tap one to see it</span></p>
-            <div class="ap-tpls" id="apTemplates"></div>
-          </div>
-          <div class="ap-build-grid">
-            <div class="ap-controls">
-              <div class="ap-ctl"><span>Photo look</span><div class="ap-looks" id="apLooks"></div></div>
-              <div class="ap-ctl"><span>Theme</span><div class="ap-swatches" id="apThemes"></div></div>
-              <div class="ap-ctl"><span>Font</span><div class="ap-fonts" id="apFonts"></div></div>
-              <div class="ap-ctl"><span>Accent</span><div class="ap-accents" id="apAccents"></div></div>
-            </div>
-            <div class="ap-preview" id="apPreview"></div>
-          </div>
-          <button type="button" class="btn btn-ghost ap-dl" id="apDownload">↓ Download my portfolio (PDF)</button>
-        </div>
-
-        <button type="submit" class="btn btn-fill ap-submit">Send my application →</button>
-        <p class="ap-progress" id="apProgress" hidden></p>
-        <p class="tal-form-note">🔒 Your number, email and socials are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
       </form>
       <aside class="ap-live" aria-label="Live portfolio preview">
         <div class="ap-live-sticky">
@@ -284,6 +260,34 @@
         </div>
       </aside>
       </div>
+
+      <!-- ══ DESIGN STUDIO — full-width: live preview + controls | template gallery ══ -->
+      <section class="ap-studio" aria-label="Portfolio designer">
+        <p class="ap-step">Design your portfolio <span class="ap-opt">free · make it yours</span></p>
+        <p class="ap-hint">Pick a design and the preview shows exactly how your cover lands — then fine-tune the look. The <b>YKS watermark &amp; branding stay on every page</b>, and booking always routes through YKS.</p>
+        <div class="ap-studio-grid">
+          <div class="ap-studio-side">
+            <button type="button" class="ap-surprise" id="apSurprise">✨ Surprise me — design it for me</button>
+            <div class="ap-live-frame ap-studio-preview"><div class="ap-preview" id="apPreview"></div></div>
+            <p class="ap-live-meta" id="apStudioMeta">Pick a design to preview →</p>
+            <div class="ap-controls">
+              <div class="ap-ctl"><span>Photo look</span><div class="ap-looks" id="apLooks"></div></div>
+              <div class="ap-ctl"><span>Theme</span><div class="ap-swatches" id="apThemes"></div></div>
+              <div class="ap-ctl"><span>Font</span><div class="ap-fonts" id="apFonts"></div></div>
+              <div class="ap-ctl"><span>Accent</span><div class="ap-accents" id="apAccents"></div></div>
+            </div>
+            <button type="button" class="btn btn-ghost ap-dl" id="apDownload">↓ Download my portfolio (PDF)</button>
+          </div>
+          <div class="ap-studio-main">
+            <p class="ap-pick-lbl">Pick a design <span>— tap one to preview it</span></p>
+            <div class="ap-tpls" id="apTemplates"></div>
+          </div>
+        </div>
+      </section>
+
+      <button type="submit" form="talForm" class="btn btn-fill ap-submit">Send my application →</button>
+      <p class="ap-progress" id="apProgress" hidden></p>
+      <p class="tal-form-note">🔒 Your number, email and socials are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
 
       <p class="l-form-ok" id="talOk">✓ Application received — thank you. If it's a fit, I'll be in touch personally.
         <span id="apOkWa" hidden><br />One quick step: <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%20just%20applied%20to%20YKS%20Talents%20and%20I%27d%20like%20to%20send%20my%20photos%2Fportfolio." target="_blank" rel="noopener">send your photos on WhatsApp →</a></span>
@@ -329,6 +333,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=29"></script>
+<script src="/js/talent-apply.js?v=30"></script>
 </body>
 </html>

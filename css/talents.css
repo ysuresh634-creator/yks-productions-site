@@ -242,12 +242,23 @@ main{overflow:hidden}
 .ap-live-meta{font-family:var(--mag-mono);font-size:11.5px;letter-spacing:.03em;color:var(--mag-ink-2);margin:16px 2px 0;text-align:center;line-height:1.5}
 .ap-live-hint{font-size:11.5px;line-height:1.5;color:var(--mag-soft);margin:9px 4px 0;text-align:center}
 @media(min-width:901px){
-  .tal-apply{max-width:1120px}
+  .tal-apply{max-width:1160px}
   .ap-layout{grid-template-columns:minmax(0,1fr) 340px;gap:clamp(30px,4vw,58px)}
-  .ap-build-grid{grid-template-columns:1fr}
-  .ap-build-grid #apPreview{display:none}
 }
 @media(max-width:900px){ .ap-live{display:none} }
+/* ── full-width DESIGN STUDIO: preview + controls (left) | template gallery (right) ── */
+.ap-studio{margin-top:46px;padding-top:38px;border-top:1px solid var(--mag-line)}
+.ap-studio-grid{display:grid;grid-template-columns:1fr;gap:26px;margin-top:22px;align-items:start}
+.ap-studio-side{display:flex;flex-direction:column;gap:18px}
+.ap-studio .ap-preview{position:static}
+.ap-studio-preview{padding:16px}
+.ap-pick-lbl{margin-top:0}
+.ap-studio .ap-tpls{grid-template-columns:repeat(2,1fr)}
+@media(min-width:901px){
+  .ap-studio-grid{grid-template-columns:372px minmax(0,1fr);gap:clamp(30px,3.5vw,54px)}
+  .ap-studio-side{position:sticky;top:88px}
+  .ap-studio .ap-tpls{grid-template-columns:repeat(auto-fill,minmax(178px,1fr))}
+}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:22px 30px}
 .tal-form label{display:flex;flex-direction:column;gap:9px;font-family:var(--mag-mono);font-size:10px;
   letter-spacing:.2em;text-transform:uppercase;color:var(--mag-soft)}

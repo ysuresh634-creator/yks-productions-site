@@ -28,6 +28,8 @@
 
   /* ── portfolio customiser: the talent's own theme / font / accent / look ── */
   var CFG = { theme: 'noir', font: 'playfair', accent: '#d47a3a', template: 'editorial', layout: 'editorial', look: 'none' };
+  // a real YKS editorial frame — stands in as the demo cover until the talent adds their own photos
+  var SAMPLE_COVER = '/assets/behance/fash-olivia.jpg';
   // each template is a whole design kit — its own font, theme, accent & photo look (all still overridable)
   var TEMPLATES = [
     { k: 'editorial', label: 'Editorial', note: 'Framed hero + profile',     kit: { font: 'playfair', theme: 'noir',      accent: '#d47a3a', look: 'none' } },
@@ -166,7 +168,7 @@
       fig.addEventListener('drop', function (e) { e.preventDefault(); var from = idxOf(+e.dataTransfer.getData('text/plain')), to = idxOf(item.id); if (from < 0 || to < 0 || from === to) return; photos.splice(to, 0, photos.splice(from, 1)[0]); renderThumbs(); });
       thumbs.appendChild(fig);
     });
-    reflectPhotoCount(); updatePreview();
+    reflectPhotoCount(); if (typeof renderTemplates === 'function') renderTemplates(); updatePreview();
   }
   function reflectPhotoCount() {
     var b = $('#apDropLabel');
@@ -398,7 +400,7 @@
     var nm = esc((form.name.value || 'Your name').trim().toUpperCase());
     var cat = (form.category.value || 'Model').trim();
     var disc = esc((DISC[cat] || 'Fashion · Editorial · Commercial').toUpperCase());
-    var cover = photos[0] ? (photos[0].edited || photos[0].url) : '';
+    var cover = photos[0] ? (photos[0].edited || photos[0].url) : SAMPLE_COVER;
     var lkCss = (LOOKS[CFG.look] && LOOKS[CFG.look].css) || 'none';
     var tag = esc(stripContact((form.tagline && form.tagline.value || '').trim()));
     var wm = '<span class="ap-cv-wm">YKS PRODUCTIONS</span>';
@@ -426,13 +428,11 @@
              : '<div class="ap-cv-ed" style="color:' + th.sub + '">EDITION 2026 · EXCLUSIVE · YKS</div>') + '</div>';
     }
     $$('.ap-preview').forEach(function (p) { p.innerHTML = html; });
-    var metaEl = $('#apLiveMeta');
-    if (metaEl) {
-      var pc = photos.length, tl = '';
-      for (var i = 0; i < TEMPLATES.length; i++) if (TEMPLATES[i].k === CFG.template) { tl = TEMPLATES[i].label; break; }
-      metaEl.textContent = pc ? ((form.name.value || 'Your name').trim() + '  ·  ' + tl + '  ·  ' + pc + (pc === 1 ? ' photo' : ' photos'))
-        : 'Add a photo — watch it come alive →';
-    }
+    var pc = photos.length, tl = '';
+    for (var i = 0; i < TEMPLATES.length; i++) if (TEMPLATES[i].k === CFG.template) { tl = TEMPLATES[i].label; break; }
+    var metaTxt = pc ? ((form.name.value || 'Your name').trim() + '  ·  ' + tl + '  ·  ' + pc + (pc === 1 ? ' photo' : ' photos'))
+      : (tl + '  ·  sample cover — add your photos');
+    $$('.ap-live-meta').forEach(function (m) { m.textContent = metaTxt; });
   }
   function mark(wrap, btn) { $$('button', wrap).forEach(function (x) { x.classList.remove('on'); }); btn.classList.add('on'); }
   // realistic mini-cover of each design (real type + palette + a portrait) so a talent picks by seeing the actual look
@@ -441,9 +441,11 @@
     if ((' minimal ethereal classic ').indexOf(' ' + l + ' ') >= 0) return 'center';
     return 'framed';
   }
-  function tplMini(layout, kit, label) {
+  function tplMini(layout, kit, label, photoUrl) {
     var th = kit ? THEMES[kit.theme] : THEMES.noir, ac = (kit && kit.accent) || '#d47a3a', ff = FONTS[(kit && kit.font) || 'playfair'].css;
-    var arch = archOf(layout), nm = esc(label || ''), photo = '<span class="mc-photo"></span>';
+    var lk = (kit && LOOKS[kit.look] && LOOKS[kit.look].css) || 'none';
+    var ps = photoUrl ? ' style="background:#241f2a url(&quot;' + photoUrl + '&quot;) center 22%/cover;background-blend-mode:normal;filter:' + lk + '"' : '';
+    var arch = archOf(layout), nm = esc(label || ''), photo = '<span class="mc-photo"' + ps + '></span>';
     var st = 'background:' + th.bg + ';color:' + th.text + ';font-family:' + ff, rule = '<span class="mc-rule" style="background:' + ac + '"></span>';
     if (arch === 'bleed') {
       return '<span class="mc mc-bleed" style="' + st + '">' + photo + '<span class="mc-wm">YKS · PORTFOLIO</span>' +
@@ -471,13 +473,19 @@
     if (kit.look) CFG.look = kit.look;
     syncControls();
   }
-  (function buildControls() {
-    var pW = $('#apTemplates');
-    if (pW) TEMPLATES.forEach(function (t) {
+  function renderTemplates() {
+    var pW = $('#apTemplates'); if (!pW) return;
+    var cover = photos[0] ? (photos[0].edited || photos[0].url) : SAMPLE_COVER;
+    pW.innerHTML = '';
+    TEMPLATES.forEach(function (t) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-tpl' + (t.k === CFG.template ? ' on' : ''); b.title = t.label + ' — ' + (t.note || ''); b.dataset.tpl = t.k;
-      b.innerHTML = tplMini(t.layout || t.k, t.kit, t.label) + '<span class="ap-tpl-cap"><b>' + t.label + '</b>' + (t.note ? '<i>' + t.note + '</i>' : '') + '</span>';
-      b.addEventListener('click', function () { CFG.template = t.k; CFG.layout = t.layout || t.k; applyKit(t.kit); mark(pW, b); updatePreview(); }); pW.appendChild(b);
+      b.innerHTML = tplMini(t.layout || t.k, t.kit, t.label, cover) + '<span class="ap-tpl-cap"><b>' + t.label + '</b>' + (t.note ? '<i>' + t.note + '</i>' : '') + '</span>';
+      b.addEventListener('click', function () { CFG.template = t.k; CFG.layout = t.layout || t.k; applyKit(t.kit); mark(pW, b); updatePreview(); });
+      pW.appendChild(b);
     });
+  }
+  (function buildControls() {
+    renderTemplates();
     var tW = $('#apThemes');
     if (tW) Object.keys(THEMES).forEach(function (k) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-sw' + (k === CFG.theme ? ' on' : ''); b.title = THEMES[k].label; b.style.background = THEMES[k].bg;
