@@ -76,7 +76,7 @@
       .replace(/[+(]?\d[\d\s().\-]{6,}\d/g, '')                            // phone numbers
       .replace(/\s{2,}/g, ' ').replace(/^[\s·|,\-]+|[\s·|,\-]+$/g, '').trim();
   }
-  var CATS = ['Portrait', 'Full length', 'Fashion', 'Commercial', 'Beauty', 'Other'];
+  var CATS = ['Portrait', 'Full length', 'Fashion', 'Commercial', 'Beauty', 'Digitals', 'Other'];
   var activeCat = 'Portrait';   // new photos land in the selected category
 
   /* ══ photos: pick / drop / preview / reorder / remove ══ */
@@ -527,6 +527,14 @@
     var TAG = stripContact((form.tagline && form.tagline.value || '').trim());   // signature line, contact scrubbed
     function st(k) { var el = form['stat_' + k]; return el && el.value.trim() ? el.value.trim() : ''; }
     var STATS = [['Height', st('height')], ['Bust', st('bust')], ['Waist', st('waist')], ['Hips', st('hips')], ['Shoe', st('shoe')], ['Hair', st('hair')], ['Eyes', st('eyes')], ['Skin', st('skin')]].filter(function (r) { return r[1]; });
+    // digitals = natural, unretouched shots — pulled out of the main flow onto their own casting page
+    // (comp card stays a tight 2-page format, so it keeps them in the grid instead)
+    var digitals = [];
+    if (cfg.template !== 'compcard') {
+      digitals = imgs.filter(function (im) { return im.cat === 'Digitals'; });
+      if (digitals.length && digitals.length < imgs.length) imgs = imgs.filter(function (im) { return im.cat !== 'Digitals'; });
+      else digitals = [];   // if every shot is a digital, keep them in the book rather than emptying it
+    }
     function fill() { doc.setFillColor.apply(doc, BG); doc.rect(0, 0, W, H, 'F'); }
     function ct(c) { doc.setTextColor.apply(doc, c); }
     function place(im, x, y, w) { doc.addImage(im.data, 'JPEG', x, y, w, w / 0.8); }   // imgs are pre-cropped 4:5
@@ -557,6 +565,18 @@
       doc.setFillColor(17, 17, 17);
       for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) doc.rect(x + (c + quiet) * mod, y + (r + quiet) * mod, mod + 0.35, mod + 0.35, 'F');
       return size;
+    }
+    // dedicated casting page for unretouched "digitals" (front/profile/full-length, natural light)
+    function digitalsPage() {
+      if (!digitals.length) return;
+      doc.addPage(); fill(); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('DIGITALS', M, 58);
+      doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text('UNRETOUCHED   ·   ' + NM, W - M, 58, { align: 'right' }); ruleY(70);
+      var shown = digitals.slice(0, 6), per = shown.length <= 2 ? shown.length : 3;
+      var gap = 16, cw = (CW - gap * (per - 1)) / per, ch = cw / 0.8, y0 = 92;
+      shown.forEach(function (im, k) { doc.addImage(im.data, 'JPEG', M + (k % per) * (cw + gap), y0 + Math.floor(k / per) * (ch + gap), cw, ch); });
+      doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('Natural light · no retouching · shown as-is for casting.', M, H - 70);
+      foot();
     }
     // shared closing "BOOK" page — big CTA + scan-to-book QR (editorial & lookbook)
     function bookPage() {
@@ -589,6 +609,7 @@
       if (about) { doc.setFont(F, 'normal'); doc.setFontSize(11); ct(TX); var ln = doc.splitTextToSize(about, CW).slice(0, 9); doc.text(ln, M, ay); ay += ln.length * 15 + 26; }
       if (STATS.length) { doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MEASUREMENTS', M, ay); ay += 16; STATS.forEach(function (r) { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text(r[0].toUpperCase(), M, ay); doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text(r[1], M + 230, ay, { align: 'right' }); doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.4); doc.line(M, ay + 6, M + 230, ay + 6); ay += 20; }); }
       foot();
+      digitalsPage();
       bookPage();
     }
     /* ── TEMPLATE: Minimal (airy, centred, one photo per page) ── */
@@ -612,6 +633,7 @@
         var w = 360; place(im, CX - w / 2, 92, w);
         doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text((im.cat || cat).toUpperCase(), CX, 92 + w / 0.8 + 22, { align: 'center' });
       });
+      digitalsPage();
       doc.addPage(); fill(); watermark();
       doc.setFont(F, 'bold'); doc.setFontSize(26); ct(TX); doc.text('BOOK ' + NM, CX, H / 2 - 60, { align: 'center' });
       doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text('Represented exclusively by YKS Productions', CX, H / 2 - 34, { align: 'center' }); doc.text('+91 97466 79720   ·   yksproductions.com', CX, H / 2 - 18, { align: 'center' });
@@ -697,7 +719,8 @@
       [plates[i], plates[i + 1]].forEach(function (im, k) { if (im) { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('PLATE ' + ('0' + (pn++)).slice(-2) + '   ·   ' + ((im.cat || cat)).toUpperCase(), M + k * (cw + 20), y + cw / 0.8 + 16); } });
       foot();
     }
-    // ── BOOK ──
+    // ── DIGITALS (if any) + BOOK ──
+    digitalsPage();
     bookPage();
     doc.save(SAVE);
   }
