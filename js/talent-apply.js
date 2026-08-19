@@ -27,7 +27,8 @@
   var uid = 0;
 
   /* ── portfolio customiser: the talent's own theme / font / accent ── */
-  var CFG = { theme: 'noir', font: 'playfair', accent: '#d47a3a' };
+  var CFG = { theme: 'noir', font: 'playfair', accent: '#d47a3a', template: 'editorial' };
+  var TEMPLATES = [{ k: 'editorial', label: 'Editorial' }, { k: 'lookbook', label: 'Lookbook' }, { k: 'minimal', label: 'Minimal' }];
   var THEMES = {
     noir:      { bg: '#14111a', text: '#f4ede2', sub: '#b0a892', label: 'Noir' },
     charcoal:  { bg: '#26242b', text: '#f0ece5', sub: '#a8a29a', label: 'Charcoal' },
@@ -315,23 +316,41 @@
   var preview = $('#apPreview');
   function updatePreview() {
     if (!preview) return;
-    var th = THEMES[CFG.theme], ff = FONTS[CFG.font].css, ac = CFG.accent;
+    var th = THEMES[CFG.theme], ff = FONTS[CFG.font].css, ac = CFG.accent, tpl = CFG.template;
     var nm = esc((form.name.value || 'Your name').trim().toUpperCase());
     var cat = (form.category.value || 'Model').trim();
     var disc = esc((DISC[cat] || 'Fashion · Editorial · Commercial').toUpperCase());
     var cover = photos[0] ? (photos[0].edited || photos[0].url) : '';
-    preview.innerHTML =
-      '<div class="ap-cover" style="background:' + th.bg + ';color:' + th.text + ';font-family:' + ff + '">' +
+    var wm = '<span class="ap-cv-wm">YKS PRODUCTIONS</span>';
+    var imgTag = cover ? '<img src="' + cover + '" alt="">' + wm : '';
+    var empty = '<div class="ap-cv-img ap-cv-empty" style="border-color:' + th.sub + '">Add a photo</div>';
+    var html;
+    if (tpl === 'lookbook') {
+      html = '<div class="ap-cover ap-cv-bleed" style="font-family:' + ff + ';background:' + th.bg + '">' +
+        (cover ? '<div class="ap-cv-full">' + imgTag + '</div>' : empty) +
+        '<div class="ap-cv-overlay"><div class="ap-cv-disc" style="color:' + ac + '">' + disc + '</div><div class="ap-cv-name" style="color:#fff">' + nm + '</div></div></div>';
+    } else if (tpl === 'minimal') {
+      html = '<div class="ap-cover ap-cv-min" style="background:' + th.bg + ';color:' + th.text + ';font-family:' + ff + '">' +
+        '<div class="ap-cv-top" style="justify-content:center"><i style="color:' + th.sub + '">YKS · TALENT PORTFOLIO</i></div>' +
+        (cover ? '<div class="ap-cv-img ap-cv-minimg">' + imgTag + '</div>' : empty) +
+        '<div class="ap-cv-name" style="text-align:center">' + nm + '</div>' +
+        '<div class="ap-cv-disc" style="color:' + ac + ';text-align:center">' + disc + '</div></div>';
+    } else {
+      html = '<div class="ap-cover" style="background:' + th.bg + ';color:' + th.text + ';font-family:' + ff + '">' +
         '<div class="ap-cv-top"><b>YKS</b><i style="color:' + th.sub + '">TALENT PORTFOLIO</i></div>' +
-        (cover ? '<div class="ap-cv-img"><img src="' + cover + '" alt=""><span class="ap-cv-wm">YKS PRODUCTIONS</span></div>'
-               : '<div class="ap-cv-img ap-cv-empty" style="border-color:' + th.sub + '">Add a photo</div>') +
-        '<div class="ap-cv-disc" style="color:' + ac + '">' + disc + '</div>' +
-        '<div class="ap-cv-name">' + nm + '</div>' +
-        '<div class="ap-cv-ed" style="color:' + th.sub + '">EDITION 2026 · EXCLUSIVE · YKS</div>' +
-      '</div>';
+        (cover ? '<div class="ap-cv-img">' + imgTag + '</div>' : empty) +
+        '<div class="ap-cv-disc" style="color:' + ac + '">' + disc + '</div><div class="ap-cv-name">' + nm + '</div>' +
+        '<div class="ap-cv-ed" style="color:' + th.sub + '">EDITION 2026 · EXCLUSIVE · YKS</div></div>';
+    }
+    preview.innerHTML = html;
   }
   function mark(wrap, btn) { $$('button', wrap).forEach(function (x) { x.classList.remove('on'); }); btn.classList.add('on'); }
   (function buildControls() {
+    var pW = $('#apTemplates');
+    if (pW) TEMPLATES.forEach(function (t) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-tpl' + (t.k === CFG.template ? ' on' : ''); b.textContent = t.label;
+      b.addEventListener('click', function () { CFG.template = t.k; mark(pW, b); updatePreview(); }); pW.appendChild(b);
+    });
     var tW = $('#apThemes');
     if (tW) Object.keys(THEMES).forEach(function (k) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-sw' + (k === CFG.theme ? ' on' : ''); b.title = THEMES[k].label; b.style.background = THEMES[k].bg;
@@ -409,7 +428,7 @@
         }))
           .then(function (imgs) {
             var th = THEMES[CFG.theme];
-            buildPortfolio(JsPDF, imgs, name, { bg: hexRgb(th.bg), text: hexRgb(th.text), sub: hexRgb(th.sub), accent: hexRgb(CFG.accent), font: FONTS[CFG.font].pdf });
+            buildPortfolio(JsPDF, imgs, name, { bg: hexRgb(th.bg), text: hexRgb(th.text), sub: hexRgb(th.sub), accent: hexRgb(CFG.accent), font: FONTS[CFG.font].pdf, template: CFG.template });
           });
       })
       .then(function () { dlBtn.textContent = 'Downloaded ✓'; setTimeout(function () { dlBtn.textContent = orig; dlBtn.disabled = false; }, 2500); })
@@ -442,7 +461,60 @@
       doc.text('REPRESENTED BY YKS PRODUCTIONS', M, H - 40);
       doc.text('BOOKINGS  +91 97466 79720   ·   YKSPRODUCTIONS.COM', W - M, H - 40, { align: 'right' });
     }
-    // ── COVER ──
+    function coverFill(im, x, y, bw, bh) { var s = Math.max(bw / im.w, bh / im.h), w = im.w * s, h = im.h * s; doc.addImage(im.data, 'JPEG', x + (bw - w) / 2, y + (bh - h) / 2, w, h); }
+    function shade(y, hgt, op) { if (doc.setGState) { doc.saveGraphicsState(); doc.setGState(new doc.GState({ opacity: op })); doc.setFillColor(8, 6, 12); doc.rect(0, y, W, hgt, 'F'); doc.restoreGraphicsState(); } }
+    var SAVE = (name.replace(/[^a-z0-9 ]/gi, '').trim() || 'YKS') + ' — YKS Portfolio.pdf';
+
+    /* ── TEMPLATE: Lookbook (full-bleed, photo-forward) ── */
+    function tplLookbook() {
+      fill(); coverFill(imgs[0], 0, 0, W, H); shade(H - 210, 210, 0.55); watermark(true);
+      doc.setFont(F, 'bold'); doc.setFontSize(9); ct([255, 255, 255]); doc.text('YKS  ·  TALENT PORTFOLIO', M, 52);
+      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), M, H - 92);
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 26 : 34); ct([255, 255, 255]); doc.text(NM, M, H - 54);
+      doc.setFont(F, 'normal'); doc.setFontSize(8); ct([232, 227, 217]); doc.text('EDITION 2026 · EXCLUSIVE · YKS', M, H - 36);
+      imgs.slice(1, 8).forEach(function (im) {
+        doc.addPage(); fill(); coverFill(im, 0, 0, W, H); shade(H - 64, 64, 0.5); watermark(true);
+        doc.setFont(F, 'normal'); doc.setFontSize(8); ct([255, 255, 255]);
+        doc.text((im.cat || cat).toUpperCase(), M, H - 28); doc.text(NM, W - M, H - 28, { align: 'right' });
+      });
+      doc.addPage(); fill(); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('PROFILE', M, 58);
+      doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text(NM, W - M, 58, { align: 'right' }); ruleY(70);
+      doc.setFont(F, 'bold'); doc.setFontSize(28); ct(TX); doc.text(name, M, 112);
+      doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(SUB); doc.text([cat, city].filter(Boolean).join('   ·   ').toUpperCase(), M, 132);
+      var ay = 172;
+      if (about) { doc.setFont(F, 'normal'); doc.setFontSize(11); ct(TX); var ln = doc.splitTextToSize(about, CW).slice(0, 9); doc.text(ln, M, ay); ay += ln.length * 15 + 26; }
+      if (STATS.length) { doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MEASUREMENTS', M, ay); ay += 16; STATS.forEach(function (r) { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text(r[0].toUpperCase(), M, ay); doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text(r[1], M + 230, ay, { align: 'right' }); doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.4); doc.line(M, ay + 6, M + 230, ay + 6); ay += 20; }); }
+      foot();
+    }
+    /* ── TEMPLATE: Minimal (airy, centred, one photo per page) ── */
+    function tplMinimal() {
+      var CX = W / 2;
+      fill(); watermark();
+      var pw = 300; place(imgs[0], CX - pw / 2, 128, pw);
+      doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('YKS  ·  TALENT PORTFOLIO', CX, 72, { align: 'center' });
+      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 22 : 28); ct(TX); doc.text(NM, CX, 128 + 375 + 46, { align: 'center' });
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(AC); doc.text(disc.toUpperCase(), CX, 128 + 375 + 68, { align: 'center' });
+      doc.addPage(); fill(); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text('PROFILE', CX, 122, { align: 'center' });
+      doc.setFont(F, 'bold'); doc.setFontSize(24); ct(TX); doc.text(name, CX, 158, { align: 'center' });
+      doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(SUB); doc.text([cat, city].filter(Boolean).join('   ·   ').toUpperCase(), CX, 178, { align: 'center' });
+      var ay = 220;
+      if (about) { doc.setFont(F, 'normal'); doc.setFontSize(11); ct(TX); var ln = doc.splitTextToSize(about, CW * 0.72).slice(0, 8); doc.text(ln, CX, ay, { align: 'center' }); ay += ln.length * 16 + 30; }
+      if (STATS.length) { doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MEASUREMENTS', CX, ay, { align: 'center' }); ay += 22; doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(TX); doc.text(doc.splitTextToSize(STATS.map(function (r) { return r[0] + ' ' + r[1]; }).join('      ·      '), CW * 0.82), CX, ay, { align: 'center' }); }
+      imgs.slice(1, 7).forEach(function (im) {
+        doc.addPage(); fill(); watermark();
+        var w = 360; place(im, CX - w / 2, 92, w);
+        doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text((im.cat || cat).toUpperCase(), CX, 92 + w / 0.8 + 22, { align: 'center' });
+      });
+      doc.addPage(); fill(); watermark();
+      doc.setFont(F, 'bold'); doc.setFontSize(26); ct(TX); doc.text('BOOK ' + NM, CX, H / 2, { align: 'center' });
+      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text('Represented exclusively by YKS Productions', CX, H / 2 + 28, { align: 'center' }); doc.text('+91 97466 79720   ·   yksproductions.com', CX, H / 2 + 46, { align: 'center' });
+    }
+    if (cfg.template === 'lookbook') { tplLookbook(); doc.save(SAVE); return; }
+    if (cfg.template === 'minimal') { tplMinimal(); doc.save(SAVE); return; }
+
+    // ── COVER ── (Editorial, default)
     fill(); place(imgs[0], M, 76, CW); watermark();
     doc.setFont(F, 'bold'); doc.setFontSize(12); ct(TX); doc.text('YKS', M, 58);
     doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('TALENT PORTFOLIO', W - M, 58, { align: 'right' });
