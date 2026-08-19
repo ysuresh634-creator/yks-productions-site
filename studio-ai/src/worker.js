@@ -1,4 +1,4 @@
-const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
