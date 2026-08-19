@@ -144,9 +144,82 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
 
 /* SETTINGS */
 .settings-wrap{padding:16px}
+.api-key-note{font-size:10px;color:var(--sub);margin-top:5px;line-height:1.5}
+
+/* ── AI CHAT ── */
+.ai-float-btn{
+  position:fixed;bottom:86px;right:16px;background:var(--gold);color:#0D0B11;
+  border:none;border-radius:50px;padding:11px 18px;font-size:12px;font-weight:700;
+  letter-spacing:1px;cursor:pointer;box-shadow:0 4px 20px rgba(201,169,110,.35);
+  z-index:90;display:none;align-items:center;gap:5px;transition:opacity .2s
+}
+.ai-float-btn.visible{display:flex}
+.ai-float-btn:active{opacity:.85}
+
+.ai-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;
+  opacity:0;pointer-events:none;transition:opacity .25s
+}
+.ai-overlay.open{opacity:1;pointer-events:all}
+
+.ai-panel{
+  position:fixed;bottom:0;left:0;right:0;background:var(--card);
+  border-top:2px solid var(--gold);border-radius:20px 20px 0 0;
+  z-index:195;display:flex;flex-direction:column;
+  max-height:72vh;transform:translateY(110%);transition:transform .28s cubic-bezier(.4,0,.2,1)
+}
+.ai-panel.open{transform:translateY(0)}
+
+.ai-panel-hdr{
+  padding:14px 18px 10px;display:flex;justify-content:space-between;
+  align-items:center;border-bottom:1px solid var(--border);flex-shrink:0
+}
+.ai-panel-title{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gold)}
+.ai-panel-hint{font-size:10px;color:var(--sub);margin-top:1px}
+.ai-close-btn{background:none;border:none;color:var(--sub);font-size:22px;cursor:pointer;line-height:1;padding:0 2px}
+
+.ai-messages{
+  flex:1;overflow-y:auto;padding:14px 16px;
+  display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch
+}
+.ai-msg{
+  max-width:88%;padding:10px 14px;border-radius:14px;
+  font-size:13px;line-height:1.55;word-break:break-word
+}
+.ai-msg.user{
+  background:var(--gold-lt);color:var(--gold);
+  align-self:flex-end;border-radius:14px 14px 4px 14px
+}
+.ai-msg.ai{
+  background:var(--card2);color:var(--text);
+  align-self:flex-start;border-radius:14px 14px 14px 4px
+}
+.ai-msg.ai.done{color:#7EC88B}
+.ai-msg.loading{
+  background:var(--card2);color:var(--sub);
+  align-self:flex-start;border-radius:14px 14px 14px 4px
+}
+
+.ai-input-row{
+  display:flex;gap:8px;padding:10px 16px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--border);flex-shrink:0
+}
+.ai-input{
+  flex:1;background:var(--input);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;
+  outline:none;-webkit-appearance:none
+}
+.ai-input:focus{border-color:var(--gold)}
+.ai-send{
+  background:var(--gold);color:#0D0B11;border:none;border-radius:10px;
+  width:44px;font-size:20px;cursor:pointer;font-weight:700;flex-shrink:0
+}
+.ai-send:active{opacity:.85}
+.ai-send:disabled{opacity:.4;cursor:not-allowed}
 
 @media print{
-  #lock-screen,.nav,.preview-toolbar,.no-print{display:none!important}
+  #lock-screen,.nav,.preview-toolbar,.no-print,.ai-float-btn,.ai-panel,.ai-overlay{display:none!important}
   .screen{padding:0;display:none}
   #screen-preview{display:block!important}
   .doc-preview{margin:0;border-radius:0;box-shadow:none}
@@ -278,6 +351,14 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
       <div class="form-field"><label class="form-label">Instagram</label><input class="form-input" id="s-ig" type="text" placeholder="@yks_photoworks"></div>
     </div>
     <div class="form-section">
+      <label class="form-label">AI Assistant</label>
+      <div class="form-field">
+        <label class="form-label">Anthropic API Key</label>
+        <input class="form-input" id="s-apikey" type="password" placeholder="sk-ant-api03-...">
+        <p class="api-key-note">Stored only in your browser. Powers the ✦ Ask AI button on the New Document screen — type commands like "change photography to ₹18,000" or "remove the fuel item".</p>
+      </div>
+    </div>
+    <div class="form-section">
       <label class="form-label">Change PIN</label>
       <div class="form-row">
         <div><label class="form-label">New PIN (4 digits)</label><input class="form-input" id="s-pin" type="password" maxlength="4" inputmode="numeric" placeholder="••••"></div>
@@ -314,9 +395,39 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
   </button>
 </nav>
 
+<!-- ══ AI CHAT ══ -->
+<button id="ai-float" class="ai-float-btn no-print" onclick="toggleAI()">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+  Ask AI
+</button>
+
+<div id="ai-overlay" class="ai-overlay no-print" onclick="closeAI()"></div>
+
+<div id="ai-panel" class="ai-panel no-print">
+  <div class="ai-panel-hdr">
+    <div>
+      <div class="ai-panel-title">✦ STUDIO AI</div>
+      <div class="ai-panel-hint">Edits your document instantly</div>
+    </div>
+    <button class="ai-close-btn" onclick="closeAI()">×</button>
+  </div>
+  <div id="ai-messages" class="ai-messages">
+    <div class="ai-msg ai">Hi! Tell me what to change and I'll edit the form for you. Examples:<br><br>
+    · "Change client name to Ravi"<br>
+    · "Add photography 18000"<br>
+    · "Remove the fuel item"<br>
+    · "Change advance to 30%"<br>
+    · "Add a professional thank-you note"</div>
+  </div>
+  <div class="ai-input-row">
+    <input id="ai-input" class="ai-input" type="text" placeholder="What should I change?" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendAI()">
+    <button id="ai-send" class="ai-send" onclick="sendAI()">→</button>
+  </div>
+</div>
+
 <script>
 // ── PIN ────────────────────────────────────────────────────────────────────
-const DEFAULT_PIN='1234'; // change in Settings after first login
+const DEFAULT_PIN='1234';
 let pinBuf='';
 
 function getPin(){ return localStorage.getItem('yks_pin')||DEFAULT_PIN; }
@@ -352,6 +463,7 @@ function lockApp(){
   pinBuf=''; updateDots();
   document.getElementById('pin-error').textContent='';
   document.getElementById('lock-screen').classList.remove('hidden');
+  closeAI();
 }
 
 // ── State ─────────────────────────────────────────────────────────────────
@@ -370,12 +482,16 @@ function loadSettingsForm(){
   set('s-phone-in',s.phoneIn); set('s-phone-ae',s.phoneAe);
   set('s-web',s.web); set('s-ig',s.ig);
   set('s-inv-num',c.inv); set('s-quo-num',c.quo);
+  const k=localStorage.getItem('yks_apikey')||'';
+  if(k) document.getElementById('s-apikey').value=k;
 }
 function saveSettings(){
   const np=v('s-pin'), np2=v('s-pin2');
   if(np){ if(np.length!==4||!/^\d+$/.test(np)){alert('PIN must be 4 digits');return;}
     if(np!==np2){alert('PINs do not match');return;}
     localStorage.setItem('yks_pin',np); }
+  const ak=v('s-apikey');
+  if(ak) localStorage.setItem('yks_apikey',ak);
   const s={name:v('s-name')||DEFAULTS.name,company:v('s-company')||DEFAULTS.company,
     phoneIn:v('s-phone-in')||DEFAULTS.phoneIn,phoneAe:v('s-phone-ae')||DEFAULTS.phoneAe,
     web:v('s-web')||DEFAULTS.web,ig:v('s-ig')||DEFAULTS.ig};
@@ -408,6 +524,13 @@ function showScreen(name){
   if(nb) nb.classList.add('active');
   if(name==='history') renderHistory();
   if(name==='settings') loadSettingsForm();
+  if(name!=='new') closeAI();
+  updateAIBtn(name);
+}
+
+function updateAIBtn(name){
+  const btn=document.getElementById('ai-float');
+  btn.classList.toggle('visible', name==='new');
 }
 
 // ── Type ───────────────────────────────────────────────────────────────────
@@ -570,17 +693,220 @@ function v(id){ return(document.getElementById(id)||{}).value||''; }
 function set(id,val){ const el=document.getElementById(id); if(el) el.value=val; }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+// ── AI CHAT ────────────────────────────────────────────────────────────────
+const AI_TOOLS=[
+  {name:'add_item',description:'Add a line item/service to the document',
+    input_schema:{type:'object',properties:{
+      description:{type:'string',description:'Service name/description'},
+      rate:{type:'number',description:'Amount in INR'}
+    },required:['description','rate']}},
+  {name:'remove_item',description:'Remove a line item by 0-based index',
+    input_schema:{type:'object',properties:{
+      index:{type:'integer',description:'0-based index of the item to remove'}
+    },required:['index']}},
+  {name:'update_item',description:'Update description and/or rate of a line item by 0-based index',
+    input_schema:{type:'object',properties:{
+      index:{type:'integer'},
+      description:{type:'string'},
+      rate:{type:'number'}
+    },required:['index']}},
+  {name:'set_client',description:'Set client name, phone, and/or event details',
+    input_schema:{type:'object',properties:{
+      name:{type:'string'},phone:{type:'string'},event:{type:'string'}
+    }}},
+  {name:'set_advance',description:'Set the advance percentage (0-100)',
+    input_schema:{type:'object',properties:{
+      pct:{type:'number',description:'Advance percentage'}
+    },required:['pct']}},
+  {name:'set_notes',description:'Set or update the notes field',
+    input_schema:{type:'object',properties:{
+      text:{type:'string'}
+    },required:['text']}},
+  {name:'set_type',description:'Switch between INVOICE and QUOTATION',
+    input_schema:{type:'object',properties:{
+      type:{type:'string',enum:['INVOICE','QUOTATION']}
+    },required:['type']}},
+  {name:'clear_items',description:'Remove all line items',
+    input_schema:{type:'object',properties:{}}}
+];
+
+let aiOpen=false;
+let aiHistory=[];
+
+function toggleAI(){
+  if(aiOpen) closeAI(); else openAI();
+}
+function openAI(){
+  aiOpen=true;
+  document.getElementById('ai-panel').classList.add('open');
+  document.getElementById('ai-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('ai-input').focus(),300);
+  if(!localStorage.getItem('yks_apikey')){
+    appendAIMsg('ai','⚠️ No API key found. Go to Settings → AI Assistant and add your Anthropic API key (sk-ant-...) to get started.');
+  }
+}
+function closeAI(){
+  aiOpen=false;
+  document.getElementById('ai-panel').classList.remove('open');
+  document.getElementById('ai-overlay').classList.remove('open');
+}
+
+function appendAIMsg(role,text,isDone){
+  const box=document.getElementById('ai-messages');
+  const el=document.createElement('div');
+  el.className='ai-msg '+role+(isDone?' done':'');
+  el.textContent=text;
+  box.appendChild(el);
+  box.scrollTop=box.scrollHeight;
+  return el;
+}
+
+function getFormContext(){
+  const rows=Array.from(document.querySelectorAll('#items-container .item-row'));
+  const items=rows.map((r,i)=>{
+    const ins=r.querySelectorAll('input');
+    return{index:i,description:ins[0].value.trim(),rate:parseFloat(ins[1].value)||0};
+  });
+  return{
+    document_type:currentType,
+    client_name:v('f-client'),client_phone:v('f-phone'),event:v('f-event'),
+    date:v('f-date'),date2:v('f-date2'),
+    items,
+    advance_pct:parseFloat(v('f-adv'))||50,
+    subtotal:items.reduce((a,i)=>a+i.rate,0),
+    notes:v('f-notes')
+  };
+}
+
+function executeAITool(name,input){
+  switch(name){
+    case 'add_item':
+      addItem(input.description,input.rate);
+      break;
+    case 'remove_item':{
+      const rows=document.querySelectorAll('#items-container .item-row');
+      if(rows[input.index]) removeItem(rows[input.index].id);
+      break;
+    }
+    case 'update_item':{
+      const rows=document.querySelectorAll('#items-container .item-row');
+      const row=rows[input.index];
+      if(row){
+        const ins=row.querySelectorAll('input');
+        if(input.description!==undefined) ins[0].value=input.description;
+        if(input.rate!==undefined) ins[1].value=input.rate;
+        calcTotals();
+      }
+      break;
+    }
+    case 'set_client':
+      if(input.name!==undefined) set('f-client',input.name);
+      if(input.phone!==undefined) set('f-phone',input.phone);
+      if(input.event!==undefined) set('f-event',input.event);
+      break;
+    case 'set_advance':
+      set('f-adv',input.pct);
+      calcTotals();
+      break;
+    case 'set_notes':
+      set('f-notes',input.text);
+      break;
+    case 'set_type':
+      setType(input.type);
+      break;
+    case 'clear_items':
+      document.getElementById('items-container').innerHTML='';
+      calcTotals();
+      break;
+  }
+}
+
+async function sendAI(){
+  const apiKey=localStorage.getItem('yks_apikey')||'';
+  const inputEl=document.getElementById('ai-input');
+  const sendBtn=document.getElementById('ai-send');
+  const msg=inputEl.value.trim();
+  if(!msg) return;
+
+  if(!apiKey){
+    appendAIMsg('ai','⚠️ Please add your Anthropic API key in Settings first.');
+    return;
+  }
+
+  inputEl.value='';
+  sendBtn.disabled=true;
+  appendAIMsg('user',msg);
+  const loadingEl=appendAIMsg('loading','✦  thinking...');
+
+  const ctx=getFormContext();
+  const sys=`You are a smart assistant built into YKS Studio — a private invoice and quotation builder for Yedukrishna Suresh (YKS Productions), a professional cinematographer and photographer in Bangalore and Dubai.
+
+Current document:
+${JSON.stringify(ctx,null,2)}
+
+When the user asks to make a change, use the appropriate tool to edit the form directly. Be brief in text replies. All currency is INR (₹). Items use 0-based indexing.`;
+
+  const msgs=[...aiHistory,{role:'user',content:msg}];
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:1024,
+        system:sys,
+        messages:msgs,
+        tools:AI_TOOLS
+      })
+    });
+
+    const data=await res.json();
+    loadingEl.remove();
+    sendBtn.disabled=false;
+
+    if(!res.ok){
+      appendAIMsg('ai','Error: '+(data.error?.message||'API error. Check your key in Settings.'));
+      return;
+    }
+
+    aiHistory.push({role:'user',content:msg});
+
+    let textOut='';
+    const toolsUsed=[];
+    for(const block of data.content){
+      if(block.type==='text') textOut+=block.text;
+      else if(block.type==='tool_use'){
+        executeAITool(block.name,block.input);
+        toolsUsed.push(block.name.replace(/_/g,' '));
+      }
+    }
+
+    const reply=textOut||(toolsUsed.length?'Done — '+toolsUsed.join(', ')+' ✓':'Done ✓');
+    appendAIMsg('ai',reply,toolsUsed.length>0&&!textOut);
+    aiHistory.push({role:'assistant',content:data.content});
+    if(aiHistory.length>12) aiHistory=aiHistory.slice(-12);
+
+  }catch(err){
+    loadingEl.remove();
+    sendBtn.disabled=false;
+    appendAIMsg('ai','Connection error. Check internet or your API key.');
+  }
+}
+
 // ── Init ───────────────────────────────────────────────────────────────────
 (function init(){
-  // Check session
   if(sessionStorage.getItem('yks_unlocked')==='1'){
     document.getElementById('lock-screen').classList.add('hidden');
   }
-  // Dates
   const today=new Date(); const due=new Date(); due.setDate(due.getDate()+14);
   document.getElementById('f-date').value=today.toISOString().split('T')[0];
   document.getElementById('f-date2').value=due.toISOString().split('T')[0];
-  // First item
   addItem();
   renderHistory();
 })();
