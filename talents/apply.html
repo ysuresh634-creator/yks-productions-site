@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=7" />
+<link rel="stylesheet" href="/css/talents.css?v=8" />
 </head>
 <body>
 
@@ -166,6 +166,21 @@
           </div>
         </div>
 
+        <!-- Portfolio builder — customise + download, built on the page -->
+        <div class="ap-block ap-build">
+          <p class="ap-step">Build your portfolio <span class="ap-opt">free · make it yours</span></p>
+          <p class="ap-hint">Reorder your photos above (the first is your cover), choose a look, then download a full YKS portfolio PDF. The <b>YKS Productions watermark &amp; branding stay on every page</b>, and every booking routes through YKS — never your own contact.</p>
+          <div class="ap-build-grid">
+            <div class="ap-controls">
+              <div class="ap-ctl"><span>Theme</span><div class="ap-swatches" id="apThemes"></div></div>
+              <div class="ap-ctl"><span>Font</span><div class="ap-fonts" id="apFonts"></div></div>
+              <div class="ap-ctl"><span>Accent</span><div class="ap-accents" id="apAccents"></div></div>
+            </div>
+            <div class="ap-preview" id="apPreview"></div>
+          </div>
+          <button type="button" class="btn btn-ghost ap-dl" id="apDownload">↓ Download my portfolio (PDF)</button>
+        </div>
+
         <button type="submit" class="btn btn-fill ap-submit">Send my application →</button>
         <p class="ap-progress" id="apProgress" hidden></p>
         <p class="tal-form-note">🔒 Your number, email and socials are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
@@ -196,6 +211,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=5"></script>
+<script src="/js/talent-apply.js?v=8"></script>
 </body>
 </html>
