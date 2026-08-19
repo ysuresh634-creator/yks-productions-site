@@ -85,8 +85,6 @@ img{display:block;max-width:100%}
 .nav .links a:not(.nav-cta):hover::after{width:100%}
 .nav .links a.nav-cta{background:var(--amber);border:1px solid var(--amber);color:var(--black);font-weight:600;padding:11px 22px;border-radius:40px;transition:.3s var(--ease)}
 .nav .links a.nav-cta:hover{background:var(--peach);border-color:var(--peach);transform:translateY(-1px);box-shadow:0 10px 26px rgba(255,140,59,.35)}
-.nav .links a.nav-build{color:var(--amber)}
-.nav .links a.nav-build::before{content:"✦";margin-right:6px;font-size:8px;vertical-align:2px;opacity:.85}
 .nav-reel{display:flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:10px;letter-spacing:.26em;color:var(--paper-dim)}
 .nav-reel span{width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 12px #ff3b30;animation:blink 1.6s infinite}
 .burger{display:none;flex-direction:column;gap:5px;background:none;border:0;padding:8px;cursor:pointer;z-index:130}
