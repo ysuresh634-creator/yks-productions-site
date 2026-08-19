@@ -427,20 +427,20 @@
     if ((' minimal ethereal classic ').indexOf(' ' + l + ' ') >= 0) return 'center';
     return 'framed';
   }
-  function tplMini(layout, kit) {
+  function tplMini(layout, kit, label) {
     var th = kit ? THEMES[kit.theme] : THEMES.noir, ac = (kit && kit.accent) || '#d47a3a', ff = FONTS[(kit && kit.font) || 'playfair'].css;
-    var arch = archOf(layout), nm = 'Aisha', disc = 'FASHION · EDITORIAL';
-    var st = 'background:' + th.bg + ';color:' + th.text + ';font-family:' + ff, photo = '<span class="mc-photo"></span>';
+    var arch = archOf(layout), nm = esc(label || ''), photo = '<span class="mc-photo"></span>';
+    var st = 'background:' + th.bg + ';color:' + th.text + ';font-family:' + ff, rule = '<span class="mc-rule" style="background:' + ac + '"></span>';
     if (arch === 'bleed') {
-      return '<span class="mc mc-bleed" style="' + st + '">' + photo + '<span class="mc-wm">YKS</span>' +
-        '<span class="mc-ov"><span class="mc-disc" style="color:' + ac + '">' + disc + '</span><span class="mc-nm" style="color:#fff">' + nm + '</span></span></span>';
+      return '<span class="mc mc-bleed" style="' + st + '">' + photo + '<span class="mc-wm">YKS · PORTFOLIO</span>' +
+        '<span class="mc-ov">' + rule + '<span class="mc-nm" style="color:#fff">' + nm + '</span></span></span>';
     }
     if (arch === 'center') {
       return '<span class="mc mc-center" style="' + st + '"><span class="mc-kick">YKS · PORTFOLIO</span>' + photo +
-        '<span class="mc-nm">' + nm + '</span><span class="mc-disc" style="color:' + ac + '">' + disc + '</span></span>';
+        '<span class="mc-nm">' + nm + '</span>' + rule + '</span>';
     }
-    return '<span class="mc mc-framed" style="' + st + '"><span class="mc-kick"><b>YKS</b> <i>PORTFOLIO</i></span>' + photo +
-      '<span class="mc-disc" style="color:' + ac + '">' + disc + '</span><span class="mc-nm">' + nm + '</span></span>';
+    return '<span class="mc mc-framed" style="' + st + '"><span class="mc-kick">YKS · PORTFOLIO</span>' + photo +
+      '<span class="mc-nm">' + nm + '</span>' + rule + '</span>';
   }
   function syncControls() {
     function sync(sel, test) { $$(sel).forEach(function (b) { b.classList.toggle('on', test(b)); }); }
@@ -460,8 +460,8 @@
   (function buildControls() {
     var pW = $('#apTemplates');
     if (pW) TEMPLATES.forEach(function (t) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-tpl' + (t.k === CFG.template ? ' on' : ''); b.title = t.note || '';
-      b.innerHTML = tplMini(t.layout || t.k, t.kit) + '<b>' + t.label + '</b>' + (t.note ? '<i>' + t.note + '</i>' : '');
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-tpl' + (t.k === CFG.template ? ' on' : ''); b.title = t.label + ' — ' + (t.note || ''); b.dataset.tpl = t.k;
+      b.innerHTML = tplMini(t.layout || t.k, t.kit, t.label) + '<span class="ap-tpl-cap"><b>' + t.label + '</b>' + (t.note ? '<i>' + t.note + '</i>' : '') + '</span>';
       b.addEventListener('click', function () { CFG.template = t.k; CFG.layout = t.layout || t.k; applyKit(t.kit); mark(pW, b); updatePreview(); }); pW.appendChild(b);
     });
     var tW = $('#apThemes');
@@ -492,7 +492,7 @@
       var t = rnd(TEMPLATES);
       CFG.template = t.k; CFG.layout = t.layout || t.k; applyKit(t.kit);
       CFG.accent = rnd(ACCENTS); CFG.look = rnd(Object.keys(LOOKS)); syncControls();
-      $$('#apTemplates .ap-tpl').forEach(function (b) { b.classList.toggle('on', (b.querySelector('b') || b).textContent === t.label); });
+      $$('#apTemplates .ap-tpl').forEach(function (b) { b.classList.toggle('on', b.dataset.tpl === t.k); });
       updatePreview();
     });
   })();
