@@ -421,26 +421,26 @@
     preview.innerHTML = html;
   }
   function mark(wrap, btn) { $$('button', wrap).forEach(function (x) { x.classList.remove('on'); }); btn.classList.add('on'); }
-  // little visual diagram of each template's layout, tinted with its kit palette, so a talent picks by sight
+  // realistic mini-cover of each design (real type + palette + a portrait) so a talent picks by seeing the actual look
+  function archOf(l) {
+    if ((' lookbook luxe feature ').indexOf(' ' + l + ' ') >= 0) return 'bleed';
+    if ((' minimal ethereal classic ').indexOf(' ' + l + ' ') >= 0) return 'center';
+    return 'framed';
+  }
   function tplMini(layout, kit) {
-    var m = {
-      editorial: '<i class="tm-ph"></i><i class="tm-l tm-l1"></i><i class="tm-l tm-l2"></i>',
-      lookbook:  '<i class="tm-full"></i><i class="tm-ov"></i>',
-      compcard:  '<i class="tm-ph tm-ph-sm"></i><span class="tm-grid"><em></em><em></em><em></em><em></em></span>',
-      minimal:   '<i class="tm-cph"></i><i class="tm-l tm-cl"></i>',
-      grid:      '<span class="tm-g"><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em></span>',
-      feature:   '<span class="tm-fe"><i class="tm-big"></i><span class="tm-side"><i class="tm-sl"></i><i class="tm-sml"></i></span></span>',
-      swiss:     '<span class="tm-sw"><i class="tm-sw-blk"></i><i class="tm-sw-ph"></i><i class="tm-l tm-sw-nm"></i></span>',
-      luxe:      '<i class="tm-full"></i><span class="tm-lx"><i></i><i></i></span>',
-      classic:   '<i class="tm-l tm-cc-r"></i><i class="tm-cph"></i><i class="tm-l tm-cl"></i>',
-      ethereal:  '<span class="tm-eth"><i class="tm-cph"></i><i class="tm-l tm-cl"></i></span>',
-      wabi:      '<i class="tm-wb-ph"></i><i class="tm-l tm-wb-l"></i>',
-      bento:     '<span class="tm-bento"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></span>'
-    };
-    var th = kit && THEMES[kit.theme], st = '';
-    if (th) st += 'background:' + th.bg + ';border-color:rgba(0,0,0,.12);--tmi:' + th.text + ';';
-    if (kit && kit.accent) st += '--tma:' + kit.accent + ';';
-    return '<span class="tm tm--' + layout + '" style="' + st + '">' + (m[layout] || '') + '</span>';
+    var th = kit ? THEMES[kit.theme] : THEMES.noir, ac = (kit && kit.accent) || '#d47a3a', ff = FONTS[(kit && kit.font) || 'playfair'].css;
+    var arch = archOf(layout), nm = 'Aisha', disc = 'FASHION · EDITORIAL';
+    var st = 'background:' + th.bg + ';color:' + th.text + ';font-family:' + ff, photo = '<span class="mc-photo"></span>';
+    if (arch === 'bleed') {
+      return '<span class="mc mc-bleed" style="' + st + '">' + photo + '<span class="mc-wm">YKS</span>' +
+        '<span class="mc-ov"><span class="mc-disc" style="color:' + ac + '">' + disc + '</span><span class="mc-nm" style="color:#fff">' + nm + '</span></span></span>';
+    }
+    if (arch === 'center') {
+      return '<span class="mc mc-center" style="' + st + '"><span class="mc-kick">YKS · PORTFOLIO</span>' + photo +
+        '<span class="mc-nm">' + nm + '</span><span class="mc-disc" style="color:' + ac + '">' + disc + '</span></span>';
+    }
+    return '<span class="mc mc-framed" style="' + st + '"><span class="mc-kick"><b>YKS</b> <i>PORTFOLIO</i></span>' + photo +
+      '<span class="mc-disc" style="color:' + ac + '">' + disc + '</span><span class="mc-nm">' + nm + '</span></span>';
   }
   function syncControls() {
     function sync(sel, test) { $$(sel).forEach(function (b) { b.classList.toggle('on', test(b)); }); }
