@@ -418,7 +418,14 @@
         (tag ? '<div class="ap-cv-tag" style="color:' + ac + '">' + tag + '</div>'
              : '<div class="ap-cv-ed" style="color:' + th.sub + '">EDITION 2026 · EXCLUSIVE · YKS</div>') + '</div>';
     }
-    preview.innerHTML = html;
+    $$('.ap-preview').forEach(function (p) { p.innerHTML = html; });
+    var metaEl = $('#apLiveMeta');
+    if (metaEl) {
+      var pc = photos.length, tl = '';
+      for (var i = 0; i < TEMPLATES.length; i++) if (TEMPLATES[i].k === CFG.template) { tl = TEMPLATES[i].label; break; }
+      metaEl.textContent = pc ? ((form.name.value || 'Your name').trim() + '  ·  ' + tl + '  ·  ' + pc + (pc === 1 ? ' photo' : ' photos'))
+        : 'Add a photo — watch it come alive →';
+    }
   }
   function mark(wrap, btn) { $$('button', wrap).forEach(function (x) { x.classList.remove('on'); }); btn.classList.add('on'); }
   // realistic mini-cover of each design (real type + palette + a portrait) so a talent picks by seeing the actual look
