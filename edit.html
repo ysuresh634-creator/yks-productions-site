@@ -337,7 +337,19 @@ function renderFrame(){
   const script=pv.createElement('script');
   script.textContent=FRAME_JS;
   pv.body.appendChild(script);
-  $('frame').srcdoc='<!DOCTYPE html>\n'+pv.documentElement.outerHTML;
+  const fr=$('frame');
+  fr.onload=()=>{
+    // If anything ever navigates the preview away from our srcdoc, the editor
+    // would be pointing at a document that is not the file we are editing.
+    // Detect it and restore rather than silently drift.
+    let href='';
+    try{ href=fr.contentWindow.location.href; }catch(e){ href='cross-origin'; }
+    if(href && href!=='about:srcdoc' && !href.startsWith('about:')){
+      toast('Preview navigated away — restoring');
+      fr.onload=null; renderFrame();
+    }
+  };
+  fr.srcdoc='<!DOCTYPE html>\n'+pv.documentElement.outerHTML;
 }
 
 // injected into the iframe
@@ -411,12 +423,28 @@ const FRAME_JS=`
     document.body.style.setProperty('overflow','visible','important');
     parent.postMessage({yks:'unstuck', hidden:hidden, shown:shown},'*');
   }
+  // Block every form of navigation while editing. Cards on this site wrap
+  // photos in a full-size <a> overlay, so a click can hit the link rather
+  // than the target and would otherwise navigate the preview away.
+  function blockNav(e){
+    if(mode==='off') return;
+    if(e.target.closest && e.target.closest('a,button,form,[onclick]')){ e.preventDefault(); e.stopPropagation(); }
+  }
+  document.addEventListener('mousedown',blockNav,true);
+  document.addEventListener('auxclick',blockNav,true);
+  document.addEventListener('submit',function(e){ if(mode!=='off'){ e.preventDefault(); e.stopPropagation(); } },true);
+
   document.addEventListener('click',function(e){
     if(mode==='off') return;
+    e.preventDefault(); e.stopPropagation();   // nothing navigates in edit mode
     var el=e.target;
     while(el && el!==document.body && !el.hasAttribute('data-yks-hot')) el=el.parentElement;
-    if(!el || el===document.body) return;
-    e.preventDefault(); e.stopPropagation();
+    if(!el || el===document.body){
+      // clicked a wrapper (typically an <a> overlay) — look inside it instead
+      var host=e.target.closest('a,button,figure,li,div');
+      el = host && host.querySelector('[data-yks-hot]');
+      if(!el) return;
+    }
     var own='';
     for(var i=0;i<el.childNodes.length;i++){ var n=el.childNodes[i]; if(n.nodeType===3) own+=n.nodeValue; }
     parent.postMessage({yks:'pick', id:el.getAttribute('data-yks-id'), tag:el.tagName.toLowerCase(),
