@@ -316,40 +316,33 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
     </div>
   </div>
   <div class="form-wrap">
-
-    <!-- File picker -->
-    <div class="form-section">
-      <label class="form-label">Which page?</label>
-      <div class="web-file-chips" id="file-chips">
-        <button class="file-chip active" onclick="selectFile('index.html',this)">Main Site</button>
-        <button class="file-chip" onclick="selectFile('talents.html',this)">Talents</button>
-        <button class="file-chip" onclick="selectFile('talents/apply.html',this)">Apply Form</button>
-        <button class="file-chip" onclick="selectFile('contact-sheet.html',this)">Contact Sheet</button>
-        <button class="file-chip" onclick="selectFile('content-creator-bangalore.html',this)">Blr SEO</button>
-        <button class="file-chip" onclick="selectFile('content-creator-dubai.html',this)">Dubai SEO</button>
-        <button class="file-chip" onclick="selectFile('studio.html',this)">Studio</button>
-      </div>
-      <input class="form-input" id="w-custom-path" placeholder="Or type a file path… e.g. blog/my-post.html" oninput="onCustomPath(this.value)" style="margin-top:4px">
-      <div id="w-selected-file" style="font-size:10px;color:var(--gold);margin-top:6px;letter-spacing:1px">● index.html</div>
+    <div class="form-section" style="text-align:center;padding:26px 18px">
+      <div style="font-size:38px;line-height:1;margin-bottom:12px">🎨</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px">Visual Site Editor</div>
+      <p class="field-note" style="font-size:12px;margin-bottom:18px">
+        Open any page of yksproductions.com, tap the text you want to change and type over it.
+        Tap a photo to swap it. Review everything, then publish.
+      </p>
+      <a href="edit.html" class="btn-generate" style="display:block;text-decoration:none;line-height:1.2">Open Editor →</a>
     </div>
 
-    <!-- Instruction -->
     <div class="form-section">
-      <label class="form-label">What do you want to change?</label>
-      <textarea class="form-input" id="w-instruction" rows="4" placeholder="Describe the change in plain English…" style="resize:none;line-height:1.6"></textarea>
-      <div class="w-examples">
-        <div class="w-example" onclick="fillExample(this)"><strong>TEXT</strong>Change my tagline to "Visual storytelling for brands that dare to be different"</div>
-        <div class="w-example" onclick="fillExample(this)"><strong>PHONE / CONTACT</strong>Update my India phone number to +91 98765 43210</div>
-        <div class="w-example" onclick="fillExample(this)"><strong>ABOUT / BIO</strong>Rewrite the About section to focus more on my Dubai work and brand films</div>
-        <div class="w-example" onclick="fillExample(this)"><strong>SERVICES / PRICING</strong>Add "Drone Videography" as a new service under the existing list</div>
-        <div class="w-example" onclick="fillExample(this)"><strong>SEO / META</strong>Update the page title and meta description to include "brand photographer Bangalore"</div>
+      <label class="form-label">What you can change</label>
+      <div style="font-size:12px;color:var(--sub);line-height:2">
+        ✏️ &nbsp;Any heading, paragraph or button label<br>
+        🖼 &nbsp;Any photo — upload straight from your phone<br>
+        🔗 &nbsp;Any link text or destination<br>
+        🏷 &nbsp;Alt text for SEO
       </div>
     </div>
 
-    <button id="w-apply-btn" class="btn-generate" onclick="applyWebsiteEdit()">Apply Change →</button>
-
-    <!-- Log -->
-    <div id="w-log" style="margin-top:16px"></div>
+    <div class="form-section">
+      <label class="form-label">Before you publish</label>
+      <p class="field-note">
+        Every change is listed for review first, and safety checks block anything that would
+        damage the page. Nothing goes live until you tap Publish.
+      </p>
+    </div>
   </div>
 </div>
 
@@ -482,7 +475,6 @@ function lockApp(){
 
 // ── State ──────────────────────────────────────────────────────────────────
 let currentType='INVOICE';
-let selectedFilePath='index.html';
 
 // ── Settings ───────────────────────────────────────────────────────────────
 const DEFAULTS={name:'Yedukrishna Suresh',company:'YKS Productions',
@@ -764,113 +756,7 @@ async function sendAI(){
 }
 
 // ── WEBSITE EDITOR ────────────────────────────────────────────────────────
-const GH_OWNER='ysuresh634-creator';
-const GH_REPO='yks-productions-site';
-const GH_BRANCH='main';
-
-function selectFile(path, chipEl){
-  selectedFilePath=path;
-  document.querySelectorAll('.file-chip').forEach(c=>c.classList.remove('active'));
-  if(chipEl) chipEl.classList.add('active');
-  document.getElementById('w-selected-file').textContent='● '+path;
-  document.getElementById('w-custom-path').value='';
-}
-function onCustomPath(val){
-  if(!val.trim()) return;
-  selectedFilePath=val.trim();
-  document.querySelectorAll('.file-chip').forEach(c=>c.classList.remove('active'));
-  document.getElementById('w-selected-file').textContent='● '+selectedFilePath;
-}
-function fillExample(el){
-  document.getElementById('w-instruction').value=el.textContent.replace(/^[A-Z /]+\n/,'').trim();
-  document.getElementById('w-instruction').focus();
-}
-
-function wLog(msg, type='info'){
-  const log=document.getElementById('w-log');
-  const el=document.createElement('div');
-  el.className='w-log-entry '+type;
-  el.textContent=msg;
-  log.prepend(el);
-}
-
-async function fetchGHFile(path){
-  const token=localStorage.getItem('yks_ghtoken')||'';
-  const res=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}?ref=${GH_BRANCH}`,{
-    headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github.v3+json'}
-  });
-  if(!res.ok){const t=await res.text();throw new Error(`GitHub ${res.status}: ${t.slice(0,200)}`);}
-  const data=await res.json();
-  return{content:b64decode(data.content),sha:data.sha};
-}
-
-async function commitGHFile(path,content,sha,message){
-  const token=localStorage.getItem('yks_ghtoken')||'';
-  const res=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`,{
-    method:'PUT',
-    headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
-    body:JSON.stringify({message,content:b64encode(content),sha,branch:GH_BRANCH})
-  });
-  if(!res.ok){const t=await res.text();throw new Error(`GitHub commit ${res.status}: ${t.slice(0,200)}`);}
-  return res.json();
-}
-
-
-async function applyWebsiteEdit(){
-  const ghToken=localStorage.getItem('yks_ghtoken')||'';
-  const instruction=v('w-instruction').trim();
-
-  if(!ghToken){wLog('⚠️ GitHub token not set. Go to Settings → Website Editor.','error');return;}
-  if(!instruction){wLog('⚠️ Please describe what you want to change.','error');return;}
-
-  const btn=document.getElementById('w-apply-btn');
-  btn.disabled=true; btn.textContent='Fetching file…';
-  document.getElementById('w-log').innerHTML='';
-
-  try{
-    wLog(`Fetching ${selectedFilePath}…`,'working');
-    const{content,sha}=await fetchGHFile(selectedFilePath);
-    const kb=Math.round(content.length/1024);
-    wLog(`Loaded ${selectedFilePath} (${kb} KB). Asking AI to make changes…`,'working');
-    btn.textContent='AI editing…';
-
-    const res=await fetch(AI_WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({type:'website_edit',file_path:selectedFilePath,instruction,file_content:content})});
-    const data=await res.json();
-    if(!res.ok)throw new Error(data.error||'AI worker error. Is it deployed?');
-
-    const edits=data.edits||[];
-    const commitMsg=data.commit_message||`Update ${selectedFilePath} via YKS Studio`;
-    let modified=content, applied=0, failed=0;
-
-    for(const edit of edits){
-      if(modified.includes(edit.find)){
-        modified=modified.split(edit.find).join(edit.replace);
-        applied++;
-      } else {
-        wLog(`⚠️ Couldn't find: "${String(edit.find).substring(0,80)}…"`, 'error');
-        failed++;
-      }
-    }
-
-    if(applied===0){
-      wLog('No edits applied. Try rephrasing with more specific text that appears in the file.','error');
-      btn.disabled=false; btn.textContent='Apply Change →'; return;
-    }
-
-    btn.textContent='Pushing to GitHub…';
-    wLog(`Applied ${applied} edit(s)${failed?`, ${failed} failed`:''}. Committing…`,'working');
-    await commitGHFile(selectedFilePath,modified,sha,commitMsg);
-
-    wLog(`✓ "${commitMsg}"`, 'success');
-    wLog(`✓ ${applied} change(s) live on yksproductions.com in ~60 seconds.`, 'success');
-    document.getElementById('w-instruction').value='';
-
-  }catch(err){
-    wLog('Error: '+err.message,'error');
-  }
-  btn.disabled=false; btn.textContent='Apply Change →';
-}
+// Editing now lives in edit.html — a direct visual editor (no AI find/replace).
 
 // ── Init ───────────────────────────────────────────────────────────────────
 (function init(){

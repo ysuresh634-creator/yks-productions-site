@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>YKS Site Editor</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{
+  --bg:#0D0B11;--card:#181521;--card2:#1C1929;--gold:#C9A96E;--gold-lt:#3A3020;
+  --text:#F8F4EF;--sub:#A89F98;--border:#2A2535;--red:#C0392B;--green:#7EC88B;
+  --input:#13111A;--blue:#5B9BD5;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;display:flex;flex-direction:column}
+
+/* ── LOCK ── */
+#lock{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999}
+#lock.hidden{display:none}
+.lk-brand{font-size:20px;font-weight:700;letter-spacing:3px;color:var(--gold)}
+.lk-sub{font-size:10px;color:var(--sub);letter-spacing:2px;margin:6px 0 44px}
+.dots{display:flex;gap:16px;margin-bottom:28px}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border)}
+.dot.on{background:var(--gold);border-color:var(--gold)}
+.lk-err{font-size:12px;color:var(--red);height:18px;margin-bottom:10px}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}
+.pk{width:72px;height:72px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none}
+.pk:active{background:var(--gold-lt);color:var(--gold)}
+
+/* ── TOP BAR ── */
+.top{background:var(--card);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:calc(8px + env(safe-area-inset-top))}
+.brand{font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--gold);white-space:nowrap}
+select.page-sel{flex:1;min-width:0;background:var(--input);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;-webkit-appearance:none}
+.btn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-save{background:var(--gold);color:#0D0B11}
+.btn-save:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--sub)}
+
+/* ── MODE BAR ── */
+.modes{background:var(--card2);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;gap:6px;align-items:center;flex-shrink:0;overflow-x:auto}
+.mode{background:none;border:1px solid var(--border);color:var(--sub);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.mode.on{background:var(--gold-lt);border-color:rgba(201,169,110,.5);color:var(--gold)}
+.chg-count{margin-left:auto;font-size:11px;color:var(--gold);font-weight:700;white-space:nowrap}
+
+/* ── STAGE ── */
+.stage{flex:1;position:relative;background:#000;overflow:hidden}
+#frame{width:100%;height:100%;border:none;background:#fff}
+.stage-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:13px;text-align:center;padding:30px;pointer-events:none}
+
+/* ── SHEETS ── */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:190;opacity:0;pointer-events:none;transition:opacity .2s}
+.ov.on{opacity:1;pointer-events:all}
+.sheet{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--gold);border-radius:18px 18px 0 0;z-index:195;transform:translateY(110%);transition:transform .25s cubic-bezier(.4,0,.2,1);max-height:84vh;display:flex;flex-direction:column}
+.sheet.on{transform:translateY(0)}
+.sh-hd{padding:14px 18px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0}
+.sh-title{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gold)}
+.sh-x{background:none;border:none;color:var(--sub);font-size:24px;cursor:pointer;line-height:1}
+.sh-body{padding:16px 18px;overflow-y:auto;padding-bottom:calc(18px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+.lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--sub);text-transform:uppercase;margin-bottom:6px;display:block}
+.inp{width:100%;background:var(--input);border:1px solid var(--border);border-radius:8px;padding:11px 12px;color:var(--text);font-size:15px;outline:none;-webkit-appearance:none;font-family:inherit}
+.inp:focus{border-color:var(--gold)}
+textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
+.fld{margin-bottom:14px}
+.row2{display:flex;gap:8px}
+.row2 .btn{flex:1;padding:13px}
+.hint{font-size:11px;color:var(--sub);margin-top:6px;line-height:1.5}
+
+/* changes list */
+.chg{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start}
+.chg-txt{flex:1;min-width:0;font-size:12px;line-height:1.5}
+.chg-kind{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:3px}
+.chg-old{color:var(--sub);text-decoration:line-through;word-break:break-word;display:block}
+.chg-new{color:var(--green);word-break:break-word;display:block;margin-top:2px}
+.chg-x{background:rgba(192,57,43,.12);border:none;color:var(--red);border-radius:6px;width:28px;height:28px;cursor:pointer;flex-shrink:0;font-size:15px}
+.empty{text-align:center;color:var(--sub);font-size:13px;padding:30px 10px}
+
+/* status log */
+.log{padding:10px 12px;border-radius:8px;margin-bottom:8px;font-size:12px;line-height:1.55}
+.log.info{background:var(--card2);color:var(--sub);border:1px solid var(--border)}
+.log.ok{background:rgba(126,200,139,.08);color:var(--green);border:1px solid rgba(126,200,139,.22)}
+.log.bad{background:rgba(192,57,43,.08);color:var(--red);border:1px solid rgba(192,57,43,.22)}
+.log.work{background:rgba(201,169,110,.06);color:var(--gold);border:1px solid rgba(201,169,110,.18)}
+
+.imgprev{width:100%;max-height:210px;object-fit:contain;background:#000;border-radius:8px;margin-bottom:12px;display:block}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--gold);color:var(--gold);padding:11px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:300;transition:transform .25s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.on{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock">
+  <div class="lk-brand">YKS SITE EDITOR</div>
+  <div class="lk-sub">PRIVATE · INTERNAL TOOL</div>
+  <div class="dots"><i class="dot" id="d0"></i><i class="dot" id="d1"></i><i class="dot" id="d2"></i><i class="dot" id="d3"></i></div>
+  <div class="lk-err" id="lkerr"></div>
+  <div class="pad">
+    <button class="pk" onclick="pk('1')">1</button><button class="pk" onclick="pk('2')">2</button><button class="pk" onclick="pk('3')">3</button>
+    <button class="pk" onclick="pk('4')">4</button><button class="pk" onclick="pk('5')">5</button><button class="pk" onclick="pk('6')">6</button>
+    <button class="pk" onclick="pk('7')">7</button><button class="pk" onclick="pk('8')">8</button><button class="pk" onclick="pk('9')">9</button>
+    <button class="pk" style="visibility:hidden"></button><button class="pk" onclick="pk('0')">0</button><button class="pk" onclick="pkDel()">⌫</button>
+  </div>
+</div>
+
+<!-- TOP -->
+<div class="top">
+  <span class="brand">EDITOR</span>
+  <select class="page-sel" id="pagesel" onchange="loadPage(this.value)"><option value="">Loading pages…</option></select>
+  <button class="btn btn-save" id="savebtn" onclick="openSave()" disabled>Save</button>
+</div>
+
+<div class="modes">
+  <button class="mode on" id="m-text"  onclick="setMode('text')">✏️ Text</button>
+  <button class="mode"    id="m-photo" onclick="setMode('photo')">🖼 Photos</button>
+  <button class="mode"    id="m-link"  onclick="setMode('link')">🔗 Links</button>
+  <button class="mode"    id="m-off"   onclick="setMode('off')">👁 Browse</button>
+  <span class="chg-count" id="chgcount" onclick="openChanges()"></span>
+</div>
+
+<div class="stage">
+  <iframe id="frame" sandbox="allow-same-origin"></iframe>
+  <div class="stage-msg" id="stagemsg">Pick a page above to start editing.</div>
+</div>
+
+<div class="ov" id="ov" onclick="closeSheets()"></div>
+
+<!-- TEXT SHEET -->
+<div class="sheet" id="sh-text">
+  <div class="sh-hd"><span class="sh-title">✏️ EDIT TEXT</span><button class="sh-x" onclick="closeSheets()">×</button></div>
+  <div class="sh-body">
+    <div class="fld"><label class="lbl">Text</label><textarea class="inp" id="t-val"></textarea></div>
+    <div class="row2"><button class="btn btn-ghost" onclick="closeSheets()">Cancel</button><button class="btn btn-save" onclick="commitText()">Apply</button></div>
+  </div>
+</div>
+
+<!-- PHOTO SHEET -->
+<div class="sheet" id="sh-photo">
+  <div class="sh-hd"><span class="sh-title">🖼 REPLACE PHOTO</span><button class="sh-x" onclick="closeSheets()">×</button></div>
+  <div class="sh-body">
+    <img class="imgprev" id="p-prev" alt="">
+    <div class="fld"><label class="lbl">Current file</label><input class="inp" id="p-src" readonly style="font-size:12px;color:var(--sub)"></div>
+    <div class="fld">
+      <label class="lbl">Choose a new photo</label>
+      <input class="inp" type="file" id="p-file" accept="image/*" onchange="pickPhoto(event)">
+      <p class="hint">Uploads to assets/uploads/ in your repo. Max 5 MB. JPG, PNG or WebP.</p>
+    </div>
+    <div class="fld"><label class="lbl">Alt text (for SEO / accessibility)</label><input class="inp" id="p-alt"></div>
+    <div class="row2"><button class="btn btn-ghost" onclick="closeSheets()">Cancel</button><button class="btn btn-save" onclick="commitPhoto()">Apply</button></div>
+  </div>
+</div>
+
+<!-- LINK SHEET -->
+<div class="sheet" id="sh-link">
+  <div class="sh-hd"><span class="sh-title">🔗 EDIT LINK</span><button class="sh-x" onclick="closeSheets()">×</button></div>
+  <div class="sh-body">
+    <div class="fld"><label class="lbl">Link text</label><input class="inp" id="l-text"></div>
+    <div class="fld"><label class="lbl">Destination (href)</label><input class="inp" id="l-href" style="font-size:13px"></div>
+    <div class="row2"><button class="btn btn-ghost" onclick="closeSheets()">Cancel</button><button class="btn btn-save" onclick="commitLink()">Apply</button></div>
+  </div>
+</div>
+
+<!-- CHANGES SHEET -->
+<div class="sheet" id="sh-chg">
+  <div class="sh-hd"><span class="sh-title">📝 YOUR CHANGES</span><button class="sh-x" onclick="closeSheets()">×</button></div>
+  <div class="sh-body"><div id="chglist"></div></div>
+</div>
+
+<!-- SAVE SHEET -->
+<div class="sheet" id="sh-save">
+  <div class="sh-hd"><span class="sh-title">🚀 PUBLISH</span><button class="sh-x" onclick="closeSheets()">×</button></div>
+  <div class="sh-body">
+    <div id="savesummary"></div>
+    <div id="savelog"></div>
+    <div class="row2" id="saveactions">
+      <button class="btn btn-ghost" onclick="closeSheets()">Cancel</button>
+      <button class="btn btn-save" id="gobtn" onclick="doSave()">Publish now</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ CONFIG ══
+const GH_OWNER='ysuresh634-creator', GH_REPO='yks-productions-site', GH_BRANCH='main';
+const SITE='https://yksproductions.com/';
+const MAX_UPLOAD=5*1024*1024;
+
+// ══ PIN ══
+let buf='';
+const getPin=()=>localStorage.getItem('yks_pin')||'1234';
+function pk(k){ if(buf.length>=4)return; buf+=k; dots(); if(buf.length===4) setTimeout(chk,120); }
+function pkDel(){ buf=buf.slice(0,-1); document.getElementById('lkerr').textContent=''; dots(); }
+function dots(){ for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('on',i<buf.length); }
+function chk(){
+  if(buf===getPin()){ document.getElementById('lock').classList.add('hidden'); sessionStorage.setItem('yks_unlocked','1'); boot(); }
+  else{ document.getElementById('lkerr').textContent='Wrong PIN. Try again.'; buf=''; dots(); }
+}
+
+// ══ STATE ══
+let masterDoc=null;      // authoritative parsed document
+let curPath='', curSha='', origSource='';
+let changes=[];          // {id,kind,label,before,after,apply()}
+let mode='text';
+let sel=null;            // {id, tag, text, src, alt, href}
+let pendingUpload=null;  // {name, dataUrl, bytes}
+let uid=0;
+
+const $=id=>document.getElementById(id);
+const ghToken=()=>localStorage.getItem('yks_ghtoken')||'';
+
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),2200); }
+
+function b64dec(b){ const bin=atob(b.replace(/\s/g,'')); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return new TextDecoder().decode(u); }
+function b64enc(s){ const u=new TextEncoder().encode(s); let bin=''; const C=0x8000; for(let i=0;i<u.length;i+=C) bin+=String.fromCharCode.apply(null,u.subarray(i,i+C)); return btoa(bin); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ══ GITHUB ══
+async function gh(path, opts={}){
+  const r=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/${path}`,{
+    ...opts, headers:{Authorization:`Bearer ${ghToken()}`,Accept:'application/vnd.github+json','Content-Type':'application/json',...(opts.headers||{})}
+  });
+  const txt=await r.text();
+  let data; try{ data=JSON.parse(txt); }catch{ data={message:txt.slice(0,200)}; }
+  if(!r.ok) throw new Error(`GitHub ${r.status}: ${data.message||'error'}`);
+  return data;
+}
+
+// ══ BOOT ══
+async function boot(){
+  if(!ghToken()){ $('stagemsg').innerHTML='⚠️ No GitHub token saved.<br><br>Open <b>Studio → Settings → Website Editor</b>,<br>paste your token, then come back.'; return; }
+  try{
+    const tree=await gh(`git/trees/${GH_BRANCH}?recursive=1`);
+    const pages=tree.tree.filter(n=>n.type==='blob'&&/\.html$/i.test(n.path)&&!n.path.startsWith('_')&&!/^google[0-9a-f]+\.html$/i.test(n.path)).map(n=>n.path).sort();
+    const pri=['index.html','talents.html','faq.html','films.html','fashion.html'];
+    pages.sort((a,b)=>{const ia=pri.indexOf(a),ib=pri.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
+    $('pagesel').innerHTML='<option value="">Choose a page…</option>'+pages.map(p=>`<option value="${esc(p)}">${esc(p.replace(/\.html$/,''))}</option>`).join('');
+  }catch(e){ $('stagemsg').textContent='Could not list pages — '+e.message; }
+}
+
+// ══ LOAD A PAGE ══
+async function loadPage(path){
+  if(!path) return;
+  if(changes.length && !confirm(`You have ${changes.length} unsaved change(s). Discard them?`)) { $('pagesel').value=curPath; return; }
+  changes=[]; renderCount(); $('savebtn').disabled=true;
+  $('stagemsg').textContent='Loading '+path+'…'; $('stagemsg').style.display='';
+  try{
+    const f=await gh(`contents/${path.split('/').map(encodeURIComponent).join('/')}?ref=${GH_BRANCH}`);
+    origSource=b64dec(f.content); curSha=f.sha; curPath=path;
+    masterDoc=new DOMParser().parseFromString(origSource,'text/html');
+    stampIds(masterDoc);
+    renderFrame();
+    $('stagemsg').style.display='none';
+  }catch(e){ $('stagemsg').textContent='Failed to load — '+e.message; }
+}
+
+function stampIds(doc){ uid=0; doc.querySelectorAll('*').forEach(el=>el.setAttribute('data-yks-id',String(++uid))); }
+
+// ══ RENDER PREVIEW ══
+function renderFrame(){
+  const pv=masterDoc.cloneNode(true);
+  // neutralise the page's own scripts so they don't fight the editor
+  pv.querySelectorAll('script').forEach(s=>s.setAttribute('type','text/x-disabled'));
+  // resolve relative assets against the live site
+  let base=pv.querySelector('base'); if(!base){ base=pv.createElement('base'); pv.head.insertBefore(base,pv.head.firstChild); }
+  base.setAttribute('href',SITE);
+  const style=pv.createElement('style');
+  style.textContent=`
+    html{scroll-behavior:auto!important}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    [data-yks-hot]{outline:2px dashed rgba(201,169,110,.85)!important;outline-offset:2px;cursor:pointer!important}
+    [data-yks-hot]:hover{outline-style:solid!important;background:rgba(201,169,110,.14)!important}
+    [data-yks-dirty]{outline:2px solid #7EC88B!important;outline-offset:2px}
+    [data-yks-reveal],.reveal,[class*="fade"]{opacity:1!important;transform:none!important;visibility:visible!important;clip-path:none!important}
+  `;
+  pv.head.appendChild(style);
+  const script=pv.createElement('script');
+  script.textContent=FRAME_JS;
+  pv.body.appendChild(script);
+  $('frame').srcdoc='<!DOCTYPE html>\n'+pv.documentElement.outerHTML;
+}
+
+// injected into the iframe
+const FRAME_JS=`
+(function(){
+  var mode='text';
+  var TEXT='h1,h2,h3,h4,h5,h6,p,span,li,a,button,td,th,figcaption,blockquote,label,strong,em,small,div';
+  function hasOwnText(el){
+    for(var i=0;i<el.childNodes.length;i++){
+      var n=el.childNodes[i];
+      if(n.nodeType===3 && n.nodeValue.trim().length>0) return true;
+    }
+    return false;
+  }
+  function targets(){
+    if(mode==='text')  return [].slice.call(document.querySelectorAll(TEXT)).filter(hasOwnText);
+    if(mode==='photo') return [].slice.call(document.querySelectorAll('img'));
+    if(mode==='link')  return [].slice.call(document.querySelectorAll('a[href]'));
+    return [];
+  }
+  function paint(){
+    [].slice.call(document.querySelectorAll('[data-yks-hot]')).forEach(function(e){e.removeAttribute('data-yks-hot');});
+    if(mode==='off') return;
+    targets().forEach(function(e){e.setAttribute('data-yks-hot','1');});
+  }
+  document.addEventListener('click',function(e){
+    if(mode==='off') return;
+    var el=e.target;
+    while(el && el!==document.body && !el.hasAttribute('data-yks-hot')) el=el.parentElement;
+    if(!el || el===document.body) return;
+    e.preventDefault(); e.stopPropagation();
+    var own='';
+    for(var i=0;i<el.childNodes.length;i++){ var n=el.childNodes[i]; if(n.nodeType===3) own+=n.nodeValue; }
+    parent.postMessage({yks:'pick', id:el.getAttribute('data-yks-id'), tag:el.tagName.toLowerCase(),
+      text:own.trim(), full:(el.textContent||'').trim().slice(0,300),
+      src:el.getAttribute('src')||'', alt:el.getAttribute('alt')||'', href:el.getAttribute('href')||''},'*');
+  },true);
+  window.addEventListener('message',function(e){
+    var d=e.data||{};
+    if(d.yks==='mode'){ mode=d.mode; paint(); }
+    if(d.yks==='patch'){
+      var el=document.querySelector('[data-yks-id="'+d.id+'"]'); if(!el) return;
+      if(d.text!==undefined){
+        var done=false;
+        for(var i=0;i<el.childNodes.length;i++){
+          var n=el.childNodes[i];
+          if(n.nodeType===3 && n.nodeValue.trim().length>0){ n.nodeValue = done? '' : d.text; done=true; }
+        }
+        if(!done) el.textContent=d.text;
+      }
+      if(d.src!==undefined) el.setAttribute('src',d.src);
+      if(d.alt!==undefined) el.setAttribute('alt',d.alt);
+      if(d.href!==undefined) el.setAttribute('href',d.href);
+      el.setAttribute('data-yks-dirty','1');
+      el.scrollIntoView({block:'center'});
+    }
+    if(d.yks==='undirty'){ var q=document.querySelector('[data-yks-id="'+d.id+'"]'); if(q) q.removeAttribute('data-yks-dirty'); }
+  });
+  paint();
+  parent.postMessage({yks:'ready'},'*');
+})();
+`;
+
+// ══ MESSAGES FROM FRAME ══
+window.addEventListener('message',e=>{
+  const d=e.data||{};
+  if(d.yks==='ready') sendMode();
+  if(d.yks==='pick') onPick(d);
+});
+function sendMode(){ const f=$('frame').contentWindow; if(f) f.postMessage({yks:'mode',mode},'*'); }
+function patch(o){ const f=$('frame').contentWindow; if(f) f.postMessage({yks:'patch',...o},'*'); }
+
+function setMode(m){
+  mode=m;
+  ['text','photo','link','off'].forEach(x=>$('m-'+x).classList.toggle('on',x===m));
+  sendMode();
+}
+
+// ══ PICK → SHEET ══
+function onPick(d){
+  sel=d; pendingUpload=null;
+  if(mode==='text'){
+    if(!d.text){ toast('That block has no direct text'); return; }
+    $('t-val').value=d.text; openSheet('sh-text'); setTimeout(()=>$('t-val').focus(),260);
+  } else if(mode==='photo'){
+    if(d.tag!=='img'){ toast('Not an image'); return; }
+    $('p-src').value=d.src; $('p-alt').value=d.alt; $('p-file').value='';
+    $('p-prev').src=/^https?:|^data:/.test(d.src)?d.src:SITE+d.src.replace(/^\//,'');
+    openSheet('sh-photo');
+  } else if(mode==='link'){
+    $('l-text').value=d.text; $('l-href').value=d.href; openSheet('sh-link');
+  }
+}
+
+// ══ APPLY EDITS ══
+function mEl(id){ return masterDoc.querySelector(`[data-yks-id="${id}"]`); }
+
+function setOwnText(el,val){
+  let done=false;
+  el.childNodes.forEach(n=>{ if(n.nodeType===3 && n.nodeValue.trim().length>0){ n.nodeValue = done? '' : val; done=true; } });
+  if(!done) el.textContent=val;
+}
+
+function addChange(c){
+  changes=changes.filter(x=>!(x.id===c.id && x.kind===c.kind));
+  changes.push(c); renderCount(); $('savebtn').disabled=false;
+}
+
+function commitText(){
+  const val=$('t-val').value;
+  if(val===sel.text){ closeSheets(); return; }
+  const el=mEl(sel.id); if(!el){ toast('Element not found'); return; }
+  setOwnText(el,val);
+  patch({id:sel.id,text:val});
+  addChange({id:sel.id,kind:'text',label:sel.tag.toUpperCase(),before:sel.text,after:val});
+  closeSheets(); toast('Text updated');
+}
+
+function commitLink(){
+  const el=mEl(sel.id); if(!el){ toast('Element not found'); return; }
+  const t=$('l-text').value, h=$('l-href').value.trim();
+  if(t!==sel.text){ setOwnText(el,t); patch({id:sel.id,text:t}); addChange({id:sel.id,kind:'text',label:'LINK TEXT',before:sel.text,after:t}); }
+  if(h!==sel.href){ el.setAttribute('href',h); patch({id:sel.id,href:h}); addChange({id:sel.id,kind:'href',label:'LINK URL',before:sel.href,after:h}); }
+  closeSheets(); toast('Link updated');
+}
+
+function pickPhoto(ev){
+  const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  if(f.size>MAX_UPLOAD){ toast('Too big — max 5 MB'); ev.target.value=''; return; }
+  const rd=new FileReader();
+  rd.onload=()=>{ pendingUpload={name:f.name.replace(/[^\w.\-]/g,'_'), dataUrl:rd.result, size:f.size}; $('p-prev').src=rd.result; };
+  rd.readAsDataURL(f);
+}
+
+function commitPhoto(){
+  const el=mEl(sel.id); if(!el){ toast('Element not found'); return; }
+  const alt=$('p-alt').value;
+  if(alt!==sel.alt){ el.setAttribute('alt',alt); patch({id:sel.id,alt}); addChange({id:sel.id,kind:'alt',label:'ALT TEXT',before:sel.alt||'(empty)',after:alt||'(empty)'}); }
+  if(pendingUpload){
+    const stamp=Date.now().toString(36);
+    const newPath='assets/uploads/'+stamp+'-'+pendingUpload.name;
+    el.setAttribute('src',newPath);
+    el.removeAttribute('srcset');
+    patch({id:sel.id,src:pendingUpload.dataUrl});
+    addChange({id:sel.id,kind:'photo',label:'PHOTO',before:sel.src,after:newPath,upload:{path:newPath,dataUrl:pendingUpload.dataUrl}});
+  }
+  pendingUpload=null; closeSheets(); toast('Photo updated');
+}
+
+// ══ CHANGES ══
+function renderCount(){ $('chgcount').textContent = changes.length? changes.length+' change'+(changes.length>1?'s':'')+' ›' : ''; }
+function openChanges(){ if(!changes.length){ toast('No changes yet'); return; } renderChanges(); openSheet('sh-chg'); }
+function renderChanges(){
+  $('chglist').innerHTML = changes.length? changes.map((c,i)=>`
+    <div class="chg">
+      <div class="chg-txt">
+        <div class="chg-kind">${esc(c.label)}</div>
+        <span class="chg-old">${esc(String(c.before).slice(0,140))||'(empty)'}</span>
+        <span class="chg-new">${esc(String(c.after).slice(0,140))||'(empty)'}</span>
+      </div>
+      <button class="chg-x" onclick="undo(${i})">×</button>
+    </div>`).join('') : '<div class="empty">No changes.</div>';
+}
+function undo(i){
+  const c=changes[i]; const el=mEl(c.id);
+  if(el){
+    if(c.kind==='text'){ setOwnText(el,c.before); patch({id:c.id,text:c.before}); }
+    if(c.kind==='href'){ el.setAttribute('href',c.before); patch({id:c.id,href:c.before}); }
+    if(c.kind==='alt'){ el.setAttribute('alt',c.before); patch({id:c.id,alt:c.before}); }
+    if(c.kind==='photo'){ el.setAttribute('src',c.before); patch({id:c.id,src:/^https?:|^data:/.test(c.before)?c.before:SITE+c.before.replace(/^\//,'')}); }
+  }
+  changes.splice(i,1); renderCount(); renderChanges();
+  if(!changes.length){ $('savebtn').disabled=true; closeSheets(); }
+  const f=$('frame').contentWindow; if(f&&!changes.some(x=>x.id===c.id)) f.postMessage({yks:'undirty',id:c.id},'*');
+}
+
+// ══ SERIALISE + GUARDS ══
+function buildOutput(){
+  const out=masterDoc.cloneNode(true);
+  out.querySelectorAll('[data-yks-id]').forEach(el=>el.removeAttribute('data-yks-id'));
+  out.querySelectorAll('[data-yks-dirty]').forEach(el=>el.removeAttribute('data-yks-dirty'));
+  const doctype=/^\s*<!DOCTYPE[^>]*>/i.exec(origSource);
+  return (doctype?doctype[0]:'<!DOCTYPE html>')+'\n'+out.documentElement.outerHTML;
+}
+
+function guards(html){
+  const problems=[];
+  const ratio=html.length/Math.max(1,origSource.length);
+  if(ratio<0.5) problems.push(`Output is only ${Math.round(ratio*100)}% of the original size — something went wrong.`);
+  if(ratio>2)   problems.push(`Output is ${Math.round(ratio*100)}% of the original size — something went wrong.`);
+  const cnt=(s,re)=>(s.match(re)||[]).length;
+  const so=cnt(origSource,/<script/gi), sn=cnt(html,/<script/gi);
+  if(so!==sn) problems.push(`Script tags changed (${so} → ${sn}).`);
+  const io=cnt(origSource,/<img/gi), inn=cnt(html,/<img/gi);
+  if(io!==inn) problems.push(`Image tags changed (${io} → ${inn}).`);
+  if(/text\/x-disabled/.test(html)) problems.push('Preview markers leaked into the output.');
+  if(/data-yks-/.test(html)) problems.push('Editor markers leaked into the output.');
+  if(/<base[^>]*yksproductions\.com/i.test(html) && !/<base/i.test(origSource)) problems.push('Preview <base> tag leaked into the output.');
+  return problems;
+}
+
+// ══ SAVE ══
+function openSave(){
+  if(!changes.length){ toast('Nothing to save'); return; }
+  const html=buildOutput(), probs=guards(html);
+  const ups=changes.filter(c=>c.upload).length;
+  $('savelog').innerHTML='';
+  $('saveactions').style.display=probs.length?'none':'flex';
+  $('savesummary').innerHTML=`
+    <div class="log info"><b>${esc(curPath)}</b><br>
+    ${changes.length} change${changes.length>1?'s':''}${ups?` · ${ups} photo upload${ups>1?'s':''}`:''}<br>
+    ${origSource.length.toLocaleString()} → ${html.length.toLocaleString()} bytes</div>
+    ${probs.map(p=>`<div class="log bad">⚠️ ${esc(p)}</div>`).join('')}
+    ${probs.length?'<div class="log bad">Publishing is blocked. Reload the page and try smaller edits.</div>':''}`;
+  openSheet('sh-save');
+}
+
+function slog(m,k='info'){ const d=document.createElement('div'); d.className='log '+k; d.textContent=m; $('savelog').appendChild(d); }
+
+async function doSave(){
+  const html=buildOutput(), probs=guards(html);
+  if(probs.length){ slog('Blocked by safety checks.','bad'); return; }
+  const btn=$('gobtn'); btn.disabled=true; btn.textContent='Publishing…';
+  try{
+    // 1. upload any new photos
+    for(const c of changes.filter(x=>x.upload)){
+      slog('Uploading '+c.upload.path+'…','work');
+      const b64=c.upload.dataUrl.split(',')[1];
+      await gh(`contents/${c.upload.path.split('/').map(encodeURIComponent).join('/')}`,{
+        method:'PUT', body:JSON.stringify({message:`Add photo ${c.upload.path}`,content:b64,branch:GH_BRANCH})
+      });
+      slog('✓ '+c.upload.path,'ok');
+    }
+    // 2. commit the page
+    slog('Committing '+curPath+'…','work');
+    const msg=`Edit ${curPath} — ${changes.length} change${changes.length>1?'s':''} via YKS Site Editor`;
+    const res=await gh(`contents/${curPath.split('/').map(encodeURIComponent).join('/')}`,{
+      method:'PUT', body:JSON.stringify({message:msg,content:b64enc(html),sha:curSha,branch:GH_BRANCH})
+    });
+    curSha=res.content.sha; origSource=html;
+    slog('✓ Published — live in about a minute','ok');
+    slog('Previous version: '+String(res.commit&&res.commit.sha||'').slice(0,7)+' (revert from GitHub if needed)','info');
+    changes=[]; renderCount(); $('savebtn').disabled=true;
+    stampIds(masterDoc);
+    btn.textContent='Done'; setTimeout(()=>{ closeSheets(); btn.disabled=false; btn.textContent='Publish now'; },1600);
+  }catch(e){
+    slog('Failed: '+e.message,'bad');
+    if(/409|sha/i.test(e.message)) slog('The file changed on GitHub since you loaded it. Reload the page and redo the edit.','bad');
+    btn.disabled=false; btn.textContent='Retry';
+  }
+}
+
+// ══ SHEETS ══
+function openSheet(id){ closeSheets(); $('ov').classList.add('on'); $(id).classList.add('on'); }
+function closeSheets(){ $('ov').classList.remove('on'); document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('on')); }
+
+window.addEventListener('beforeunload',e=>{ if(changes.length){ e.preventDefault(); e.returnValue=''; } });
+
+// ══ INIT ══
+if(sessionStorage.getItem('yks_unlocked')==='1'){ $('lock').classList.add('hidden'); boot(); }
+</script>
+</body>
+</html>

@@ -1,33 +1,54 @@
 const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
+const ALLOWED_ORIGINS = [
+  'https://yksproductions.com',
+  'https://www.yksproductions.com',
+];
+
+const MAX_BODY = 256 * 1024; // the invoice form is tiny; anything larger is abuse
+
+const cors = origin => ({
+  'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
-};
+  'Vary': 'Origin',
+});
 
-const ok  = d => new Response(JSON.stringify(d),     { headers: { ...CORS, 'Content-Type': 'application/json' } });
-const err = (m, s=500) => new Response(JSON.stringify({ error: m }), { status: s, headers: { ...CORS, 'Content-Type': 'application/json' } });
+const ok  = (d, o) => new Response(JSON.stringify(d), { headers: { ...cors(o), 'Content-Type': 'application/json' } });
+const err = (m, s, o) => new Response(JSON.stringify({ error: m }), { status: s || 500, headers: { ...cors(o), 'Content-Type': 'application/json' } });
 
 export default {
   async fetch(request, env) {
-    if (request.method === 'OPTIONS') return new Response('', { headers: CORS });
-    if (request.method !== 'POST') return err('POST only', 405);
+    const origin = request.headers.get('Origin') || '';
 
-    const body = await request.json().catch(() => null);
-    if (!body?.type) return err('Missing type', 400);
+    if (request.method === 'OPTIONS') return new Response('', { headers: cors(origin) });
+    if (request.method !== 'POST') return err('POST only', 405, origin);
+
+    // Only the Studio may call this. Not airtight against a crafted client,
+    // but this Worker can no longer write anything — worst case is Gemini quota,
+    // which is hard-capped by the free tier.
+    if (origin && !ALLOWED_ORIGINS.includes(origin)) return err('Forbidden origin', 403, origin);
+
+    const len = Number(request.headers.get('Content-Length') || 0);
+    if (len > MAX_BODY) return err('Request too large', 413, origin);
+
+    const raw = await request.text();
+    if (raw.length > MAX_BODY) return err('Request too large', 413, origin);
+
+    let body;
+    try { body = JSON.parse(raw); } catch { return err('Invalid JSON', 400, origin); }
+    if (!body || !body.type) return err('Missing type', 400, origin);
 
     const key = env.GEMINI_API_KEY;
-    if (!key) return err('GEMINI_API_KEY secret not set. Run: wrangler secret put GEMINI_API_KEY', 500);
+    if (!key) return err('GEMINI_API_KEY secret not set', 500, origin);
 
-    if (body.type === 'invoice_ai') return invoiceAI(body, key);
-    if (body.type === 'website_edit') return websiteEdit(body, key);
-    return err('Unknown type', 400);
+    if (body.type === 'invoice_ai') return invoiceAI(body, key, origin);
+    return err('Unknown type', 400, origin);
   },
 };
 
 // ── Invoice AI ────────────────────────────────────────────────────────────
-async function invoiceAI({ context, message }, key) {
+async function invoiceAI({ context, message }, key, origin) {
   const sys = `You are a smart assistant in YKS Studio, editing invoices and quotations for Yedukrishna Suresh (YKS Productions), a cinematographer and photographer in Bangalore/Dubai. Current document state: ${JSON.stringify(context)}. Use tools to edit the form. Currency is INR. Items use 0-based indexing. Be brief.`;
 
   const functions = [
@@ -53,7 +74,7 @@ async function invoiceAI({ context, message }, key) {
   });
 
   const data = await res.json();
-  if (!res.ok) return err(data.error?.message || 'Gemini error');
+  if (!res.ok) return err(data.error?.message || 'Gemini error', 502, origin);
 
   const parts = data.candidates?.[0]?.content?.parts || [];
   const toolCalls = [];
@@ -62,49 +83,5 @@ async function invoiceAI({ context, message }, key) {
     if (p.text) text += p.text;
     if (p.functionCall) toolCalls.push({ name: p.functionCall.name, input: p.functionCall.args || {} });
   }
-  return ok({ text: text || null, tool_calls: toolCalls });
-}
-
-// ── Website Edit ──────────────────────────────────────────────────────────
-async function websiteEdit({ file_path, instruction, file_content }, key) {
-  const prompt = `You are editing HTML files for yksproductions.com — the portfolio website of Yedukrishna Suresh (YKS Productions), a cinematographer/photographer in Bangalore and Dubai.
-
-File: ${file_path}
-Instruction: ${instruction}
-
-Return ONLY a raw JSON object — no markdown, no code fences, nothing else. Exact format:
-{"edits":[{"find":"exact verbatim text to find","replace":"replacement text"},...],"commit_message":"short description"}
-
-Rules:
-- "find" must exist VERBATIM in the file including whitespace/indentation
-- Make minimal changes — do not rewrite whole sections unless explicitly asked
-- Preserve all surrounding HTML, scripts, and styles
-
-File content:
-${file_content}`;
-
-  const res = await fetch(`${GEMINI}?key=${key}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    }),
-  });
-
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    return err(data.error?.message || `Gemini HTTP ${res.status}`);
-  }
-
-  const data = await res.json();
-  let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-  // Strip markdown code fences if present
-  raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
-
-  try {
-    return ok(JSON.parse(raw));
-  } catch {
-    return err('AI response was not valid JSON: ' + raw.slice(0, 300));
-  }
+  return ok({ text: text || null, tool_calls: toolCalls }, origin);
 }
