@@ -86,6 +86,30 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 .log.work{background:rgba(201,169,110,.06);color:var(--gold);border:1px solid rgba(201,169,110,.18)}
 
 .imgprev{width:100%;max-height:210px;object-fit:contain;background:#000;border-radius:8px;margin-bottom:12px;display:block}
+
+/* ── PHOTO EDITOR ── */
+.pe-stage{position:relative;width:100%;background:#000;border-radius:10px;overflow:hidden;margin-bottom:12px;touch-action:none;-webkit-user-select:none;user-select:none}
+#pe-canvas{display:block;width:100%;height:auto;cursor:grab}
+#pe-canvas:active{cursor:grabbing}
+.pe-hint{position:absolute;left:0;right:0;bottom:0;padding:6px 10px;font-size:10px;letter-spacing:.4px;color:#cfc7bf;background:linear-gradient(transparent,rgba(0,0,0,.75));text-align:center;pointer-events:none}
+.pe-tabs{display:flex;gap:6px;margin-bottom:12px}
+.pe-tab{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--sub);border-radius:8px;padding:9px 4px;font-size:12px;font-weight:600;cursor:pointer}
+.pe-tab.on{background:var(--gold-lt);border-color:rgba(201,169,110,.5);color:var(--gold)}
+.pe-pane{display:none}
+.pe-pane.on{display:block}
+.pe-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.pe-chip{background:var(--card2);border:1px solid var(--border);color:var(--sub);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
+.pe-chip.on{background:var(--gold-lt);border-color:rgba(201,169,110,.5);color:var(--gold)}
+.pe-slider{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.pe-slider span{font-size:11px;color:var(--sub);width:82px;flex-shrink:0;letter-spacing:.3px}
+.pe-slider b{font-size:11px;color:var(--gold);width:44px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+.pe-slider input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:3px;background:var(--border);border-radius:3px;outline:none}
+.pe-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--gold);cursor:pointer;border:none}
+.pe-slider input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--gold);cursor:pointer;border:none}
+.pe-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.pe-mini{background:var(--card2);border:1px solid var(--border);color:var(--sub);border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;cursor:pointer}
+.pe-mini:active{border-color:var(--gold);color:var(--gold)}
+.pe-out{font-size:10px;color:var(--sub);text-align:center;margin:10px 0 12px;letter-spacing:.3px;min-height:14px}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--gold);color:var(--gold);padding:11px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:300;transition:transform .25s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
 .toast.on{transform:translateX(-50%) translateY(0)}
 </style>
@@ -165,17 +189,60 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 
 <!-- PHOTO SHEET -->
 <div class="sheet" id="sh-photo">
-  <div class="sh-hd"><span class="sh-title">🖼 REPLACE PHOTO</span><button class="sh-x" onclick="closeSheets()">×</button></div>
+  <div class="sh-hd"><span class="sh-title">🖼 PHOTO</span><button class="sh-x" onclick="closeSheets()">×</button></div>
   <div class="sh-body">
-    <img class="imgprev" id="p-prev" alt="">
-    <div class="fld"><label class="lbl">Current file</label><input class="inp" id="p-src" readonly style="font-size:12px;color:var(--sub)"></div>
-    <div class="fld">
-      <label class="lbl">Choose a new photo</label>
-      <input class="inp" type="file" id="p-file" accept="image/*" onchange="pickPhoto(event)">
-      <p class="hint">Uploads to assets/uploads/ in your repo. Max 5 MB. JPG, PNG or WebP.</p>
+
+    <!-- canvas stage -->
+    <div class="pe-stage" id="pe-stage">
+      <canvas id="pe-canvas"></canvas>
+      <div class="pe-hint" id="pe-hint">Drag to reframe · pinch or use Zoom below</div>
     </div>
-    <div class="fld"><label class="lbl">Alt text (for SEO / accessibility)</label><input class="inp" id="p-alt"></div>
-    <div class="row2"><button class="btn btn-ghost" onclick="closeSheets()">Cancel</button><button class="btn btn-save" onclick="commitPhoto()">Apply</button></div>
+
+    <!-- tabs -->
+    <div class="pe-tabs">
+      <button class="pe-tab on" id="pt-frame"  onclick="peTab('frame')">Reframe</button>
+      <button class="pe-tab"    id="pt-adjust" onclick="peTab('adjust')">Adjust</button>
+      <button class="pe-tab"    id="pt-file"   onclick="peTab('file')">Replace</button>
+    </div>
+
+    <!-- REFRAME -->
+    <div class="pe-pane on" id="pp-frame">
+      <label class="lbl">Shape</label>
+      <div class="pe-chips" id="pe-ratios"></div>
+      <div class="pe-slider"><span>Zoom</span><input type="range" id="pe-zoom" min="100" max="400" value="100" oninput="peSet('zoom',this.value)"><b id="pe-zoom-v">1.0×</b></div>
+      <div class="pe-slider"><span>Straighten</span><input type="range" id="pe-rot" min="-45" max="45" value="0" oninput="peSet('rot',this.value)"><b id="pe-rot-v">0°</b></div>
+      <div class="pe-btns">
+        <button class="pe-mini" onclick="peRotate90()">⟲ Rotate 90°</button>
+        <button class="pe-mini" onclick="peFlip()">⇋ Flip</button>
+        <button class="pe-mini" onclick="peCenter()">Center</button>
+      </div>
+    </div>
+
+    <!-- ADJUST -->
+    <div class="pe-pane" id="pp-adjust">
+      <div class="pe-slider"><span>Exposure</span><input type="range" id="pe-bri" min="50" max="150" value="100" oninput="peSet('bri',this.value)"><b id="pe-bri-v">0</b></div>
+      <div class="pe-slider"><span>Contrast</span><input type="range" id="pe-con" min="50" max="150" value="100" oninput="peSet('con',this.value)"><b id="pe-con-v">0</b></div>
+      <div class="pe-slider"><span>Saturation</span><input type="range" id="pe-sat" min="0" max="200" value="100" oninput="peSet('sat',this.value)"><b id="pe-sat-v">0</b></div>
+      <div class="pe-slider"><span>Warmth</span><input type="range" id="pe-warm" min="-50" max="50" value="0" oninput="peSet('warm',this.value)"><b id="pe-warm-v">0</b></div>
+      <div class="pe-btns"><button class="pe-mini" onclick="peResetAdjust()">Reset adjustments</button></div>
+    </div>
+
+    <!-- REPLACE -->
+    <div class="pe-pane" id="pp-file">
+      <div class="fld"><label class="lbl">Current file</label><input class="inp" id="p-src" readonly style="font-size:12px;color:var(--sub)"></div>
+      <div class="fld">
+        <label class="lbl">Use a different photo</label>
+        <input class="inp" type="file" id="p-file" accept="image/*" onchange="pickPhoto(event)">
+        <p class="hint">Pick a new photo, then reframe and adjust it above. Max 25 MB in — it is resized on export.</p>
+      </div>
+      <div class="fld"><label class="lbl">Alt text (for SEO / accessibility)</label><input class="inp" id="p-alt"></div>
+    </div>
+
+    <div class="pe-out" id="pe-out"></div>
+    <div class="row2">
+      <button class="btn btn-ghost" onclick="closeSheets()">Cancel</button>
+      <button class="btn btn-save" id="pe-apply" onclick="commitPhoto()">Apply</button>
+    </div>
   </div>
 </div>
 
@@ -214,7 +281,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 // ══ CONFIG ══
 const GH_OWNER='ysuresh634-creator', GH_REPO='yks-productions-site', GH_BRANCH='main';
 const SITE='https://yksproductions.com/';
-const MAX_UPLOAD=5*1024*1024;
+const MAX_UPLOAD=25*1024*1024;   // input limit; export is always resized down
 
 // ══ PIN ══
 let buf='';
@@ -447,9 +514,14 @@ const FRAME_JS=`
     }
     var own='';
     for(var i=0;i<el.childNodes.length;i++){ var n=el.childNodes[i]; if(n.nodeType===3) own+=n.nodeValue; }
+    // how the image is actually framed on the page, so the editor can export
+    // exactly the shape the visitor sees
+    var rect=el.getBoundingClientRect();
+    var slotAR=(rect.width>0&&rect.height>0)?(rect.width/rect.height):0;
     parent.postMessage({yks:'pick', id:el.getAttribute('data-yks-id'), tag:el.tagName.toLowerCase(),
       text:own.trim(), full:(el.textContent||'').trim().slice(0,300),
-      src:el.getAttribute('src')||'', alt:el.getAttribute('alt')||'', href:el.getAttribute('href')||''},'*');
+      src:el.getAttribute('src')||'', alt:el.getAttribute('alt')||'', href:el.getAttribute('href')||'',
+      slotAR:slotAR},'*');
   },true);
   window.addEventListener('message',function(e){
     var d=e.data||{};
@@ -505,8 +577,13 @@ function onPick(d){
   } else if(mode==='photo'){
     if(d.tag!=='img'){ toast('Not an image'); return; }
     $('p-src').value=d.src; $('p-alt').value=d.alt; $('p-file').value='';
-    $('p-prev').src=/^https?:|^data:/.test(d.src)?d.src:SITE+d.src.replace(/^\//,'');
+    $('pe-out').textContent='Loading photo…';
     openSheet('sh-photo');
+    const url = /^https?:|^data:/.test(d.src) ? d.src : SITE+d.src.replace(/^\//,'');
+    const name = (d.src.split('/').pop()||'photo').replace(/\.[^.]+$/,'').replace(/[^\w\-]/g,'_');
+    // d.slotAR is how the photo is actually framed on the page, so "Fits slot"
+    // exports exactly what the visitor will see.
+    setTimeout(()=>peLoad(url, d.slotAR||1, name), 120);
   } else if(mode==='link'){
     $('l-text').value=d.text; $('l-href').value=d.href; openSheet('sh-link');
   }
@@ -544,25 +621,220 @@ function commitLink(){
   closeSheets(); toast('Link updated');
 }
 
+// ══ PHOTO EDITOR ══════════════════════════════════════════════════════════
+// Everything is baked into an exported file, so what you see is what ships —
+// no inline styles added to the page and no reliance on CSS object-fit.
+const MAX_EXPORT = 2400;          // longest edge of the written file
+const RATIOS = [
+  {k:'orig', label:'Original'},
+  {k:'fit',  label:'Fits slot'},
+  {k:'1',    label:'1:1',  v:1},
+  {k:'4:5',  label:'4:5',  v:4/5},
+  {k:'3:2',  label:'3:2',  v:3/2},
+  {k:'2:3',  label:'2:3',  v:2/3},
+  {k:'16:9', label:'16:9', v:16/9},
+  {k:'9:16', label:'9:16', v:9/16},
+];
+
+let pe = null;   // {img, natW, natH, slotAR, ratio, zoom, rot, quarter, flip, ox, oy, bri, con, sat, warm, dirty, srcName}
+
+function peDefaults(img, slotAR, srcName){
+  return { img, natW:img.naturalWidth, natH:img.naturalHeight, slotAR,
+           ratio:'fit', zoom:1, rot:0, quarter:0, flip:false, ox:0, oy:0,
+           bri:100, con:100, sat:100, warm:0, dirty:false, srcName };
+}
+
+function peAspect(){
+  if(!pe) return 1;
+  if(pe.ratio==='orig'){ const q=pe.quarter%2===1; return q ? pe.natH/pe.natW : pe.natW/pe.natH; }
+  if(pe.ratio==='fit')  return pe.slotAR || 1;
+  const r=RATIOS.find(x=>x.k===pe.ratio); return r&&r.v ? r.v : 1;
+}
+
+function peFilter(){
+  const warm=pe.warm/100;
+  // warmth is applied as a sepia+hue nudge; subtle and reversible
+  return `brightness(${pe.bri/100}) contrast(${pe.con/100}) saturate(${pe.sat/100})`
+       + (warm>0 ? ` sepia(${warm*0.55})` : warm<0 ? ` hue-rotate(${warm*22}deg)` : '');
+}
+
+function peRenderTo(ctx, outW, outH){
+  const {img,natW,natH}=pe;
+  const q=pe.quarter%2===1;
+  const srcW=q?natH:natW, srcH=q?natW:natH;
+
+  // scale so the (rotated) image covers the output box, then apply user zoom
+  const cover=Math.max(outW/srcW, outH/srcH)*pe.zoom;
+  const drawW=srcW*cover, drawH=srcH*cover;
+
+  // clamp pan so you can never drag past the edge of the photo
+  const maxX=Math.max(0,(drawW-outW)/2), maxY=Math.max(0,(drawH-outH)/2);
+  pe.ox=Math.max(-maxX,Math.min(maxX,pe.ox));
+  pe.oy=Math.max(-maxY,Math.min(maxY,pe.oy));
+
+  ctx.save();
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,outW,outH);
+  ctx.filter=peFilter();
+  ctx.translate(outW/2+pe.ox, outH/2+pe.oy);
+  ctx.rotate((pe.quarter*90+pe.rot)*Math.PI/180);
+  if(pe.flip) ctx.scale(-1,1);
+  const w=natW*cover, h=natH*cover;
+  ctx.imageSmoothingQuality='high';
+  ctx.drawImage(img,-w/2,-h/2,w,h);
+  ctx.restore();
+}
+
+function peDraw(){
+  if(!pe) return;
+  const cv=$('pe-canvas');
+  const stageW=Math.max(240, $('pe-stage').clientWidth||320);
+  const ar=peAspect();
+  let w=stageW, h=Math.round(stageW/ar);
+  const capH=Math.round(Math.min(window.innerHeight*0.34, 340));
+  if(h>capH){ h=capH; w=Math.round(h*ar); }
+  const dpr=Math.min(2, window.devicePixelRatio||1);
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  cv.style.width=w+'px'; cv.style.height=h+'px';
+  const ctx=cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  peRenderTo(ctx,w,h);
+  peOut();
+}
+
+function peOut(){
+  const ar=peAspect();
+  let ow,oh;
+  if(ar>=1){ ow=Math.min(MAX_EXPORT,pe.natW); oh=Math.round(ow/ar); }
+  else { oh=Math.min(MAX_EXPORT,pe.natH); ow=Math.round(oh*ar); }
+  $('pe-out').textContent=`Exports ${ow} × ${oh} px · JPEG`;
+  return {ow,oh};
+}
+
+function peSet(k,v){
+  if(!pe) return;
+  v=parseFloat(v);
+  if(k==='zoom'){ pe.zoom=v/100; $('pe-zoom-v').textContent=(v/100).toFixed(1)+'×'; }
+  if(k==='rot'){  pe.rot=v;      $('pe-rot-v').textContent=v+'°'; }
+  if(k==='bri'){  pe.bri=v;      $('pe-bri-v').textContent=(v-100>0?'+':'')+(v-100); }
+  if(k==='con'){  pe.con=v;      $('pe-con-v').textContent=(v-100>0?'+':'')+(v-100); }
+  if(k==='sat'){  pe.sat=v;      $('pe-sat-v').textContent=(v-100>0?'+':'')+(v-100); }
+  if(k==='warm'){ pe.warm=v;     $('pe-warm-v').textContent=(v>0?'+':'')+v; }
+  pe.dirty=true; peDraw();
+}
+function peRotate90(){ if(!pe)return; pe.quarter=(pe.quarter+1)%4; pe.ox=pe.oy=0; pe.dirty=true; peDraw(); }
+function peFlip(){ if(!pe)return; pe.flip=!pe.flip; pe.dirty=true; peDraw(); }
+function peCenter(){ if(!pe)return; pe.ox=pe.oy=0; pe.dirty=true; peDraw(); }
+function peResetAdjust(){
+  if(!pe)return;
+  pe.bri=100;pe.con=100;pe.sat=100;pe.warm=0;
+  ['bri','con','sat','warm'].forEach(k=>{ $('pe-'+k).value = k==='warm'?0:100; $('pe-'+k+'-v').textContent='0'; });
+  pe.dirty=true; peDraw();
+}
+function peRatio(k){
+  if(!pe)return;
+  pe.ratio=k; pe.ox=pe.oy=0; pe.dirty=true;
+  [...document.querySelectorAll('#pe-ratios .pe-chip')].forEach(c=>c.classList.toggle('on',c.dataset.k===k));
+  peDraw();
+}
+function peTab(t){
+  ['frame','adjust','file'].forEach(x=>{
+    $('pt-'+x).classList.toggle('on',x===t);
+    $('pp-'+x).classList.toggle('on',x===t);
+  });
+}
+
+// drag to reframe + pinch to zoom
+(function peGestures(){
+  const cv=$('pe-canvas'); if(!cv) return;
+  let drag=false,lx=0,ly=0,pinch=0,startZoom=1;
+  const pts=new Map();
+  const scaleFactor=()=>{ const r=cv.getBoundingClientRect(); return r.width? (cv.width/(window.devicePixelRatio||1))/r.width : 1; };
+  cv.addEventListener('pointerdown',e=>{
+    if(!pe) return;
+    cv.setPointerCapture(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===1){ drag=true; lx=e.clientX; ly=e.clientY; }
+    else if(pts.size===2){ const a=[...pts.values()]; pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y); startZoom=pe.zoom; drag=false; }
+  });
+  cv.addEventListener('pointermove',e=>{
+    if(!pe||!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===2 && pinch>0){
+      const a=[...pts.values()]; const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+      const z=Math.max(1,Math.min(4,startZoom*(d/pinch)));
+      pe.zoom=z; $('pe-zoom').value=Math.round(z*100); $('pe-zoom-v').textContent=z.toFixed(1)+'×';
+      pe.dirty=true; peDraw(); return;
+    }
+    if(drag){
+      const f=scaleFactor();
+      pe.ox+=(e.clientX-lx)*f; pe.oy+=(e.clientY-ly)*f;
+      lx=e.clientX; ly=e.clientY; pe.dirty=true; peDraw();
+    }
+  });
+  const end=e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=0; if(pts.size===0) drag=false; };
+  cv.addEventListener('pointerup',end);
+  cv.addEventListener('pointercancel',end);
+  cv.addEventListener('wheel',e=>{
+    if(!pe) return; e.preventDefault();
+    const z=Math.max(1,Math.min(4, pe.zoom*(e.deltaY<0?1.06:0.94)));
+    pe.zoom=z; $('pe-zoom').value=Math.round(z*100); $('pe-zoom-v').textContent=z.toFixed(1)+'×';
+    pe.dirty=true; peDraw();
+  },{passive:false});
+})();
+
+function peLoad(url, slotAR, name){
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=()=>{
+    pe=peDefaults(img, slotAR, name);
+    $('pe-ratios').innerHTML=RATIOS.map(r=>`<button class="pe-chip${r.k==='fit'?' on':''}" data-k="${r.k}" onclick="peRatio('${r.k}')">${r.label}</button>`).join('');
+    $('pe-zoom').value=100; $('pe-zoom-v').textContent='1.0×';
+    $('pe-rot').value=0;    $('pe-rot-v').textContent='0°';
+    peResetAdjust(); pe.dirty=false;
+    peTab('frame'); peDraw();
+  };
+  img.onerror=()=>{ $('pe-out').textContent='Could not load this image for editing.'; pe=null; };
+  img.src=url;
+}
+
 function pickPhoto(ev){
   const f=ev.target.files&&ev.target.files[0]; if(!f) return;
-  if(f.size>MAX_UPLOAD){ toast('Too big — max 5 MB'); ev.target.value=''; return; }
+  if(f.size>MAX_UPLOAD){ toast('Too big — max '+Math.round(MAX_UPLOAD/1048576)+' MB'); ev.target.value=''; return; }
   const rd=new FileReader();
-  rd.onload=()=>{ pendingUpload={name:f.name.replace(/[^\w.\-]/g,'_'), dataUrl:rd.result, size:f.size}; $('p-prev').src=rd.result; };
+  rd.onload=()=>{
+    pendingUpload={name:f.name.replace(/\.[^.]+$/,'').replace(/[^\w\-]/g,'_')||'photo', size:f.size};
+    peLoad(rd.result, pe?pe.slotAR:1, pendingUpload.name);
+    peTab('frame'); toast('Now reframe and adjust it');
+  };
   rd.readAsDataURL(f);
+}
+
+function peExport(){
+  const {ow,oh}=peOut();
+  const cv=document.createElement('canvas');
+  cv.width=ow; cv.height=oh;
+  peRenderTo(cv.getContext('2d'), ow, oh);
+  return cv.toDataURL('image/jpeg', 0.9);
 }
 
 function commitPhoto(){
   const el=mEl(sel.id); if(!el){ toast('Element not found'); return; }
   const alt=$('p-alt').value;
   if(alt!==sel.alt){ el.setAttribute('alt',alt); patch({id:sel.id,alt}); addChange({id:sel.id,kind:'alt',label:'ALT TEXT',before:sel.alt||'(empty)',after:alt||'(empty)'}); }
-  if(pendingUpload){
+
+  const edited = pe && pe.dirty;
+  if(pendingUpload || edited){
+    if(!pe){ toast('Nothing to apply'); return; }
+    let dataUrl;
+    try{ dataUrl=peExport(); }
+    catch(e){ toast('Could not export this image'); return; }
     const stamp=Date.now().toString(36);
-    const newPath='assets/uploads/'+stamp+'-'+pendingUpload.name;
+    const baseName=(pendingUpload&&pendingUpload.name) || (pe.srcName||'photo');
+    const newPath='assets/uploads/'+stamp+'-'+baseName+'.jpg';
     el.setAttribute('src',newPath);
     el.removeAttribute('srcset');
-    patch({id:sel.id,src:pendingUpload.dataUrl});
-    addChange({id:sel.id,kind:'photo',label:'PHOTO',before:sel.src,after:newPath,upload:{path:newPath,dataUrl:pendingUpload.dataUrl}});
+    patch({id:sel.id,src:dataUrl});
+    addChange({id:sel.id,kind:'photo',label: pendingUpload?'PHOTO REPLACED':'PHOTO EDITED',
+      before:sel.src, after:newPath, upload:{path:newPath,dataUrl}});
   }
   pendingUpload=null; closeSheets(); toast('Photo updated');
 }
@@ -675,6 +947,7 @@ function openSheet(id){ closeSheets(); $('ov').classList.add('on'); $(id).classL
 function closeSheets(){ $('ov').classList.remove('on'); document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('on')); }
 
 window.addEventListener('beforeunload',e=>{ if(changes.length){ e.preventDefault(); e.returnValue=''; } });
+window.addEventListener('resize',()=>{ if(pe && $('sh-photo').classList.contains('on')) peDraw(); });
 
 // ══ INIT ══
 if(sessionStorage.getItem('yks_unlocked')==='1'){ $('lock').classList.add('hidden'); boot(); }
