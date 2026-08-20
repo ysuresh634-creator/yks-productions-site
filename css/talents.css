@@ -536,7 +536,14 @@ main{overflow-x:clip}
 .ap-dl-kick{font-family:var(--mag-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mag-accent);margin:0 0 8px}
 .ap-dl-h{font-family:var(--mag-display);font-weight:500;font-size:24px;color:var(--mag-ink);margin:0 0 8px}
 .ap-dl-say{font-size:13.5px;line-height:1.6;color:var(--mag-soft);max-width:46ch;margin:0 auto 20px}
-.ap-download .ap-dl{display:inline-block;width:auto}
+.ap-dl-say b{color:var(--mag-ink)}
+.ap-dl-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.ap-download .ap-dl,.ap-dl-wa{display:inline-flex;align-items:center;justify-content:center;width:auto}
+.ap-dl-wa{gap:8px}
+.ap-download .ap-dl[disabled]{opacity:.5;cursor:not-allowed;filter:grayscale(.3)}
+.ap-dl-hintline{font-size:12px;color:var(--mag-soft);margin:16px auto 0;max-width:42ch;line-height:1.5}
+.ap-dl-hintline.on{color:var(--mag-accent)}
+@media(max-width:520px){.ap-dl-actions{flex-direction:column}.ap-dl-actions .ap-dl,.ap-dl-wa{width:100%}}
 
 /* private "more about you" — sub-label for the preference chips */
 .ap-sub-lbl{display:block;font-family:var(--mag-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mag-soft);margin-bottom:13px}

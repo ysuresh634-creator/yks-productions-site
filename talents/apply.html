@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=36" />
+<link rel="stylesheet" href="/css/talents.css?v=37" />
 </head>
 <body>
 
@@ -445,14 +445,18 @@
         </div>
       </section>
 
-      <!-- ③ DOWNLOAD — the parting gift, last: take your free copy -->
-      <div class="ap-download">
+      <!-- ③ DOWNLOAD — gated: you get it free the moment you send it to YKS -->
+      <div class="ap-download" id="apDownloadBlock">
         <div class="ap-dl-copy">
           <p class="ap-dl-kick">All yours</p>
           <h3 class="ap-dl-h">Take your portfolio with you.</h3>
-          <p class="ap-dl-say">The book you designed above — YKS-branded, watermarked, yours to keep and share. Free, no strings.</p>
+          <p class="ap-dl-say">It's yours <b>free</b> — the moment you put it in my hands. Drop it straight into my WhatsApp, or submit the form above.</p>
         </div>
-        <button type="button" class="btn btn-ghost ap-dl" id="apDownload">↓ Download my portfolio (PDF)</button>
+        <div class="ap-dl-actions">
+          <button type="button" class="btn btn-fill ap-dl-wa" id="apDlWa">Drop it in my WhatsApp →</button>
+          <button type="button" class="btn btn-ghost ap-dl" id="apDownload" disabled>🔒 Download to my device</button>
+        </div>
+        <p class="ap-dl-hintline" id="apDlHint">Your device download unlocks the moment you send it to me — above, or on WhatsApp.</p>
       </div>
     </div>
   </div>
@@ -493,6 +497,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=38"></script>
+<script src="/js/talent-apply.js?v=39"></script>
 </body>
 </html>

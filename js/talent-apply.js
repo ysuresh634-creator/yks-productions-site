@@ -836,6 +836,57 @@
       .then(function () { dlBtn.textContent = 'Downloaded ✓'; setTimeout(function () { dlBtn.textContent = orig; dlBtn.disabled = false; }, 2500); })
       .catch(function () { dlBtn.textContent = orig; dlBtn.disabled = false; alert('Couldn’t build the PDF just now — please try again.'); });
   });
+
+  // ── the free portfolio is GATED: the device download unlocks only once they've sent it to YKS ──
+  function unlockDownload() {
+    if (dlBtn) { dlBtn.disabled = false; dlBtn.textContent = '↓ Download my portfolio (PDF)'; }
+    var hint = $('#apDlHint'); if (hint) { hint.textContent = '✓ Unlocked — your copy is ready to keep.'; hint.classList.add('on'); }
+  }
+
+  // "Drop it in my WhatsApp" — build the PDF, upload it, open a WhatsApp chat straight to YKS with the link.
+  // This IS a submission: the talent lands in YKS's inbox with their book, opening a direct conversation.
+  var waBtn = $('#apDlWa');
+  if (waBtn) waBtn.addEventListener('click', function () {
+    if (!photos.length) { alert('Add at least one photo first — your portfolio is built from your photos.'); return; }
+    var name = (form.name.value || '').trim();
+    if (!name) { alert('Add your name first (in “The basics” above) — it goes on your cover.'); if (form.name) form.name.focus(); return; }
+    var orig = waBtn.textContent; waBtn.disabled = true; waBtn.textContent = 'Preparing your PDF…';
+    Promise.all([ensureJsPDF(), ensureFonts(), ensureQR()])
+      .then(function (rr) {
+        var JsPDF = rr[0];
+        return Promise.all(photos.slice(0, 8).map(function (p) {
+          var pr = p.edited ? gradeDataURL(p.edited).then(function (d) { return { data: d, w: 900, h: 1125 }; }) : prepImg(p.file, 0.8, 1000);
+          return pr.then(function (im) { im.cat = p.cat || ''; im.fit = !!p.fit; return im; });
+        })).then(function (imgs) {
+          var th = THEMES[CFG.theme];
+          return new Promise(function (resolve, reject) {
+            try {
+              buildPortfolio(JsPDF, imgs, name, { bg: hexRgb(th.bg), text: hexRgb(th.text), sub: hexRgb(th.sub), accent: hexRgb(CFG.accent), font: FONTS[CFG.font].pdf, template: CFG.layout,
+                onDoc: function (doc) { resolve(doc.output('blob')); } });
+            } catch (er) { reject(er); }
+          });
+        });
+      })
+      .then(function (blob) {
+        waBtn.textContent = 'Sending to YKS…';
+        var file = new File([blob], name.replace(/\s+/g, '-') + '-YKS-portfolio.pdf', { type: 'application/pdf' });
+        return upload(file, null, name + ' — WhatsApp');
+      })
+      .then(function (url) {
+        unlockDownload();
+        waBtn.textContent = 'Opening WhatsApp ✓';
+        var msg = 'Hi Yedukrishna — here’s my YKS portfolio (' + name + '): ' + url;
+        window.open('https://wa.me/919746679720?text=' + encodeURIComponent(msg), '_blank');
+        setTimeout(function () { waBtn.textContent = orig; waBtn.disabled = false; }, 3000);
+      })
+      .catch(function () { waBtn.textContent = orig; waBtn.disabled = false; alert('Couldn’t prepare it just now — please try again, or submit the form above.'); });
+  });
+
+  // deliver the finished PDF: to the device (default) or hand the doc back via cfg.onDoc (WhatsApp/upload path)
+  function deliver(doc, filename, cfg) {
+    if (cfg && typeof cfg.onDoc === 'function') cfg.onDoc(doc, filename);
+    else doc.save(filename);
+  }
   function buildPortfolio(JsPDF, imgs, name, cfg) {
     var doc = new JsPDF({ unit: 'pt', format: 'a4', compress: true });
     registerFonts(doc);
@@ -1189,18 +1240,18 @@
         foot();
       }
     }
-    if (cfg.template === 'lookbook') { tplLookbook(); doc.save(SAVE); return; }
-    if (cfg.template === 'duo') { tplDuo(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
-    if (cfg.template === 'compcard') { tplCompCard(); doc.save(SAVE); return; }
-    if (cfg.template === 'minimal') { tplMinimal(); doc.save(SAVE); return; }
-    if (cfg.template === 'grid') { tplGrid(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
-    if (cfg.template === 'feature') { tplFeature(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
-    if (cfg.template === 'swiss') { tplSwiss(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
-    if (cfg.template === 'luxe') { tplLuxe(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
-    if (cfg.template === 'classic') { tplClassic(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
-    if (cfg.template === 'ethereal') { tplEthereal(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
-    if (cfg.template === 'wabi') { tplWabi(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
-    if (cfg.template === 'bento') { tplBento(); profilePage(); digitalsPage(); bookPage(); doc.save(SAVE); return; }
+    if (cfg.template === 'lookbook') { tplLookbook(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'duo') { tplDuo(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'compcard') { tplCompCard(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'minimal') { tplMinimal(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'grid') { tplGrid(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'feature') { tplFeature(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'swiss') { tplSwiss(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'luxe') { tplLuxe(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'classic') { tplClassic(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'ethereal') { tplEthereal(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'wabi') { tplWabi(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
+    if (cfg.template === 'bento') { tplBento(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
 
     // ── COVER ── (Editorial, default)
     fill(); place(imgs[0], M, 76, CW); watermark();
@@ -1249,7 +1300,7 @@
     // ── DIGITALS (if any) + BOOK ──
     digitalsPage();
     bookPage();
-    doc.save(SAVE);
+    deliver(doc, SAVE, cfg);
   }
 
   /* ══ upload one file to Cloudinary (unsigned) with progress ══ */
@@ -1363,6 +1414,7 @@
         say('');
         form.style.display = 'none';
         var ok = $('#talOk'); if (ok) ok.style.display = 'block';
+        unlockDownload();   // they submitted → their free portfolio download is now unlocked
         if (window.gtag) gtag('event', 'talent_apply');
         // anything that couldn't upload (not configured yet, or a clip too big/rejected) → hand to WhatsApp so nothing is lost
         if ((!configured && (photos.length || pdf)) || waVideos.length) {
