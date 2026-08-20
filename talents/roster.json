@@ -1,0 +1,92 @@
+{
+  "_README": "Single source of truth for the talent roster. Add an entry, then run: python3 tools/build-talents.py  — it regenerates every profile page, the roster cards, the schema and the sitemap. NEVER put talent contact details (email/phone/Instagram) in here; bookings route through YKS only, and the build script will refuse if it finds any.",
+  "talent": [
+    {
+      "slug": "shalini-singh",
+      "name": "Shalini Singh",
+      "cat": "model",
+      "region": "india",
+      "city": "Delhi",
+      "country": "India",
+      "countryCode": "IN",
+      "gender": "Female",
+      "nationality": "Indian",
+      "over18": true,
+      "plate": 1,
+      "tags": [
+        "Fashion",
+        "Editorial",
+        "Runway",
+        "Commercial",
+        "Bridal"
+      ],
+      "specs": {
+        "Height": "5'5\"",
+        "Bust": "34C",
+        "Waist": "28\"",
+        "High hip": "36\"",
+        "Hips": "38\"",
+        "Shoe": "35 EU",
+        "Hair": "Brown / blonde",
+        "Eyes": "Dark brown",
+        "Skin": "Medium fair"
+      },
+      "bio": "Shalini Singh is a professional model and digital creator working across fashion, editorial and commercial print. She moves easily between the controlled language of a studio call and the faster, looser register of content — a range that makes her equally castable for a lookbook, a runway line-up or a campaign that has to live on a phone. On set she is a fast study: quick to take direction, precise with hands and jawline, and comfortable holding a look for as long as the frame needs.",
+      "shortBio": "Professional model and digital creator working across fashion, editorial and commercial print. Equally castable for a lookbook, a runway line-up or a campaign built for a phone.",
+      "castableFor": [
+        "Fashion / Editorial",
+        "Runway",
+        "Commercial / Print",
+        "Influencer / Content",
+        "Film & TV / Acting",
+        "Fitness",
+        "Bridal"
+      ],
+      "dir": "shalini",
+      "cover": "shalini-01.jpg",
+      "gallery": [
+        {
+          "file": "shalini-02.jpg",
+          "alt": "colour editorial in red",
+          "label": "Colour / Editorial"
+        },
+        {
+          "file": "shalini-04.jpg",
+          "alt": "evening editorial",
+          "label": "Evening / Editorial"
+        },
+        {
+          "file": "shalini-03.jpg",
+          "alt": "studio commercial",
+          "label": "Studio / Commercial"
+        },
+        {
+          "file": "shalini-05.jpg",
+          "alt": "location, equestrian",
+          "label": "Location / Equestrian"
+        },
+        {
+          "file": "shalini-07.jpg",
+          "alt": "location editorial",
+          "label": "Location / Editorial"
+        },
+        {
+          "file": "shalini-06.jpg",
+          "alt": "location, automotive",
+          "label": "Location / Automotive"
+        }
+      ],
+      "geoRegion": "IN-DL",
+      "metaDescription": "Shalini Singh — professional fashion, editorial and runway model based in Delhi, available for shoots across India. See her portfolio, stats and range, and book her through YKS Productions.",
+      "ogDescription": "Fashion, editorial and runway model. See her portfolio and book through YKS Productions.",
+      "keywords": "Shalini Singh model, model Delhi, fashion model India, editorial model Delhi, runway model India, book a model Delhi, hire model India, YKS Talents",
+      "knowsAbout": [
+        "Fashion modelling",
+        "Editorial",
+        "Runway",
+        "Commercial print",
+        "Bridal"
+      ]
+    }
+  ]
+}
