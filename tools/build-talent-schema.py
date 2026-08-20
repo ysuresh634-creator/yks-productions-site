@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
-"""Regenerate the talent schema on talents.html from the roster cards.
+"""Regenerate the talent schema block on talents.html.
 
-The roster lives in data-* attributes so the modal can read it. Those are
-invisible to search — Google and AI assistants could not see that anyone
-was bookable. This lifts each card into a Person entity inside an ItemList,
-plus ImageObject entries so the galleries can surface in Image Search.
+This used to lift each roster card into a Person entity so Google could
+see who was bookable. That was the wrong trade: it published talent names
+into search results. Talent names belong on our roster and nowhere else.
 
-Run after adding or removing talent:
+So the schema now describes the SERVICE — a casting and booking pool
+operating across India — rather than the people in it. That is also the
+thing worth ranking for: nobody searches a talent's name to find an
+agency, they search "models in Mumbai" and "how to join a modelling
+roster". The people stay ours; the offering goes to Google.
+
     python3 tools/build-talent-schema.py
 """
-import io, re, json, html, sys, os
+import io, os, re, json, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGE = os.path.join(ROOT, 'talents.html')
@@ -17,69 +21,96 @@ BASE = 'https://yksproductions.com'
 MARK_A = '<!-- TALENT-SCHEMA:START -->'
 MARK_B = '<!-- TALENT-SCHEMA:END -->'
 
-CAT = {
-    'model': 'Model',
-    'influencer': 'Content Creator',
-    'actor': 'Actor',
-}
+roster = json.load(io.open(os.path.join(ROOT, '_data', 'roster.json'),
+                           encoding='utf-8'))['talent']
+
+CAT = {'model': ('Models', 'Fashion, editorial, commercial and runway models'),
+       'actor':  ('Actors', 'Actors for film, series, ad films and branded content'),
+       'influencer': ('Creators', 'Content creators and influencers for branded work')}
+
+# Only describe a category we can actually cast. Claiming a bench we do not
+# have is the one thing that would make the rest of this untrustworthy.
+have = [c for c in ('model', 'actor', 'influencer')
+        if any(t['cat'] == c for t in roster)]
+cities = sorted({t['city'] for t in roster if t.get('country') == 'India'})
+
+graph = [
+    {
+        '@type': 'CollectionPage',
+        '@id': f'{BASE}/talents.html#roster',
+        'url': f'{BASE}/talents.html',
+        'name': 'Talent roster — models, actors and creators across India',
+        'description': (
+            'The YKS Talents roster. Brands and casting teams book models, '
+            'actors and creators from the pool for shoots anywhere in India. '
+            'Every booking is arranged through YKS Productions — talent contact '
+            'details are never published.'),
+        'isPartOf': {'@id': f'{BASE}/#website'},
+        'about': {'@id': f'{BASE}/talents.html#service'},
+        'significantLink': [f'{BASE}/casting-india.html',
+                            f'{BASE}/talents/apply.html'],
+    },
+    {
+        '@type': 'Service',
+        '@id': f'{BASE}/talents.html#service',
+        'name': 'Talent casting and booking — India',
+        'serviceType': 'Casting and talent booking',
+        'description': (
+            'A managed talent pool for commercial shoots in India. Brands send '
+            'a casting brief and receive a shortlist; talent join the roster '
+            'free and are put forward for paid work. YKS Productions handles '
+            'availability, booking and the shoot itself.'),
+        'provider': {'@id': f'{BASE}/#business'},
+        'areaServed': {'@type': 'Country', 'name': 'India'},
+        'audience': [
+            {'@type': 'BusinessAudience',
+             'audienceType': 'Brands, agencies and casting directors'},
+            {'@type': 'Audience',
+             'audienceType': 'Models, actors and content creators seeking paid work'},
+        ],
+        'availableChannel': [
+            {'@type': 'ServiceChannel',
+             'name': 'Casting brief',
+             'serviceUrl': f'{BASE}/casting-india.html#brief'},
+            {'@type': 'ServiceChannel',
+             'name': 'Talent application',
+             'serviceUrl': f'{BASE}/talents/apply.html'},
+        ],
+    },
+]
+
+if have:
+    graph.append({
+        '@type': 'ItemList',
+        '@id': f'{BASE}/talents.html#categories',
+        'name': 'What can be cast from the roster',
+        'itemListElement': [
+            {'@type': 'ListItem', 'position': i,
+             'item': {'@type': 'Service',
+                      'name': CAT[c][0],
+                      'description': CAT[c][1],
+                      'provider': {'@id': f'{BASE}/#business'},
+                      'areaServed': {'@type': 'Country', 'name': 'India'}}}
+            for i, c in enumerate(have, start=1)
+        ],
+    })
+
+block = (MARK_A + '\n<script type="application/ld+json">\n'
+         + json.dumps({'@context': 'https://schema.org', '@graph': graph},
+                      indent=2, ensure_ascii=False)
+         + '\n</script>\n' + MARK_B)
 
 s = io.open(PAGE, encoding='utf-8').read()
+if MARK_A not in s or MARK_B not in s:
+    sys.exit('BUILD ABORTED — schema markers missing from talents.html')
+s = re.sub(re.escape(MARK_A) + r'.*?' + re.escape(MARK_B), lambda _: block, s, flags=re.S)
 
-people = []
-for m in re.finditer(r'<article class="tal"([^>]*)>', s):
-    d = dict(re.findall(r'data-([a-z]+)="([^"]*)"', m.group(1)))
-    if not d.get('name'):
-        continue
-    name = html.unescape(d['name'])
-    city = html.unescape(d.get('city', ''))
-    tags = [t.strip() for t in html.unescape(d.get('tags', '')).split('·') if t.strip()]
-    gallery = [g for g in d.get('gallery', '').split('|') if g.strip()]
-
-    person = {
-        '@type': 'Person',
-        'name': name,
-        'jobTitle': CAT.get(d.get('cat'), 'Talent'),
-        'description': html.unescape(d.get('bio', ''))[:300],
-    }
-    if city:
-        person['homeLocation'] = {'@type': 'Place', 'name': city}
-    if tags:
-        person['knowsAbout'] = tags
-    if gallery:
-        person['image'] = [BASE + g for g in gallery]
-    # bookable through YKS only — never expose talent contact details
-    person['worksFor'] = {'@id': BASE + '/#business'}
-    people.append(person)
-
-graph = {
-    '@context': 'https://schema.org',
-    '@graph': [{
-        '@type': 'ItemList',
-        'name': 'Talent roster — models, influencers and actors',
-        'url': BASE + '/talents.html#roster',
-        'numberOfItems': len(people),
-        'itemListElement': [
-            {'@type': 'ListItem', 'position': i + 1, 'item': p}
-            for i, p in enumerate(people)
-        ],
-    }]
-}
-
-block = MARK_A + '\n<script type="application/ld+json">\n' \
-      + json.dumps(graph, indent=2, ensure_ascii=False) + '\n</script>\n' + MARK_B
-
-if MARK_A in s:
-    s = re.sub(re.escape(MARK_A) + r'.*?' + re.escape(MARK_B), block, s, flags=re.S)
-else:
-    s = s.replace('</head>', block + '\n</head>', 1)
+# the one check that matters
+leaked = [t['name'] for t in roster if t['name'] in block]
+if leaked:
+    sys.exit(f'BUILD ABORTED — talent name(s) in schema: {leaked}')
 
 io.open(PAGE, 'w', encoding='utf-8').write(s)
-
-# validate what we just wrote
-for m in re.finditer(r'<script type="application/ld\+json">(.*?)</script>', s, re.S):
-    json.loads(m.group(1))
-
-print(f'talent in schema: {len(people)}')
-for p in people:
-    print(f"  {p['name']} — {p['jobTitle']}, {p.get('homeLocation',{}).get('name','?')}, "
-          f"{len(p.get('image',[]))} images")
+print(f'talents.html schema : rewritten, {len(graph)} entities, 0 names')
+print(f'categories declared : {", ".join(CAT[c][0] for c in have) or "(none — roster empty)"}')
+print(f'cities in roster    : {", ".join(cities) or "(none)"}')

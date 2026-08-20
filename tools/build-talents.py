@@ -10,6 +10,12 @@ to the JSON and run this — never hand-edit the generated parts.
 Guard rails enforced here rather than trusted to memory:
   · No talent contact detail may appear anywhere in the data. Bookings
     route through YKS only. The build ABORTS if it finds any.
+  · No talent NAME may reach the generated HTML — not the title, meta,
+    schema, URL, alt text or body copy. Names live in talents/names.json
+    (robots-blocked) and are painted in by JS for human visitors only.
+    The build ABORTS if a name leaks into the markup.
+  · Profile pages are noindex. The roster is ours to show, not Google's
+    to list.
   · Every talent must be marked over18. The build ABORTS otherwise —
     casting a minor in India needs prior District Magistrate permission
     under CLPRA and that is not a thing to do by accident.
@@ -26,7 +32,7 @@ CAT_LABEL = {'model': 'Model', 'influencer': 'Creator', 'actor': 'Actor'}
 CAT_JOB = {'model': 'Model', 'influencer': 'Content Creator', 'actor': 'Actor'}
 
 P = lambda *a: os.path.join(ROOT, *a)
-data = json.load(io.open(P('talents', 'roster.json'), encoding='utf-8'))
+data = json.load(io.open(P('_data', 'roster.json'), encoding='utf-8'))
 roster = data['talent']
 
 # ── guard rails ────────────────────────────────────────────────
@@ -45,7 +51,7 @@ for pat, why in [
 for t in roster:
     if not t.get('over18'):
         errs.append(f'"{t.get("name", "?")}" is not marked over18:true — the roster is 18+ only')
-    for k in ('slug', 'name', 'cat', 'region', 'city', 'dir', 'cover'):
+    for k in ('slug', 'code', 'name', 'cat', 'region', 'city', 'dir', 'cover'):
         if not t.get(k):
             errs.append(f'"{t.get("name", "?")}" is missing required field: {k}')
     d = P('assets', 'talents', t.get('dir', ''))
@@ -71,50 +77,26 @@ def profile(t, plate):
     cat = CAT_LABEL.get(t['cat'], 'Talent')
     where = f'{t["city"]}, {t["country"]}'
     wa = WA.get(t['region'], WA['india'])
-    msg = quote(f'Hi Yedukrishna, I\'d like to book {t["name"]} ({cat}, {t["city"]}) from your talent pool. Is she available?'
-                if t.get('gender') == 'Female' else
-                f'Hi Yedukrishna, I\'d like to book {t["name"]} ({cat}, {t["city"]}) from your talent pool. Are they available?')
-    first = t['name'].split()[0]
+    code = t['code'].upper()
+    # The enquiry opens on the roster code, never the name. JS rewrites it to
+    # the name for a human who has the page open; a crawler only ever sees the code.
+    msg = quote(f'Hi Yedukrishna, I\'d like to book {code} ({cat}, {t["city"]}) '
+                f'from your talent pool. Is this talent available?')
     tagline = ', '.join(x.lower() for x in t.get('tags', [])[:3])
-    desc = t.get('metaDescription') or (
-        f'{t["name"]} — professional {tagline} {cat.lower()} based in {where}, '
-        f'available for shoots across India. See the portfolio, stats and range, '
-        f'and book through YKS Productions.')
-    ogdesc = t.get('ogDescription') or (
-        f'{tagline.capitalize()} {cat.lower()} in {t["city"]}. '
-        f'See the portfolio and book through YKS Productions.')
-    kw = t.get('keywords') or ', '.join([
-        f'{t["name"]} {cat.lower()}', f'{cat.lower()} {t["city"]}',
-        f'{t.get("tags", ["fashion"])[0].lower()} {cat.lower()} India',
-        f'book a {cat.lower()} {t["city"]}', f'hire {cat.lower()} India',
-        'YKS Talents'])
+    desc = (f'Roster profile {code} — {tagline} {cat.lower()} based in {where}, '
+            f'available for shoots across India. Booked through YKS Productions.')
+    ogdesc = f'{cat} · {where} — YKS Talents roster.'
+    kw = ''
 
     specs = '\n'.join(
         f'          <div class="pf-row"><dt>{e(k)}</dt><dd>{e(v)}</dd></div>'
         for k, v in (t.get('specs') or {}).items())
     cast = '\n'.join(f'            <li>{e(c)}</li>' for c in t.get('castableFor', []))
     plates = '\n'.join(
-        f'      <figure class="pf-plate"><img src="{img(t, g["file"])}" alt="{e(t["name"])} — {e(g["alt"])}" loading="lazy" />'
+        f'      <figure class="pf-plate"><img src="{img(t, g["file"])}" alt="{cat} · {e(t["city"])} — {e(g["alt"])}" loading="lazy" />'
         f'<figcaption><b>Plate {i+2:02d}</b><span>{e(g["label"])}</span></figcaption></figure>'
         for i, g in enumerate(t.get('gallery', [])))
     ngal = len(t.get('gallery', []))
-
-    schema = {
-        '@context': 'https://schema.org', '@type': 'ProfilePage',
-        'url': f'{BASE}/talents/{t["slug"]}.html',
-        'mainEntity': {
-            '@type': 'Person', 'name': t['name'],
-            'jobTitle': CAT_JOB.get(t['cat'], 'Talent'),
-            **({'gender': t['gender']} if t.get('gender') else {}),
-            **({'nationality': t['nationality']} if t.get('nationality') else {}),
-            'address': {'@type': 'PostalAddress', 'addressLocality': t['city'],
-                        'addressCountry': t.get('countryCode', 'IN')},
-            'image': BASE + img(t, t['cover']),
-            'worksFor': {'@type': 'Organization', 'name': 'YKS Productions', 'url': BASE + '/'},
-            'knowsAbout': t.get('knowsAbout') or t.get('tags', []),
-        },
-        'isPartOf': {'@id': f'{BASE}/#website'},
-    }
 
     return f'''<!DOCTYPE html>
 <html lang="en">
@@ -128,18 +110,17 @@ def profile(t, plate):
   gtag('js', new Date());
   gtag('config', 'G-C57X89TN45');
 </script>
-<title>{e(t['name'])} — {cat} · {e(where)} | YKS Talents</title>
+<title>Roster profile {code} — {cat} · {e(where)} | YKS Talents</title>
 <meta name="description" content="{e(desc)}" />
-<meta name="keywords" content="{e(kw)}" />
-<link rel="canonical" href="{BASE}/talents/{t['slug']}.html" />
-<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="{BASE}/talents/id/{t['code']}.html" />
+<meta name="robots" content="noindex, nofollow, noimageindex, noarchive" />
 <meta name="geo.region" content="{e(t.get('geoRegion', t.get('countryCode', 'IN')))}" />
 <meta name="geo.placename" content="{e(where)}" />
 <meta property="og:type" content="profile" />
 <meta property="og:site_name" content="YKS Productions" />
-<meta property="og:title" content="{e(t['name'])} — {cat} · {e(where)}" />
+<meta property="og:title" content="{cat} · {e(where)} — YKS Talents" />
 <meta property="og:description" content="{e(ogdesc)}" />
-<meta property="og:url" content="{BASE}/talents/{t['slug']}.html" />
+<meta property="og:url" content="{BASE}/talents/id/{t['code']}.html" />
 <meta property="og:image" content="{BASE}{img(t, t['cover'])}" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -150,9 +131,6 @@ def profile(t, plate):
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=14" />
 <link rel="stylesheet" href="/css/talents.css?v=6" />
-<script type="application/ld+json">
-{json.dumps(schema, indent=2, ensure_ascii=False)}
-</script>
 </head>
 <body data-wa="{wa}">
 
@@ -172,16 +150,16 @@ def profile(t, plate):
     </div>
     <div class="pf-hero-grid">
       <div class="pf-hero-img">
-        <img src="{img(t, t['cover'])}" alt="{e(t['name'])} — {cat.lower()}, {e(t['city'])}" />
+        <img src="{img(t, t['cover'])}" alt="{cat} · {e(t['city'])} — YKS Talents roster {code}" />
       </div>
       <div class="pf-hero-txt">
         <p class="tal-kicker">{cat} · {e(where)}</p>
-        <h1 class="pf-name">{e(t['name'])}</h1>
+        <h1 class="pf-name" data-tname="{t['code']}" data-nosnippet>{cat} {code}</h1>
         <p class="pf-disc">{e(' · '.join(t.get('tags', [])))}</p>
         <div class="pf-cta">
-          <a class="btn btn-fill" href="https://wa.me/{wa}?text={msg}" target="_blank" rel="noopener">Enquire to book {e(first)} →</a>
+          <a class="btn btn-fill" data-tbook="{t['code']}" href="https://wa.me/{wa}?text={msg}" target="_blank" rel="noopener">Enquire to book <span data-tfirst="{t['code']}">this talent</span> →</a>
         </div>
-        <p class="pf-priv">Booked only through YKS — no direct contact is shared. I handle availability, rates and the shoot.</p>
+        <p class="pf-priv">Booked only through YKS — no direct contact is shared, and this profile is not published to search engines. I handle availability, rates and the shoot.</p>
       </div>
     </div>
   </div>
@@ -225,10 +203,10 @@ def profile(t, plate):
 <section class="l-cta">
   <div class="wrap">
     <p class="tal-kicker">Casting</p>
-    <h2>Book {e(first)} <em>for your shoot</em></h2>
+    <h2>Book <span data-tfirst="{t['code']}" data-nosnippet>this talent</span> <em>for your shoot</em></h2>
     <p>Tell me the dates, the city and what you're shooting — I'll confirm availability and come back with one all-in number.</p>
     <div class="l-cta-row center">
-      <a class="btn btn-fill" href="https://wa.me/{wa}?text={msg}" target="_blank" rel="noopener">Enquire to book {e(first)} →</a>
+      <a class="btn btn-fill" data-tbook="{t['code']}" href="https://wa.me/{wa}?text={msg}" target="_blank" rel="noopener">Enquire to book <span data-tfirst="{t['code']}">this talent</span> →</a>
       <a class="btn btn-ghost" href="/casting-india.html#brief">Send a casting brief</a>
     </div>
   </div>
@@ -251,6 +229,7 @@ def profile(t, plate):
   </div>
 </footer>
 
+<script src="/js/talent-names.js?v=1"></script>
 <script src="/js/landing.js?v=4"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=4"></script>
@@ -264,64 +243,93 @@ def card(t):
     cat = CAT_LABEL.get(t['cat'], 'Talent')
     stats = '|'.join(f'{k}:{v}' for k, v in (t.get('specs') or {}).items())
     gal = '|'.join(img(t, g['file']) for g in t.get('gallery', []))
+    tags = ' · '.join(t.get('tags', []))
+    href = f'/talents/id/{t["code"]}.html'
     return (
         f'      <article class="tal" data-cat="{t["cat"]}" data-region="{t["region"]}" '
-        f'data-name="{e(t["name"])}" data-city="{e(t["city"])}, {e(t["country"])}"\n'
-        f'        data-tags="{e(" · ".join(t.get("tags", [])))}"\n'
+        f'data-code="{t["code"]}" data-city="{e(t["city"])}, {e(t["country"])}"\n'
+        f'        data-tags="{e(tags)}"\n'
         f'        data-stats="{e(stats)}"\n'
         f'        data-bio="{e(t.get("shortBio") or t.get("bio", ""))}"\n'
-        f'        data-gallery="{img(t, t["cover"])}|{gal}"\n'
-        f'        data-href="/talents/{t["slug"]}.html">\n'
-        f'        <a class="tal-open" href="/talents/{t["slug"]}.html">\n'
-        f'          <img src="{img(t, t["cover"])}" alt="{e(t["name"])} — {cat.lower()}, {e(t["city"])}" loading="lazy" />\n'
-        f'          <span class="tal-grad"></span>\n'
-        f'          <span class="tal-body">\n'
-        f'            <span class="tal-cat">{cat}</span>\n'
-        f'            <span class="t-name">{e(t["name"])}</span>\n'
-        f'            <span class="tal-cue">{e(t["city"])}, {e(t["country"])}</span>\n'
-        f'            <span class="tal-chips">{e(" · ".join(t.get("tags", [])))}</span>\n'
-        f'          </span>\n'
+        f'        data-gallery="{img(t, t["cover"])}|{gal}">\n'
+        f'        <a class="tal-open" href="{href}" rel="nofollow">\n'
+        f'          <span class="tal-media"><img src="{img(t, t["cover"])}" '
+        f'alt="{cat} · {e(t["city"])} — YKS Talents roster" loading="lazy" /></span>\n'
+        f'          <span class="tal-grad"></span><span class="tal-cat">{cat}</span>\n'
+        f'          <span class="tal-body"><b data-tname="{t["code"]}" data-nosnippet>'
+        f'{cat} {t["code"].upper()}</b><small>{e(t["city"])}, {e(t["country"])}</small>'
+        f'<em>{e(" · ".join(t.get("tags", [])[:3]))}</em></span>\n'
+        f'          <span class="tal-cue">Open profile →</span>\n'
         f'        </a>\n'
         f'      </article>')
 
 
+os.makedirs(P('talents', 'id'), exist_ok=True)
 written = []
 for i, t in enumerate(sorted(roster, key=lambda x: x.get('plate', 99)), start=1):
-    path = P('talents', t['slug'] + '.html')
-    io.open(path, 'w', encoding='utf-8').write(profile(t, t.get('plate', i)))
-    written.append(t['slug'])
+    io.open(P('talents', 'id', t['code'] + '.html'), 'w',
+            encoding='utf-8').write(profile(t, t.get('plate', i)))
+    written.append(t['code'])
 
-# ── sitemap ────────────────────────────────────────────────────
+# ── names.json — the only place a name is published, and robots blocks it ──
+# Human visitors' browsers fetch it and paint the names in; crawlers obey the
+# Disallow and never see it, so no name enters a search index.
+io.open(P('talents', 'names.json'), 'w', encoding='utf-8').write(json.dumps(
+    {t['code']: {'name': t['name'], 'first': t['name'].split()[0]} for t in roster},
+    indent=2, ensure_ascii=False) + '\n')
+
+# ── roster grid on talents.html ────────────────────────────────
+tp = P('talents.html')
+th = io.open(tp, encoding='utf-8').read()
+cards = '\n\n'.join(card(t) for t in sorted(roster, key=lambda x: x.get('plate', 99)))
+th = re.sub(r'(<!-- TALENT-CARDS:START -->).*?(<!-- TALENT-CARDS:END -->)',
+            lambda m: m.group(1) + '\n\n' + cards + '\n\n      ' + m.group(2), th, flags=re.S)
+io.open(tp, 'w', encoding='utf-8').write(th)
+
+# ── sitemap: strip any profile URL that a previous build submitted ─────
+# These pages are noindex now. Leaving them in the sitemap would be asking
+# Google to crawl exactly what we are asking it to forget.
 sm_path = P('sitemap.xml')
 sm = io.open(sm_path, encoding='utf-8').read()
-added = 0
-for t in roster:
-    loc = f'{BASE}/talents/{t["slug"]}.html'
-    if loc in sm:
-        continue
-    entry = (f'  <url>\n    <loc>{loc}</loc>\n    <lastmod>2026-08-21</lastmod>\n'
-             f'    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>\n')
-    anchor = f'  <url>\n    <loc>{BASE}/talents.html</loc>'
-    sm = sm.replace(anchor, entry + anchor, 1)
-    added += 1
-if added:
+before = sm
+sm = re.sub(r'  <url>\s*<loc>[^<]*/talents/(?!apply\.html)[^<]*</loc>.*?</url>\n',
+            '', sm, flags=re.S)
+removed = before.count('<loc>') - sm.count('<loc>')
+if removed:
     io.open(sm_path, 'w', encoding='utf-8').write(sm)
 
 # ── validate what we generated ─────────────────────────────────
+# The load-bearing check: a talent name must not exist in any published
+# byte. If one does, the roster has leaked and this build is not shippable.
 bad = []
-for slug in written:
-    s = io.open(P('talents', slug + '.html'), encoding='utf-8').read()
-    for m in re.finditer(r'<script type="application/ld\+json">(.*?)</script>', s, re.S):
+names = [t['name'] for t in roster] + [t['name'].split()[0] for t in roster]
+published = [P('talents', 'id', c + '.html') for c in written] + [P('talents.html')]
+for f in published:
+    s_ = io.open(f, encoding='utf-8').read()
+    rel = os.path.relpath(f, ROOT)
+    for n in names:
+        if n in s_:
+            bad.append(f'{rel}: LEAK — talent name "{n}" is in the published HTML')
+    for m in re.finditer(r'<script type="application/ld\+json">(.*?)</script>', s_, re.S):
         try:
-            json.loads(m.group(1))
+            blob_ = json.loads(m.group(1))
         except Exception as ex:
-            bad.append(f'{slug}: invalid schema — {ex}')
-    for i in re.findall(r'<img\b[^>]*>', s):
-        if not re.search(r'alt="[^"]+"', i):
-            bad.append(f'{slug}: image without alt')
+            bad.append(f'{rel}: invalid schema — {ex}')
+            continue
+        for n in names:
+            if n in json.dumps(blob_, ensure_ascii=False):
+                bad.append(f'{rel}: LEAK — talent name "{n}" is in the schema')
+    for i_ in re.findall(r'<img\b[^>]*>', s_):
+        if not re.search(r'alt="[^"]+"', i_):
+            bad.append(f'{rel}: image without alt')
+for c in written:
+    s_ = io.open(P('talents', 'id', c + '.html'), encoding='utf-8').read()
+    if 'noindex' not in s_:
+        bad.append(f'talents/id/{c}.html: profile is not noindex')
 
-print(f'profiles written : {len(written)}  ({", ".join(written)})')
-print(f'sitemap entries  : +{added}')
+print(f'profiles written : {len(written)}  ({", ".join(written)})  [noindex]')
+print(f'names.json       : {len(roster)} (robots-blocked, JS-only)')
+print(f'sitemap cleaned  : -{removed} profile URL(s)')
 print(f'problems         : {len(bad)}')
 for b in bad:
     print('  ✗', b)

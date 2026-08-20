@@ -10,6 +10,17 @@ Disallow: /ruk-choose.html
 Disallow: /review.html
 
 # ─────────────────────────────────────────────────────────────
+# Talent privacy. Roster profiles are noindex (crawl them, don't
+# list them). The name file is blocked outright — it is the only
+# place a talent's name is published, and it exists so a human
+# visitor's browser can paint names onto the roster. No crawler
+# fetches it, so no talent name can enter a search index.
+# Talent contact details exist nowhere on this site at all.
+# ─────────────────────────────────────────────────────────────
+Disallow: /talents/names.json
+Disallow: /_data/
+
+# ─────────────────────────────────────────────────────────────
 # AI assistants & answer engines — explicitly welcome.
 # We WANT to be cited in ChatGPT, Claude, Perplexity, Gemini,
 # Copilot and AI Overviews. See /llms.txt for a clean summary.

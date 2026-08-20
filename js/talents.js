@@ -124,10 +124,19 @@
         mBook = $('#talModalBook'), mStats = $('#talModalStats');
     var CAT_LABEL = { model: 'Model', influencer: 'Influencer / Creator', actor: 'Actor' };
 
+    /* Names are not in the markup — talent-names.js fetches them from a
+       robots-blocked file so no name reaches a search index. Until (or
+       unless) that lands, the roster code stands in. */
+    var tname = function (d) {
+      var m = window.YKS_TNAMES && window.YKS_TNAMES[d.code];
+      return (m && m.name) || ((CAT_LABEL[d.cat] || 'Talent') + ' ' + String(d.code || '').toUpperCase());
+    };
+
     var openModal = function (card) {
       var d = card.dataset;
       mCat.textContent = CAT_LABEL[d.cat] || d.cat;
-      mName.textContent = d.name;
+      var who = tname(d);
+      mName.textContent = who;
       mCity.textContent = d.city || '';
       if (mStats) {
         mStats.innerHTML = '';
@@ -145,17 +154,17 @@
       mTags.textContent = d.tags || '';
       mGallery.innerHTML = '';
       (d.gallery || '').split('|').filter(Boolean).forEach(function (src) {
-        var img = new Image(); img.src = src; img.alt = d.name + ' — ' + (CAT_LABEL[d.cat] || '');
+        var img = new Image(); img.src = src; img.alt = (CAT_LABEL[d.cat] || 'Talent') + ' · ' + (d.city || '') + ' — YKS Talents roster';
         img.loading = 'lazy'; mGallery.appendChild(img);
       });
       var num = WA[d.region] || WA.india;
-      var msg = 'Hi Yedukrishna, I\'d like to book ' + d.name + ' (' + (CAT_LABEL[d.cat] || d.cat) +
+      var msg = 'Hi Yedukrishna, I\'d like to book ' + who + ' (' + (CAT_LABEL[d.cat] || d.cat) +
                 (d.city ? ', ' + d.city : '') + ') from your talent pool. Are they available?';
       mBook.href = 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
-      mBook.textContent = 'Enquire to book ' + d.name + ' →';
+      mBook.textContent = 'Enquire to book ' + who + ' →';
       modal.classList.add('on'); modal.setAttribute('aria-hidden', 'false');
       document.documentElement.style.overflow = 'hidden';
-      if (window.gtag) gtag('event', 'talent_open', { talent: d.name, category: d.cat });
+      if (window.gtag) gtag('event', 'talent_open', { talent: d.code, category: d.cat });
     };
     var closeModal = function () {
       modal.classList.remove('on'); modal.setAttribute('aria-hidden', 'true');

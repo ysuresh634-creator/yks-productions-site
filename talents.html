@@ -26,7 +26,7 @@
 <meta property="og:title" content="Talents at YKS — Models, Influencers &amp; Actors · India &amp; UAE" />
 <meta property="og:description" content="A curated pool of models, influencers and actors across India and the UAE. Book any talent directly through YKS." />
 <meta property="og:url" content="https://yksproductions.com/talents.html" />
-<meta property="og:image" content="https://yksproductions.com/assets/talents/shalini/shalini-01.jpg" />
+<meta property="og:image" content="https://yksproductions.com/assets/talents/m01/01.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 
 <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -71,40 +71,76 @@
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "CollectionPage",
+      "@id": "https://yksproductions.com/talents.html#roster",
+      "url": "https://yksproductions.com/talents.html",
+      "name": "Talent roster — models, actors and creators across India",
+      "description": "The YKS Talents roster. Brands and casting teams book models, actors and creators from the pool for shoots anywhere in India. Every booking is arranged through YKS Productions — talent contact details are never published.",
+      "isPartOf": {
+        "@id": "https://yksproductions.com/#website"
+      },
+      "about": {
+        "@id": "https://yksproductions.com/talents.html#service"
+      },
+      "significantLink": [
+        "https://yksproductions.com/casting-india.html",
+        "https://yksproductions.com/talents/apply.html"
+      ]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://yksproductions.com/talents.html#service",
+      "name": "Talent casting and booking — India",
+      "serviceType": "Casting and talent booking",
+      "description": "A managed talent pool for commercial shoots in India. Brands send a casting brief and receive a shortlist; talent join the roster free and are put forward for paid work. YKS Productions handles availability, booking and the shoot itself.",
+      "provider": {
+        "@id": "https://yksproductions.com/#business"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "India"
+      },
+      "audience": [
+        {
+          "@type": "BusinessAudience",
+          "audienceType": "Brands, agencies and casting directors"
+        },
+        {
+          "@type": "Audience",
+          "audienceType": "Models, actors and content creators seeking paid work"
+        }
+      ],
+      "availableChannel": [
+        {
+          "@type": "ServiceChannel",
+          "name": "Casting brief",
+          "serviceUrl": "https://yksproductions.com/casting-india.html#brief"
+        },
+        {
+          "@type": "ServiceChannel",
+          "name": "Talent application",
+          "serviceUrl": "https://yksproductions.com/talents/apply.html"
+        }
+      ]
+    },
+    {
       "@type": "ItemList",
-      "name": "Talent roster — models, influencers and actors",
-      "url": "https://yksproductions.com/talents.html#roster",
-      "numberOfItems": 1,
+      "@id": "https://yksproductions.com/talents.html#categories",
+      "name": "What can be cast from the roster",
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
           "item": {
-            "@type": "Person",
-            "name": "Shalini Singh",
-            "jobTitle": "Model",
-            "description": "Professional model and digital creator working across fashion, editorial and commercial print. She moves easily between the controlled language of a studio call and the faster register of content — equally castable for a lookbook, a runway line-up or a campaign built for a phone. A fast study on set",
-            "homeLocation": {
-              "@type": "Place",
-              "name": "Delhi, India"
-            },
-            "knowsAbout": [
-              "Fashion",
-              "Editorial",
-              "Runway",
-              "Commercial",
-              "Bridal"
-            ],
-            "image": [
-              "https://yksproductions.com/assets/talents/shalini/shalini-01.jpg",
-              "https://yksproductions.com/assets/talents/shalini/shalini-02.jpg",
-              "https://yksproductions.com/assets/talents/shalini/shalini-03.jpg",
-              "https://yksproductions.com/assets/talents/shalini/shalini-04.jpg",
-              "https://yksproductions.com/assets/talents/shalini/shalini-05.jpg",
-              "https://yksproductions.com/assets/talents/shalini/shalini-06.jpg"
-            ],
-            "worksFor": {
+            "@type": "Service",
+            "name": "Models",
+            "description": "Fashion, editorial, commercial and runway models",
+            "provider": {
               "@id": "https://yksproductions.com/#business"
+            },
+            "areaServed": {
+              "@type": "Country",
+              "name": "India"
             }
           }
         }
@@ -275,20 +311,22 @@
 
     <!-- grid (each card carries its full profile in data-* for the modal) -->
     <div class="tal-grid" id="talGrid">
+      <!-- TALENT-CARDS:START -->
 
-      <article class="tal" data-cat="model" data-region="india" data-name="Shalini Singh" data-city="Delhi, India"
+      <article class="tal" data-cat="model" data-region="india" data-code="m01" data-city="Delhi, India"
         data-tags="Fashion · Editorial · Runway · Commercial · Bridal"
-        data-stats="Height:5&#39;5|Hair:Brown / blonde|Eyes:Dark brown|Shoe:35 EU"
-        data-bio="Professional model and digital creator working across fashion, editorial and commercial print. She moves easily between the controlled language of a studio call and the faster register of content — equally castable for a lookbook, a runway line-up or a campaign built for a phone. A fast study on set: quick to take direction, precise with hands and jawline, and able to hold a look for as long as the frame needs."
-        data-gallery="/assets/talents/shalini/shalini-01.jpg|/assets/talents/shalini/shalini-02.jpg|/assets/talents/shalini/shalini-03.jpg|/assets/talents/shalini/shalini-04.jpg|/assets/talents/shalini/shalini-05.jpg|/assets/talents/shalini/shalini-06.jpg">
-        <a class="tal-open" href="/talents/shalini-singh.html">
-          <span class="tal-media"><img src="/assets/talents/shalini/shalini-01.jpg" alt="Shalini Singh — model, Delhi" loading="lazy" /></span>
+        data-stats="Height:5&#x27;5&quot;|Bust:34C|Waist:28&quot;|High hip:36&quot;|Hips:38&quot;|Shoe:35 EU|Hair:Brown / blonde|Eyes:Dark brown|Skin:Medium fair"
+        data-bio="Professional model and digital creator working across fashion, editorial and commercial print. Equally castable for a lookbook, a runway line-up or a campaign built for a phone."
+        data-gallery="/assets/talents/m01/01.jpg|/assets/talents/m01/02.jpg|/assets/talents/m01/04.jpg|/assets/talents/m01/03.jpg|/assets/talents/m01/05.jpg|/assets/talents/m01/07.jpg|/assets/talents/m01/06.jpg">
+        <a class="tal-open" href="/talents/id/m01.html" rel="nofollow">
+          <span class="tal-media"><img src="/assets/talents/m01/01.jpg" alt="Model · Delhi — YKS Talents roster" loading="lazy" /></span>
           <span class="tal-grad"></span><span class="tal-cat">Model</span>
-          <span class="tal-body"><b>Shalini Singh</b><small>Delhi, India</small><em>Fashion · Editorial · Runway</em></span>
+          <span class="tal-body"><b data-tname="m01" data-nosnippet>Model M01</b><small>Delhi, India</small><em>Fashion · Editorial · Runway</em></span>
           <span class="tal-cue">Open profile →</span>
         </a>
       </article>
 
+      <!-- TALENT-CARDS:END -->
     </div>
     <p class="tal-empty" id="talEmpty" hidden>No talent in this filter yet — <a href="/talents/apply.html">apply to be the first →</a></p>
   </div>
@@ -367,6 +405,7 @@
 <script src="/js/landing.js?v=10"></script>
 <script src="/js/fx.js?v=6"></script>
 <script src="/js/lead.js?v=2"></script>
+<script src="/js/talent-names.js?v=1"></script>
 <script src="/js/talents.js?v=6"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=5"></script>

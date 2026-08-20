@@ -441,3 +441,24 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
   .cs-frame{width:168px}
   .cs-sheet{gap:20px}
 }
+
+/* ── talent mini-grid — used by the generated category × city pages ──
+   A client scanning "models in Mumbai" wants faces first and detail
+   second, so the card is mostly photograph. */
+.tal-mini-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.tal-mini{display:block;border-radius:14px;overflow:hidden;border:1px solid rgba(244,237,226,.1);
+  background:rgba(22,19,28,.55);transition:border-color .3s var(--ease),transform .3s var(--ease)}
+.tal-mini:hover{border-color:rgba(255,140,59,.45);transform:translateY(-3px)}
+.tal-mini:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.tal-mini img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;
+  transition:filter .4s var(--ease);filter:brightness(.92)}
+.tal-mini:hover img{filter:brightness(1)}
+.tal-mini span{display:flex;flex-direction:column;gap:3px;padding:14px 16px 16px}
+.tal-mini b{font-family:var(--serif);font-size:1.12rem;font-weight:500;letter-spacing:-.005em}
+.tal-mini small{font-size:.82rem;color:var(--paper-dim);line-height:1.5}
+@media(max-width:560px){
+  .tal-mini-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .tal-mini span{padding:11px 12px 13px}
+  .tal-mini b{font-size:1rem}
+  .tal-mini small{font-size:.75rem}
+}
