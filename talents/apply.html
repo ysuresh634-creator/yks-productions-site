@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=34" />
+<link rel="stylesheet" href="/css/talents.css?v=35" />
 </head>
 <body>
 
@@ -281,6 +281,75 @@
           </div>
         </div>
 
+        <!-- More about you — private, only YKS sees this -->
+        <div class="ap-block">
+          <p class="ap-step">More about you <span class="ap-opt">optional · 100% private</span></p>
+          <p class="ap-hint">The more I know, the better I can put you forward for the right jobs. <b class="tal-priv">Only YKS ever sees this — none of it is shown publicly.</b> Fill what you're comfortable with; skip anything you'd rather not.</p>
+          <div class="row2">
+            <label>Date of birth <span class="tal-priv">private</span><input type="date" name="dob" /></label>
+            <label>Gender
+              <select name="gender">
+                <option value="" disabled selected>Choose one</option>
+                <option>Woman</option><option>Man</option><option>Non-binary</option><option>Prefer to self-describe</option><option>Prefer not to say</option>
+              </select>
+            </label>
+          </div>
+          <div class="row2">
+            <label>Marital status
+              <select name="marital">
+                <option value="" disabled selected>Choose one</option>
+                <option>Single</option><option>In a relationship</option><option>Married</option><option>Prefer not to say</option>
+              </select>
+            </label>
+            <label>Highest education
+              <select name="education">
+                <option value="" disabled selected>Choose one</option>
+                <option>In school</option><option>High school</option><option>Diploma</option><option>Bachelor’s degree</option><option>Master’s or higher</option><option>Other</option>
+              </select>
+            </label>
+          </div>
+          <div class="row2">
+            <label>Languages you speak<input type="text" name="languages" placeholder="English, Hindi, Tamil…" /></label>
+            <label>Current work or studies<input type="text" name="occupation" placeholder="Student, full-time model, engineer…" /></label>
+          </div>
+          <div class="row2">
+            <label>Availability
+              <select name="availability">
+                <option value="" disabled selected>Choose one</option>
+                <option>Full-time</option><option>Part-time</option><option>Weekends &amp; evenings</option><option>Project by project</option>
+              </select>
+            </label>
+            <label>Open to travel for work?
+              <select name="travel">
+                <option value="" disabled selected>Choose one</option>
+                <option>Yes — anywhere</option><option>Within my country</option><option>Within my city only</option><option>Not right now</option>
+              </select>
+            </label>
+          </div>
+          <div class="ap-full">
+            <span class="ap-sub-lbl">Work you're looking for <span class="ap-opt">tap all that fit</span></span>
+            <div class="ap-chips ap-prefs" id="apPrefs">
+              <button type="button" data-v="Fashion">Fashion</button>
+              <button type="button" data-v="Commercial">Commercial</button>
+              <button type="button" data-v="Runway / Ramp">Runway / Ramp</button>
+              <button type="button" data-v="Print / Catalogue">Print / Catalogue</button>
+              <button type="button" data-v="Film &amp; TV">Film &amp; TV</button>
+              <button type="button" data-v="Ad films">Ad films</button>
+              <button type="button" data-v="Music videos">Music videos</button>
+              <button type="button" data-v="Fitness">Fitness</button>
+              <button type="button" data-v="Bridal">Bridal</button>
+              <button type="button" data-v="Product / E-com">Product / E-com</button>
+            </div>
+            <input type="hidden" name="preferences" />
+          </div>
+          <label class="ap-full">Your comfort zone &amp; boundaries <span class="ap-opt">optional · this protects you</span>
+            <textarea name="comfort" rows="2" placeholder="What are you happy to shoot — and anything that's a firm no? (e.g. swimwear yes; no smoking scenes.) I'll never put you forward for something you're not comfortable with."></textarea>
+          </label>
+          <label class="ap-full">Anything else I should know? <span class="ap-opt">optional</span>
+            <textarea name="extra" rows="2" placeholder="Injuries, tattoos/piercings, dietary needs, a parent/guardian's number if you're under 18 — anything that helps me look after you on set."></textarea>
+          </label>
+        </div>
+
       </form>
 
       <!-- ══ DESIGN STUDIO — full-width: live preview + controls | template gallery ══ -->
@@ -298,7 +367,7 @@
               <div class="ap-ctl"><span>Font</span><div class="ap-fonts" id="apFonts"></div></div>
               <div class="ap-ctl"><span>Accent</span><div class="ap-accents" id="apAccents"></div></div>
             </div>
-            <button type="button" class="btn btn-ghost ap-dl" id="apDownload">↓ Download my portfolio (PDF)</button>
+            <p class="ap-dl-hint">Love it? <b>Send it to me below</b> to join the roster — your free PDF is waiting at the very bottom to download &amp; keep.</p>
           </div></div>
           <div class="ap-studio-main">
             <p class="ap-pick-lbl">Pick a design <span>— tap one to preview it</span></p>
@@ -307,7 +376,19 @@
         </div>
       </section>
 
-      <!-- ══ BOOK A SHOOT — the real thing (this is what we're actually here for) ══ -->
+      <!-- ① SUBMIT — the primary action: get their portfolio in front of YKS -->
+      <div class="ap-tail">
+        <p class="ap-tail-lead">Happy with it? This is the one that matters — <b>send it to me</b> and you're in front of me for casting.</p>
+        <button type="submit" form="talForm" class="btn btn-fill ap-submit">Submit my portfolio to YKS →</button>
+        <p class="ap-progress" id="apProgress" hidden></p>
+        <p class="tal-form-note">🔒 Your number, email and socials are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
+        <p class="l-form-ok" id="talOk">✓ Application received — thank you. If it's a fit, I'll be in touch personally.
+          <span id="apOkWa" hidden><br />One quick step: <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%20just%20applied%20to%20YKS%20Talents%20and%20I%27d%20like%20to%20send%20my%20photos%2Fvideos." target="_blank" rel="noopener">send your photos &amp; videos on WhatsApp →</a></span>
+        </p>
+        <p class="ap-wa">Rather do it all over chat? <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%27d%20like%20to%20join%20the%20YKS%20talent%20roster." target="_blank" rel="noopener">Apply on WhatsApp →</a></p>
+      </div>
+
+      <!-- ② BOOK A SHOOT — the real thing (this is what we're actually here for) -->
       <section class="ap-shoot" aria-label="Book a portfolio shoot with YKS">
         <div class="ap-shoot-glow" aria-hidden="true"></div>
         <div class="ap-shoot-grid">
@@ -337,19 +418,19 @@
             <p class="ap-shoot-scarce">I take only a few new faces a month — I'd rather shoot a handful properly than a crowd in a rush. Tell me you're in and I'll send you everything myself.</p>
             <a class="ap-shoot-cta" id="apShootCta" href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%20just%20built%20my%20portfolio%20on%20your%20site%20and%20I%20want%20to%20book%20a%20real%20shoot%20with%20you.%20When%20can%20we%20do%20it%3F" target="_blank" rel="noopener">Book my shoot →</a>
             <p class="ap-shoot-fine">Straight to me on WhatsApp — no agency, no middleman.</p>
-            <p class="ap-shoot-soft">Not ready yet? Send your free application below — this stands whenever you are.</p>
+            <p class="ap-shoot-soft">Not ready yet? No rush — this stands whenever you are.</p>
           </div>
         </div>
       </section>
 
-      <div class="ap-tail">
-        <button type="submit" form="talForm" class="btn btn-fill ap-submit">Send my application →</button>
-        <p class="ap-progress" id="apProgress" hidden></p>
-        <p class="tal-form-note">🔒 Your number, email and socials are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
-        <p class="l-form-ok" id="talOk">✓ Application received — thank you. If it's a fit, I'll be in touch personally.
-          <span id="apOkWa" hidden><br />One quick step: <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%20just%20applied%20to%20YKS%20Talents%20and%20I%27d%20like%20to%20send%20my%20photos%2Fvideos." target="_blank" rel="noopener">send your photos &amp; videos on WhatsApp →</a></span>
-        </p>
-        <p class="ap-wa">Rather do it all over chat? <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%27d%20like%20to%20join%20the%20YKS%20talent%20roster." target="_blank" rel="noopener">Apply on WhatsApp →</a></p>
+      <!-- ③ DOWNLOAD — the parting gift, last: take your free copy -->
+      <div class="ap-download">
+        <div class="ap-dl-copy">
+          <p class="ap-dl-kick">All yours</p>
+          <h3 class="ap-dl-h">Take your portfolio with you.</h3>
+          <p class="ap-dl-say">The book you designed above — YKS-branded, watermarked, yours to keep and share. Free, no strings.</p>
+        </div>
+        <button type="button" class="btn btn-ghost ap-dl" id="apDownload">↓ Download my portfolio (PDF)</button>
       </div>
     </div>
   </div>
@@ -390,6 +471,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=36"></script>
+<script src="/js/talent-apply.js?v=37"></script>
 </body>
 </html>

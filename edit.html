@@ -110,6 +110,14 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 .pe-mini{background:var(--card2);border:1px solid var(--border);color:var(--sub);border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;cursor:pointer}
 .pe-mini:active{border-color:var(--gold);color:var(--gold)}
 .pe-out{font-size:10px;color:var(--sub);text-align:center;margin:10px 0 12px;letter-spacing:.3px;min-height:14px}
+.pathbox{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.path-dir{font-size:12px;color:var(--gold);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;line-height:1.5}
+.path-file{font-size:13px;color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;margin-top:2px}
+.chk{display:flex;align-items:flex-start;gap:8px;margin-top:10px;cursor:pointer}
+.chk input{margin-top:2px;flex-shrink:0;accent-color:var(--gold);width:16px;height:16px}
+.chk span{font-size:11px;color:var(--sub);line-height:1.5}
+.dest-ok{color:var(--green)!important}
+.dest-warn{color:#E0A34A!important}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--gold);color:var(--gold);padding:11px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:300;transition:transform .25s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
 .toast.on{transform:translateX(-50%) translateY(0)}
 </style>
@@ -229,11 +237,25 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 
     <!-- REPLACE -->
     <div class="pe-pane" id="pp-file">
-      <div class="fld"><label class="lbl">Current file</label><input class="inp" id="p-src" readonly style="font-size:12px;color:var(--sub)"></div>
+      <div class="fld">
+        <label class="lbl">This photo lives in</label>
+        <div class="pathbox">
+          <div class="path-dir" id="p-dir">—</div>
+          <div class="path-file" id="p-name">—</div>
+        </div>
+        <input type="hidden" id="p-src">
+      </div>
       <div class="fld">
         <label class="lbl">Use a different photo</label>
         <input class="inp" type="file" id="p-file" accept="image/*" onchange="pickPhoto(event)">
         <p class="hint">Pick a new photo, then reframe and adjust it above. Max 25 MB in — it is resized on export.</p>
+      </div>
+      <div class="fld">
+        <label class="lbl">Save it into</label>
+        <select class="inp" id="p-folder" onchange="peDest()"></select>
+        <label class="chk"><input type="checkbox" id="p-overwrite" onchange="peDest()">
+          <span>Overwrite the original file (keeps the exact same path)</span></label>
+        <p class="hint" id="p-dest">—</p>
       </div>
       <div class="fld"><label class="lbl">Alt text (for SEO / accessibility)</label><input class="inp" id="p-alt"></div>
     </div>
@@ -242,6 +264,38 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
     <div class="row2">
       <button class="btn btn-ghost" onclick="closeSheets()">Cancel</button>
       <button class="btn btn-save" id="pe-apply" onclick="commitPhoto()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO SHEET -->
+<div class="sheet" id="sh-video">
+  <div class="sh-hd"><span class="sh-title">🎬 REPLACE VIDEO</span><button class="sh-x" onclick="closeSheets()">×</button></div>
+  <div class="sh-body">
+    <video id="v-prev" class="imgprev" style="max-height:200px" muted playsinline controls preload="metadata"></video>
+    <div class="fld">
+      <label class="lbl">This video lives in</label>
+      <div class="pathbox">
+        <div class="path-dir" id="v-dir">—</div>
+        <div class="path-file" id="v-name">—</div>
+      </div>
+    </div>
+    <div class="fld">
+      <label class="lbl">Use a different video</label>
+      <input class="inp" type="file" id="v-file" accept="video/*" onchange="pickVideo(event)">
+      <p class="hint">MP4 or WebM. Max 25 MB — GitHub rejects large files and the whole
+      file has to be encoded in your browser, so keep clips short and compressed.</p>
+    </div>
+    <div class="fld">
+      <label class="lbl">Save it into</label>
+      <select class="inp" id="v-folder" onchange="vDest()"></select>
+      <label class="chk"><input type="checkbox" id="v-overwrite" onchange="vDest()">
+        <span>Overwrite the original file (keeps the exact same path)</span></label>
+      <p class="hint" id="v-dest">—</p>
+    </div>
+    <div class="row2">
+      <button class="btn btn-ghost" onclick="closeSheets()">Cancel</button>
+      <button class="btn btn-save" onclick="commitVideo()">Apply</button>
     </div>
   </div>
 </div>
@@ -301,7 +355,33 @@ let changes=[];          // {id,kind,label,before,after,apply()}
 let mode='text';
 let sel=null;            // {id, tag, text, src, alt, href}
 let pendingUpload=null;  // {name, dataUrl, bytes}
+let pendingVideo=null;   // {name, dataUrl, size, ext}
+let mediaFolders=[];     // [{dir,count}] every folder in the repo that holds media
 let uid=0;
+
+// Where the currently-selected file lives, and where its replacement will go.
+function dirOf(p){
+  const clean=String(p||'').split('?')[0].split('#')[0].replace(/^\//,'');
+  return clean.includes('/') ? clean.replace(/\/[^\/]*$/,'') : '';
+}
+function fileOf(p){
+  return String(p||'').split('?')[0].split('#')[0].split('/').pop()||'';
+}
+function folderOptions(currentDir){
+  const seen=new Set();
+  const rows=[];
+  if(currentDir!==undefined){
+    rows.push({v:currentDir, label:(currentDir||'(site root)')+'  — same folder as the original'});
+    seen.add(currentDir);
+  }
+  mediaFolders.forEach(f=>{
+    const v=f.dir==='(root)'?'':f.dir;
+    if(seen.has(v)) return;
+    seen.add(v);
+    rows.push({v, label:(v||'(site root)')+'  ('+f.count+')'});
+  });
+  return rows;
+}
 
 const $=id=>document.getElementById(id);
 const ghToken=()=>localStorage.getItem('yks_ghtoken')||'';
@@ -347,6 +427,19 @@ async function boot(){
   $('setup').classList.remove('on'); $('stagemsg').style.display='';
   try{
     const tree=await gh(`git/trees/${GH_BRANCH}?recursive=1`);
+
+    // Map every folder that already holds media, with counts, so replacements
+    // can land beside the file they replace instead of in a dumping ground.
+    const counts={};
+    tree.tree.forEach(n=>{
+      if(n.type!=='blob') return;
+      if(!/\.(jpe?g|png|webp|avif|gif|svg|mp4|webm|mov|m4v)$/i.test(n.path)) return;
+      if(n.path.includes('node_modules')) return;
+      const dir=n.path.includes('/') ? n.path.replace(/\/[^\/]*$/,'') : '(root)';
+      counts[dir]=(counts[dir]||0)+1;
+    });
+    mediaFolders=Object.keys(counts).sort().map(d=>({dir:d,count:counts[d]}));
+
     const pages=tree.tree.filter(n=>n.type==='blob'&&/\.html$/i.test(n.path)&&!n.path.startsWith('_')&&!/^google[0-9a-f]+\.html$/i.test(n.path)).map(n=>n.path).sort();
     const pri=['index.html','talents.html','faq.html','films.html','fashion.html'];
     pages.sort((a,b)=>{const ia=pri.indexOf(a),ib=pri.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});

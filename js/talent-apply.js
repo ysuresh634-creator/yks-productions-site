@@ -411,6 +411,7 @@
     openBtn.textContent = aiPanel.hidden ? '✨ Write it for me' : '✕ Close the writer';
   });
   $$('.ap-chips').forEach(function (group) {
+    if (group.id === 'apPrefs') return;   // work-preference chips have their own handler (below)
     var key = group.dataset.k, multi = group.classList.contains('ap-multi');
     group.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
@@ -423,6 +424,17 @@
       }
     });
   });
+
+  // work-preference chips (multi-select) → hidden input, private to YKS
+  (function wirePrefs() {
+    var group = $('#apPrefs'); if (!group) return;
+    group.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      b.classList.toggle('on');
+      if (form.preferences) form.preferences.value = $$('button.on', group).map(function (x) { return x.dataset.v; }).join(', ');
+      persistDraft();
+    });
+  })();
 
   function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
   function list(arr) {
@@ -488,7 +500,8 @@
   });
 
   /* ══ autosave draft (text + video links; uploaded files can't persist across reloads) ══ */
-  var textNames = ['name', 'contact', 'category', 'region', 'city', 'socials', 'about'];
+  var textNames = ['name', 'contact', 'category', 'region', 'city', 'socials', 'about', 'tagline',
+    'dob', 'gender', 'marital', 'education', 'languages', 'occupation', 'availability', 'travel', 'comfort', 'extra', 'preferences'];
   function persistDraft() {
     try {
       var d = {}; textNames.forEach(function (n) { if (form[n] != null) d[n] = form[n].value; });
@@ -499,6 +512,10 @@
   try {
     var saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
     textNames.forEach(function (n) { if (form[n] != null && saved[n] != null) form[n].value = saved[n]; });
+    if (saved.preferences) {   // re-light the work-preference chips to match the restored hidden value
+      var chosen = saved.preferences.split(',').map(function (s) { return s.trim(); });
+      $$('#apPrefs button').forEach(function (b) { if (chosen.indexOf(b.dataset.v) > -1) b.classList.add('on'); });
+    }
     if (Array.isArray(saved.vlinks) && saved.vlinks.length) {
       saved.vlinks.forEach(function (u) { videos.push({ id: ++uid, kind: 'link', url: u, name: linkName(u) }); });
       renderVids();
@@ -1274,7 +1291,20 @@
         name: form.name.value, phone_whatsapp: form.contact.value,
         category: form.category.value, based_in: form.region.value,
         city: form.city.value, instagram_social: form.socials.value,
+        signature_line: (form.tagline && form.tagline.value) || '(none)',
         about: form.about.value,
+        // ── private personal data (only YKS ever sees this — never rendered publicly) ──
+        date_of_birth: (form.dob && form.dob.value) || '(none)',
+        gender: (form.gender && form.gender.value) || '(none)',
+        marital_status: (form.marital && form.marital.value) || '(none)',
+        education: (form.education && form.education.value) || '(none)',
+        languages: (form.languages && form.languages.value) || '(none)',
+        current_work: (form.occupation && form.occupation.value) || '(none)',
+        availability: (form.availability && form.availability.value) || '(none)',
+        open_to_travel: (form.travel && form.travel.value) || '(none)',
+        work_preferences: (form.preferences && form.preferences.value) || '(none)',
+        comfort_boundaries: (form.comfort && form.comfort.value) || '(none)',
+        anything_else: (form.extra && form.extra.value) || '(none)',
         files_folder: (configured && (photos.length || pdf || vidFiles.length)) ? folderName : '(none)',
         photos: configured
           ? (up.photos.filter(Boolean).join('\n') || (photos.length ? photos.length + ' photo(s) uploaded' : '(none)'))

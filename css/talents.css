@@ -521,9 +521,27 @@ main{overflow-x:clip}
 
 .ap-tail{max-width:640px;margin:0 auto;text-align:center;padding-top:8px}
 .ap-tail>*{margin-left:auto;margin-right:auto}
-.ap-submit{display:block;width:fit-content;min-width:min(320px,100%);margin:44px auto 6px;padding:18px 44px;font-size:12px;letter-spacing:.16em}
+.ap-tail-lead{font-size:15px;line-height:1.6;color:var(--mag-ink-2);max-width:44ch;margin:0 auto}
+.ap-tail-lead b{color:var(--mag-ink);font-weight:600}
+.ap-submit{display:block;width:fit-content;min-width:min(320px,100%);margin:22px auto 6px;padding:18px 44px;font-size:12px;letter-spacing:.16em}
 .ap-tail .tal-form-note{margin-top:16px}
 .ap-tail .ap-wa{margin-top:26px}
+
+/* studio → hint that the download lives at the very bottom */
+.ap-dl-hint{font-size:13px;line-height:1.55;color:var(--mag-soft);margin:4px 0 0;padding-top:14px;border-top:1px solid var(--mag-line)}
+.ap-dl-hint b{color:var(--mag-ink-2);font-weight:600}
+
+/* ③ DOWNLOAD — the parting gift, last */
+.ap-download{max-width:640px;margin:52px auto 0;text-align:center;padding:34px 24px 6px;border-top:1px solid var(--mag-line)}
+.ap-dl-kick{font-family:var(--mag-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mag-accent);margin:0 0 8px}
+.ap-dl-h{font-family:var(--mag-display);font-weight:500;font-size:24px;color:var(--mag-ink);margin:0 0 8px}
+.ap-dl-say{font-size:13.5px;line-height:1.6;color:var(--mag-soft);max-width:46ch;margin:0 auto 20px}
+.ap-download .ap-dl{display:inline-block;width:auto}
+
+/* private "more about you" — sub-label for the preference chips */
+.ap-sub-lbl{display:block;font-family:var(--mag-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mag-soft);margin-bottom:13px}
+.ap-sub-lbl .ap-opt{margin-left:8px}
+.ap-full .ap-chips{margin-bottom:2px}
 .ap-progress{font-family:var(--mag-mono);font-size:12px;letter-spacing:.05em;color:var(--mag-accent);margin:16px 0 0}
 .ap-progress[hidden]{display:none}
 .ap-wa{margin-top:28px;padding-top:22px;border-top:1px solid var(--mag-line);font-size:14px;color:var(--mag-soft)}
