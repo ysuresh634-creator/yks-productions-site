@@ -149,7 +149,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
   <button class="mode on" id="m-text"  onclick="setMode('text')">✏️ Text</button>
   <button class="mode"    id="m-photo" onclick="setMode('photo')">🖼 Photos</button>
   <button class="mode"    id="m-link"  onclick="setMode('link')">🔗 Links</button>
-  <button class="mode"    id="m-off"   onclick="setMode('off')">👁 Browse</button>
+  <button class="mode"    id="m-off"   onclick="setMode('off')">🧭 Navigate</button>
   <span class="chg-count" id="chgcount" onclick="openChanges()"></span>
 </div>
 
@@ -357,6 +357,7 @@ let sel=null;            // {id, tag, text, src, alt, href}
 let pendingUpload=null;  // {name, dataUrl, bytes}
 let pendingVideo=null;   // {name, dataUrl, size, ext}
 let mediaFolders=[];     // [{dir,count}] every folder in the repo that holds media
+let sitePages=[];        // every editable .html path, used to resolve link taps
 let uid=0;
 
 // Where the currently-selected file lives, and where its replacement will go.
@@ -443,6 +444,7 @@ async function boot(){
     const pages=tree.tree.filter(n=>n.type==='blob'&&/\.html$/i.test(n.path)&&!n.path.startsWith('_')&&!/^google[0-9a-f]+\.html$/i.test(n.path)).map(n=>n.path).sort();
     const pri=['index.html','talents.html','faq.html','films.html','fashion.html'];
     pages.sort((a,b)=>{const ia=pri.indexOf(a),ib=pri.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
+    sitePages=pages;
     $('pagesel').innerHTML='<option value="">Choose a page…</option>'+pages.map(p=>`<option value="${esc(p)}">${esc(p.replace(/\.html$/,''))}</option>`).join('');
   }catch(e){ $('stagemsg').textContent='Could not list pages — '+e.message; }
 }
@@ -464,6 +466,38 @@ async function loadPage(path){
 }
 
 function stampIds(doc){ uid=0; doc.querySelectorAll('*').forEach(el=>el.setAttribute('data-yks-id',String(++uid))); }
+
+// Tapping a link in the preview should open that page in the EDITOR, not
+// navigate the iframe (which would leave us editing a document we no longer
+// have loaded). Map the href onto a real file in the repo.
+function goToLink(href){
+  href=String(href||'').trim();
+  if(!href) return;
+  if(/^(mailto:|tel:|javascript:|data:)/i.test(href)){ toast('Not a page link'); return; }
+
+  if(href.startsWith('#')){
+    const f=$('frame').contentWindow;
+    if(f) f.postMessage({yks:'anchor',sel:href},'*');
+    return;
+  }
+
+  let u;
+  try{ u=new URL(href, SITE); }catch(e){ toast('Could not read that link'); return; }
+  if(u.origin!==new URL(SITE).origin){ toast('External link — not part of your site'); return; }
+
+  let p=decodeURIComponent(u.pathname).replace(/^\/+/,'');
+  if(p==='' || p.endsWith('/')) p+='index.html';
+
+  const tries=[p, p+'.html', p.replace(/\/+$/,'')+'.html', p.replace(/\/+$/,'')+'/index.html'];
+  const hit=tries.find(c=>sitePages.includes(c));
+  if(hit){
+    if(hit===curPath){ toast('Already on this page'); return; }
+    $('pagesel').value=hit;
+    loadPage(hit);
+  } else {
+    toast('No editable page at /'+p);
+  }
+}
 
 // ══ RENDER PREVIEW ══
 function renderFrame(){
@@ -587,7 +621,6 @@ const FRAME_JS=`
   // photos in a full-size <a> overlay, so a click can hit the link rather
   // than the target and would otherwise navigate the preview away.
   function blockNav(e){
-    if(mode==='off') return;
     if(e.target.closest && e.target.closest('a,button,form,[onclick]')){ e.preventDefault(); e.stopPropagation(); }
   }
   document.addEventListener('mousedown',blockNav,true);
@@ -595,15 +628,26 @@ const FRAME_JS=`
   document.addEventListener('submit',function(e){ if(mode!=='off'){ e.preventDefault(); e.stopPropagation(); } },true);
 
   document.addEventListener('click',function(e){
-    if(mode==='off') return;
-    e.preventDefault(); e.stopPropagation();   // nothing navigates in edit mode
+    e.preventDefault(); e.stopPropagation();   // the preview itself never navigates
+    var link=e.target.closest && e.target.closest('a[href]');
+
+    // Browse mode: taps are purely for getting around the site
+    if(mode==='off'){
+      if(link) parent.postMessage({yks:'navigate',href:link.getAttribute('href')},'*');
+      return;
+    }
+
     var el=e.target;
     while(el && el!==document.body && !el.hasAttribute('data-yks-hot')) el=el.parentElement;
     if(!el || el===document.body){
       // clicked a wrapper (typically an <a> overlay) — look inside it instead
       var host=e.target.closest('a,button,figure,li,div');
       el = host && host.querySelector('[data-yks-hot]');
-      if(!el) return;
+    }
+    if(!el || el===document.body){
+      // nothing editable here, so treat a tap on a link as navigation
+      if(link) parent.postMessage({yks:'navigate',href:link.getAttribute('href')},'*');
+      return;
     }
     var own='';
     for(var i=0;i<el.childNodes.length;i++){ var n=el.childNodes[i]; if(n.nodeType===3) own+=n.nodeValue; }
@@ -641,6 +685,13 @@ const FRAME_JS=`
       el.scrollIntoView({block:'center'});
     }
     if(d.yks==='undirty'){ var q=document.querySelector('[data-yks-id="'+d.id+'"]'); if(q) q.removeAttribute('data-yks-dirty'); }
+    if(d.yks==='anchor'){
+      var t=null;
+      try{ t=document.querySelector(d.sel); }catch(err){}
+      if(!t) t=document.getElementsByName(d.sel.replace(/^#/,''))[0];
+      if(t) t.scrollIntoView({block:'start'});
+      parent.postMessage({yks:'anchorDone',found:!!t},'*');
+    }
   });
   unstick();
   paint();
@@ -653,6 +704,7 @@ window.addEventListener('message',e=>{
   const d=e.data||{};
   if(d.yks==='ready') sendMode();
   if(d.yks==='pick') onPick(d);
+  if(d.yks==='navigate') goToLink(d.href);
   if(d.yks==='unstuck'){ window.__diag={...(window.__diag||{}),hidden:d.hidden,shown:d.shown}; }
   if(d.yks==='painted'){ window.__diag={...(window.__diag||{}),mode:d.mode,hot:d.hot};
     if(d.hot===0 && d.mode!=='off') toast('Nothing editable found in this mode'); }
