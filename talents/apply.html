@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=13" />
-<link rel="stylesheet" href="/css/talents.css?v=35" />
+<link rel="stylesheet" href="/css/talents.css?v=36" />
 </head>
 <body>
 
@@ -294,6 +294,28 @@
               </select>
             </label>
           </div>
+
+          <!-- Age gate + guardian consent (revealed for under-18s) -->
+          <div class="ap-full ap-age">
+            <span class="ap-sub-lbl">Your age</span>
+            <div class="ap-agebtns" id="apAgeBtns">
+              <button type="button" data-age="adult" class="on">I'm 18 or older</button>
+              <button type="button" data-age="minor">I'm under 18</button>
+            </div>
+            <input type="hidden" name="age_group" value="18 or older" />
+            <div class="ap-guardian" id="apGuardian" hidden>
+              <p class="ap-guard-note">Because you're under 18, I need a parent or guardian's consent — I won't take anything further without it. Their details stay private, only with YKS.</p>
+              <div class="row2">
+                <label>Parent / guardian name<input type="text" name="guardian_name" /></label>
+                <label>Guardian phone / WhatsApp<input type="tel" name="guardian_contact" placeholder="+91 / +971 …" /></label>
+              </div>
+              <label class="ap-consent">
+                <input type="checkbox" name="guardian_consent" id="apGuardConsent" />
+                <span>My parent or guardian knows I'm applying and consents to YKS contacting them about work. <b>Required.</b></span>
+              </label>
+            </div>
+          </div>
+
           <div class="row2">
             <label>Marital status
               <select name="marital">
@@ -471,6 +493,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=37"></script>
+<script src="/js/talent-apply.js?v=38"></script>
 </body>
 </html>

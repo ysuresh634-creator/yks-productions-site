@@ -436,6 +436,35 @@
     });
   })();
 
+  // age gate + guardian consent — under-18s must add a consenting parent/guardian before they can submit
+  var ageHidden = form.age_group, guardianBox = $('#apGuardian'), consentCb = $('#apGuardConsent'), dobEl = form.dob;
+  function applyAge(group, clearOnAdult) {
+    var minor = group === 'minor';
+    if (ageHidden) ageHidden.value = minor ? 'Under 18' : '18 or older';
+    $$('#apAgeBtns button').forEach(function (b) { b.classList.toggle('on', b.dataset.age === group); });
+    if (guardianBox) guardianBox.hidden = !minor;
+    if (form.guardian_name) form.guardian_name.required = minor;
+    if (form.guardian_contact) form.guardian_contact.required = minor;
+    if (consentCb) consentCb.required = minor;
+    if (!minor && clearOnAdult) {
+      if (form.guardian_name) form.guardian_name.value = '';
+      if (form.guardian_contact) form.guardian_contact.value = '';
+      if (consentCb) consentCb.checked = false;
+    }
+  }
+  var ageBtns = $('#apAgeBtns');
+  if (ageBtns) ageBtns.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    applyAge(b.dataset.age, true); persistDraft();
+  });
+  if (dobEl) dobEl.addEventListener('change', function () {   // filling a DOB auto-flips the age gate
+    if (!dobEl.value) return;
+    var d = new Date(dobEl.value); if (isNaN(d.getTime())) return;
+    var now = new Date(), age = now.getFullYear() - d.getFullYear(), m = now.getMonth() - d.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+    if (age >= 0 && age < 120) { applyAge(age < 18 ? 'minor' : 'adult', true); persistDraft(); }
+  });
+
   function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
   function list(arr) {
     arr = arr.slice(0);
@@ -501,17 +530,21 @@
 
   /* ══ autosave draft (text + video links; uploaded files can't persist across reloads) ══ */
   var textNames = ['name', 'contact', 'category', 'region', 'city', 'socials', 'about', 'tagline',
-    'dob', 'gender', 'marital', 'education', 'languages', 'occupation', 'availability', 'travel', 'comfort', 'extra', 'preferences'];
+    'dob', 'gender', 'marital', 'education', 'languages', 'occupation', 'availability', 'travel', 'comfort', 'extra', 'preferences',
+    'age_group', 'guardian_name', 'guardian_contact'];
   function persistDraft() {
     try {
       var d = {}; textNames.forEach(function (n) { if (form[n] != null) d[n] = form[n].value; });
       d.vlinks = videos.filter(function (v) { return v.kind === 'link'; }).map(function (v) { return v.url; });
+      d.guardian_consent = consentCb ? consentCb.checked : false;
       localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
     } catch (e) {}
   }
   try {
     var saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
     textNames.forEach(function (n) { if (form[n] != null && saved[n] != null) form[n].value = saved[n]; });
+    applyAge((form.age_group && form.age_group.value === 'Under 18') ? 'minor' : 'adult', false);   // restore the age gate + guardian visibility
+    if (consentCb && saved.guardian_consent) consentCb.checked = true;
     if (saved.preferences) {   // re-light the work-preference chips to match the restored hidden value
       var chosen = saved.preferences.split(',').map(function (s) { return s.trim(); });
       $$('#apPrefs button').forEach(function (b) { if (chosen.indexOf(b.dataset.v) > -1) b.classList.add('on'); });
@@ -1305,6 +1338,11 @@
         work_preferences: (form.preferences && form.preferences.value) || '(none)',
         comfort_boundaries: (form.comfort && form.comfort.value) || '(none)',
         anything_else: (form.extra && form.extra.value) || '(none)',
+        age_group: (form.age_group && form.age_group.value) || '(none)',
+        guardian_name: (form.guardian_name && form.guardian_name.value) || '(n/a)',
+        guardian_contact: (form.guardian_contact && form.guardian_contact.value) || '(n/a)',
+        guardian_consent: (consentCb && consentCb.checked) ? 'YES — guardian consents'
+          : ((form.age_group && form.age_group.value === 'Under 18') ? 'NO — MISSING' : '(n/a — adult)'),
         files_folder: (configured && (photos.length || pdf || vidFiles.length)) ? folderName : '(none)',
         photos: configured
           ? (up.photos.filter(Boolean).join('\n') || (photos.length ? photos.length + ' photo(s) uploaded' : '(none)'))
