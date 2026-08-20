@@ -136,6 +136,24 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 .chk span{font-size:11px;color:var(--sub);line-height:1.5}
 .dest-ok{color:var(--green)!important}
 .dest-warn{color:#E0A34A!important}
+/* Staged edits used to be publishable only from a small header button that
+   scrolled out of reach on a phone. This bar is always in view. */
+.pubbar{position:fixed;left:0;right:0;bottom:0;z-index:150;display:flex;align-items:center;gap:8px;
+  background:var(--card);border-top:2px solid var(--gold);padding:10px 12px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom));
+  transform:translateY(130%);transition:transform .25s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 -8px 26px rgba(0,0,0,.5)}
+.pubbar.on{transform:translateY(0)}
+.pb-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+#pb-count{font-size:13px;color:var(--gold);font-weight:700;white-space:nowrap}
+#pb-page{font-size:10px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-review{background:none;border:1px solid var(--border);color:var(--sub);border-radius:9px;
+  padding:11px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.pb-go{background:var(--gold);color:#0D0B11;border:none;border-radius:9px;padding:12px 22px;
+  font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.pb-go:active{opacity:.85}
+.pb-go:disabled{opacity:.5;cursor:not-allowed}
+
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--gold);color:var(--gold);padding:11px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:300;transition:transform .25s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
 .toast.on{transform:translateX(-50%) translateY(0)}
 </style>
@@ -203,6 +221,16 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
       </p>
     </div>
   </div>
+</div>
+
+<!-- always-visible publish bar, shown whenever anything is staged -->
+<div class="pubbar" id="pubbar">
+  <div class="pb-txt">
+    <b id="pb-count">0 changes</b>
+    <span id="pb-page"></span>
+  </div>
+  <button class="pb-review" onclick="openChanges()">Review</button>
+  <button class="pb-go" onclick="quickPublish()">Publish →</button>
 </div>
 
 <div class="ov" id="ov" onclick="closeSheets()"></div>
@@ -1205,6 +1233,20 @@ function renderCount(){
   const b=$('savebtn');
   b.textContent = n ? 'Publish '+n : 'Save';
   b.classList.toggle('pending', n>0);
+  // the bar is the primary way to publish; it cannot scroll out of reach
+  $('pubbar').classList.toggle('on', n>0);
+  $('pb-count').textContent = n+' change'+(n===1?'':'s')+' ready';
+  $('pb-page').textContent = curPath ? 'on '+curPath+' — not live yet' : '';
+}
+
+// One tap from the bar: run the safety checks, then publish, showing the log.
+async function quickPublish(){
+  if(!changes.length) return;
+  const probs=guards(buildOutput());
+  openSave();
+  if(probs.length) return;          // openSave already lists the problems
+  await new Promise(r=>setTimeout(r,60));
+  doSave();
 }
 function openChanges(){ if(!changes.length){ toast('No changes yet'); return; } renderChanges(); openSheet('sh-chg'); }
 function renderChanges(){
