@@ -88,7 +88,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 .imgprev{width:100%;max-height:210px;object-fit:contain;background:#000;border-radius:8px;margin-bottom:12px;display:block}
 
 /* ── PHOTO EDITOR ── */
-.pe-stage{position:relative;width:100%;background:#000;border-radius:10px;overflow:hidden;margin-bottom:12px;touch-action:none;-webkit-user-select:none;user-select:none}
+.pe-stage{position:relative;width:100%;background:#000;border-radius:10px;overflow:hidden;margin-bottom:12px;touch-action:none;-webkit-user-select:none;user-select:none;display:flex;align-items:center;justify-content:center;min-height:120px}
 #pe-canvas{display:block;width:100%;height:auto;cursor:grab}
 #pe-canvas:active{cursor:grabbing}
 .pe-hint{position:absolute;left:0;right:0;bottom:0;padding:6px 10px;font-size:10px;letter-spacing:.4px;color:#cfc7bf;background:linear-gradient(transparent,rgba(0,0,0,.75));text-align:center;pointer-events:none}
@@ -703,9 +703,12 @@ function peDraw(){
 
 function peOut(){
   const ar=peAspect();
+  // size from the rotated source, or a 90-degree turn silently loses resolution
+  const q=pe.quarter%2===1;
+  const srcW=q?pe.natH:pe.natW, srcH=q?pe.natW:pe.natH;
   let ow,oh;
-  if(ar>=1){ ow=Math.min(MAX_EXPORT,pe.natW); oh=Math.round(ow/ar); }
-  else { oh=Math.min(MAX_EXPORT,pe.natH); ow=Math.round(oh*ar); }
+  if(ar>=1){ ow=Math.min(MAX_EXPORT,srcW); oh=Math.round(ow/ar); }
+  else { oh=Math.min(MAX_EXPORT,srcH); ow=Math.round(oh*ar); }
   $('pe-out').textContent=`Exports ${ow} × ${oh} px · JPEG`;
   return {ow,oh};
 }
