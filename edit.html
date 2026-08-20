@@ -611,9 +611,11 @@ const FRAME_JS=`
     // exactly the shape the visitor sees
     var rect=el.getBoundingClientRect();
     var slotAR=(rect.width>0&&rect.height>0)?(rect.width/rect.height):0;
-    // a <video> may carry its src on a child <source> rather than itself
-    var src=el.getAttribute('src')||'';
-    if(!src && el.tagName==='VIDEO'){ var s=el.querySelector('source'); if(s) src=s.getAttribute('src')||''; }
+    // media may carry its path on src, on data-src (lazy loading), or on a
+    // child <source> — check all of them
+    var src=el.getAttribute('src')||el.getAttribute('data-src')||'';
+    if(!src){ var s=el.querySelector&&el.querySelector('source');
+              if(s) src=s.getAttribute('src')||s.getAttribute('data-src')||''; }
     parent.postMessage({yks:'pick', id:el.getAttribute('data-yks-id'), tag:el.tagName.toLowerCase(),
       text:own.trim(), full:(el.textContent||'').trim().slice(0,300),
       src:src, alt:el.getAttribute('alt')||'', href:el.getAttribute('href')||'',
@@ -752,6 +754,17 @@ function vDest(){
 
 // ══ APPLY EDITS ══
 function mEl(id){ return masterDoc.querySelector(`[data-yks-id="${id}"]`); }
+
+// Write a media path back to whichever attribute the element actually uses:
+// src, data-src (lazy loading), or a child <source>. Writing only `src` would
+// silently do nothing on this site's lazy-loaded videos.
+function setMediaSrc(el,path){
+  let wrote=false;
+  ['src','data-src'].forEach(a=>{ if(el.hasAttribute(a)){ el.setAttribute(a,path); wrote=true; } });
+  const s=el.querySelector&&el.querySelector('source');
+  if(s) ['src','data-src'].forEach(a=>{ if(s.hasAttribute(a)){ s.setAttribute(a,path); wrote=true; } });
+  if(!wrote) el.setAttribute('src',path);
+}
 
 function setOwnText(el,val){
   let done=false;
@@ -995,7 +1008,7 @@ function commitPhoto(){
     const base=(pendingUpload&&pendingUpload.name)||(pe.srcName||'photo');
     const newPath=destPath(sel.src, $('p-folder').value, overwrite, base, 'jpg');
     if(!overwrite){
-      el.setAttribute('src',newPath);
+      setMediaSrc(el,newPath);
       el.removeAttribute('srcset');
     }
     patch({id:sel.id,src:dataUrl});
@@ -1025,13 +1038,7 @@ function commitVideo(){
   const el=mEl(sel.id); if(!el){ toast('Element not found'); return; }
   const overwrite=$('v-overwrite').checked;
   const newPath=destPath(sel.src, $('v-folder').value, overwrite, pendingVideo.name, pendingVideo.ext);
-  if(!overwrite){
-    // the source may live on the <video> itself or on a child <source>
-    if(el.hasAttribute('src')) el.setAttribute('src',newPath);
-    const s=el.querySelector('source');
-    if(s) s.setAttribute('src',newPath);
-    if(!el.hasAttribute('src') && !s) el.setAttribute('src',newPath);
-  }
+  if(!overwrite) setMediaSrc(el,newPath);
   addChange({id:sel.id,kind:'video',label: overwrite?'VIDEO OVERWRITTEN':'VIDEO REPLACED',
     before:sel.src, after:newPath, upload:{path:newPath,dataUrl:pendingVideo.dataUrl,overwrite}});
   pendingVideo=null; closeSheets(); toast('Video updated');
@@ -1058,8 +1065,7 @@ function undo(i){
     if(c.kind==='href'){ el.setAttribute('href',c.before); patch({id:c.id,href:c.before}); }
     if(c.kind==='alt'){ el.setAttribute('alt',c.before); patch({id:c.id,alt:c.before}); }
     if(c.kind==='photo'||c.kind==='video'){
-      el.setAttribute('src',c.before);
-      const s=el.querySelector&&el.querySelector('source'); if(s) s.setAttribute('src',c.before);
+      setMediaSrc(el,c.before);
       patch({id:c.id,src:/^https?:|^data:/.test(c.before)?c.before:SITE+c.before.replace(/^\//,'')});
     }
   }
