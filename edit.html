@@ -534,7 +534,7 @@ const FRAME_JS=`
   function targets(){
     var list;
     if(mode==='text')       list=[].slice.call(document.querySelectorAll(TEXT)).filter(hasOwnText);
-    else if(mode==='photo') list=[].slice.call(document.querySelectorAll('img'));
+    else if(mode==='photo') list=[].slice.call(document.querySelectorAll('img,video'));
     else if(mode==='link')  list=[].slice.call(document.querySelectorAll('a[href]'));
     else return [];
     return list.filter(onScreen);
@@ -611,9 +611,12 @@ const FRAME_JS=`
     // exactly the shape the visitor sees
     var rect=el.getBoundingClientRect();
     var slotAR=(rect.width>0&&rect.height>0)?(rect.width/rect.height):0;
+    // a <video> may carry its src on a child <source> rather than itself
+    var src=el.getAttribute('src')||'';
+    if(!src && el.tagName==='VIDEO'){ var s=el.querySelector('source'); if(s) src=s.getAttribute('src')||''; }
     parent.postMessage({yks:'pick', id:el.getAttribute('data-yks-id'), tag:el.tagName.toLowerCase(),
       text:own.trim(), full:(el.textContent||'').trim().slice(0,300),
-      src:el.getAttribute('src')||'', alt:el.getAttribute('alt')||'', href:el.getAttribute('href')||'',
+      src:src, alt:el.getAttribute('alt')||'', href:el.getAttribute('href')||'',
       slotAR:slotAR},'*');
   },true);
   window.addEventListener('message',function(e){
@@ -668,18 +671,83 @@ function onPick(d){
     if(!d.text){ toast('That block has no direct text'); return; }
     $('t-val').value=d.text; openSheet('sh-text'); setTimeout(()=>$('t-val').focus(),260);
   } else if(mode==='photo'){
+    if(d.tag==='video'){ onPickVideo(d); return; }
     if(d.tag!=='img'){ toast('Not an image'); return; }
     $('p-src').value=d.src; $('p-alt').value=d.alt; $('p-file').value='';
+    const dir=dirOf(d.src), file=fileOf(d.src);
+    $('p-dir').textContent = dir ? dir+'/' : '(site root)/';
+    $('p-name').textContent = file || '(no filename)';
+    $('p-folder').innerHTML = folderOptions(dir).map(o=>`<option value="${esc(o.v)}">${esc(o.label)}</option>`).join('');
+    $('p-folder').value = dir;
+    $('p-overwrite').checked = false;
+    peDest();
     $('pe-out').textContent='Loading photo…';
     openSheet('sh-photo');
     const url = /^https?:|^data:/.test(d.src) ? d.src : SITE+d.src.replace(/^\//,'');
-    const name = (d.src.split('/').pop()||'photo').replace(/\.[^.]+$/,'').replace(/[^\w\-]/g,'_');
+    const name = (file||'photo').replace(/\.[^.]+$/,'').replace(/[^\w\-]/g,'_');
     // d.slotAR is how the photo is actually framed on the page, so "Fits slot"
     // exports exactly what the visitor will see.
     setTimeout(()=>peLoad(url, d.slotAR||1, name), 120);
   } else if(mode==='link'){
     $('l-text').value=d.text; $('l-href').value=d.href; openSheet('sh-link');
   }
+}
+
+function onPickVideo(d){
+  pendingVideo=null;
+  const dir=dirOf(d.src), file=fileOf(d.src);
+  $('v-dir').textContent = dir ? dir+'/' : '(site root)/';
+  $('v-name').textContent = file || '(no filename)';
+  $('v-folder').innerHTML = folderOptions(dir).map(o=>`<option value="${esc(o.v)}">${esc(o.label)}</option>`).join('');
+  $('v-folder').value = dir;
+  $('v-overwrite').checked=false; $('v-file').value='';
+  $('v-prev').src = /^https?:|^data:/.test(d.src) ? d.src : SITE+d.src.replace(/^\//,'');
+  vDest();
+  openSheet('sh-video');
+}
+
+// ── where a replacement will be written ──
+function destPath(origSrc, folderSel, overwrite, newBaseName, ext){
+  const origDir=dirOf(origSrc), origFile=fileOf(origSrc);
+  if(overwrite && origFile) return (origDir?origDir+'/':'')+origFile;
+  const dir=folderSel||'';
+  const stamp=Date.now().toString(36).slice(-5);
+  const base=(newBaseName||origFile.replace(/\.[^.]+$/,'')||'file').replace(/[^\w\-]/g,'_').slice(0,48);
+  return (dir?dir+'/':'')+base+'-'+stamp+'.'+ext;
+}
+
+function peDest(){
+  if(!$('p-dir')) return;
+  const src=$('p-src').value;
+  const ow=$('p-overwrite').checked;
+  const base=(pendingUpload&&pendingUpload.name)||fileOf(src).replace(/\.[^.]+$/,'')||'photo';
+  const p=destPath(src, $('p-folder').value, ow, base, 'jpg');
+  $('p-folder').disabled=ow;
+  const el=$('p-dest');
+  if(ow && !/\.jpe?g$/i.test(fileOf(src))){
+    el.className='hint dest-warn';
+    el.textContent='→ '+p+'  ⚠ the original is not a .jpg, so overwriting it stores JPEG data under its old extension. Prefer a new file.';
+  } else if(ow){
+    el.className='hint dest-warn';
+    el.textContent='→ '+p+'  ⚠ replaces the original permanently; visitors may see the cached old image for a while.';
+  } else {
+    el.className='hint dest-ok';
+    el.textContent='→ '+p;
+  }
+}
+
+function vDest(){
+  if(!$('v-dir')) return;
+  const src=$('v-prev').getAttribute('src')||'';
+  const orig=sel?sel.src:src;
+  const ow=$('v-overwrite').checked;
+  const ext=(pendingVideo&&pendingVideo.ext)||(fileOf(orig).split('.').pop()||'mp4');
+  const base=(pendingVideo&&pendingVideo.name)||fileOf(orig).replace(/\.[^.]+$/,'')||'video';
+  const p=destPath(orig, $('v-folder').value, ow, base, ext);
+  $('v-folder').disabled=ow;
+  const el=$('v-dest');
+  el.className = ow ? 'hint dest-warn' : 'hint dest-ok';
+  el.textContent = '→ '+p + (ow?'  ⚠ replaces the original permanently.':'');
 }
 
 // ══ APPLY EDITS ══
@@ -923,16 +991,50 @@ function commitPhoto(){
     let dataUrl;
     try{ dataUrl=peExport(); }
     catch(e){ toast('Could not export this image'); return; }
-    const stamp=Date.now().toString(36);
-    const baseName=(pendingUpload&&pendingUpload.name) || (pe.srcName||'photo');
-    const newPath='assets/uploads/'+stamp+'-'+baseName+'.jpg';
-    el.setAttribute('src',newPath);
-    el.removeAttribute('srcset');
+    const overwrite=$('p-overwrite').checked;
+    const base=(pendingUpload&&pendingUpload.name)||(pe.srcName||'photo');
+    const newPath=destPath(sel.src, $('p-folder').value, overwrite, base, 'jpg');
+    if(!overwrite){
+      el.setAttribute('src',newPath);
+      el.removeAttribute('srcset');
+    }
     patch({id:sel.id,src:dataUrl});
-    addChange({id:sel.id,kind:'photo',label: pendingUpload?'PHOTO REPLACED':'PHOTO EDITED',
-      before:sel.src, after:newPath, upload:{path:newPath,dataUrl}});
+    addChange({id:sel.id,kind:'photo',
+      label: overwrite?'PHOTO OVERWRITTEN':(pendingUpload?'PHOTO REPLACED':'PHOTO EDITED'),
+      before:sel.src, after:newPath, upload:{path:newPath,dataUrl,overwrite}});
   }
   pendingUpload=null; closeSheets(); toast('Photo updated');
+}
+
+function pickVideo(ev){
+  const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  if(f.size>MAX_UPLOAD){ toast('Too big — max '+Math.round(MAX_UPLOAD/1048576)+' MB'); ev.target.value=''; return; }
+  const ext=(f.name.split('.').pop()||'mp4').toLowerCase().replace(/[^\w]/g,'');
+  const rd=new FileReader();
+  rd.onload=()=>{
+    pendingVideo={ name:f.name.replace(/\.[^.]+$/,'').replace(/[^\w\-]/g,'_')||'video',
+                   dataUrl:rd.result, size:f.size, ext };
+    $('v-prev').src=rd.result; vDest();
+    toast('Video ready — tap Apply');
+  };
+  rd.readAsDataURL(f);
+}
+
+function commitVideo(){
+  if(!pendingVideo){ toast('Choose a video first'); return; }
+  const el=mEl(sel.id); if(!el){ toast('Element not found'); return; }
+  const overwrite=$('v-overwrite').checked;
+  const newPath=destPath(sel.src, $('v-folder').value, overwrite, pendingVideo.name, pendingVideo.ext);
+  if(!overwrite){
+    // the source may live on the <video> itself or on a child <source>
+    if(el.hasAttribute('src')) el.setAttribute('src',newPath);
+    const s=el.querySelector('source');
+    if(s) s.setAttribute('src',newPath);
+    if(!el.hasAttribute('src') && !s) el.setAttribute('src',newPath);
+  }
+  addChange({id:sel.id,kind:'video',label: overwrite?'VIDEO OVERWRITTEN':'VIDEO REPLACED',
+    before:sel.src, after:newPath, upload:{path:newPath,dataUrl:pendingVideo.dataUrl,overwrite}});
+  pendingVideo=null; closeSheets(); toast('Video updated');
 }
 
 // ══ CHANGES ══
@@ -955,7 +1057,11 @@ function undo(i){
     if(c.kind==='text'){ setOwnText(el,c.before); patch({id:c.id,text:c.before}); }
     if(c.kind==='href'){ el.setAttribute('href',c.before); patch({id:c.id,href:c.before}); }
     if(c.kind==='alt'){ el.setAttribute('alt',c.before); patch({id:c.id,alt:c.before}); }
-    if(c.kind==='photo'){ el.setAttribute('src',c.before); patch({id:c.id,src:/^https?:|^data:/.test(c.before)?c.before:SITE+c.before.replace(/^\//,'')}); }
+    if(c.kind==='photo'||c.kind==='video'){
+      el.setAttribute('src',c.before);
+      const s=el.querySelector&&el.querySelector('source'); if(s) s.setAttribute('src',c.before);
+      patch({id:c.id,src:/^https?:|^data:/.test(c.before)?c.before:SITE+c.before.replace(/^\//,'')});
+    }
   }
   changes.splice(i,1); renderCount(); renderChanges();
   if(!changes.length){ $('savebtn').disabled=true; closeSheets(); }
@@ -1010,24 +1116,37 @@ async function doSave(){
   if(probs.length){ slog('Blocked by safety checks.','bad'); return; }
   const btn=$('gobtn'); btn.disabled=true; btn.textContent='Publishing…';
   try{
-    // 1. upload any new photos
+    // 1. upload media, each into the folder chosen for it
     for(const c of changes.filter(x=>x.upload)){
-      slog('Uploading '+c.upload.path+'…','work');
-      const b64=c.upload.dataUrl.split(',')[1];
-      await gh(`contents/${c.upload.path.split('/').map(encodeURIComponent).join('/')}`,{
-        method:'PUT', body:JSON.stringify({message:`Add photo ${c.upload.path}`,content:b64,branch:GH_BRANCH})
-      });
-      slog('✓ '+c.upload.path,'ok');
+      const u=c.upload;
+      const apiPath=u.path.split('/').map(encodeURIComponent).join('/');
+      slog((u.overwrite?'Overwriting ':'Uploading ')+u.path+'…','work');
+      const body={ message:(u.overwrite?'Replace ':'Add ')+u.path, content:u.dataUrl.split(',')[1], branch:GH_BRANCH };
+      if(u.overwrite){
+        // updating an existing path requires its current blob sha
+        try{
+          const cur=await gh(`contents/${apiPath}?ref=${GH_BRANCH}`);
+          body.sha=cur.sha;
+        }catch(e){ slog('Original not found, writing it as a new file instead.','info'); }
+      }
+      await gh(`contents/${apiPath}`,{ method:'PUT', body:JSON.stringify(body) });
+      slog('✓ '+u.path,'ok');
     }
-    // 2. commit the page
-    slog('Committing '+curPath+'…','work');
-    const msg=`Edit ${curPath} — ${changes.length} change${changes.length>1?'s':''} via YKS Site Editor`;
-    const res=await gh(`contents/${curPath.split('/').map(encodeURIComponent).join('/')}`,{
-      method:'PUT', body:JSON.stringify({message:msg,content:b64enc(html),sha:curSha,branch:GH_BRANCH})
-    });
-    curSha=res.content.sha; origSource=html;
+
+    // 2. commit the page, but only if the markup actually changed
+    //    (overwriting a photo in place leaves the HTML identical)
+    if(html!==origSource){
+      slog('Committing '+curPath+'…','work');
+      const msg=`Edit ${curPath} — ${changes.length} change${changes.length>1?'s':''} via YKS Site Editor`;
+      const res=await gh(`contents/${curPath.split('/').map(encodeURIComponent).join('/')}`,{
+        method:'PUT', body:JSON.stringify({message:msg,content:b64enc(html),sha:curSha,branch:GH_BRANCH})
+      });
+      curSha=res.content.sha; origSource=html;
+      slog('Previous version: '+String(res.commit&&res.commit.sha||'').slice(0,7)+' (revert from GitHub if needed)','info');
+    } else {
+      slog('Page markup unchanged — only the media files were written.','info');
+    }
     slog('✓ Published — live in about a minute','ok');
-    slog('Previous version: '+String(res.commit&&res.commit.sha||'').slice(0,7)+' (revert from GitHub if needed)','info');
     changes=[]; renderCount(); $('savebtn').disabled=true;
     stampIds(masterDoc);
     btn.textContent='Done'; setTimeout(()=>{ closeSheets(); btn.disabled=false; btn.textContent='Publish now'; },1600);
