@@ -1,0 +1,75 @@
+{
+  "_note": "Hand-written per city. A city with no blurb gets no page — that gate is what keeps these from being doorway pages. Every claim here is true of the city's commercial production market generally; none of it claims YKS work in that city.",
+  "cities": [
+    {
+      "slug": "mumbai", "city": "Mumbai", "state": "Maharashtra", "geo": "IN-MH",
+      "also": ["Navi Mumbai", "Thane", "Andheri", "Malad", "Goregaon"],
+      "market": "Mumbai is where most of India's national advertising is cast and shot. Ad films, magazine editorial, campaign stills and runway all concentrate here, which means the bar is high and the competition for a booking is real.",
+      "talent": "There are more models in Mumbai than in any other Indian city, so what separates people is rarely looks — it is a clean digitals set, reliable availability and being easy to direct on a long day.",
+      "client": "Casting in Mumbai is fast and expensive. Briefs that arrive with dates, usage and a mood reference already attached get shortlisted quicker, because half the city is competing for the same faces on the same weekend."
+    },
+    {
+      "slug": "delhi", "city": "Delhi NCR", "state": "Delhi", "geo": "IN-DL",
+      "also": ["New Delhi", "Gurugram", "Gurgaon", "Noida", "Faridabad", "Ghaziabad"],
+      "market": "Delhi NCR runs on volume. Apparel e-commerce, marketplace catalogue and D2C brand content are shot here at a scale nowhere else matches, much of it out of studios in Gurugram and Noida.",
+      "talent": "Catalogue work in NCR rewards consistency over drama — the ability to hit clean, repeatable poses for hours and keep the same energy at frame 400 as at frame 4.",
+      "client": "NCR is the most cost-efficient place in India to shoot high-volume apparel. If you are shooting a large SKU count, the shortlist should be built around stamina and fit, not just a strong portfolio."
+    },
+    {
+      "slug": "bangalore", "city": "Bangalore", "state": "Karnataka", "geo": "IN-KA",
+      "also": ["Bengaluru", "Whitefield", "Koramangala", "Indiranagar", "HSR Layout"],
+      "market": "Bangalore's commercial work is digital-first. D2C brands, tech companies and startups shoot for social, product pages and performance ads rather than print, so the output is shorter, faster and more frequent.",
+      "talent": "Bangalore casting leans toward faces that read as real people rather than runway — believable on camera, comfortable talking to a lens, often expected to deliver a piece to camera as well as stills.",
+      "client": "Brands here tend to shoot little and often. That favours talent who can be booked repeatedly for short days rather than one large production, and it makes availability more valuable than a big portfolio."
+    },
+    {
+      "slug": "hyderabad", "city": "Hyderabad", "state": "Telangana", "geo": "IN-TG",
+      "also": ["Secunderabad", "Gachibowli", "Hitec City", "Jubilee Hills"],
+      "market": "Hyderabad carries a large film industry alongside a growing base of lifestyle, jewellery and pharma-adjacent brand work, so commercial and screen casting sit closer together here than in most cities.",
+      "talent": "Because film and commercial casting overlap, a showreel is worth as much as a portfolio here — being able to hold a performance, not only a pose, opens more of the market.",
+      "client": "Hyderabad gives access to crew and faces used to both screen and stills work, which is useful when a campaign needs a film and a set of key art out of the same day."
+    },
+    {
+      "slug": "chennai", "city": "Chennai", "state": "Tamil Nadu", "geo": "IN-TN",
+      "also": ["Tiruvallur", "Guindy", "Adyar", "OMR"],
+      "market": "Chennai's commercial demand comes largely from apparel, textiles and jewellery advertisers, with a substantial film industry running alongside it.",
+      "talent": "Jewellery and silk work is unusually technical — long holds, careful hand and neck positioning, heavy costume — and talent who are genuinely good at it stay booked.",
+      "client": "For traditional wear and jewellery, casting locally matters more than usual: drape, styling and the way a garment sits are regional, and it shows on camera."
+    },
+    {
+      "slug": "pune", "city": "Pune", "state": "Maharashtra", "geo": "IN-MH",
+      "also": ["Pimpri-Chinchwad", "Hinjewadi", "Kharadi", "Baner"],
+      "market": "Pune's brand work skews toward automotive, manufacturing and education, and it absorbs a steady amount of overflow from Mumbai when a production wants the same faces at a lower cost of shooting.",
+      "talent": "Being within reach of Mumbai is an advantage worth stating plainly — talent who can travel for a Mumbai call at short notice see far more of the market.",
+      "client": "Pune is a practical base when a shoot needs Mumbai-standard casting without Mumbai location costs, particularly for automotive and lifestyle work."
+    },
+    {
+      "slug": "kolkata", "city": "Kolkata", "state": "West Bengal", "geo": "IN-WB",
+      "also": ["Howrah", "Salt Lake", "New Town"],
+      "market": "Kolkata's commercial casting is driven by apparel, jewellery and regional FMCG, with a strong tradition of festive and wedding-season campaign work.",
+      "talent": "Festive season is the pivot of the year here. Talent who keep their availability open through the run-up to the wedding and Durga Puja calendar catch most of the annual volume.",
+      "client": "Eastern India campaigns often need faces that read regionally rather than pan-nationally, and that is a specific casting brief worth writing down explicitly."
+    },
+    {
+      "slug": "ahmedabad", "city": "Ahmedabad", "state": "Gujarat", "geo": "IN-GJ",
+      "also": ["Gandhinagar", "Surat", "Vadodara"],
+      "market": "Gujarat is a manufacturing centre for textiles and apparel, so a large share of the shooting here is catalogue and lookbook work produced directly by brands and exporters.",
+      "talent": "Catalogue is the bread and butter — less glamorous than campaign work, more reliable, and the fastest way for a new model to build a usable portfolio and a booking history.",
+      "client": "If you manufacture here, shooting here removes the sample-shipping problem entirely, which is usually the real bottleneck in a catalogue schedule."
+    },
+    {
+      "slug": "jaipur", "city": "Jaipur", "state": "Rajasthan", "geo": "IN-RJ",
+      "also": ["Udaipur", "Jodhpur"],
+      "market": "Jaipur's demand is concentrated in jewellery, bridal and heritage-location fashion, and it draws productions from other cities that come specifically for the architecture and light.",
+      "talent": "Much of the work is bridal and heavy-costume, which asks for patience over pace — long jewellery sets, layered outfits and slow, controlled movement.",
+      "client": "Location is half the reason to shoot in Rajasthan. Casting locally where possible keeps the schedule intact when a production is already spending its budget on permissions and travel."
+    },
+    {
+      "slug": "chandigarh", "city": "Chandigarh", "state": "Chandigarh", "geo": "IN-CH",
+      "also": ["Mohali", "Panchkula", "Ludhiana", "Amritsar"],
+      "market": "The Chandigarh and wider Punjab market is built around apparel, wedding wear and a very active regional music-video and branded-content scene.",
+      "talent": "The regional content industry here is genuinely large, and it is one of the few places where a model can build a real body of on-camera work without moving to Mumbai first.",
+      "client": "North Indian wedding and ethnic wear casting is its own specialism, and the depth of talent for it in this region is not matched elsewhere."
+    }
+  ]
+}

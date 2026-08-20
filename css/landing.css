@@ -462,3 +462,35 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
   .tal-mini b{font-size:1rem}
   .tal-mini small{font-size:.75rem}
 }
+
+/* ── two-sided city pages ──────────────────────────────────────────
+   Talent on one side, brands on the other, equal weight. Neither side
+   is the "real" audience, so neither gets the visually dominant half. */
+.l-twoside{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}
+@media(max-width:860px){.l-twoside{grid-template-columns:1fr}}
+.l-svcside{border:1px solid rgba(244,237,226,.1);background:rgba(22,19,28,.5);
+  border-radius:18px;padding:34px 32px;display:flex;flex-direction:column;gap:16px}
+.l-svcside h2{font-size:clamp(24px,2.7vw,34px);letter-spacing:-.01em;margin:2px 0 2px}
+.l-svcside .l-eyebrow{margin-bottom:4px}
+.l-svcside .l-prose{font-size:.99rem;line-height:1.78}
+.l-svcside .l-cta-row{margin-top:auto;padding-top:10px}
+.l-note{margin-top:26px;font-family:var(--mono);font-size:12px;letter-spacing:.06em}
+.l-note a{color:var(--amber);border-bottom:1px solid rgba(255,140,59,.35);padding-bottom:2px}
+.l-note a:hover{color:var(--peach);border-color:var(--peach)}
+.tal-kicker{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--paper-dim);margin-bottom:14px}
+@media(max-width:860px){.l-svcside{padding:28px 24px}}
+
+/* city index — a plain, scannable list of doors, not a decorative grid */
+.l-citygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px}
+.l-citygrid a{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:15px 18px;border:1px solid rgba(244,237,226,.11);border-radius:12px;
+  background:rgba(22,19,28,.5);font-size:.95rem;
+  transition:border-color .3s var(--ease),color .3s var(--ease),transform .3s var(--ease)}
+.l-citygrid a::after{content:"→";font-family:var(--mono);color:var(--paper-dim);
+  transition:color .3s var(--ease),transform .3s var(--ease)}
+.l-citygrid a:hover{border-color:rgba(255,140,59,.42);color:var(--amber);transform:translateY(-2px)}
+.l-citygrid a:hover::after{color:var(--amber);transform:translateX(3px)}
+.l-citygrid a:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+@media(max-width:520px){.l-citygrid{grid-template-columns:1fr 1fr;gap:8px}
+  .l-citygrid a{padding:13px 14px;font-size:.88rem}}

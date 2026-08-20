@@ -272,10 +272,16 @@
   var wrap = cta.querySelector('.l-form-wrap');
   var promise = document.createElement('ul');
   promise.className = 'l-promise';
-  promise.innerHTML =
-      '<li><b>Same day.</b> You get a reply today — not "we\'ll revert".</li>'
-    + '<li><b>One all-in number.</b> Nothing added later, no surprise line items.</li>'
-    + '<li><b>Preview in 48h.</b> First edited frames within two days of the shoot.</li>';
+  /* Casting pages face two audiences — someone deciding whether to trust us
+     with their name, and a brand deciding whether to brief us. "Preview in
+     48h" answers neither, so those pages get their own three. */
+  promise.innerHTML = document.body.dataset.page === 'casting'
+    ? '<li><b>Free to join.</b> No registration fee, no portfolio package, ever.</li>'
+      + '<li><b>Your details stay private.</b> Contact is never published or passed on.</li>'
+      + '<li><b>Same day.</b> You get a reply today — not "we\'ll revert".</li>'
+    : '<li><b>Same day.</b> You get a reply today — not "we\'ll revert".</li>'
+      + '<li><b>One all-in number.</b> Nothing added later, no surprise line items.</li>'
+      + '<li><b>Preview in 48h.</b> First edited frames within two days of the shoot.</li>';
   if (wrap) cta.insertBefore(promise, wrap); else cta.appendChild(promise);
 
   /* ── micro-copy under the send button: removes the last hesitation ── */
