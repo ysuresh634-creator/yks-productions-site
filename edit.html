@@ -35,6 +35,9 @@ select.page-sel{flex:1;min-width:0;background:var(--input);border:1px solid var(
 .btn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .btn-save{background:var(--gold);color:#0D0B11}
 .btn-save:disabled{opacity:.4;cursor:not-allowed}
+.btn-save.pending{animation:pulseSave 1.8s ease-in-out infinite;box-shadow:0 0 0 0 rgba(201,169,110,.7)}
+@keyframes pulseSave{0%{box-shadow:0 0 0 0 rgba(201,169,110,.65)}70%{box-shadow:0 0 0 9px rgba(201,169,110,0)}100%{box-shadow:0 0 0 0 rgba(201,169,110,0)}}
+@media (prefers-reduced-motion:reduce){.btn-save.pending{animation:none;outline:2px solid var(--gold);outline-offset:2px}}
 .btn-ghost{background:none;border:1px solid var(--border);color:var(--sub)}
 
 /* ── MODE BAR ── */
@@ -323,7 +326,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
     <div id="savesummary"></div>
     <div id="savelog"></div>
     <div class="row2" id="saveactions">
-      <button class="btn btn-ghost" onclick="closeSheets()">Cancel</button>
+      <button class="btn btn-ghost" onclick="closeSheets()">Not yet</button>
       <button class="btn btn-save" id="gobtn" onclick="doSave()">Publish now</button>
     </div>
   </div>
@@ -836,7 +839,7 @@ function commitText(){
   setOwnText(el,val);
   patch({id:sel.id,text:val});
   addChange({id:sel.id,kind:'text',label:sel.tag.toUpperCase(),before:sel.text,after:val});
-  closeSheets(); toast('Text updated');
+  closeSheets(); toast('Staged — tap Publish to go live');
 }
 
 function commitLink(){
@@ -844,7 +847,7 @@ function commitLink(){
   const t=$('l-text').value, h=$('l-href').value.trim();
   if(t!==sel.text){ setOwnText(el,t); patch({id:sel.id,text:t}); addChange({id:sel.id,kind:'text',label:'LINK TEXT',before:sel.text,after:t}); }
   if(h!==sel.href){ el.setAttribute('href',h); patch({id:sel.id,href:h}); addChange({id:sel.id,kind:'href',label:'LINK URL',before:sel.href,after:h}); }
-  closeSheets(); toast('Link updated');
+  closeSheets(); toast('Staged — tap Publish to go live');
 }
 
 // ══ PHOTO EDITOR ══════════════════════════════════════════════════════════
@@ -1068,7 +1071,7 @@ function commitPhoto(){
       label: overwrite?'PHOTO OVERWRITTEN':(pendingUpload?'PHOTO REPLACED':'PHOTO EDITED'),
       before:sel.src, after:newPath, upload:{path:newPath,dataUrl,overwrite}});
   }
-  pendingUpload=null; closeSheets(); toast('Photo updated');
+  pendingUpload=null; closeSheets(); toast('Staged — tap Publish to go live');
 }
 
 function pickVideo(ev){
@@ -1093,11 +1096,17 @@ function commitVideo(){
   if(!overwrite) setMediaSrc(el,newPath);
   addChange({id:sel.id,kind:'video',label: overwrite?'VIDEO OVERWRITTEN':'VIDEO REPLACED',
     before:sel.src, after:newPath, upload:{path:newPath,dataUrl:pendingVideo.dataUrl,overwrite}});
-  pendingVideo=null; closeSheets(); toast('Video updated');
+  pendingVideo=null; closeSheets(); toast('Staged — tap Publish to go live');
 }
 
 // ══ CHANGES ══
-function renderCount(){ $('chgcount').textContent = changes.length? changes.length+' change'+(changes.length>1?'s':'')+' ›' : ''; }
+function renderCount(){
+  const n=changes.length;
+  $('chgcount').textContent = n ? n+' change'+(n>1?'s':'')+' — review ›' : '';
+  const b=$('savebtn');
+  b.textContent = n ? 'Publish '+n : 'Save';
+  b.classList.toggle('pending', n>0);
+}
 function openChanges(){ if(!changes.length){ toast('No changes yet'); return; } renderChanges(); openSheet('sh-chg'); }
 function renderChanges(){
   $('chglist').innerHTML = changes.length? changes.map((c,i)=>`
@@ -1205,6 +1214,7 @@ async function doSave(){
       slog('Page markup unchanged — only the media files were written.','info');
     }
     slog('✓ Published — live in about a minute','ok');
+    slog('If the page looks unchanged, hard-refresh it (⌘⇧R / pull down on mobile) — the old version is cached.','info');
     changes=[]; renderCount(); $('savebtn').disabled=true;
     stampIds(masterDoc);
     btn.textContent='Done'; setTimeout(()=>{ closeSheets(); btn.disabled=false; btn.textContent='Publish now'; },1600);
