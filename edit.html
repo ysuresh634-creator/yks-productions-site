@@ -43,9 +43,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .pg-row.on{background:var(--gold-lt);border-color:rgba(201,169,110,.55)}
 .pg-ico{font-size:17px;flex-shrink:0;width:22px;text-align:center}
 .pg-txt{flex:1;min-width:0}
-.pg-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg-name{display:block;font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pg-row.on .pg-name{color:var(--gold)}
-.pg-path{font-size:10px;color:var(--sub);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.pg-path{display:block;font-size:10px;color:var(--sub);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .pg-none{text-align:center;color:var(--sub);font-size:13px;padding:34px 10px}
 .btn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .btn-save{background:var(--gold);color:#0D0B11}
@@ -526,10 +526,11 @@ function pgGroup(path){
   if(/^talents/.test(path))                                                                  return {k:'tal',   label:'Talents',           icon:'👤'};
   if(/^(films|fashion|weddings|portraits|real-estate|nights|gear|labs)\.html$/.test(path))   return {k:'work',  label:'Work & portfolio',  icon:'🎞'};
   if(/^(cs-|ruk-choose|marriott|review)/.test(path))                                         return {k:'case',  label:'Case studies',      icon:'⭐'};
+  if(/^blog\//.test(path))                                                                    return {k:'blog',  label:'Blog posts',        icon:'✍️'};
   if(/(preview|^studio|^edit)/.test(path))                                                   return {k:'tool',  label:'Tools & previews',  icon:'🛠'};
   return {k:'seo', label:'Location & service pages', icon:'📍'};
 }
-const PG_ORDER=['main','work','tal','case','seo','tool'];
+const PG_ORDER=['main','work','tal','case','blog','seo','tool'];
 
 function setPageLabel(path){
   $('pagebtn-name').textContent = path ? pgName(path) : 'Choose a page';
