@@ -15,6 +15,7 @@
   'use strict';
   var WEB3FORMS_KEY = 'fbf5d037-af64-46a1-8ddc-5777379ec179';
   var WA_NUMBER = '919746679720';
+  var ENGINE_URL = '';   // ← paste the YKS Talents Engine URL (…workers.dev) here to feed the roster pipeline, then push
   var DRAFT_KEY = 'yks_talent_draft2';   // bumped — abandons any stale demo draft so the preview starts on "YOUR NAME"
 
   var $ = function (s, c) { return (c || document).querySelector(s); };
@@ -1405,6 +1406,24 @@
           (waVideos.length ? '(' + waVideos.length + ' clip(s) — applicant will send on WhatsApp)' : '(none)'),
         video_links: vidLinks.length ? vidLinks.join('\n') : '(none)'
       };
+      // also feed the structured submission to the YKS Talents Engine (roster pipeline) — non-blocking; never breaks the apply flow
+      if (ENGINE_URL && up.photos && up.photos.filter(Boolean).length) {
+        try {
+          var g = function (n) { return (form[n] && form[n].value) || ''; };
+          var ephotos = photos.map(function (p, i) { return { url: (up.photos && up.photos[i]) || '', cat: p.cat || '' }; }).filter(function (x) { return x.url; });
+          var submission = {
+            name: g('name'), contact: g('contact'), category: g('category'), based_in: g('region'), city: g('city'),
+            socials: g('socials'), about: g('about'), tagline: g('tagline'), work_preferences: g('preferences'),
+            stat_height: g('stat_height'), stat_bust: g('stat_bust'), stat_waist: g('stat_waist'), stat_hips: g('stat_hips'),
+            stat_shoe: g('stat_shoe'), stat_hair: g('stat_hair'), stat_eyes: g('stat_eyes'), stat_skin: g('stat_skin'),
+            dob: g('dob'), gender: g('gender'), marital: g('marital'), education: g('education'), languages: g('languages'),
+            occupation: g('occupation'), availability: g('availability'), travel: g('travel'), comfort: g('comfort'), extra: g('extra'),
+            age_group: g('age_group'), guardian_name: g('guardian_name'), guardian_contact: g('guardian_contact'),
+            photos: ephotos, cover_url: (ephotos[0] && ephotos[0].url) || '', videos: (up.videos || []), video_links: vidLinks
+          };
+          fetch(ENGINE_URL.replace(/\/+$/, '') + '/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(submission) }).catch(function () {});
+        } catch (e) {}
+      }
       return fetch('https://api.web3forms.com/submit', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload)
