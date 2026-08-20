@@ -31,7 +31,22 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 /* ── TOP BAR ── */
 .top{background:var(--card);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:calc(8px + env(safe-area-inset-top))}
 .brand{font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--gold);white-space:nowrap}
-select.page-sel{flex:1;min-width:0;background:var(--input);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;-webkit-appearance:none}
+.page-btn{flex:1;min-width:0;background:var(--input);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:13px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.page-btn:active{border-color:var(--gold)}
+#pagebtn-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pagebtn-path{font-size:9px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px}
+.sheet.tall{max-height:88vh}
+.pg-group{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--sub);text-transform:uppercase;margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.pg-group:first-child{margin-top:0}
+.pg-row{width:100%;display:flex;align-items:center;gap:11px;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;margin-bottom:6px;cursor:pointer;text-align:left}
+.pg-row:active{border-color:var(--gold)}
+.pg-row.on{background:var(--gold-lt);border-color:rgba(201,169,110,.55)}
+.pg-ico{font-size:17px;flex-shrink:0;width:22px;text-align:center}
+.pg-txt{flex:1;min-width:0}
+.pg-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg-row.on .pg-name{color:var(--gold)}
+.pg-path{font-size:10px;color:var(--sub);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.pg-none{text-align:center;color:var(--sub);font-size:13px;padding:34px 10px}
 .btn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .btn-save{background:var(--gold);color:#0D0B11}
 .btn-save:disabled{opacity:.4;cursor:not-allowed}
@@ -144,7 +159,10 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 <!-- TOP -->
 <div class="top">
   <span class="brand">EDITOR</span>
-  <select class="page-sel" id="pagesel" onchange="loadPage(this.value)"><option value="">Loading pages…</option></select>
+  <button class="page-btn" id="pagebtn" onclick="openPages()">
+    <span id="pagebtn-name">Choose a page</span>
+    <span id="pagebtn-path"></span>
+  </button>
   <button class="btn btn-save" id="savebtn" onclick="openSave()" disabled>Save</button>
 </div>
 
@@ -269,6 +287,19 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
       <button class="btn btn-save" id="pe-apply" onclick="commitPhoto()">Apply</button>
     </div>
   </div>
+</div>
+
+<!-- PAGE PICKER -->
+<div class="sheet tall" id="sh-pages">
+  <div class="sh-hd">
+    <span class="sh-title">📄 YOUR PAGES</span>
+    <button class="sh-x" onclick="closeSheets()">×</button>
+  </div>
+  <div style="padding:10px 16px 6px;flex-shrink:0">
+    <input class="inp" id="pg-search" placeholder="Search — try dubai, wedding, fashion…" oninput="renderPages(this.value)" autocomplete="off">
+    <p class="hint" style="margin-top:8px">Or just tap links in the page itself to move around your site.</p>
+  </div>
+  <div class="sh-body" style="padding-top:4px"><div id="pg-list"></div></div>
 </div>
 
 <!-- VIDEO SHEET -->
@@ -448,19 +479,19 @@ async function boot(){
     const pri=['index.html','talents.html','faq.html','films.html','fashion.html'];
     pages.sort((a,b)=>{const ia=pri.indexOf(a),ib=pri.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
     sitePages=pages;
-    $('pagesel').innerHTML='<option value="">Choose a page…</option>'+pages.map(p=>`<option value="${esc(p)}">${esc(p.replace(/\.html$/,''))}</option>`).join('');
+    setPageLabel(curPath||'');
   }catch(e){ $('stagemsg').textContent='Could not list pages — '+e.message; }
 }
 
 // ══ LOAD A PAGE ══
 async function loadPage(path){
   if(!path) return;
-  if(changes.length && !confirm(`You have ${changes.length} unsaved change(s). Discard them?`)) { $('pagesel').value=curPath; return; }
+  if(changes.length && !confirm(`You have ${changes.length} unsaved change(s). Discard them?`)) return;
   changes=[]; renderCount(); $('savebtn').disabled=true;
   $('stagemsg').textContent='Loading '+path+'…'; $('stagemsg').style.display='';
   try{
     const f=await gh(`contents/${path.split('/').map(encodeURIComponent).join('/')}?ref=${GH_BRANCH}`);
-    origSource=b64dec(f.content); curSha=f.sha; curPath=path;
+    origSource=b64dec(f.content); curSha=f.sha; curPath=path; setPageLabel(path);
     masterDoc=new DOMParser().parseFromString(origSource,'text/html');
     stampIds(masterDoc);
     renderFrame();
@@ -469,6 +500,69 @@ async function loadPage(path){
 }
 
 function stampIds(doc){ uid=0; doc.querySelectorAll('*').forEach(el=>el.setAttribute('data-yks-id',String(++uid))); }
+
+// ══ PAGE PICKER ═══════════════════════════════════════════════════════════
+// 65 filenames in a dropdown is unusable, especially on a phone. Group them,
+// give them readable names, and make them searchable.
+const PG_NAMES={
+  'index.html':'Home', 'what-i-do.html':'What I Do', 'faq.html':'FAQ',
+  'contact-sheet.html':'Contact Sheet', 'quote.html':'Get a Quote',
+  'talents.html':'Talents', 'talents/apply.html':'Talents · Apply',
+  'studio.html':'Studio (invoices)', 'edit.html':'This editor',
+  'yks-productions-onepage.html':'One-pager', 'real-estate.html':'Real Estate',
+  'cs-couple.html':'Case study · Couple', 'cs-rukmini.html':'Case study · Rukmini',
+  'cs-wedding.html':'Case study · Wedding', 'ruk-choose.html':'Rukmini · Selects',
+  'marriott.html':'Marriott', 'review.html':'Client Review',
+};
+function pgName(path){
+  if(PG_NAMES[path]) return PG_NAMES[path];
+  let n=path.replace(/\.html$/,'').replace(/^talents\//,'Talents · ');
+  n=n.replace(/-/g,' ').replace(/\//g,' · ');
+  return n.replace(/\b\w/g,c=>c.toUpperCase())
+          .replace(/\bUae\b/,'UAE').replace(/\bCs\b/,'Case study');
+}
+function pgGroup(path){
+  if(/^(index|what-i-do|faq|contact-sheet|quote|yks-productions-onepage)\.html$/.test(path)) return {k:'main',  label:'Main pages',        icon:'🏠'};
+  if(/^talents/.test(path))                                                                  return {k:'tal',   label:'Talents',           icon:'👤'};
+  if(/^(films|fashion|weddings|portraits|real-estate|nights|gear|labs)\.html$/.test(path))   return {k:'work',  label:'Work & portfolio',  icon:'🎞'};
+  if(/^(cs-|ruk-choose|marriott|review)/.test(path))                                         return {k:'case',  label:'Case studies',      icon:'⭐'};
+  if(/(preview|^studio|^edit)/.test(path))                                                   return {k:'tool',  label:'Tools & previews',  icon:'🛠'};
+  return {k:'seo', label:'Location & service pages', icon:'📍'};
+}
+const PG_ORDER=['main','work','tal','case','seo','tool'];
+
+function setPageLabel(path){
+  $('pagebtn-name').textContent = path ? pgName(path) : 'Choose a page';
+  $('pagebtn-path').textContent = path || '';
+}
+
+function openPages(){
+  if(!sitePages.length){ toast('Pages are still loading'); return; }
+  $('pg-search').value=''; renderPages(''); openSheet('sh-pages');
+  setTimeout(()=>{ if(window.innerWidth>700) $('pg-search').focus(); },260);
+}
+
+function renderPages(q){
+  q=(q||'').trim().toLowerCase();
+  const matches=sitePages.filter(p=> !q || p.toLowerCase().includes(q) || pgName(p).toLowerCase().includes(q));
+  if(!matches.length){ $('pg-list').innerHTML='<div class="pg-none">Nothing matches “'+esc(q)+'”.</div>'; return; }
+  const buckets={};
+  matches.forEach(p=>{ const g=pgGroup(p); (buckets[g.k]=buckets[g.k]||{g,items:[]}).items.push(p); });
+  $('pg-list').innerHTML = PG_ORDER.filter(k=>buckets[k]).map(k=>{
+    const b=buckets[k];
+    return `<div class="pg-group">${esc(b.g.label)} · ${b.items.length}</div>` + b.items.map(p=>
+      `<button class="pg-row${p===curPath?' on':''}" onclick="pickPage('${esc(p)}')">
+         <span class="pg-ico">${b.g.icon}</span>
+         <span class="pg-txt"><span class="pg-name">${esc(pgName(p))}</span><span class="pg-path">${esc(p)}</span></span>
+       </button>`).join('');
+  }).join('');
+}
+
+function pickPage(p){
+  closeSheets();
+  if(p===curPath){ toast('Already on this page'); return; }
+  loadPage(p);
+}
 
 // Tapping a link in the preview should open that page in the EDITOR, not
 // navigate the iframe (which would leave us editing a document we no longer
@@ -495,7 +589,6 @@ function goToLink(href){
   const hit=tries.find(c=>sitePages.includes(c));
   if(hit){
     if(hit===curPath){ toast('Already on this page'); return; }
-    $('pagesel').value=hit;
     loadPage(hit);
   } else {
     toast('No editable page at /'+p);
