@@ -647,7 +647,10 @@ function renderFrame(){
 const FRAME_JS=`
 (function(){
   var mode='text';
-  var TEXT='h1,h2,h3,h4,h5,h6,p,span,li,a,button,td,th,figcaption,blockquote,label,strong,em,small,div';
+  // An allowlist of tags silently misses things — <b>, <i>, <time>, <dd> and
+  // friends were never editable. Target anything holding its own text instead,
+  // and just exclude containers whose text is not page copy.
+  var TEXT_SKIP='script,style,noscript,template,select,option,head,title,svg,iframe,canvas,audio,video';
   function hasOwnText(el){
     for(var i=0;i<el.childNodes.length;i++){
       var n=el.childNodes[i];
@@ -656,7 +659,7 @@ const FRAME_JS=`
     return false;
   }
   function onScreen(el){
-    if(el.closest('script,style,head,noscript,select,template')) return false;
+    if(el.closest(TEXT_SKIP) && el.tagName!=='VIDEO') return false;
     var r=el.getBoundingClientRect();
     if(r.width<4||r.height<4) return false;
     var cs=getComputedStyle(el);
@@ -664,7 +667,9 @@ const FRAME_JS=`
   }
   function targets(){
     var list;
-    if(mode==='text')       list=[].slice.call(document.querySelectorAll(TEXT)).filter(hasOwnText);
+    if(mode==='text')       list=[].slice.call(document.querySelectorAll('body *')).filter(function(el){
+      return hasOwnText(el) && !el.closest(TEXT_SKIP);
+    });
     else if(mode==='photo') list=[].slice.call(document.querySelectorAll('img,video'));
     else if(mode==='link')  list=[].slice.call(document.querySelectorAll('a[href]'));
     else return [];
