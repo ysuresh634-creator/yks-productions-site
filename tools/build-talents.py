@@ -14,8 +14,12 @@ Guard rails enforced here rather than trusted to memory:
     schema, URL, alt text or body copy. Names live in talents/names.json
     (robots-blocked) and are painted in by JS for human visitors only.
     The build ABORTS if a name leaks into the markup.
-  · Profile pages are noindex. The roster is ours to show, not Google's
-    to list.
+  · Profile pages are noindex AND their URLs are unguessable. A sequential
+    slug (m01, m02...) let anyone sent one shortlist link type the next
+    number and walk the whole roster — and these pages carry a photograph,
+    a city and full measurements. noindex does not stop a human. The pid is
+    random, minted once, and persisted so links stay stable.
+  · The roster is ours to show, not Google's to list.
   · Every talent must be marked over18. The build ABORTS otherwise —
     casting a minor in India needs prior District Magistrate permission
     under CLPRA and that is not a thing to do by accident.
@@ -51,7 +55,7 @@ for pat, why in [
 for t in roster:
     if not t.get('over18'):
         errs.append(f'"{t.get("name", "?")}" is not marked over18:true — the roster is 18+ only')
-    for k in ('slug', 'code', 'name', 'cat', 'region', 'city', 'dir', 'cover'):
+    for k in ('slug', 'code', 'pid', 'name', 'cat', 'region', 'city', 'dir', 'cover'):
         if not t.get(k):
             errs.append(f'"{t.get("name", "?")}" is missing required field: {k}')
     d = P('assets', 'talents', t.get('dir', ''))
@@ -112,7 +116,7 @@ def profile(t, plate):
 </script>
 <title>Roster profile {code} — {cat} · {e(where)} | YKS Talents</title>
 <meta name="description" content="{e(desc)}" />
-<link rel="canonical" href="{BASE}/talents/id/{t['code']}.html" />
+<link rel="canonical" href="{BASE}/talents/id/{t['pid']}.html" />
 <meta name="robots" content="noindex, nofollow, noimageindex, noarchive" />
 <meta name="geo.region" content="{e(t.get('geoRegion', t.get('countryCode', 'IN')))}" />
 <meta name="geo.placename" content="{e(where)}" />
@@ -120,7 +124,7 @@ def profile(t, plate):
 <meta property="og:site_name" content="YKS Productions" />
 <meta property="og:title" content="{cat} · {e(where)} — YKS Talents" />
 <meta property="og:description" content="{e(ogdesc)}" />
-<meta property="og:url" content="{BASE}/talents/id/{t['code']}.html" />
+<meta property="og:url" content="{BASE}/talents/id/{t['pid']}.html" />
 <meta property="og:image" content="{BASE}{img(t, t['cover'])}" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -244,7 +248,7 @@ def card(t):
     stats = '|'.join(f'{k}:{v}' for k, v in (t.get('specs') or {}).items())
     gal = '|'.join(img(t, g['file']) for g in t.get('gallery', []))
     tags = ' · '.join(t.get('tags', []))
-    href = f'/talents/id/{t["code"]}.html'
+    href = f'/talents/id/{t["pid"]}.html'
     return (
         f'      <article class="tal" data-cat="{t["cat"]}" data-region="{t["region"]}" '
         f'data-code="{t["code"]}" data-city="{e(t["city"])}, {e(t["country"])}"\n'
@@ -267,9 +271,9 @@ def card(t):
 os.makedirs(P('talents', 'id'), exist_ok=True)
 written = []
 for i, t in enumerate(sorted(roster, key=lambda x: x.get('plate', 99)), start=1):
-    io.open(P('talents', 'id', t['code'] + '.html'), 'w',
+    io.open(P('talents', 'id', t['pid'] + '.html'), 'w',
             encoding='utf-8').write(profile(t, t.get('plate', i)))
-    written.append(t['code'])
+    written.append(t['pid'])
 
 # ── names.json — the only place a name is published, and robots blocks it ──
 # Human visitors' browsers fetch it and paint the names in; crawlers obey the

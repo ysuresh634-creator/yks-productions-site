@@ -135,7 +135,7 @@ def roster_strip(c):
     if not here:
         return ''
     cards = '\n'.join(
-        f'''        <a class="tal-mini" href="/talents/id/{t["code"]}.html" rel="nofollow">
+        f'''        <a class="tal-mini" href="/talents/id/{t["pid"]}.html" rel="nofollow">
           <img src="/assets/talents/{t["dir"]}/{t["cover"]}" alt="{CAT_LABEL.get(t["cat"], "Talent")} · {e(t["city"])} — YKS Talents roster" loading="lazy" />
           <span><b data-tname="{t["code"]}" data-nosnippet>{CAT_LABEL.get(t["cat"], "Talent")} {t["code"].upper()}</b>
           <small>{e(" · ".join(t.get("tags", [])[:3]))}</small></span>
