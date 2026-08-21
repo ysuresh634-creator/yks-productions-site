@@ -32,35 +32,15 @@
   // a premium abstract editorial frame — the demo cover until the talent adds their own photos
   var SAMPLE_COVER = '/assets/studio-cover.svg';
   // each template is a whole design kit — its own font, theme, accent & photo look (all still overridable)
+  // Six sharp choices — each is a genuinely different BOOK, all in the YKS house style.
+  // (Legacy keys from older drafts still resolve via the HOUSE map in buildPortfolio.)
   var TEMPLATES = [
-    { k: 'editorial', label: 'Editorial', note: 'Framed hero + profile',     kit: { font: 'playfair', theme: 'noir',      accent: '#d47a3a', look: 'none' } },
-    { k: 'lookbook',  label: 'Lookbook',  note: 'Full-bleed, photo-first',   kit: { font: 'oswald',   theme: 'noir',      accent: '#d47a3a', look: 'film' } },
-    { k: 'compcard',  label: 'Comp Card', note: 'Agency standard · 2 pages', kit: { font: 'oswald',   theme: 'charcoal',  accent: '#c0392b', look: 'none' } },
-    { k: 'minimal',   label: 'Minimal',   note: 'Airy, one shot a page',     kit: { font: 'sans',     theme: 'ivory',     accent: '#b0552b', look: 'none' } },
-    { k: 'grid',      label: 'Grid',      note: 'Contact sheet · shows range', kit: { font: 'sans',    theme: 'slate',     accent: '#3b6fd4', look: 'none' } },
-    { k: 'feature',   label: 'Feature',   note: 'Magazine spread',           kit: { font: 'playfair', theme: 'noir',      accent: '#d47a3a', look: 'warm' } },
-    { k: 'swiss',     label: 'Swiss',     note: 'Grid & bold type',          kit: { font: 'sans',     theme: 'porcelain', accent: '#c0392b', look: 'none' } },
-    { k: 'luxe',      label: 'Luxe',      note: 'Type-led, elegant',         kit: { font: 'playfair', theme: 'noir',      accent: '#c9a24b', look: 'warm' } },
-    { k: 'classic',   label: 'Classic',   note: 'Neo-classical, refined',    kit: { font: 'serif',    theme: 'ivory',     accent: '#b0552b', look: 'none' } },
-    { k: 'ethereal',  label: 'Ethereal',  note: 'Soft, airy, light',         kit: { font: 'serif',    theme: 'blush',     accent: '#d16a8a', look: 'fade' } },
-    { k: 'wabi',      label: 'Wabi-Sabi', note: 'Quiet, natural, muted',     kit: { font: 'serif',    theme: 'sand',      accent: '#7a8b3a', look: 'fade' } },
-    { k: 'bento',     label: 'Bento',     note: 'Modular grid',              kit: { font: 'sans',     theme: 'charcoal',  accent: '#2a9d8f', look: 'none' } },
-    // more styles — each reuses a layout with its own kit, so it's a distinct look
-    { k: 'maximal',   label: 'Maximal',   note: 'Bold & dense',       layout: 'grid',     kit: { font: 'oswald',   theme: 'noir',      accent: '#d16a8a', look: 'none' } },
-    { k: 'brutalist', label: 'Brutalist', note: 'Raw, stark, mono',   layout: 'swiss',    kit: { font: 'mono',     theme: 'porcelain', accent: '#c0392b', look: 'bw' } },
-    { k: 'bohemian',  label: 'Bohemian',  note: 'Warm & earthy',      layout: 'feature',  kit: { font: 'serif',    theme: 'sand',      accent: '#b0552b', look: 'warm' } },
-    { k: 'victorian', label: 'Victorian', note: 'Ornate, vintage',    layout: 'classic',  kit: { font: 'serif',    theme: 'ivory',     accent: '#7d4b7d', look: 'none' } },
-    { k: 'gothic',    label: 'Gothic',    note: 'Dark & dramatic',    layout: 'luxe',     kit: { font: 'playfair', theme: 'noir',      accent: '#8a7fd6', look: 'cool' } },
-    { k: 'noir',      label: 'Noir',      note: 'B&W, cinematic',     layout: 'lookbook', kit: { font: 'oswald',   theme: 'noir',      accent: '#e2ddd3', look: 'bw' } },
-    { k: 'mono',      label: 'Mono',      note: 'Monospace, clean',   layout: 'minimal',  kit: { font: 'mono',     theme: 'porcelain', accent: '#3b6fd4', look: 'none' } },
-    { k: 'sepia',     label: 'Sepia',     note: 'Warm vintage film',  layout: 'classic',  kit: { font: 'serif',    theme: 'sand',      accent: '#b0552b', look: 'film' } },
-    { k: 'duo',       label: 'Duo',       note: 'Diptych · paired shots',                     kit: { font: 'playfair', theme: 'noir',      accent: '#d47a3a', look: 'none' } },
-    { k: 'beauty',    label: 'Beauty',    note: 'Soft & close',       layout: 'feature',  kit: { font: 'serif',    theme: 'porcelain', accent: '#d16a8a', look: 'warm' } },
-    { k: 'bridal',    label: 'Bridal',    note: 'Cream & gold',       layout: 'classic',  kit: { font: 'serif',    theme: 'ivory',     accent: '#c9a24b', look: 'fade' } },
-    { k: 'fitness',   label: 'Fitness',   note: 'Bold & dynamic',     layout: 'lookbook', kit: { font: 'oswald',   theme: 'charcoal',  accent: '#3b6fd4', look: 'none' } },
-    { k: 'street',    label: 'Street',    note: 'Candid, documentary', layout: 'grid',    kit: { font: 'mono',     theme: 'slate',     accent: '#b8912e', look: 'film' } },
-    { k: 'runway',    label: 'Runway',    note: 'Sequential, editorial', layout: 'feature', kit: { font: 'oswald',  theme: 'noir',      accent: '#d47a3a', look: 'none' } },
-    { k: 'commercial',label: 'Commercial',note: 'Clean & bright',     layout: 'compcard', kit: { font: 'sans',     theme: 'porcelain', accent: '#3b6fd4', look: 'none' } }
+    { k: 'editorial', label: 'Editorial',     note: 'The book — cover, profile, plates & spreads', kit: { font: 'playfair', theme: 'noir', accent: '#d47a3a', look: 'none' } },
+    { k: 'lookbook',  label: 'Lookbook',      note: 'Full-bleed, photo-first',                     kit: { font: 'oswald',   theme: 'noir', accent: '#d47a3a', look: 'film' } },
+    { k: 'compcard',  label: 'Comp Card',     note: 'Agency standard · 2 pages',                   kit: { font: 'oswald',   theme: 'noir', accent: '#c0392b', look: 'none' } },
+    { k: 'minimal',   label: 'Minimal',       note: 'Airy — one shot a page',                      kit: { font: 'sans',     theme: 'noir', accent: '#b0552b', look: 'none' } },
+    { k: 'grid',      label: 'Contact Sheet', note: 'Your range at a glance',                      kit: { font: 'sans',     theme: 'noir', accent: '#3b6fd4', look: 'none' } },
+    { k: 'duo',       label: 'Diptych',       note: 'Paired full-bleed frames',                    kit: { font: 'playfair', theme: 'noir', accent: '#c9a24b', look: 'none' } }
   ];
   /* photo "look": a single grade applied to EVERY image so the book feels
      shot as one story — the thing that separates a pro portfolio from a phone roll */
@@ -1052,7 +1032,9 @@
   var preview = $('#apPreview');
   function updatePreview() {
     if (!preview) return;
-    var th = THEMES[CFG.theme], ff = FONTS[CFG.font].css, ac = CFG.accent, tpl = CFG.layout;
+    // the preview must match the PDF: every book is the YKS house style (night cover, gold rule), so show that —
+    // not a theme colour the generator ignores. The accent still drives the chips + booking page.
+    var th = { bg: '#0c0a10', text: '#f4f0e8', sub: '#c4beb4' }, ff = "'Inter',system-ui,sans-serif", ac = '#b8912e', tpl = CFG.layout;
     var nm = esc((form.name.value || 'Your name').trim().toUpperCase());
     var cat = (form.category.value || 'Model').trim();
     var disc = esc((DISC[cat] || 'Fashion · Editorial · Commercial').toUpperCase());
@@ -1471,7 +1453,8 @@
     function hPaperFoot() { hhair(M, H - 56, W - M, INK, 1.1); htk('+91 97466 79720', M, H - 40, 7.5, INKSUB, { ls: 1.1 }); htk('YKSPRODUCTIONS893@GMAIL.COM', W - M, H - 40, 7.5, INKSUB, { align: 'right', ls: 1.1 }); }
     function hPlateFoot(cap) { hhair(M, H - 44, W - M, GOLD, 0.8); htk(cap, M, H - 28, 8, GOLD, { bold: true, ls: 1.5 }); htk(NM + '  /  ' + ('0' + hsPg).slice(-2), W - M, H - 28, 8, GOLD, { align: 'right', ls: 1.5 }); }
     function hFit(str, f, wt, start, min, maxW) { var s = start; doc.setFont(f, wt); while (s > min) { doc.setFontSize(s); if (doc.getTextWidth(String(str).toUpperCase()) <= maxW) break; s -= 1; } return s; }
-    function hBio() { if (about) return about; var role = (cat === 'Actor' ? 'actor' : (/Influencer|Creator/i.test(cat) ? 'model and digital creator' : 'professional model')); var where = city ? ' based in ' + city : ''; return name + ' is a ' + role + where + ', working across ' + disc.toLowerCase() + '. Equally at home on a controlled studio call and looser, content-led shoots — a range that suits a lookbook, a runway line-up or a campaign built to live on a phone. Quick to take direction, precise on the marks, and comfortable holding a look for as long as the frame needs.'; }
+    // the talent's own voice — this is THEIR portfolio, so it reads first person, never YKS describing them
+    function hBio() { if (about) return about; var role = (cat === 'Actor' ? 'actor' : (/Influencer|Creator/i.test(cat) ? 'model and digital creator' : 'model')); var where = city ? ' based in ' + city : ''; return "I'm a " + role + where + ', working across ' + disc.toLowerCase() + ". I'm equally at home on a controlled studio call and on looser, content-led shoots — so I'm as castable for a lookbook as for a campaign built to live on a phone. I take direction quickly, I'm precise on the marks, and I can hold a look for as long as the frame needs."; }
     function hsCover(hero) { hbg(NIGHT); var bandH = 166; hnbleed(hero, 0, 0, W, H - bandH); shade(0, 150, 0.2); hhair(M, H - bandH, W - M, GOLD, 0.9); hlogoBox(M, 44, 118, LIGHT); var by = H - bandH; htk(disc, M, by + 40, 8.5, GOLD, { bold: true, ls: 2 }); var parts = NM.split(' '), l1 = parts[0], l2 = parts.slice(1).join(' '); if (!l2) l1 = NM; var ns = hFit(l2 || l1, HF, 'bold', 40, 22, W * 0.55); doc.setFont(HF, 'bold'); doc.setFontSize(ns); ct(LIGHT); if (l2) { doc.text(l1, M, by + 82); doc.text(l2, M, by + 82 + ns * 0.9); } else doc.text(l1, M, by + 104); htk('TALENT PORTFOLIO', W - M, by + 62, 8.5, MUTE, { align: 'right', ls: 2 }); htk('EDITION 2026 / 01', W - M, by + 80, 8.5, MUTE, { align: 'right', ls: 2 }); htk('EXCLUSIVE · YKS', W - M, by + 98, 8.5, GOLD, { align: 'right', ls: 2 }); return l1; }
     function hsProfile(figImg) { hnp(PAPER); hRunHead('YKS PRODUCTIONS — TALENT PORTFOLIO'); htk('PROFILE', M, 116, 9, INKSUB, { bold: true, ls: 2 }); doc.setFont(HF, 'bold'); doc.setFontSize(30); ct(INK); doc.text(NM, M, 150); var LCW = 250; doc.setFont(HF, 'normal'); doc.setFontSize(10.5); ct(INK); var bl = doc.splitTextToSize(hBio(), LCW).slice(0, 11); doc.text(bl, M, 190, { lineHeightFactor: 1.5 }); var ly = 190 + bl.length * 15.6 + 30; htk('CASTABLE FOR', M, ly, 9, INKSUB, { bold: true, ls: 2 }); ly += 24; var cx2 = M, cy2 = ly; doc.setFont(HF, 'normal'); doc.setFontSize(9.5); disc.split(' · ').forEach(function (t) { var tw = doc.getTextWidth(t) + 22; if (cx2 + tw > M + LCW) { cx2 = M; cy2 += 32; } doc.setDrawColor.apply(doc, HFA); doc.setLineWidth(0.9); doc.roundedRect(cx2, cy2 - 14, tw, 24, 3, 3, 'S'); ct(INK); doc.text(t, cx2 + 11, cy2 + 2); cx2 += tw + 8; }); var RW = 200, rx = W - M - RW, fy = 130, fig = figImg || imgs[1] || imgs[0]; if (fig) { place(fig, rx, fy, RW); var fby = fy + RW / 0.8; htk('FIG. 01 — ' + ((fig.cat || 'FULL LENGTH')), rx, fby + 22, 8, GOLD, { bold: true, ls: 1.5 }); hhair(rx, fby + 32, W - M, GOLD, 0.8); } var my = fy + RW / 0.8 + 70; htk('MEASUREMENTS', rx, my, 9, INKSUB, { bold: true, ls: 2 }); my += 6; STATS.slice(0, 9).forEach(function (r) { my += 22; hhair(rx, my - 15, W - M, INK, 0.5); htk(r[0], rx, my, 8, INKSUB, { ls: 1.2 }); doc.setFont(HF, 'bold'); doc.setFontSize(9.5); ct(INK); doc.text(r[1], W - M, my, { align: 'right' }); }); htk('REPRESENTED BY', M, H - 150, 9, INKSUB, { bold: true, ls: 2 }); hlogoBox(M, H - 138, 96, INK); htk('+91 97466 79720', M + 112, H - 116, 9, INK, { bold: true, ls: 0.5, upper: false }); htk('yksproductions893@gmail.com', M + 112, H - 100, 8.5, INKSUB, { ls: 0.5, upper: false }); hPaperFoot(); }
     function hsPlate(im, cap) { hnp(NIGHT); hnbleed(im, 0, 0, W, H); shade(H - 90, 90, 0.34); hPlateFoot(cap); }

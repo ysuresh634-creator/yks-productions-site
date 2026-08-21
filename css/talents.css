@@ -834,3 +834,6 @@ main{overflow-x:clip}
 .ap-cv-minimg{width:70%;aspect-ratio:4/5;flex:0 0 auto;margin:14px auto 10px;position:relative;overflow:hidden;border-radius:2px}
 .ap-cv-minimg img{width:100%;height:100%;object-fit:cover;display:block}
 .ap-cv-min .ap-cv-name{margin-top:6px}
+
+/* studio: control sub-labels */
+.ap-ctl>span em{font-style:normal;display:block;font-size:9px;letter-spacing:.04em;text-transform:none;color:var(--mag-soft);opacity:.8;margin-top:2px}
