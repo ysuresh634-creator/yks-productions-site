@@ -1248,9 +1248,22 @@
       var text = (raw && raw.value || '').trim();
       if (!text) { if (msg) msg.textContent = 'Paste your stats above first.'; return; }
       var o = parseStats(text), map = { height: 'stat_height', bust: 'stat_bust', waist: 'stat_waist', hips: 'stat_hips', shoe: 'stat_shoe', hair: 'stat_hair', eyes: 'stat_eyes', skin: 'stat_skin' }, n = 0;
-      Object.keys(map).forEach(function (k) { if (o[k] && form[map[k]]) { form[map[k]].value = o[k]; n++; } });
+      var filled = [];
+      Object.keys(map).forEach(function (k) { if (o[k] && form[map[k]]) { form[map[k]].value = o[k]; n++; filled.push(form[map[k]]); } });
       updatePreview();
-      if (msg) msg.textContent = n ? 'Sorted ' + n + ' of 8 — check them below and fix anything.' : 'Couldn’t read those — try one per line, e.g. “Waist 26”.';
+      // make the result visible: flash the fields that just changed, so it's obvious something happened
+      filled.forEach(function (el) {
+        var wrap = el.closest ? el.closest('label') : null; if (!wrap) return;
+        wrap.classList.remove('ap-just-filled');
+        void wrap.offsetWidth;                       // restart the animation if it's already running
+        wrap.classList.add('ap-just-filled');
+        setTimeout(function () { wrap.classList.remove('ap-just-filled'); }, 2200);
+      });
+      if (msg) {
+        msg.textContent = n ? '✓ Sorted ' + n + ' of 8 — filled in below, check and fix anything.' : '✕ Couldn’t read those — try one per line, e.g. “Waist 26”.';
+        msg.className = 'ap-statsmsg ' + (n ? 'ok' : 'warn');
+      }
+      if (n) { var gridEl = $('.ap-stats'); if (gridEl && gridEl.scrollIntoView) gridEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     });
   })();
 
