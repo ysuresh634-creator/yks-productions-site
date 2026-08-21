@@ -228,8 +228,15 @@
   var POSTER_MSGS = {
     welcome: { head: 'Welcome to the roster', sub: 'Now represented by YKS' },
     booking: { head: 'Available for bookings', sub: 'Casting through YKS' },
-    newwork: { head: 'New on the YKS Edit', sub: 'Fresh work, out now' }
+    newwork: { head: 'New on the YKS Edit', sub: 'Fresh work, out now' },
+    featured: { head: 'Featured talent', sub: 'Represented by YKS' }
   };
+  // social-media template sub-sections (Canva-style grouping)
+  var POSTER_CATS = [
+    { k: 'editorial', label: 'Editorial', note: 'Magazine-grade, portfolio-first' },
+    { k: 'statement', label: 'Statement', note: 'Big type — announce yourself' },
+    { k: 'social', label: 'Story & Social', note: 'Playful, made to share' }
+  ];
   var POSTER = { tpl: 'edit', photo: 0, msg: 'welcome', fmt: 'feed' };
   var posterImgCache = {};
   function pLoad(src) {
@@ -260,13 +267,36 @@
     while (s > min) { ctx.font = w + ' ' + s + 'px ' + fam; if (ctx.measureText(text).width <= maxW) break; s -= 2; }
     return s;
   }
+  // rounded-rect path (older Android webviews lack ctx.roundRect)
+  function pRR(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  // wrap text to a width at a given font, return the lines
+  function pWrap(ctx, text, fam, w, size, maxW) {
+    ctx.font = w + ' ' + size + 'px ' + fam;
+    var words = String(text).split(/\s+/), lines = [], line = '';
+    words.forEach(function (word) {
+      var test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = word; }
+      else line = test;
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
   // YKS mark used on every template (the branding rule)
   function pBrand(ctx, W, x, y, light) {
     var col = light ? '#f4ede2' : '#0a0810';
     pText(ctx, 'YKS · TALENT EDIT', x, y, { size: 26, ls: 5, color: col, w: '600' });
   }
   var POSTER_TEMPLATES = [
-    { k: 'edit', label: 'Editorial', draw: function (ctx, W, H, img, d) {
+    { k: 'edit', label: 'Editorial', cat: 'editorial', draw: function (ctx, W, H, img, d) {
       ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
       pCover(ctx, img, 0, 0, W, H);
       pGrad(ctx, 0, 0, 0, H * 0.30, [[0, 'rgba(7,6,10,.62)'], [1, 'rgba(7,6,10,0)']]); ctx.fillRect(0, 0, W, H * 0.30);
@@ -281,7 +311,7 @@
       ctx.fillStyle = '#ff8c3b'; ctx.fillRect(64, H - 104, 88, 4);
       pText(ctx, d.foot, 64, H - 58, { size: 22, color: 'rgba(244,237,226,.62)' });
     } },
-    { k: 'masthead', label: 'Cover', draw: function (ctx, W, H, img, d) {
+    { k: 'masthead', label: 'Cover', cat: 'editorial', draw: function (ctx, W, H, img, d) {
       ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
       pCover(ctx, img, 0, 0, W, H);
       pGrad(ctx, 0, 0, 0, H * 0.34, [[0, 'rgba(7,6,10,.7)'], [1, 'rgba(7,6,10,0)']]); ctx.fillRect(0, 0, W, H * 0.34);
@@ -293,7 +323,7 @@
       pText(ctx, d.head, W / 2, H - 100, { size: 25, ls: 3, color: '#ff8c3b', align: 'center', w: '600', upper: true });
       pText(ctx, d.foot, W / 2, H - 56, { size: 21, color: 'rgba(244,237,226,.65)', align: 'center' });
     } },
-    { k: 'band', label: 'Band', draw: function (ctx, W, H, img, d) {
+    { k: 'band', label: 'Band', cat: 'statement', draw: function (ctx, W, H, img, d) {
       var ph = Math.round(H * 0.68);
       ctx.fillStyle = '#0a0810'; ctx.fillRect(0, 0, W, H);
       pCover(ctx, img, 0, 0, W, ph);
@@ -306,7 +336,7 @@
       pText(ctx, d.disc, 64, ph + 74 + 138, { size: 23, ls: 2, color: '#b9b0a6', upper: true });
       pText(ctx, d.foot, 64, H - 52, { size: 21, color: 'rgba(244,237,226,.6)' });
     } },
-    { k: 'frame', label: 'Frame', draw: function (ctx, W, H, img, d) {
+    { k: 'frame', label: 'Frame', cat: 'editorial', draw: function (ctx, W, H, img, d) {
       ctx.fillStyle = '#0c0a12'; ctx.fillRect(0, 0, W, H);
       var m = 70, iw = W - m * 2, ih = Math.round(iw * 1.15), iy = 150;
       ctx.save(); ctx.beginPath(); ctx.rect(m, iy, iw, ih); ctx.clip(); pCover(ctx, img, m, iy, iw, ih); ctx.restore();
@@ -319,7 +349,7 @@
       pText(ctx, d.disc, W / 2, by + 120, { size: 22, ls: 2, color: '#b9b0a6', align: 'center', upper: true });
       pText(ctx, d.foot, W / 2, H - 54, { size: 21, color: 'rgba(244,237,226,.55)', align: 'center' });
     } },
-    { k: 'bold', label: 'Bold', draw: function (ctx, W, H, img, d) {
+    { k: 'bold', label: 'Bold', cat: 'statement', draw: function (ctx, W, H, img, d) {
       ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
       pCover(ctx, img, 0, 0, W, H);
       ctx.fillStyle = 'rgba(7,6,10,.42)'; ctx.fillRect(0, 0, W, H);
@@ -335,6 +365,129 @@
       if (l2) pText(ctx, l2.toUpperCase(), 60, midY + ns * 0.92, { size: ns, color: '#ff8c3b', w: '700', fam: DISPLAY });
       pText(ctx, d.disc, 64, H - 118, { size: 24, ls: 2, color: '#d8cfc4', upper: true });
       pText(ctx, d.foot, 64, H - 60, { size: 22, color: 'rgba(244,237,226,.62)' });
+    } },
+    /* ── Editorial ── */
+    { k: 'split', label: 'Split', cat: 'editorial', draw: function (ctx, W, H, img, d) {
+      var pw = Math.round(W * 0.60);
+      ctx.fillStyle = '#0a0810'; ctx.fillRect(0, 0, W, H);
+      pCover(ctx, img, 0, 0, pw, H);
+      pGrad(ctx, pw - 60, 0, pw, 0, [[0, 'rgba(10,8,16,0)'], [1, 'rgba(10,8,16,1)']]); ctx.fillRect(pw - 60, 0, 60, H);
+      ctx.fillStyle = '#ff8c3b'; ctx.fillRect(pw, 0, 5, H);
+      var px = pw + 44, pInW = W - px - 44;
+      ctx.save(); ctx.translate(W - 40, H - 60); ctx.rotate(-Math.PI / 2);
+      pText(ctx, 'YKS · TALENT EDIT', 0, 0, { size: 22, ls: 5, color: 'rgba(244,237,226,.6)', w: '600' }); ctx.restore();
+      pText(ctx, d.head, px, 150, { size: 21, ls: 2, color: '#ff8c3b', w: '600', upper: true });
+      var size = 78, lines;
+      do { lines = pWrap(ctx, d.name, DISPLAY, '700', size, pInW); size -= 3; } while (lines.length > 3 && size > 40);
+      var ly = 226;
+      lines.forEach(function (ln) { pText(ctx, ln, px, ly, { size: size, color: '#f4ede2', w: '700', fam: DISPLAY }); ly += size * 0.98; });
+      ctx.fillStyle = '#ff8c3b'; ctx.fillRect(px, ly + 8, 70, 4);
+      var dl = pWrap(ctx, d.disc, MONO, '500', 21, pInW), dy = ly + 62;
+      dl.forEach(function (ln) { pText(ctx, ln, px, dy, { size: 21, ls: 1, color: '#b9b0a6', upper: true }); dy += 30; });
+      pText(ctx, 'yksproductions.com', px, H - 54, { size: 19, color: 'rgba(244,237,226,.55)' });
+    } },
+    { k: 'marquee', label: 'Marquee', cat: 'editorial', draw: function (ctx, W, H, img, d) {
+      var ph = Math.round(H * 0.58);
+      ctx.fillStyle = '#0a0810'; ctx.fillRect(0, 0, W, H);
+      pCover(ctx, img, 0, 0, W, ph);
+      pGrad(ctx, 0, 0, 0, H * 0.20, [[0, 'rgba(10,8,16,.55)'], [1, 'rgba(10,8,16,0)']]); ctx.fillRect(0, 0, W, H * 0.20);
+      pBrand(ctx, W, 64, 84, true);
+      var band = Math.round(H * 0.13), by = ph, fs = Math.round(band * 0.6);
+      ctx.fillStyle = '#ff8c3b'; ctx.fillRect(0, by, W, band);
+      ctx.save(); ctx.beginPath(); ctx.rect(0, by, W, band); ctx.clip();
+      var nm = d.name.toUpperCase() + '   ·   ';
+      ctx.font = '700 ' + fs + 'px ' + DISPLAY;
+      var unit = ctx.measureText(nm).width, tick = '';
+      while (ctx.measureText(tick).width < W + unit) tick += nm;
+      pText(ctx, tick, -Math.round(unit * 0.4), by + band * 0.7, { size: fs, color: '#0a0810', w: '700', fam: DISPLAY });
+      ctx.restore();
+      var fy = by + band;
+      pText(ctx, d.head, W / 2, fy + (H - fy) * 0.42, { size: 24, ls: 3, color: '#ff8c3b', align: 'center', w: '600', upper: true });
+      pText(ctx, d.disc, W / 2, fy + (H - fy) * 0.62, { size: 21, ls: 2, color: '#d8cfc4', align: 'center', upper: true });
+      pText(ctx, d.foot, W / 2, H - 52, { size: 20, color: 'rgba(244,237,226,.6)', align: 'center' });
+    } },
+    /* ── Statement ── */
+    { k: 'spotlight', label: 'Spotlight', cat: 'statement', draw: function (ctx, W, H, img, d) {
+      ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
+      pCover(ctx, img, 0, 0, W, H);
+      var g = ctx.createRadialGradient(W / 2, H * 0.42, H * 0.12, W / 2, H * 0.5, H * 0.72);
+      g.addColorStop(0, 'rgba(7,6,10,0)'); g.addColorStop(0.6, 'rgba(7,6,10,.34)'); g.addColorStop(1, 'rgba(7,6,10,.94)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      pGrad(ctx, 0, H * 0.6, 0, H, [[0, 'rgba(7,6,10,0)'], [1, 'rgba(7,6,10,.92)']]); ctx.fillRect(0, H * 0.6, W, H * 0.4);
+      pText(ctx, 'YKS · TALENT EDIT', W / 2, 88, { size: 24, ls: 6, color: 'rgba(244,237,226,.82)', w: '600', align: 'center' });
+      pText(ctx, d.head, W / 2, H - 206, { size: 25, ls: 4, color: '#ff8c3b', align: 'center', w: '600', upper: true });
+      var ns = pFit(ctx, d.name, DISPLAY, '700', 100, 52, W - 130);
+      pText(ctx, d.name, W / 2, H - 128, { size: ns, color: '#f4ede2', w: '700', fam: DISPLAY, align: 'center' });
+      pText(ctx, d.disc, W / 2, H - 80, { size: 22, ls: 2, color: '#d8cfc4', align: 'center', upper: true });
+      pText(ctx, d.foot, W / 2, H - 46, { size: 20, color: 'rgba(244,237,226,.6)', align: 'center' });
+    } },
+    { k: 'tag', label: 'Tag', cat: 'statement', draw: function (ctx, W, H, img, d) {
+      ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
+      pCover(ctx, img, 0, 0, W, H);
+      pGrad(ctx, 0, H * 0.55, 0, H, [[0, 'rgba(7,6,10,0)'], [1, 'rgba(7,6,10,.7)']]); ctx.fillRect(0, H * 0.55, W, H * 0.45);
+      pText(ctx, 'YKS · TALENT EDIT', 60, 84, { size: 24, ls: 5, color: '#f4ede2', w: '600' });
+      var bx = 56, pad = 30, tw = Math.min(W - 112, 600);
+      var ns = pFit(ctx, d.name, DISPLAY, '700', 62, 34, tw - pad * 2);
+      var bh = 46 + ns + 44, byy = H - 56 - bh;
+      ctx.fillStyle = '#ff8c3b'; pRR(ctx, bx, byy, tw, bh, 14); ctx.fill();
+      pText(ctx, d.head, bx + pad, byy + 40, { size: 18, ls: 2, color: 'rgba(10,8,16,.75)', w: '600', upper: true });
+      pText(ctx, d.name, bx + pad, byy + 40 + ns * 0.82, { size: ns, color: '#0a0810', w: '700', fam: DISPLAY });
+      pText(ctx, d.disc, bx + pad, byy + bh - 18, { size: 17, ls: 1, color: 'rgba(10,8,16,.72)', upper: true });
+    } },
+    /* ── Story & Social ── */
+    { k: 'polaroid', label: 'Polaroid', cat: 'social', draw: function (ctx, W, H, img, d) {
+      ctx.fillStyle = '#0c0a12'; ctx.fillRect(0, 0, W, H);
+      var gl = ctx.createRadialGradient(W / 2, H * 0.44, 40, W / 2, H * 0.44, W * 0.7);
+      gl.addColorStop(0, 'rgba(255,140,59,.14)'); gl.addColorStop(1, 'rgba(12,10,18,0)');
+      ctx.fillStyle = gl; ctx.fillRect(0, 0, W, H);
+      pText(ctx, 'YKS · TALENT EDIT', W / 2, 92, { size: 24, ls: 5, color: 'rgba(244,237,226,.7)', w: '600', align: 'center' });
+      var cw = Math.min(W * 0.74, 780), border = cw * 0.06, capH = cw * 0.2;
+      var inW = cw - border * 2, inH = inW * 1.16, ch = border + inH + capH;
+      ctx.save();
+      ctx.translate(W / 2, H * 0.52); ctx.rotate(-3.2 * Math.PI / 180);
+      ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 20;
+      ctx.fillStyle = '#f4ede2'; pRR(ctx, -cw / 2, -ch / 2, cw, ch, 8); ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.save(); pRR(ctx, -cw / 2 + border, -ch / 2 + border, inW, inH, 3); ctx.clip();
+      pCover(ctx, img, -cw / 2 + border, -ch / 2 + border, inW, inH); ctx.restore();
+      var capY = -ch / 2 + border + inH;
+      var cs = pFit(ctx, d.name, DISPLAY, '700', Math.min(cw * 0.12, 76), 30, inW);
+      pText(ctx, d.name, 0, capY + capH * 0.62, { size: cs, color: '#1a1420', w: '700', fam: DISPLAY, align: 'center' });
+      ctx.restore();
+      pText(ctx, d.head + ' · yksproductions.com', W / 2, H - 70, { size: 20, ls: 1, color: 'rgba(244,237,226,.66)', align: 'center', upper: true });
+    } },
+    { k: 'filmstrip', label: 'Filmstrip', cat: 'social', draw: function (ctx, W, H, img, d) {
+      ctx.fillStyle = '#050409'; ctx.fillRect(0, 0, W, H);
+      var strip = Math.round(H * 0.10);
+      pCover(ctx, img, 0, strip, W, H - strip * 2);
+      ctx.fillStyle = '#0a0810'; ctx.fillRect(0, 0, W, strip); ctx.fillRect(0, H - strip, W, strip);
+      ctx.fillStyle = 'rgba(244,237,226,.9)';
+      var hw = W * 0.045, hh = strip * 0.34, gap = W * 0.028, stepw = hw + gap, n = Math.ceil(W / stepw) + 1;
+      for (var i = 0; i < n; i++) {
+        var hx = i * stepw + gap * 0.5;
+        pRR(ctx, hx, (strip - hh) / 2, hw, hh, 5); ctx.fill();
+        pRR(ctx, hx, H - strip + (strip - hh) / 2, hw, hh, 5); ctx.fill();
+      }
+      pGrad(ctx, 0, strip, 0, strip + H * 0.14, [[0, 'rgba(5,4,9,.72)'], [1, 'rgba(5,4,9,0)']]); ctx.fillRect(0, strip, W, H * 0.14);
+      pText(ctx, 'YKS · TALENT EDIT', 56, strip + 52, { size: 22, ls: 5, color: 'rgba(255,140,59,.95)', w: '600' });
+      var scrimT = H - strip - H * 0.26;
+      pGrad(ctx, 0, scrimT, 0, H - strip, [[0, 'rgba(5,4,9,0)'], [1, 'rgba(5,4,9,.9)']]); ctx.fillRect(0, scrimT, W, H - strip - scrimT);
+      pText(ctx, d.head, 60, H - strip - 94, { size: 23, ls: 3, color: '#ff8c3b', w: '600', upper: true });
+      var ns = pFit(ctx, d.name, DISPLAY, '700', 88, 46, W - 120);
+      pText(ctx, d.name, 60, H - strip - 40, { size: ns, color: '#f4ede2', w: '700', fam: DISPLAY });
+    } },
+    { k: 'duotone', label: 'Duotone', cat: 'social', draw: function (ctx, W, H, img, d) {
+      pGrad(ctx, 0, 0, 0, H, [[0, '#ff8c3b'], [0.55, '#8a3d5a'], [1, '#1a1030']]); ctx.fillRect(0, 0, W, H);
+      ctx.save(); ctx.globalCompositeOperation = 'luminosity';
+      pCover(ctx, img, 0, 0, W, H); ctx.restore();
+      ctx.save(); ctx.globalCompositeOperation = 'multiply';
+      pGrad(ctx, 0, 0, 0, H, [[0, 'rgba(40,20,60,.35)'], [1, 'rgba(20,12,32,.6)']]); ctx.fillRect(0, 0, W, H); ctx.restore();
+      pGrad(ctx, 0, H * 0.55, 0, H, [[0, 'rgba(12,8,20,0)'], [1, 'rgba(12,8,20,.9)']]); ctx.fillRect(0, H * 0.55, W, H * 0.45);
+      pBrand(ctx, W, 64, 84, true);
+      pText(ctx, d.head, 64, H - 178, { size: 24, ls: 3, color: '#ffd9b0', w: '600', upper: true });
+      var ns = pFit(ctx, d.name, DISPLAY, '700', 108, 56, W - 120);
+      pText(ctx, d.name, 60, H - 106, { size: ns, color: '#fff4e8', w: '700', fam: DISPLAY });
+      pText(ctx, d.disc, 64, H - 58, { size: 22, ls: 2, color: 'rgba(255,240,225,.82)', upper: true });
     } }
   ];
   function posterData() {
@@ -385,14 +538,25 @@
     });
   }
   (function initPosters() {
-    var tpls = $('#apPosterTpls'); if (tpls) POSTER_TEMPLATES.forEach(function (t) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-pt'; b.dataset.k = t.k;
-      var cv = document.createElement('canvas'); cv.className = 'ap-pt-cv';
-      var lb = document.createElement('span'); lb.textContent = t.label;
-      b.appendChild(cv); b.appendChild(lb);
-      b.addEventListener('click', function () { POSTER.tpl = t.k; refreshPosters(); });
-      tpls.appendChild(b);
-    });
+    var tpls = $('#apPosterTpls');
+    if (tpls) {
+      tpls.innerHTML = '';
+      POSTER_CATS.forEach(function (cat) {
+        var group = document.createElement('div'); group.className = 'ap-pt-group';
+        var h = document.createElement('p'); h.className = 'ap-pt-cat';
+        h.innerHTML = cat.label + ' <span>' + cat.note + '</span>';
+        var grid = document.createElement('div'); grid.className = 'ap-pt-grid';
+        POSTER_TEMPLATES.filter(function (t) { return t.cat === cat.k; }).forEach(function (t) {
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-pt'; b.dataset.k = t.k;
+          var cv = document.createElement('canvas'); cv.className = 'ap-pt-cv';
+          var lb = document.createElement('span'); lb.textContent = t.label;
+          b.appendChild(cv); b.appendChild(lb);
+          b.addEventListener('click', function () { POSTER.tpl = t.k; refreshPosters(); });
+          grid.appendChild(b);
+        });
+        group.appendChild(h); group.appendChild(grid); tpls.appendChild(group);
+      });
+    }
     $$('#apPosterMsg .ap-seg').forEach(function (b) { b.addEventListener('click', function () { POSTER.msg = b.dataset.v; refreshPosters(); }); });
     $$('#apPosterFmt .ap-seg').forEach(function (b) { b.addEventListener('click', function () { POSTER.fmt = b.dataset.v; refreshPosters(); }); });
     var dl = $('#apPosterDl');
