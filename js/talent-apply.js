@@ -179,6 +179,7 @@
       thumbs.appendChild(fig);
     });
     reflectPhotoCount(); renderCover(); renderStrength(); if (typeof renderTemplates === 'function') renderTemplates(); updatePreview();
+    if (typeof refreshPosters === 'function') refreshPosters();
   }
   function reflectPhotoCount() {
     var b = $('#apDropLabel');
@@ -220,6 +221,203 @@
       '<div class="ap-str-bar"><i style="width:' + pct + '%"></i></div><div class="ap-str-chips">' + chips + '</div>';
   }
   renderCover();
+
+  /* ══ POSTER ENGINE — Canva-style: pick a template, we render a YKS-branded social poster from their own photo.
+     Pure client-side canvas → downloadable/shareable PNG. No Claude. Every template carries YKS branding. ══ */
+  var POSTER_FORMATS = { feed: [1080, 1350], story: [1080, 1920], square: [1080, 1080] };
+  var POSTER_MSGS = {
+    welcome: { head: 'Welcome to the roster', sub: 'Now represented by YKS' },
+    booking: { head: 'Available for bookings', sub: 'Casting through YKS' },
+    newwork: { head: 'New on the YKS Edit', sub: 'Fresh work, out now' }
+  };
+  var POSTER = { tpl: 'edit', photo: 0, msg: 'welcome', fmt: 'feed' };
+  var posterImgCache = {};
+  function pLoad(src) {
+    return posterImgCache[src] || (posterImgCache[src] = new Promise(function (res, rej) {
+      var im = new Image(); im.onload = function () { res(im); }; im.onerror = rej; im.src = src;
+    }));
+  }
+  function pCover(ctx, img, x, y, w, h) {
+    var ir = img.width / img.height, r = w / h, sw, sh, sx, sy;
+    if (ir > r) { sh = img.height; sw = sh * r; sx = (img.width - sw) / 2; sy = 0; }
+    else { sw = img.width; sh = sw / r; sx = 0; sy = (img.height - sh) / 2; }
+    ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  }
+  function pGrad(ctx, x0, y0, x1, y1, stops) {
+    var g = ctx.createLinearGradient(x0, y0, x1, y1); stops.forEach(function (s) { g.addColorStop(s[0], s[1]); });
+    ctx.fillStyle = g;
+  }
+  var DISPLAY = '"Bodoni Moda", Georgia, serif', MONO = '"Space Grotesk", system-ui, sans-serif';
+  function pText(ctx, text, x, y, o) {
+    ctx.font = (o.w || '500') + ' ' + o.size + 'px ' + (o.fam || MONO);
+    ctx.fillStyle = o.color; ctx.textAlign = o.align || 'left'; ctx.textBaseline = 'alphabetic';
+    try { ctx.letterSpacing = (o.ls || 0) + 'px'; } catch (e) {}
+    ctx.fillText(o.upper ? String(text).toUpperCase() : text, x, y);
+    try { ctx.letterSpacing = '0px'; } catch (e) {}
+  }
+  function pFit(ctx, text, fam, w, start, min, maxW) {
+    var s = start; ctx.textAlign = 'left';
+    while (s > min) { ctx.font = w + ' ' + s + 'px ' + fam; if (ctx.measureText(text).width <= maxW) break; s -= 2; }
+    return s;
+  }
+  // YKS mark used on every template (the branding rule)
+  function pBrand(ctx, W, x, y, light) {
+    var col = light ? '#f4ede2' : '#0a0810';
+    pText(ctx, 'YKS · TALENT EDIT', x, y, { size: 26, ls: 5, color: col, w: '600' });
+  }
+  var POSTER_TEMPLATES = [
+    { k: 'edit', label: 'Editorial', draw: function (ctx, W, H, img, d) {
+      ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
+      pCover(ctx, img, 0, 0, W, H);
+      pGrad(ctx, 0, 0, 0, H * 0.30, [[0, 'rgba(7,6,10,.62)'], [1, 'rgba(7,6,10,0)']]); ctx.fillRect(0, 0, W, H * 0.30);
+      pGrad(ctx, 0, H * 0.40, 0, H, [[0, 'rgba(7,6,10,0)'], [0.55, 'rgba(7,6,10,.86)'], [1, 'rgba(7,6,10,.98)']]); ctx.fillRect(0, H * 0.40, W, H * 0.60);
+      pBrand(ctx, W, 64, 84, true);
+      pText(ctx, 'yksproductions.com', W - 64, 84, { size: 22, color: 'rgba(244,237,226,.7)', align: 'right' });
+      var ns = pFit(ctx, d.name, DISPLAY, '700', 104, 52, W - 128);
+      var nameY = H - 176;
+      pText(ctx, d.head, 64, nameY - ns * 0.86 - 30, { size: 30, ls: 3, color: '#ff8c3b', w: '600', upper: true });
+      pText(ctx, d.name, 64, nameY, { size: ns, color: '#f4ede2', w: '700', fam: DISPLAY });
+      pText(ctx, d.disc, 64, H - 128, { size: 24, ls: 2, color: '#d8cfc4', upper: true });
+      ctx.fillStyle = '#ff8c3b'; ctx.fillRect(64, H - 104, 88, 4);
+      pText(ctx, d.foot, 64, H - 58, { size: 22, color: 'rgba(244,237,226,.62)' });
+    } },
+    { k: 'masthead', label: 'Cover', draw: function (ctx, W, H, img, d) {
+      ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
+      pCover(ctx, img, 0, 0, W, H);
+      pGrad(ctx, 0, 0, 0, H * 0.34, [[0, 'rgba(7,6,10,.7)'], [1, 'rgba(7,6,10,0)']]); ctx.fillRect(0, 0, W, H * 0.34);
+      pGrad(ctx, 0, H * 0.55, 0, H, [[0, 'rgba(7,6,10,0)'], [1, 'rgba(7,6,10,.9)']]); ctx.fillRect(0, H * 0.55, W, H * 0.45);
+      pText(ctx, 'YKS', W / 2, 168, { size: 150, color: '#f4ede2', w: '700', fam: DISPLAY, align: 'center' });
+      pText(ctx, 'THE TALENT EDIT', W / 2, 212, { size: 26, ls: 12, color: '#ff8c3b', align: 'center', upper: true });
+      var ns = pFit(ctx, d.name, DISPLAY, '700', 96, 50, W - 140);
+      pText(ctx, d.name, W / 2, H - 150, { size: ns, color: '#f4ede2', w: '700', fam: DISPLAY, align: 'center' });
+      pText(ctx, d.head, W / 2, H - 100, { size: 25, ls: 3, color: '#ff8c3b', align: 'center', w: '600', upper: true });
+      pText(ctx, d.foot, W / 2, H - 56, { size: 21, color: 'rgba(244,237,226,.65)', align: 'center' });
+    } },
+    { k: 'band', label: 'Band', draw: function (ctx, W, H, img, d) {
+      var ph = Math.round(H * 0.68);
+      ctx.fillStyle = '#0a0810'; ctx.fillRect(0, 0, W, H);
+      pCover(ctx, img, 0, 0, W, ph);
+      ctx.fillStyle = '#0a0810'; ctx.fillRect(0, ph, W, H - ph);
+      ctx.fillStyle = '#ff8c3b'; ctx.fillRect(0, ph, W, 6);
+      pBrand(ctx, W, 64, ph + 74, true);
+      pText(ctx, d.head, W - 64, ph + 74, { size: 22, ls: 2, color: '#ff8c3b', align: 'right', upper: true });
+      var ns = pFit(ctx, d.name, DISPLAY, '700', 92, 48, W - 128);
+      pText(ctx, d.name, 64, ph + 74 + 92, { size: ns, color: '#f4ede2', w: '700', fam: DISPLAY });
+      pText(ctx, d.disc, 64, ph + 74 + 138, { size: 23, ls: 2, color: '#b9b0a6', upper: true });
+      pText(ctx, d.foot, 64, H - 52, { size: 21, color: 'rgba(244,237,226,.6)' });
+    } },
+    { k: 'frame', label: 'Frame', draw: function (ctx, W, H, img, d) {
+      ctx.fillStyle = '#0c0a12'; ctx.fillRect(0, 0, W, H);
+      var m = 70, iw = W - m * 2, ih = Math.round(iw * 1.15), iy = 150;
+      ctx.save(); ctx.beginPath(); ctx.rect(m, iy, iw, ih); ctx.clip(); pCover(ctx, img, m, iy, iw, ih); ctx.restore();
+      ctx.strokeStyle = 'rgba(255,140,59,.85)'; ctx.lineWidth = 3; ctx.strokeRect(m, iy, iw, ih);
+      pText(ctx, 'YKS · TALENT EDIT', W / 2, 96, { size: 26, ls: 6, color: '#f4ede2', w: '600', align: 'center' });
+      var by = iy + ih + 92;
+      pText(ctx, d.head, W / 2, by, { size: 24, ls: 3, color: '#ff8c3b', align: 'center', w: '600', upper: true });
+      var ns = pFit(ctx, d.name, DISPLAY, '700', 90, 46, W - 160);
+      pText(ctx, d.name, W / 2, by + 78, { size: ns, color: '#f4ede2', w: '700', fam: DISPLAY, align: 'center' });
+      pText(ctx, d.disc, W / 2, by + 120, { size: 22, ls: 2, color: '#b9b0a6', align: 'center', upper: true });
+      pText(ctx, d.foot, W / 2, H - 54, { size: 21, color: 'rgba(244,237,226,.55)', align: 'center' });
+    } },
+    { k: 'bold', label: 'Bold', draw: function (ctx, W, H, img, d) {
+      ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
+      pCover(ctx, img, 0, 0, W, H);
+      ctx.fillStyle = 'rgba(7,6,10,.42)'; ctx.fillRect(0, 0, W, H);
+      pGrad(ctx, 0, H * 0.5, 0, H, [[0, 'rgba(7,6,10,0)'], [1, 'rgba(7,6,10,.9)']]); ctx.fillRect(0, H * 0.5, W, H * 0.5);
+      pBrand(ctx, W, 64, 84, true);
+      pText(ctx, d.head, 64, 84, { size: 22, ls: 2, color: '#ff8c3b', align: 'left', upper: true });
+      // big name, up to 2 lines
+      var parts = d.name.split(' '), l1 = d.name, l2 = '';
+      if (parts.length > 1 && ctx.measureText(d.name).width) { l1 = parts.shift(); l2 = parts.join(' '); }
+      var ns = pFit(ctx, (l2 || l1), DISPLAY, '700', 150, 70, W - 120);
+      var midY = H * 0.62;
+      pText(ctx, l1.toUpperCase(), 60, midY, { size: ns, color: '#f4ede2', w: '700', fam: DISPLAY });
+      if (l2) pText(ctx, l2.toUpperCase(), 60, midY + ns * 0.92, { size: ns, color: '#ff8c3b', w: '700', fam: DISPLAY });
+      pText(ctx, d.disc, 64, H - 118, { size: 24, ls: 2, color: '#d8cfc4', upper: true });
+      pText(ctx, d.foot, 64, H - 60, { size: 22, color: 'rgba(244,237,226,.62)' });
+    } }
+  ];
+  function posterData() {
+    var nm = (form.name.value || 'Your Name').trim();
+    var cat = (form.category.value || 'Model').trim();
+    var disc = (DISC[cat] || 'Fashion · Editorial · Commercial');
+    var m = POSTER_MSGS[POSTER.msg] || POSTER_MSGS.welcome;
+    return { name: nm, disc: disc, head: m.head, sub: m.sub, foot: 'yksproductions.com · @yks_photoworks' };
+  }
+  function renderPosterTo(canvas, tplK, cb) {
+    var tpl = POSTER_TEMPLATES.filter(function (t) { return t.k === tplK; })[0] || POSTER_TEMPLATES[0];
+    var fmt = POSTER_FORMATS[POSTER.fmt] || POSTER_FORMATS.feed;
+    canvas.width = fmt[0]; canvas.height = fmt[1];
+    var ctx = canvas.getContext('2d');
+    var pl = photos.length ? photos[POSTER.photo % photos.length] : null;
+    var src = pl ? (pl.edited || pl.url) : SAMPLE_COVER;
+    var draw = function () { pLoad(src).then(function (img) { tpl.draw(ctx, canvas.width, canvas.height, img, posterData()); if (cb) cb(); }).catch(function () { if (cb) cb(); }); };
+    if (document.fonts && document.fonts.load) {
+      Promise.all([document.fonts.load('700 90px "Bodoni Moda"'), document.fonts.load('600 26px "Space Grotesk"')]).then(draw, draw);
+    } else draw();
+  }
+  var posterPreview = $('#apPosterCanvas');
+  function refreshPosters() {
+    var sec = $('#apPosters'); if (!sec) return;
+    sec.hidden = !photos.length;
+    if (!photos.length || !posterPreview) return;
+    // active states
+    $$('#apPosterTpls .ap-pt').forEach(function (b) { b.classList.toggle('on', b.dataset.k === POSTER.tpl); });
+    $$('#apPosterMsg .ap-seg').forEach(function (b) { b.classList.toggle('on', b.dataset.v === POSTER.msg); });
+    $$('#apPosterFmt .ap-seg').forEach(function (b) { b.classList.toggle('on', b.dataset.v === POSTER.fmt); });
+    renderPosterPhotoPicker();
+    renderPosterTo(posterPreview, POSTER.tpl);
+    // render template thumbnails (small)
+    $$('#apPosterTpls .ap-pt').forEach(function (b) {
+      var mini = b.querySelector('canvas'); if (!mini) return;
+      var savedFmt = POSTER.fmt, savedTpl = POSTER.tpl; POSTER.fmt = 'feed';
+      renderPosterTo(mini, b.dataset.k); POSTER.fmt = savedFmt;
+    });
+  }
+  function renderPosterPhotoPicker() {
+    var wrap = $('#apPosterPhotos'); if (!wrap) return;
+    wrap.innerHTML = '';
+    photos.forEach(function (p, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-pph' + (i === POSTER.photo ? ' on' : '');
+      var im = document.createElement('img'); im.src = p.edited || p.url; b.appendChild(im);
+      b.addEventListener('click', function () { POSTER.photo = i; refreshPosters(); });
+      wrap.appendChild(b);
+    });
+  }
+  (function initPosters() {
+    var tpls = $('#apPosterTpls'); if (tpls) POSTER_TEMPLATES.forEach(function (t) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-pt'; b.dataset.k = t.k;
+      var cv = document.createElement('canvas'); cv.className = 'ap-pt-cv';
+      var lb = document.createElement('span'); lb.textContent = t.label;
+      b.appendChild(cv); b.appendChild(lb);
+      b.addEventListener('click', function () { POSTER.tpl = t.k; refreshPosters(); });
+      tpls.appendChild(b);
+    });
+    $$('#apPosterMsg .ap-seg').forEach(function (b) { b.addEventListener('click', function () { POSTER.msg = b.dataset.v; refreshPosters(); }); });
+    $$('#apPosterFmt .ap-seg').forEach(function (b) { b.addEventListener('click', function () { POSTER.fmt = b.dataset.v; refreshPosters(); }); });
+    var dl = $('#apPosterDl');
+    if (dl) dl.addEventListener('click', function () {
+      var c = document.createElement('canvas'); renderPosterTo(c, POSTER.tpl, function () {
+        c.toBlob(function (blob) {
+          var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+          a.download = (form.name.value || 'YKS').trim().replace(/\s+/g, '-') + '-YKS-poster.jpg'; a.click();
+        }, 'image/jpeg', 0.94);
+      });
+    });
+    var sh = $('#apPosterShare');
+    if (sh) sh.addEventListener('click', function () {
+      var c = document.createElement('canvas'); renderPosterTo(c, POSTER.tpl, function () {
+        c.toBlob(function (blob) {
+          var file = new File([blob], 'YKS-poster.jpg', { type: 'image/jpeg' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], text: (posterData().head) + ' — via YKS Productions · yksproductions.com' }).catch(function () {});
+          } else { var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'YKS-poster.jpg'; a.click(); }
+        }, 'image/jpeg', 0.94);
+      });
+    });
+    var nEl = document.querySelector('#talForm [name="name"]'); if (nEl) nEl.addEventListener('input', function () { if (!$('#apPosters').hidden) refreshPosters(); });
+    var cEl = form.category; if (cEl) cEl.addEventListener('change', function () { if (!$('#apPosters').hidden) refreshPosters(); });
+  })();
 
   // Book-a-shoot CTA — quietly personalise the WhatsApp opener with their name (feels 1:1, not a form)
   (function wireShootCta() {

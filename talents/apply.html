@@ -41,7 +41,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=15" />
-<link rel="stylesheet" href="/css/talents.css?v=37" />
+<link rel="stylesheet" href="/css/talents.css?v=38" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -764,6 +764,39 @@
         </div>
       </section>
 
+      <!-- ══ POSTER STUDIO — Canva-style, YKS-branded social creatives from their own photos ══ -->
+      <section class="ap-posters" id="apPosters" aria-label="Poster studio" hidden>
+        <p class="ap-step">Your poster kit <span class="ap-opt">Instagram-ready · YKS-branded</span></p>
+        <p class="ap-hint">On-brand creatives made from your own photos — post them to announce you're on the YKS roster. Pick a template, tweak it, then download or share straight to Instagram.</p>
+        <div class="ap-poster-wrap">
+          <div class="ap-poster-controls">
+            <p class="ap-pick-lbl">Template</p>
+            <div class="ap-poster-tpls" id="apPosterTpls"></div>
+            <p class="ap-pick-lbl">Photo</p>
+            <div class="ap-poster-photos" id="apPosterPhotos"></div>
+            <p class="ap-pick-lbl">Message</p>
+            <div class="ap-segs" id="apPosterMsg">
+              <button type="button" class="ap-seg on" data-v="welcome">Welcome</button>
+              <button type="button" class="ap-seg" data-v="booking">Booking</button>
+              <button type="button" class="ap-seg" data-v="newwork">New work</button>
+            </div>
+            <p class="ap-pick-lbl">Format</p>
+            <div class="ap-segs" id="apPosterFmt">
+              <button type="button" class="ap-seg on" data-v="feed">Feed 4:5</button>
+              <button type="button" class="ap-seg" data-v="story">Story 9:16</button>
+              <button type="button" class="ap-seg" data-v="square">Square</button>
+            </div>
+          </div>
+          <div class="ap-poster-stage">
+            <div class="ap-poster-preview"><canvas id="apPosterCanvas"></canvas></div>
+            <div class="ap-poster-actions">
+              <button type="button" class="btn btn-fill ap-poster-share" id="apPosterShare">Share to Instagram →</button>
+              <button type="button" class="btn btn-ghost" id="apPosterDl">↓ Download</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ① SUBMIT — the primary action: get their portfolio in front of YKS -->
       <div class="ap-tail">
         <p class="ap-tail-lead">Happy with it? This is the one that matters — <b>send it to me</b> and you're in front of me for casting.</p>
@@ -910,6 +943,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=40"></script>
+<script src="/js/talent-apply.js?v=41"></script>
 </body>
 </html>
