@@ -497,14 +497,15 @@
     var m = POSTER_MSGS[POSTER.msg] || POSTER_MSGS.welcome;
     return { name: nm, disc: disc, head: m.head, sub: m.sub, foot: 'yksproductions.com · @yks_photoworks' };
   }
-  function renderPosterTo(canvas, tplK, cb) {
+  function renderPosterTo(canvas, tplK, cb, thumbW) {
     var tpl = POSTER_TEMPLATES.filter(function (t) { return t.k === tplK; })[0] || POSTER_TEMPLATES[0];
     var fmt = POSTER_FORMATS[POSTER.fmt] || POSTER_FORMATS.feed;
-    canvas.width = fmt[0]; canvas.height = fmt[1];
+    var FW = fmt[0], FH = fmt[1], sc = thumbW ? thumbW / FW : 1;   // thumbnails render into a tiny backing store (memory!) via a scale transform
+    canvas.width = Math.round(FW * sc); canvas.height = Math.round(FH * sc);
     var ctx = canvas.getContext('2d');
     var pl = photos.length ? photos[POSTER.photo % photos.length] : null;
     var src = pl ? (pl.edited || pl.url) : SAMPLE_COVER;
-    var draw = function () { pLoad(src).then(function (img) { tpl.draw(ctx, canvas.width, canvas.height, img, posterData()); if (cb) cb(); }).catch(function () { if (cb) cb(); }); };
+    var draw = function () { pLoad(src).then(function (img) { if (sc !== 1) { ctx.save(); ctx.scale(sc, sc); } tpl.draw(ctx, FW, FH, img, posterData()); if (sc !== 1) ctx.restore(); if (cb) cb(); }).catch(function () { if (cb) cb(); }); };
     if (document.fonts && document.fonts.load) {
       Promise.all([document.fonts.load('700 90px "Bodoni Moda"'), document.fonts.load('600 26px "Space Grotesk"')]).then(draw, draw);
     } else draw();
@@ -520,11 +521,11 @@
     $$('#apPosterFmt .ap-seg').forEach(function (b) { b.classList.toggle('on', b.dataset.v === POSTER.fmt); });
     renderPosterPhotoPicker();
     renderPosterTo(posterPreview, POSTER.tpl);
-    // render template thumbnails (small)
+    // render template thumbnails at a tiny backing size (they display ~84px — full-res here was ~70MB across 12 canvases, which crashed mobile)
     $$('#apPosterTpls .ap-pt').forEach(function (b) {
       var mini = b.querySelector('canvas'); if (!mini) return;
-      var savedFmt = POSTER.fmt, savedTpl = POSTER.tpl; POSTER.fmt = 'feed';
-      renderPosterTo(mini, b.dataset.k); POSTER.fmt = savedFmt;
+      var savedFmt = POSTER.fmt; POSTER.fmt = 'feed';
+      renderPosterTo(mini, b.dataset.k, null, 220); POSTER.fmt = savedFmt;
     });
   }
   function renderPosterPhotoPicker() {

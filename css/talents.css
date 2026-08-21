@@ -31,6 +31,8 @@ main{overflow-x:clip}
 
 /* ── top nav + contents bar → paper ── */
 .l-nav{background:rgba(7,6,10,.82);-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);border-bottom:1px solid var(--mag-line)}
+/* mobile: a fixed nav that re-blurs the page behind it every scroll frame makes phones drop the whole layer (blank-on-scroll) — go solid instead */
+@media(max-width:820px){.l-nav{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(9,7,12,.98)}.ap-shoot-glow{display:none}}
 .l-brand{font-family:var(--mag-display);color:var(--mag-ink);font-weight:600}
 .l-brand span{color:var(--mag-accent)}
 .l-brand em{color:var(--mag-soft)}
