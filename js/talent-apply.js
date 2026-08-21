@@ -1047,37 +1047,47 @@
     openBtn.addEventListener('click', function () { panel.hidden = !panel.hidden; if (!panel.hidden && raw) raw.focus(); });
     function cap(s) { return s.replace(/\b[a-z]/g, function (c) { return c.toUpperCase(); }); }
     function parseStats(text) {
-      var t = ' ' + text.replace(/\s+/g, ' ').trim() + ' ', low = t.toLowerCase(), o = {}, m;
-      // Height — 5'6", 5 ft 6, 1.68 m, 168 cm, or "Height: …"
-      if (m = t.match(/(\d)\s*['’]\s*(\d{1,2})/)) o.height = m[1] + "'" + m[2] + '"';
-      else if (m = low.match(/\b(\d)\s*(?:ft|feet|foot)\s*(\d{1,2})?/)) o.height = m[1] + "'" + (m[2] || '0') + '"';
-      else if (m = low.match(/\b(1\.[3-9]\d)\s*m\b/)) o.height = m[1] + ' m';
-      else if (m = low.match(/\b(1[3-9]\d|2[0-1]\d)\s*cm\b/)) o.height = m[1] + ' cm';
-      else if (m = low.match(/height[:\s]+(\d[\d'"’.\s]*(?:cm|m)?)/)) o.height = m[1].trim();
-      // Bust–Waist–Hips triple — 34-26-36, 34/26/36, 34x26x36, or space-separated
-      var tr = t.match(/\b([2-4]\d)\s*[-\/x]\s*([1-3]\d)\s*[-\/x]\s*([2-4]\d)\b/i)
-            || t.match(/(?:measurements?|stats|vitals|figure|bwh)[:\s]*([2-4]\d)\s+([1-3]\d)\s+([2-4]\d)\b/i)
-            || t.match(/\b([2-4]\d)\s+([1-3]\d)\s+([2-4]\d)\b/);
-      if (tr) { o.bust = tr[1]; o.waist = tr[2]; o.hips = tr[3]; }
-      if (m = low.match(/(?:bust|chest)[:\s]+(\d{2}\s*[a-e]?)/)) o.bust = m[1].toUpperCase().replace(/\s+/g, '');
-      if (m = low.match(/waist[:\s]+(\d{2})/)) o.waist = m[1];
-      if (m = low.match(/hips?[:\s]+(\d{2})/)) o.hips = m[1];
-      // Shoe — "shoe 38 EU", "UK 5", "size 7", "6 uk" (number and unit in either order)
-      var sc = low.match(/shoe[^a-z0-9]*(?:size)?[:\s]*([a-z0-9.\s]{1,8})/);
-      var sm = (sc ? sc[1] : low).match(/\b(\d{1,2}(?:\.5)?)\s*(eu|uk|us)\b|\b(eu|uk|us)\s*(\d{1,2}(?:\.5)?)\b/);
-      if (!sm && sc) sm = sc[1].match(/(\d{1,2}(?:\.5)?)/);   // "shoe 8" with no unit
-      if (sm) { var num = sm[1] || sm[4] || sm[0], unit = (sm[2] || sm[3] || '').toUpperCase(); if (num) o.shoe = (num + (unit ? ' ' + unit : '')).trim(); }
-      // Hair — "Hair: Brown" or "brown hair"
-      var HAIR = ['jet black', 'black', 'dark brown', 'light brown', 'brown', 'blonde', 'blond', 'brunette', 'auburn', 'red', 'ginger', 'grey', 'gray', 'white'];
-      if (m = low.match(/hair[:\s]+([a-z ]+?)\s*(?:[,.;\/|]|eyes?|skin|complexion|shoe|height|$)/)) o.hair = cap(m[1].trim());
-      else { for (var i = 0; i < HAIR.length; i++) if (new RegExp('\\b' + HAIR[i] + '\\b\\s*hair').test(low)) { o.hair = cap(HAIR[i]); break; } }
-      // Eyes — "Eyes: Green" or "green eyes"
-      if (m = low.match(/eyes?[:\s]+([a-z ]+?)\s*(?:[,.;\/|]|hair|skin|complexion|shoe|height|$)/)) o.eyes = cap(m[1].trim());
-      else { var EYES = ['dark brown', 'light brown', 'brown', 'black', 'blue', 'green', 'hazel', 'grey', 'gray', 'amber']; for (var j = 0; j < EYES.length; j++) if (new RegExp('\\b' + EYES[j] + '\\b\\s*eyes?').test(low)) { o.eyes = cap(EYES[j]); break; } }
-      // Skin / complexion — "Skin: Fair", "wheatish complexion", "medium skin", or a bare tone word
-      if (m = low.match(/(?:skin tone|complexion|skin)[:\s]+([a-z ]+?)\s*(?:[,.;\/|]|hair|eyes?|shoe|height|$)/)) o.skin = cap(m[1].trim());
-      else if (m = low.match(/\b(fair|light|medium|olive|tan|wheatish|dusky|deep|dark|brown|ebony)\s*(?:skin|complexion|tone)/)) o.skin = cap(m[1]);
-      else { var SKIN = ['wheatish', 'olive', 'dusky', 'fair', 'medium', 'tan']; for (var k = 0; k < SKIN.length; k++) if (new RegExp('\\b' + SKIN[k] + '\\b').test(low)) { o.skin = cap(SKIN[k]); break; } }
+      var o = {};
+      function num(s) { var m = String(s).match(/(\d{1,3}(?:\.\d)?)/); return m ? m[1] : ''; }
+      function cleanWord(v) { return String(v).replace(/[^a-z\/ -]/gi, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 2).join(' '); }
+      function heightFrom(s) {
+        var m;
+        if (m = s.match(/\b(1\.[3-9]\d)\s*m\b/i)) return m[1] + ' m';                       // 1.68 m
+        if (m = s.match(/\b(1[3-9]\d|2[0-1]\d)\s*cm\b/i)) return m[1] + ' cm';               // 168 cm
+        if (m = s.match(/(\d)\s*(?:['’]|ft|feet|foot)\s*(\d{1,2})?/i)) return m[1] + "'" + (m[2] || '0') + '"';   // 5'7, 5 ft 7
+        if (m = s.match(/\b(1[3-9]\d|2[0-1]\d)\b/)) return m[1] + ' cm';                     // bare 168
+        return s.replace(/[^0-9'"’.a-z ]/gi, '').trim();
+      }
+      function shoeFrom(s) {
+        var unit = (s.match(/\b(eu|uk|us)\b/i) || [])[1];
+        var d = s.match(/(\d{1,2}(?:\.5)?)/);
+        if (!d) return '';
+        var n = d[1].replace(/^0+(\d)/, '$1');   // "06" → "6", keep "38"
+        return unit ? (n + ' ' + unit.toUpperCase()) : n;
+      }
+      // Line-based: read the value that sits AFTER each field keyword — tolerant of "(inches)", "Size", "Color", -/:/– and units.
+      function txtVal(v) { return cleanWord(String(v).replace(/^[\s:–-]*(colou?r|tone|shade)?[\s:–-]*/i, '')); }
+      String(text).split(/[\n\r]+/).forEach(function (line) {
+        if (!line.trim()) return;
+        var low = line.toLowerCase(), hasSep = /[:\-–]/.test(line), v, b, w, h, s;
+        function after(kwRe) { var mm = low.match(kwRe); return mm ? line.slice(mm.index + mm[0].length) : null; }
+        if (!o.height && (v = after(/\bheight\b/)) != null) o.height = heightFrom(v);
+        if (!o.bust && (v = after(/\b(chest|bust|breast)\b/)) != null) { b = v.match(/(\d{2})\s*([a-e])?/i); if (b) o.bust = b[1] + (b[2] ? b[2].toUpperCase() : ''); }
+        if (!o.waist && (v = after(/\bwaist\b/)) != null) { w = num(v); if (w) o.waist = w; }
+        if (!o.hips && (v = after(/\bhips?\b/)) != null) { h = num(v); if (h) o.hips = h; }
+        if (!o.shoe && (v = after(/\bshoe\b/)) != null) { s = shoeFrom(v); if (s) o.shoe = s; }
+        if (!o.hair && hasSep && !/length/.test(low) && (v = after(/\bhair\b/)) != null) o.hair = cap(txtVal(v));   // "Hair Color", not "Hair Length"
+        if (!o.eyes && hasSep && (v = after(/\beyes?\b/)) != null) o.eyes = cap(txtVal(v));
+        if (!o.skin && hasSep && (v = after(/\b(skin|complexion)\b/)) != null) o.skin = cap(txtVal(v));
+      });
+      // Whole-text fallbacks — only fill what the line pass missed (handles no-separator pastes like "34-26-36" or "brown eyes")
+      var t = ' ' + String(text).replace(/\s+/g, ' ').trim() + ' ', low = t.toLowerCase(), m;
+      if (!o.height) { if (m = t.match(/(\d)\s*['’]\s*(\d{1,2})/)) o.height = m[1] + "'" + m[2] + '"'; else if (m = low.match(/\b(1[3-9]\d|2[0-1]\d)\s*cm\b/)) o.height = m[1] + ' cm'; }
+      var tr = t.match(/\b([2-4]\d)\s*[-\/x]\s*([1-3]\d)\s*[-\/x]\s*([2-4]\d)\b/i);
+      if (tr) { o.bust = o.bust || tr[1]; o.waist = o.waist || tr[2]; o.hips = o.hips || tr[3]; }
+      if (!o.hair) { var HAIR = ['jet black', 'black', 'dark brown', 'light brown', 'brown', 'blonde', 'blond', 'auburn', 'red', 'ginger', 'grey', 'gray']; for (var i = 0; i < HAIR.length; i++) if (new RegExp('\\b' + HAIR[i] + '\\b\\s*hair').test(low)) { o.hair = cap(HAIR[i]); break; } }
+      if (!o.eyes) { var EYES = ['dark brown', 'light brown', 'brown', 'black', 'blue', 'green', 'hazel', 'grey', 'gray', 'amber']; for (var j = 0; j < EYES.length; j++) if (new RegExp('\\b' + EYES[j] + '\\b\\s*eyes?').test(low)) { o.eyes = cap(EYES[j]); break; } }
+      if (!o.skin) { if (m = low.match(/\b(fair|light|medium|olive|tan|wheatish|dusky|deep|dark|brown|ebony)\s*(?:skin|complexion|tone)/)) o.skin = cap(m[1]); }
       return o;
     }
     fillBtn.addEventListener('click', function () {
