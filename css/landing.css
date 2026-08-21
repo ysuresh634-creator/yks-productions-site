@@ -494,3 +494,12 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
 .l-citygrid a:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 @media(max-width:520px){.l-citygrid{grid-template-columns:1fr 1fr;gap:8px}
   .l-citygrid a{padding:13px 14px;font-size:.88rem}}
+
+/* the four-question check on the talent apply page */
+.ap-check{list-style:none;counter-reset:ck;display:flex;flex-direction:column;gap:11px;margin:4px 0 4px}
+.ap-check li{position:relative;padding-left:34px;color:rgba(244,237,226,.78);font-size:.99rem;line-height:1.65}
+.ap-check li::before{counter-increment:ck;content:counter(ck);position:absolute;left:0;top:1px;
+  width:23px;height:23px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-size:11px;color:var(--amber);
+  border:1px solid rgba(255,140,59,.42);background:rgba(255,140,59,.07)}
+.ap-check b{color:var(--paper);font-weight:600}
