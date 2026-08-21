@@ -1264,7 +1264,7 @@
     // digitals = natural, unretouched shots — pulled out of the main flow onto their own casting page
     // (comp card stays a tight 2-page format, so it keeps them in the grid instead)
     var digitals = [];
-    if (cfg.template !== 'compcard' && cfg.template !== 'editorial') {
+    if (cfg.template !== 'compcard' && cfg.template !== 'editorial' && cfg.template !== 'lookbook' && cfg.template !== 'minimal') {
       digitals = imgs.filter(function (im) { return im.cat === 'Digitals'; });
       if (digitals.length && digitals.length < imgs.length) imgs = imgs.filter(function (im) { return im.cat !== 'Digitals'; });
       else digitals = [];   // if every shot is a digital, keep them in the book rather than emptying it
@@ -1323,58 +1323,32 @@
       if (drawQR(bookURL, qx, qy, qs)) { doc.setFont(F, 'normal'); doc.setFontSize(7.5); ct(SUB); doc.text('SCAN TO BOOK THROUGH YKS', qx + qs / 2, qy + qs + 15, { align: 'center' }); }
     }
 
-    /* ── TEMPLATE: Lookbook (full-bleed, photo-forward) ── */
-    function tplLookbook() {
-      fill(); bleed(imgs[0], 0, 0, W, H); shade(H - 210, 210, 0.55); watermark(true);
-      doc.setFont(F, 'bold'); doc.setFontSize(9); ct([255, 255, 255]); doc.text('YKS  ·  TALENT PORTFOLIO', M, 52);
-      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text(disc.toUpperCase(), M, H - 92);
-      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 26 : 34); ct([255, 255, 255]); doc.text(NM, M, H - 54);
-      doc.setFont(F, 'normal'); doc.setFontSize(TAG ? 9.5 : 8); ct(TAG ? [255, 255, 255] : [232, 227, 217]); doc.text(TAG || 'EDITION 2026 · EXCLUSIVE · YKS', M, H - 36);
-      imgs.slice(1, 8).forEach(function (im) {
-        doc.addPage(); fill(); bleed(im, 0, 0, W, H); shade(H - 64, 64, 0.5); watermark(true);
-        doc.setFont(F, 'normal'); doc.setFontSize(8); ct([255, 255, 255]);
-        doc.text((im.cat || cat).toUpperCase(), M, H - 28); doc.text(NM, W - M, H - 28, { align: 'right' });
-      });
-      doc.addPage(); fill(); watermark();
-      doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('PROFILE', M, 58);
-      doc.setFont(F, 'normal'); doc.setFontSize(8.5); ct(SUB); doc.text(NM, W - M, 58, { align: 'right' }); ruleY(70);
-      doc.setFont(F, 'bold'); doc.setFontSize(28); ct(TX); doc.text(name, M, 112);
-      doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(SUB); doc.text([cat, city].filter(Boolean).join('   ·   ').toUpperCase(), M, 132);
-      var ay = 172;
-      if (about) { doc.setFont(F, 'normal'); doc.setFontSize(11); ct(TX); var ln = doc.splitTextToSize(about, CW).slice(0, 9); doc.text(ln, M, ay); ay += ln.length * 15 + 26; }
-      if (STATS.length) { doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MEASUREMENTS', M, ay); ay += 16; STATS.forEach(function (r) { doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text(r[0].toUpperCase(), M, ay); doc.setFont(F, 'bold'); doc.setFontSize(9); ct(TX); doc.text(r[1], M + 230, ay, { align: 'right' }); doc.setDrawColor.apply(doc, SUB); doc.setLineWidth(0.4); doc.line(M, ay + 6, M + 230, ay + 6); ay += 20; }); }
-      foot();
-      digitalsPage();
-      bookPage();
-    }
-    /* ── TEMPLATE: Minimal (airy, centred, one photo per page) ── */
-    function tplMinimal() {
-      var CX = W / 2;
-      fill(); watermark();
-      var pw = 300; place(imgs[0], CX - pw / 2, 128, pw);
-      doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text('YKS  ·  TALENT PORTFOLIO', CX, 72, { align: 'center' });
-      doc.setFont(F, 'bold'); doc.setFontSize(NM.length > 16 ? 22 : 28); ct(TX); doc.text(NM, CX, 128 + 375 + 46, { align: 'center' });
-      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(AC); doc.text(disc.toUpperCase(), CX, 128 + 375 + 68, { align: 'center' });
-      if (TAG) { doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text(TAG, CX, 128 + 375 + 88, { align: 'center' }); }
-      doc.addPage(); fill(); watermark();
-      doc.setFont(F, 'bold'); doc.setFontSize(9); ct(AC); doc.text('PROFILE', CX, 122, { align: 'center' });
-      doc.setFont(F, 'bold'); doc.setFontSize(24); ct(TX); doc.text(name, CX, 158, { align: 'center' });
-      doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(SUB); doc.text([cat, city].filter(Boolean).join('   ·   ').toUpperCase(), CX, 178, { align: 'center' });
-      var ay = 220;
-      if (about) { doc.setFont(F, 'normal'); doc.setFontSize(11); ct(TX); var ln = doc.splitTextToSize(about, CW * 0.72).slice(0, 8); doc.text(ln, CX, ay, { align: 'center' }); ay += ln.length * 16 + 30; }
-      if (STATS.length) { doc.setFont(F, 'bold'); doc.setFontSize(8.5); ct(AC); doc.text('MEASUREMENTS', CX, ay, { align: 'center' }); ay += 22; doc.setFont(F, 'normal'); doc.setFontSize(9.5); ct(TX); doc.text(doc.splitTextToSize(STATS.map(function (r) { return r[0] + ' ' + r[1]; }).join('      ·      '), CW * 0.82), CX, ay, { align: 'center' }); }
-      imgs.slice(1, 7).forEach(function (im) {
-        doc.addPage(); fill(); watermark();
-        var w = 360; place(im, CX - w / 2, 92, w);
-        doc.setFont(F, 'normal'); doc.setFontSize(8); ct(SUB); doc.text((im.cat || cat).toUpperCase(), CX, 92 + w / 0.8 + 22, { align: 'center' });
-      });
-      digitalsPage();
-      doc.addPage(); fill(); watermark();
-      doc.setFont(F, 'bold'); doc.setFontSize(26); ct(TX); doc.text('BOOK ' + NM, CX, H / 2 - 60, { align: 'center' });
-      doc.setFont(F, 'normal'); doc.setFontSize(9); ct(SUB); doc.text('Represented exclusively by YKS Productions', CX, H / 2 - 34, { align: 'center' }); doc.text('+91 97466 79720   ·   yksproductions.com', CX, H / 2 - 18, { align: 'center' });
-      var mqs = 132;
-      if (drawQR(bookURL, CX - mqs / 2, H / 2 + 6, mqs)) { doc.setFont(F, 'normal'); doc.setFontSize(7.5); ct(SUB); doc.text('SCAN TO BOOK THROUGH YKS', CX, H / 2 + 6 + mqs + 16, { align: 'center' }); }
-    }
+    /* ══ SHARED HOUSE STYLE — the Shalini-grade component system (cover · profile · plates · spreads · closing) used by the premium templates. Own light+dark palette independent of the kit theme, so pages never render as empty dark voids. ══ */
+    var NIGHT = [12, 10, 16], PAPER = [255, 255, 255], INK = [20, 20, 22], INKSUB = [140, 138, 134], LIGHT = [244, 240, 232], MUTE = [196, 190, 180], GOLD = [184, 145, 47], HFA = AC;
+    var HF = 'helvetica', LG = 'times', hsPg = 1;
+    function hbg(c) { doc.setFillColor.apply(doc, c); doc.rect(0, 0, W, H, 'F'); }
+    function htk(str, x, y, sz, c, o) { o = o || {}; doc.setFont(HF, o.bold ? 'bold' : 'normal'); doc.setFontSize(sz); ct(c); doc.text(o.upper === false ? String(str) : String(str).toUpperCase(), x, y, { align: o.align || 'left', charSpace: o.ls == null ? 1.3 : o.ls }); }
+    function hhair(x1, y, x2, c, lw) { doc.setDrawColor.apply(doc, c); doc.setLineWidth(lw || 0.8); doc.line(x1, y, x2, y); }
+    function hnp(c) { doc.addPage(); hsPg++; hbg(c); }
+    function hlum(c) { return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; }
+    function hnbleed(im, x, y, bw, bh) { if (im.fit) { doc.setFillColor.apply(doc, NIGHT); doc.rect(x, y, bw, bh, 'F'); var s = Math.min(bw / im.w, bh / im.h), w = im.w * s, h = im.h * s; doc.addImage(im.data, 'JPEG', x + (bw - w) / 2, y + (bh - h) / 2, w, h); } else coverFill(im, x, y, bw, bh); }
+    function hlogoBox(x, y, w, c) { var h = w * 0.60, cx = x + w / 2; doc.setDrawColor.apply(doc, c); doc.setLineWidth(0.9); doc.rect(x, y, w, h); doc.setFont(LG, 'normal'); ct(c); doc.setFontSize(w * 0.285); doc.text('YKS', cx, y + h * 0.50, { align: 'center', charSpace: 1 }); var py = y + h * 0.80, word = 'PRODUCTIONS', ws = 1.3; doc.setFont(HF, 'normal'); doc.setFontSize(w * 0.064); var tw = doc.getTextWidth(word) + (word.length - 1) * ws; doc.text(word, cx, py, { align: 'center', charSpace: ws }); doc.setLineWidth(0.5); var gap = w * 0.05, dash = w * 0.085; doc.line(cx - tw / 2 - gap - dash, py - 2.5, cx - tw / 2 - gap, py - 2.5); doc.line(cx + tw / 2 + gap, py - 2.5, cx + tw / 2 + gap + dash, py - 2.5); }
+    function hRunHead(left, onDark) { var c = onDark ? LIGHT : INK; htk(left, M, 60, 8, c, { bold: true, ls: 1.5 }); htk(NM + '  /  ' + ('0' + hsPg).slice(-2), W - M, 60, 8, c, { bold: true, align: 'right', ls: 1.5 }); hhair(M, 72, W - M, onDark ? GOLD : INK, 1.1); }
+    function hPaperFoot() { hhair(M, H - 56, W - M, INK, 1.1); htk('+91 97466 79720', M, H - 40, 7.5, INKSUB, { ls: 1.1 }); htk('YKSPRODUCTIONS893@GMAIL.COM', W - M, H - 40, 7.5, INKSUB, { align: 'right', ls: 1.1 }); }
+    function hPlateFoot(cap) { hhair(M, H - 44, W - M, GOLD, 0.8); htk(cap, M, H - 28, 8, GOLD, { bold: true, ls: 1.5 }); htk(NM + '  /  ' + ('0' + hsPg).slice(-2), W - M, H - 28, 8, GOLD, { align: 'right', ls: 1.5 }); }
+    function hFit(str, f, wt, start, min, maxW) { var s = start; doc.setFont(f, wt); while (s > min) { doc.setFontSize(s); if (doc.getTextWidth(String(str).toUpperCase()) <= maxW) break; s -= 1; } return s; }
+    function hBio() { if (about) return about; var role = (cat === 'Actor' ? 'actor' : (/Influencer|Creator/i.test(cat) ? 'model and digital creator' : 'professional model')); var where = city ? ' based in ' + city : ''; return name + ' is a ' + role + where + ', working across ' + disc.toLowerCase() + '. Equally at home on a controlled studio call and looser, content-led shoots — a range that suits a lookbook, a runway line-up or a campaign built to live on a phone. Quick to take direction, precise on the marks, and comfortable holding a look for as long as the frame needs.'; }
+    function hsCover(hero) { hbg(NIGHT); var bandH = 166; hnbleed(hero, 0, 0, W, H - bandH); shade(0, 150, 0.2); hhair(M, H - bandH, W - M, GOLD, 0.9); hlogoBox(M, 44, 118, LIGHT); var by = H - bandH; htk(disc, M, by + 40, 8.5, GOLD, { bold: true, ls: 2 }); var parts = NM.split(' '), l1 = parts[0], l2 = parts.slice(1).join(' '); if (!l2) l1 = NM; var ns = hFit(l2 || l1, HF, 'bold', 40, 22, W * 0.55); doc.setFont(HF, 'bold'); doc.setFontSize(ns); ct(LIGHT); if (l2) { doc.text(l1, M, by + 82); doc.text(l2, M, by + 82 + ns * 0.9); } else doc.text(l1, M, by + 104); htk('TALENT PORTFOLIO', W - M, by + 62, 8.5, MUTE, { align: 'right', ls: 2 }); htk('EDITION 2026 / 01', W - M, by + 80, 8.5, MUTE, { align: 'right', ls: 2 }); htk('EXCLUSIVE · YKS', W - M, by + 98, 8.5, GOLD, { align: 'right', ls: 2 }); return l1; }
+    function hsProfile(figImg) { hnp(PAPER); hRunHead('YKS PRODUCTIONS — TALENT PORTFOLIO'); htk('PROFILE', M, 116, 9, INKSUB, { bold: true, ls: 2 }); doc.setFont(HF, 'bold'); doc.setFontSize(30); ct(INK); doc.text(NM, M, 150); var LCW = 250; doc.setFont(HF, 'normal'); doc.setFontSize(10.5); ct(INK); var bl = doc.splitTextToSize(hBio(), LCW).slice(0, 11); doc.text(bl, M, 190, { lineHeightFactor: 1.5 }); var ly = 190 + bl.length * 15.6 + 30; htk('CASTABLE FOR', M, ly, 9, INKSUB, { bold: true, ls: 2 }); ly += 24; var cx2 = M, cy2 = ly; doc.setFont(HF, 'normal'); doc.setFontSize(9.5); disc.split(' · ').forEach(function (t) { var tw = doc.getTextWidth(t) + 22; if (cx2 + tw > M + LCW) { cx2 = M; cy2 += 32; } doc.setDrawColor.apply(doc, HFA); doc.setLineWidth(0.9); doc.roundedRect(cx2, cy2 - 14, tw, 24, 3, 3, 'S'); ct(INK); doc.text(t, cx2 + 11, cy2 + 2); cx2 += tw + 8; }); var RW = 200, rx = W - M - RW, fy = 130, fig = figImg || imgs[1] || imgs[0]; if (fig) { place(fig, rx, fy, RW); var fby = fy + RW / 0.8; htk('FIG. 01 — ' + ((fig.cat || 'FULL LENGTH')), rx, fby + 22, 8, GOLD, { bold: true, ls: 1.5 }); hhair(rx, fby + 32, W - M, GOLD, 0.8); } var my = fy + RW / 0.8 + 70; htk('MEASUREMENTS', rx, my, 9, INKSUB, { bold: true, ls: 2 }); my += 6; STATS.slice(0, 9).forEach(function (r) { my += 22; hhair(rx, my - 15, W - M, INK, 0.5); htk(r[0], rx, my, 8, INKSUB, { ls: 1.2 }); doc.setFont(HF, 'bold'); doc.setFontSize(9.5); ct(INK); doc.text(r[1], W - M, my, { align: 'right' }); }); htk('REPRESENTED BY', M, H - 150, 9, INKSUB, { bold: true, ls: 2 }); hlogoBox(M, H - 138, 96, INK); htk('+91 97466 79720', M + 112, H - 116, 9, INK, { bold: true, ls: 0.5, upper: false }); htk('yksproductions893@gmail.com', M + 112, H - 100, 8.5, INKSUB, { ls: 0.5, upper: false }); hPaperFoot(); }
+    function hsPlate(im, cap) { hnp(NIGHT); hnbleed(im, 0, 0, W, H); shade(H - 90, 90, 0.34); hPlateFoot(cap); }
+    function hsSpread(a, b, section, capA, capB, statement) { hnp(PAPER); hRunHead(section); var g = 22, cw = (CW - g) / 2, yy = 100, ph = cw / 0.8; [a, b].forEach(function (im, k) { if (im) place(im, M + k * (cw + g), yy, cw); }); [a, b].forEach(function (im, k) { if (im) htk(k ? capB : capA, M + k * (cw + g), yy + ph + 22, 8, INKSUB, { ls: 1.3 }); }); if (statement) { hhair(M, H - 150, W - M, INK, 1.1); doc.setFont(HF, 'bold'); doc.setFontSize(25); ct(INK); var ds = disc.split(' · '), half = Math.ceil(ds.length / 2); doc.text(ds.slice(0, half).join(' · ').toUpperCase() + ' ·', M, H - 118); doc.text(ds.slice(half).join(' · ').toUpperCase(), M, H - 92); doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(INKSUB); doc.text(doc.splitTextToSize('Straight colour or a black-and-white conversion — no retouching. Full-resolution files, additional looks and video on request.', 190), W - M, H - 128, { align: 'right', lineHeightFactor: 1.4 }); htk('SELECTED WORK', W - M, H - 92, 8, INKSUB, { align: 'right', ls: 1.3 }); } hPaperFoot(); }
+    function hsCenter(im, cap) { hnp(PAPER); hRunHead('PLATE — ' + ((im.cat || 'SELECTED'))); var w = 336, x = (W - w) / 2, y = 118; place(im, x, y, w); htk(cap, W / 2, y + w / 0.8 + 26, 8, GOLD, { bold: true, ls: 1.5, align: 'center' }); hhair(W / 2 - 40, y + w / 0.8 + 36, W / 2 + 40, GOLD, 0.8); hPaperFoot(); }
+    function hsClosing(firstName) { hnp(HFA); var onA = hlum(HFA) > 0.62 ? INK : [255, 255, 255], onAsub = hlum(HFA) > 0.62 ? [80, 70, 60] : [255, 255, 255]; htk('BOOKING', M, 60, 8, onA, { bold: true, ls: 1.6 }); htk(NM + '  /  ' + ('0' + hsPg).slice(-2), W - M, 60, 8, onA, { bold: true, align: 'right', ls: 1.6 }); hhair(M, 72, W - M, onA, 1.1); doc.setFont(HF, 'bold'); doc.setFontSize(58); ct(onA); doc.text('BOOK', M, 400); doc.text(firstName, M, 460); htk('PHONE', M, 512, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('+91 97466 79720', M + 110, 512); htk('EMAIL', M, 540, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('yksproductions893@gmail.com', M + 110, 540, { charSpace: 0 }); hhair(M, H - 96, W - M, onA, 1.1); doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(onA); doc.text(doc.splitTextToSize('Represented exclusively by YKS Productions. Rates, availability and full-resolution files on request.', 320), M, H - 76, { lineHeightFactor: 1.4 }); hlogoBox(W - M - 100, H - 108, 100, onA); }
+
+    /* ── TEMPLATE: Lookbook (fashion, photo-forward — full-bleed plates) ── */
+    function tplLookbook() { var fn = hsCover(imgs[0]); var n = 1; imgs.slice(1, 8).forEach(function (im) { hsPlate(im, 'LOOK ' + ('0' + (n++)).slice(-2) + ' — ' + ((im.cat || 'EDITORIAL'))); }); hsProfile(); hsClosing(fn); }
+    /* ── TEMPLATE: Minimal (airy — one centred plate per page) ── */
+    function tplMinimal() { var fn = hsCover(imgs[0]); hsProfile(); imgs.slice(2, 7).forEach(function (im, k) { hsCenter(im, 'PLATE ' + ('0' + (k + 1)).slice(-2) + ' — ' + ((im.cat || 'SELECTED'))); }); hsClosing(fn); }
     /* ── TEMPLATE: Comp Card (agency standard — face front, grid + stats back) ── */
     function tplCompCard() {
       // FRONT — one hero headshot, name, agency mark
@@ -1599,98 +1573,8 @@
         foot();
       }
     }
-    /* ── TEMPLATE: Editorial (YKS house style — the flagship; a light+dark editorial book, no watermark) ── */
-    function tplEditorial() {
-      var NIGHT = [12, 10, 16], PAPER = [255, 255, 255], INK = [20, 20, 22], INKSUB = [140, 138, 134], LIGHT = [244, 240, 232], MUTE = [196, 190, 180], GOLD = [184, 145, 47], A = AC;
-      var HF = 'helvetica', LG = 'times', pg = 1;
-      function bg(c) { doc.setFillColor.apply(doc, c); doc.rect(0, 0, W, H, 'F'); }
-      function tk(str, x, y, sz, c, o) { o = o || {}; doc.setFont(HF, o.bold ? 'bold' : 'normal'); doc.setFontSize(sz); ct(c); doc.text(o.upper === false ? String(str) : String(str).toUpperCase(), x, y, { align: o.align || 'left', charSpace: o.ls == null ? 1.3 : o.ls }); }
-      function hair(x1, y, x2, c, lw) { doc.setDrawColor.apply(doc, c); doc.setLineWidth(lw || 0.8); doc.line(x1, y, x2, y); }
-      function np(c) { doc.addPage(); pg++; bg(c); }
-      function lum(c) { return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; }
-      function nbleed(im, x, y, bw, bh) { if (im.fit) { doc.setFillColor.apply(doc, NIGHT); doc.rect(x, y, bw, bh, 'F'); var s = Math.min(bw / im.w, bh / im.h), w = im.w * s, h = im.h * s; doc.addImage(im.data, 'JPEG', x + (bw - w) / 2, y + (bh - h) / 2, w, h); } else coverFill(im, x, y, bw, bh); }
-      function logoBox(x, y, w, c) { var h = w * 0.60, cx = x + w / 2; doc.setDrawColor.apply(doc, c); doc.setLineWidth(0.9); doc.rect(x, y, w, h); doc.setFont(LG, 'normal'); ct(c); doc.setFontSize(w * 0.285); doc.text('YKS', cx, y + h * 0.50, { align: 'center', charSpace: 1 }); var py = y + h * 0.80, word = 'PRODUCTIONS', ws = 1.3; doc.setFont(HF, 'normal'); doc.setFontSize(w * 0.064); var tw = doc.getTextWidth(word) + (word.length - 1) * ws; doc.text(word, cx, py, { align: 'center', charSpace: ws }); doc.setLineWidth(0.5); var gap = w * 0.05, dash = w * 0.085; doc.line(cx - tw / 2 - gap - dash, py - 2.5, cx - tw / 2 - gap, py - 2.5); doc.line(cx + tw / 2 + gap, py - 2.5, cx + tw / 2 + gap + dash, py - 2.5); }
-      function runHead(left) { tk(left, M, 60, 8, INK, { bold: true, ls: 1.5 }); tk(NM + '  /  ' + ('0' + pg).slice(-2), W - M, 60, 8, INK, { bold: true, align: 'right', ls: 1.5 }); hair(M, 72, W - M, INK, 1.1); }
-      function paperFoot() { hair(M, H - 56, W - M, INK, 1.1); tk('+91 97466 79720', M, H - 40, 7.5, INKSUB, { ls: 1.1 }); tk('YKSPRODUCTIONS893@GMAIL.COM', W - M, H - 40, 7.5, INKSUB, { align: 'right', ls: 1.1 }); }
-      function plateFoot(cap) { hair(M, H - 44, W - M, GOLD, 0.8); tk(cap, M, H - 28, 8, GOLD, { bold: true, ls: 1.5 }); tk(NM + '  /  ' + ('0' + pg).slice(-2), W - M, H - 28, 8, GOLD, { align: 'right', ls: 1.5 }); }
-      function fitFont(str, font, wt, start, min, maxW) { var s = start; doc.setFont(font, wt); while (s > min) { doc.setFontSize(s); if (doc.getTextWidth(String(str).toUpperCase()) <= maxW) break; s -= 1; } return s; }
-      function edBio() { if (about) return about; var role = (cat === 'Actor' ? 'actor' : (/Influencer|Creator/i.test(cat) ? 'model and digital creator' : 'professional model')); var where = city ? ' based in ' + city : ''; return name + ' is a ' + role + where + ', working across ' + disc.toLowerCase() + '. Equally at home on a controlled studio call and looser, content-led shoots — a range that suits a lookbook, a runway line-up or a campaign built to live on a phone. Quick to take direction, precise on the marks, and comfortable holding a look for as long as the frame needs.'; }
-      var castable = disc.split(' · '), fig = imgs[1] || imgs[0];
-
-      // COVER
-      bg(NIGHT);
-      var bandH = 166; nbleed(imgs[0], 0, 0, W, H - bandH); shade(0, 150, 0.2); hair(M, H - bandH, W - M, GOLD, 0.9); logoBox(M, 44, 118, LIGHT);
-      var by = H - bandH;
-      tk(disc, M, by + 40, 8.5, GOLD, { bold: true, ls: 2 });
-      var parts = NM.split(' '), l1 = parts[0], l2 = parts.slice(1).join(' '); if (!l2) l1 = NM;
-      var ns = fitFont(l2 || l1, HF, 'bold', 40, 22, W * 0.55); doc.setFont(HF, 'bold'); doc.setFontSize(ns); ct(LIGHT);
-      if (l2) { doc.text(l1, M, by + 82); doc.text(l2, M, by + 82 + ns * 0.9); } else doc.text(l1, M, by + 104);
-      tk('TALENT PORTFOLIO', W - M, by + 62, 8.5, MUTE, { align: 'right', ls: 2 });
-      tk('EDITION 2026 / 01', W - M, by + 80, 8.5, MUTE, { align: 'right', ls: 2 });
-      tk('EXCLUSIVE · YKS', W - M, by + 98, 8.5, GOLD, { align: 'right', ls: 2 });
-
-      // PROFILE
-      np(PAPER); runHead('YKS PRODUCTIONS — TALENT PORTFOLIO');
-      tk('PROFILE', M, 116, 9, INKSUB, { bold: true, ls: 2 });
-      doc.setFont(HF, 'bold'); doc.setFontSize(30); ct(INK); doc.text(NM, M, 150);
-      var LCW = 250;
-      doc.setFont(HF, 'normal'); doc.setFontSize(10.5); ct(INK);
-      var bl = doc.splitTextToSize(edBio(), LCW).slice(0, 11); doc.text(bl, M, 190, { lineHeightFactor: 1.5 });
-      var ly = 190 + bl.length * 15.6 + 30;
-      tk('CASTABLE FOR', M, ly, 9, INKSUB, { bold: true, ls: 2 }); ly += 24;
-      var cx2 = M, cy2 = ly; doc.setFont(HF, 'normal'); doc.setFontSize(9.5);
-      castable.forEach(function (t) { var tw = doc.getTextWidth(t) + 22; if (cx2 + tw > M + LCW) { cx2 = M; cy2 += 32; } doc.setDrawColor.apply(doc, A); doc.setLineWidth(0.9); doc.roundedRect(cx2, cy2 - 14, tw, 24, 3, 3, 'S'); ct(INK); doc.text(t, cx2 + 11, cy2 + 2); cx2 += tw + 8; });
-      var RW = 200, rx = W - M - RW, fy = 130;
-      if (fig) { place(fig, rx, fy, RW); var fby = fy + RW / 0.8; tk('FIG. 01 — ' + ((fig.cat || 'FULL LENGTH')), rx, fby + 22, 8, GOLD, { bold: true, ls: 1.5 }); hair(rx, fby + 32, W - M, GOLD, 0.8); }
-      var my = fy + RW / 0.8 + 70; tk('MEASUREMENTS', rx, my, 9, INKSUB, { bold: true, ls: 2 }); my += 6;
-      STATS.slice(0, 9).forEach(function (r) { my += 22; hair(rx, my - 15, W - M, INK, 0.5); tk(r[0], rx, my, 8, INKSUB, { ls: 1.2 }); doc.setFont(HF, 'bold'); doc.setFontSize(9.5); ct(INK); doc.text(r[1], W - M, my, { align: 'right' }); });
-      tk('REPRESENTED BY', M, H - 150, 9, INKSUB, { bold: true, ls: 2 }); logoBox(M, H - 138, 96, INK);
-      tk('+91 97466 79720', M + 112, H - 116, 9, INK, { bold: true, ls: 0.5, upper: false });
-      tk('yksproductions893@gmail.com', M + 112, H - 100, 8.5, INKSUB, { ls: 0.5, upper: false });
-      paperFoot();
-
-      // PLATE 01 (full-bleed)
-      if (imgs[2]) { np(NIGHT); nbleed(imgs[2], 0, 0, W, H); shade(H - 90, 90, 0.34); plateFoot('PLATE 01 — ' + ((imgs[2].cat || 'EDITORIAL'))); }
-
-      // SPREAD 1
-      if (imgs[3] || imgs[4]) {
-        np(PAPER); runHead('EDITORIAL — MOVEMENT');
-        var g = 22, cw = (CW - g) / 2, yy = 100, ph = cw / 0.8;
-        [imgs[3], imgs[4]].forEach(function (im, k) { if (im) place(im, M + k * (cw + g), yy, cw); });
-        [imgs[3], imgs[4]].forEach(function (im, k) { if (im) tk('PLATE ' + ('0' + (k + 2)).slice(-2) + ' — ' + ((im.cat || (k ? 'PROFILE' : 'THREE-QUARTER'))), M + k * (cw + g), yy + ph + 22, 8, INKSUB, { ls: 1.3 }); });
-        hair(M, H - 150, W - M, INK, 1.1);
-        doc.setFont(HF, 'bold'); doc.setFontSize(25); ct(INK);
-        var ds = disc.split(' · '), half = Math.ceil(ds.length / 2);
-        doc.text(ds.slice(0, half).join(' · ').toUpperCase() + ' ·', M, H - 118); doc.text(ds.slice(half).join(' · ').toUpperCase(), M, H - 92);
-        doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(INKSUB);
-        doc.text(doc.splitTextToSize('Straight colour or a black-and-white conversion — no retouching. Full-resolution files, additional looks and video on request.', 190), W - M, H - 128, { align: 'right', lineHeightFactor: 1.4 });
-        tk('PLATES 02 — 03', W - M, H - 92, 8, INKSUB, { align: 'right', ls: 1.3 });
-        paperFoot();
-      }
-
-      // PLATE 04 (full-bleed)
-      if (imgs[5]) { np(NIGHT); nbleed(imgs[5], 0, 0, W, H); shade(H - 90, 90, 0.34); plateFoot('PLATE 04 — ' + ((imgs[5].cat || 'PORTRAIT'))); }
-
-      // SPREAD 2
-      if (imgs[6] || imgs[7]) {
-        np(PAPER); runHead('EDITORIAL — SELECTED');
-        var g2 = 22, cw2 = (CW - g2) / 2, y2 = 100, ph2 = cw2 / 0.8;
-        [imgs[6], imgs[7]].forEach(function (im, k) { if (im) place(im, M + k * (cw2 + g2), y2, cw2); });
-        [imgs[6], imgs[7]].forEach(function (im, k) { if (im) tk('PLATE ' + ('0' + (k + 5)).slice(-2) + ' — ' + ((im.cat || 'LOOK')), M + k * (cw2 + g2), y2 + ph2 + 22, 8, INKSUB, { ls: 1.3 }); });
-        paperFoot();
-      }
-
-      // CLOSING (accent flood)
-      np(A);
-      var onA = lum(A) > 0.62 ? INK : [255, 255, 255], onAsub = lum(A) > 0.62 ? [80, 70, 60] : [255, 255, 255];
-      tk('BOOKING', M, 60, 8, onA, { bold: true, ls: 1.6 }); tk(NM + '  /  ' + ('0' + pg).slice(-2), W - M, 60, 8, onA, { bold: true, align: 'right', ls: 1.6 }); hair(M, 72, W - M, onA, 1.1);
-      doc.setFont(HF, 'bold'); doc.setFontSize(58); ct(onA); doc.text('BOOK', M, 400); doc.text(l1, M, 460);
-      tk('PHONE', M, 512, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('+91 97466 79720', M + 110, 512);
-      tk('EMAIL', M, 540, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('yksproductions893@gmail.com', M + 110, 540, { charSpace: 0 });
-      hair(M, H - 96, W - M, onA, 1.1); doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(onA);
-      doc.text(doc.splitTextToSize('Represented exclusively by YKS Productions. Rates, availability and full-resolution files on request.', 320), M, H - 76, { lineHeightFactor: 1.4 });
-      logoBox(W - M - 100, H - 108, 100, onA);
-    }
+    /* ── TEMPLATE: Editorial (YKS house style — the flagship editorial book) ── */
+    function tplEditorial() { var fn = hsCover(imgs[0]); hsProfile(); if (imgs[2]) hsPlate(imgs[2], 'PLATE 01 — ' + ((imgs[2].cat || 'EDITORIAL'))); if (imgs[3] || imgs[4]) hsSpread(imgs[3], imgs[4], 'EDITORIAL — MOVEMENT', 'PLATE 02 — ' + ((imgs[3] && imgs[3].cat) || 'THREE-QUARTER'), 'PLATE 03 — ' + ((imgs[4] && imgs[4].cat) || 'PROFILE'), true); if (imgs[5]) hsPlate(imgs[5], 'PLATE 04 — ' + ((imgs[5].cat || 'PORTRAIT'))); if (imgs[6] || imgs[7]) hsSpread(imgs[6], imgs[7], 'EDITORIAL — SELECTED', 'PLATE 05 — ' + ((imgs[6] && imgs[6].cat) || 'LOOK'), 'PLATE 06 — ' + ((imgs[7] && imgs[7].cat) || 'LOOK'), false); hsClosing(fn); }
     if (cfg.template === 'lookbook') { tplLookbook(); deliver(doc, SAVE, cfg); return; }
     if (cfg.template === 'duo') { tplDuo(); profilePage(); digitalsPage(); bookPage(); deliver(doc, SAVE, cfg); return; }
     if (cfg.template === 'compcard') { tplCompCard(); deliver(doc, SAVE, cfg); return; }
