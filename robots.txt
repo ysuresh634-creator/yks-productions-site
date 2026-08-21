@@ -136,7 +136,7 @@ Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
 Allow: /
 
-User-agent: Claude-Web
+User-agent: Claude-User
 # Talent privacy. names.json is the only published file holding a talent's
 # real name, and it exists so a visitor's browser can paint names onto the
 # roster. No crawler may read it. _data/ holds the source roster.
@@ -161,7 +161,7 @@ Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
 Allow: /
 
-User-agent: anthropic-ai
+User-agent: Claude-SearchBot
 # Talent privacy. names.json is the only published file holding a talent's
 # real name, and it exists so a visitor's browser can paint names onto the
 # roster. No crawler may read it. _data/ holds the source roster.
@@ -362,6 +362,56 @@ Disallow: /yks-productions-onepage.html
 Allow: /
 
 User-agent: Meta-ExternalAgent
+# Talent privacy. names.json is the only published file holding a talent's
+# real name, and it exists so a visitor's browser can paint names onto the
+# roster. No crawler may read it. _data/ holds the source roster.
+# Talent contact details exist nowhere on this site at all.
+Disallow: /talents/names.json
+Disallow: /_data/
+# Internal client review and photo-selection pages.
+Disallow: /contact-sheet.html
+Disallow: /cs-couple.html
+Disallow: /cs-rukmini.html
+Disallow: /cs-wedding.html
+Disallow: /ruk-choose.html
+Disallow: /review.html
+# Unfinished previews and scratch pages — not for indexing.
+Disallow: /_hero-preview.html
+Disallow: /hero-motion-preview.html
+Disallow: /work-preview.html
+Disallow: /_fonts-preview.html
+Disallow: /edit.html
+Disallow: /studio.html
+Disallow: /labs.html
+Disallow: /yks-productions-onepage.html
+Allow: /
+
+User-agent: Meta-WebIndexer
+# Talent privacy. names.json is the only published file holding a talent's
+# real name, and it exists so a visitor's browser can paint names onto the
+# roster. No crawler may read it. _data/ holds the source roster.
+# Talent contact details exist nowhere on this site at all.
+Disallow: /talents/names.json
+Disallow: /_data/
+# Internal client review and photo-selection pages.
+Disallow: /contact-sheet.html
+Disallow: /cs-couple.html
+Disallow: /cs-rukmini.html
+Disallow: /cs-wedding.html
+Disallow: /ruk-choose.html
+Disallow: /review.html
+# Unfinished previews and scratch pages — not for indexing.
+Disallow: /_hero-preview.html
+Disallow: /hero-motion-preview.html
+Disallow: /work-preview.html
+Disallow: /_fonts-preview.html
+Disallow: /edit.html
+Disallow: /studio.html
+Disallow: /labs.html
+Disallow: /yks-productions-onepage.html
+Allow: /
+
+User-agent: Meta-ExternalFetcher
 # Talent privacy. names.json is the only published file holding a talent's
 # real name, and it exists so a visitor's browser can paint names onto the
 # roster. No crawler may read it. _data/ holds the source roster.

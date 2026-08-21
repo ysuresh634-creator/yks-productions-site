@@ -41,9 +41,16 @@ PRIVATE = [
 ]
 
 # Answer engines we want citing us. Each needs its own full copy of the rules.
-AI = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-Web',
-      'anthropic-ai', 'PerplexityBot', 'Perplexity-User', 'Google-Extended',
-      'Applebot', 'Applebot-Extended', 'Bingbot', 'CCBot', 'Meta-ExternalAgent',
+# Names taken from each vendor's own crawler documentation, not from
+# SEO blog posts. Claude-Web and anthropic-ai were dropped: Anthropic's
+# support article documents exactly three agents and neither is among them.
+# Claude-User and Claude-SearchBot are the two that actually fetch a page
+# to answer a question, which is the surface we care about.
+AI = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User',
+      'ClaudeBot', 'Claude-User', 'Claude-SearchBot',
+      'PerplexityBot', 'Perplexity-User', 'Google-Extended',
+      'Applebot', 'Applebot-Extended', 'Bingbot', 'CCBot',
+      'Meta-ExternalAgent', 'Meta-WebIndexer', 'Meta-ExternalFetcher',
       'Amazonbot', 'DuckAssistBot', 'cohere-ai', 'YouBot']
 
 
