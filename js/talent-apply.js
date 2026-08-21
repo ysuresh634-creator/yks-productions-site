@@ -725,6 +725,14 @@
   var cropModal = $('#apCrop'), cropImg = $('#apCropImg'), cropBlur = $('#apCropBlur'), cropFrame = $('#apCropFrame'), cropZoom = $('#apCropZoom');
   var cropNote = $('#apCropNote'), modeFillBtn = $('#apModeFill'), modeFitBtn = $('#apModeFit');
   var cropBright = $('#apCropBright'), cropContrast = $('#apCropContrast'), cropRotBtn = $('#apCropRotate');
+  var vZoom = $('#apCropZoomV'), vBright = $('#apCropBrightV'), vContrast = $('#apCropContrastV');
+  function pct(v) { var n = Math.round((v - 1) * 100); return (n > 0 ? '+' : '') + n; }
+  function syncCropVals() {
+    if (!cropS) return;
+    if (vZoom) vZoom.textContent = (cropS.zoom || 1).toFixed(1) + '\u00d7';
+    if (vBright) vBright.textContent = pct(cropS.bright || 1);
+    if (vContrast) vContrast.textContent = pct(cropS.contrast || 1);
+  }
   function adjFilter(st) { return 'brightness(' + (st.bright || 1) + ') contrast(' + (st.contrast || 1) + ')'; }
   var cropS = null;
   function openCrop(item) {
@@ -763,6 +771,7 @@
     cropImg.style.width = w + 'px'; cropImg.style.height = h + 'px';
     cropImg.style.transform = 'translate(' + cropS.tx + 'px,' + cropS.ty + 'px)';
     cropImg.style.filter = adjFilter(cropS);
+    syncCropVals();
   }
   function closeCrop() { if (cropModal) cropModal.hidden = true; document.documentElement.style.overflow = ''; cropS = null; }
   function saveCrop() {
@@ -814,7 +823,15 @@
     cropFrame.addEventListener('touchmove', function (e) { cmove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
     cropFrame.addEventListener('touchend', function () { drag = false; });
     $('#apCropSave').addEventListener('click', saveCrop);
-    $('#apCropReset').addEventListener('click', function () { if (cropS) { cropS.item.edited = null; cropS.item.fit = false; closeCrop(); renderThumbs(); } });
+    $('#apCropReset').addEventListener('click', function () {
+      if (!cropS) return;
+      cropS.rot = 0; cropS.bright = 1; cropS.contrast = 1; cropS.nat = cropS.orig;
+      cropS.item.edited = null; cropS.item.fit = false;
+      if (cropBright) cropBright.value = 1; if (cropContrast) cropContrast.value = 1;
+      cropImg.src = cropS.orig.src; cropBlur.src = cropS.orig.src;
+      setMode('fill', true);
+      renderThumbs();
+    });
     $('#apCropCancel').addEventListener('click', closeCrop);
     cropModal.addEventListener('click', function (e) { if (e.target === cropModal) closeCrop(); });
   }
