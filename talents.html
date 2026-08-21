@@ -43,7 +43,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=15" />
-<link rel="stylesheet" href="/css/talents.css?v=43" />
+<link rel="stylesheet" href="/css/talents.css?v=44" />
 
 <script type="application/ld+json">
 {
@@ -549,7 +549,8 @@
         <label>Your name<input type="text" name="client_name" placeholder="You / your brand" required /></label>
         <label>Email or phone<input type="text" name="client_contact" placeholder="How I reach you" required /></label>
       </div>
-      <label>What are you casting?<textarea name="brief" rows="3" placeholder="The look, the usage, how many faces — a line or two is plenty." required></textarea></label>
+      <label>What are you casting?<textarea name="brief" rows="3" placeholder="The look, the usage, how many faces — a line or two is plenty." required></textarea>
+        <span class="cast-aid"><button type="button" class="cast-ai" id="castAi">✨ Tidy up my brief</button><small>Rough notes are fine — this shapes them into a clear brief.</small></span></label>
       <div class="cast-row3">
         <label>City<input type="text" name="city" placeholder="Mumbai, Dubai…" /></label>
         <label>Dates<input type="text" name="shoot_dates" placeholder="e.g. 12–13 Sep" /></label>
@@ -568,6 +569,18 @@
 (function () {
   var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev';
   var f = document.getElementById('castForm'); if (!f) return;
+  // AI: shape a rough note into a clear casting brief (never invents budget, dates or brands)
+  var aiBtn = document.getElementById('castAi');
+  if (aiBtn) aiBtn.addEventListener('click', function () {
+    var el = f.brief, src = (el.value || '').trim();
+    if (!src) { el.focus(); return; }
+    var old = aiBtn.textContent; aiBtn.disabled = true; aiBtn.textContent = '✨ Writing…';
+    var done = false, to = setTimeout(function () { if (!done) { done = true; aiBtn.disabled = false; aiBtn.textContent = old; } }, 20000);
+    fetch(ENGINE + '/ai/write', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: 'brief', text: src }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (done) return; done = true; clearTimeout(to); if (j && j.text) el.value = j.text; aiBtn.disabled = false; aiBtn.textContent = old; })
+      .catch(function () { if (done) return; done = true; clearTimeout(to); aiBtn.disabled = false; aiBtn.textContent = old; });
+  });
   f.addEventListener('submit', function (e) {
     e.preventDefault();
     if (!f.checkValidity()) { f.reportValidity(); return; }

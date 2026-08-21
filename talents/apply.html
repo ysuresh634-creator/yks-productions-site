@@ -41,7 +41,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=15" />
-<link rel="stylesheet" href="/css/talents.css?v=43" />
+<link rel="stylesheet" href="/css/talents.css?v=44" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -735,9 +735,17 @@
           </div>
           <label class="ap-full">Your comfort zone &amp; boundaries <span class="ap-opt">optional · this protects you</span>
             <textarea name="comfort" rows="2" placeholder="What are you happy to shoot — and anything that's a firm no? (e.g. swimwear yes; no smoking scenes.) I'll never put you forward for something you're not comfortable with."></textarea>
+            <span class="ap-polish-row">
+              <button type="button" class="ap-tag-ai" id="apComfortAi" data-field="What are you happy to shoot — and anything that is a firm no?">✨ Say it clearly</button>
+              <small class="ap-mini">Tidies your own words — it never changes what you said yes or no to.</small>
+            </span>
           </label>
           <label class="ap-full">Anything else I should know? <span class="ap-opt">optional</span>
             <textarea name="extra" rows="2" placeholder="Injuries, tattoos/piercings, dietary needs, a parent/guardian's number if you're under 18 — anything that helps me look after you on set."></textarea>
+            <span class="ap-polish-row">
+              <button type="button" class="ap-tag-ai" id="apExtraAi" data-field="Anything else I should know?">✨ Say it clearly</button>
+              <small class="ap-mini">Tidies your own words — nothing invented, numbers kept exactly.</small>
+            </span>
           </label>
         </div>
 
@@ -890,7 +898,7 @@
 <!-- photo crop / adjust editor -->
 <div class="ap-crop" id="apCrop" hidden>
   <div class="ap-crop-box">
-    <p class="ap-crop-title">Adjust your photo <span>drag to move · slide to zoom</span></p>
+    <p class="ap-crop-title">Adjust your photo <span>drag to move · zoom, rotate &amp; tune</span></p>
     <div class="ap-crop-modes">
       <button type="button" class="ap-crop-mode on" id="apModeFill">▣ Fill frame</button>
       <button type="button" class="ap-crop-mode" id="apModeFit">◱ Fit whole</button>
@@ -898,6 +906,11 @@
     <div class="ap-crop-frame" id="apCropFrame"><img id="apCropBlur" alt="" aria-hidden="true" draggable="false" /><img id="apCropImg" alt="Your photo — drag to reposition, pinch or scroll to zoom" draggable="false" /></div>
     <p class="ap-crop-note" id="apCropNote">Drag to reposition — the frame is what shows in your portfolio.</p>
     <label class="ap-crop-zoom">Zoom<input type="range" id="apCropZoom" min="1" max="3" step="0.01" value="1" /></label>
+    <div class="ap-crop-adj">
+      <label>Brightness<input type="range" id="apCropBright" min="0.6" max="1.4" step="0.01" value="1" /></label>
+      <label>Contrast<input type="range" id="apCropContrast" min="0.6" max="1.5" step="0.01" value="1" /></label>
+      <button type="button" class="ap-crop-rot" id="apCropRotate" title="Rotate 90°">⟳ Rotate</button>
+    </div>
     <div class="ap-crop-btns">
       <button type="button" id="apCropReset">Reset</button>
       <button type="button" id="apCropCancel">Cancel</button>
@@ -945,6 +958,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=53"></script>
+<script src="/js/talent-apply.js?v=54"></script>
 </body>
 </html>

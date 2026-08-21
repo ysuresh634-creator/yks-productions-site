@@ -724,6 +724,8 @@
   /* ══ per-photo crop / adjust editor — Fill (crop) or Fit (show the whole photo) ══ */
   var cropModal = $('#apCrop'), cropImg = $('#apCropImg'), cropBlur = $('#apCropBlur'), cropFrame = $('#apCropFrame'), cropZoom = $('#apCropZoom');
   var cropNote = $('#apCropNote'), modeFillBtn = $('#apModeFill'), modeFitBtn = $('#apModeFit');
+  var cropBright = $('#apCropBright'), cropContrast = $('#apCropContrast'), cropRotBtn = $('#apCropRotate');
+  function adjFilter(st) { return 'brightness(' + (st.bright || 1) + ') contrast(' + (st.contrast || 1) + ')'; }
   var cropS = null;
   function openCrop(item) {
     if (!cropModal) return;
@@ -731,8 +733,9 @@
     var nat = new Image();
     nat.onload = function () {
       var fw = cropFrame.clientWidth || 300, fh = cropFrame.clientHeight || 375;
-      cropS = { item: item, nat: nat, fw: fw, fh: fh, mode: item.fit ? 'fit' : 'fill', zoom: 1 };
+      cropS = { item: item, orig: nat, nat: nat, fw: fw, fh: fh, mode: item.fit ? 'fit' : 'fill', zoom: 1, rot: 0, bright: 1, contrast: 1 };
       cropImg.src = nat.src; cropBlur.src = nat.src;
+      if (cropBright) cropBright.value = 1; if (cropContrast) cropContrast.value = 1;
       setMode(cropS.mode, true);
     };
     nat.src = item.url;
@@ -759,6 +762,7 @@
     }
     cropImg.style.width = w + 'px'; cropImg.style.height = h + 'px';
     cropImg.style.transform = 'translate(' + cropS.tx + 'px,' + cropS.ty + 'px)';
+    cropImg.style.filter = adjFilter(cropS);
   }
   function closeCrop() { if (cropModal) cropModal.hidden = true; document.documentElement.style.overflow = ''; cropS = null; }
   function saveCrop() {
@@ -767,13 +771,14 @@
     var c = document.createElement('canvas'); c.width = outW; c.height = outH; var ctx = c.getContext('2d');
     if (cropS.mode === 'fit') {
       var nat = cropS.nat, bs = Math.max(outW / nat.width, outH / nat.height);   // blurred backdrop fills — no bars
-      if ('filter' in ctx) ctx.filter = 'blur(24px) brightness(.6)';
+      if ('filter' in ctx) ctx.filter = 'blur(24px) brightness(' + (0.6 * (cropS.bright || 1)) + ')';
       ctx.drawImage(nat, (outW - nat.width * bs) / 2, (outH - nat.height * bs) / 2, nat.width * bs, nat.height * bs);
-      if ('filter' in ctx) ctx.filter = 'none';
+      if ('filter' in ctx) ctx.filter = adjFilter(cropS);
       var s = cropS.base * cropS.zoom;                                            // whole photo, positioned
       ctx.drawImage(nat, cropS.tx * k, cropS.ty * k, nat.width * s * k, nat.height * s * k);
       cropS.item.edited = c.toDataURL('image/jpeg', 0.86); cropS.item.fit = true;
     } else {
+      if ('filter' in ctx) ctx.filter = adjFilter(cropS);
       var s2 = cropS.base * cropS.zoom, sx = -cropS.tx / s2, sy = -cropS.ty / s2, sw = cropS.fw / s2, sh = cropS.fh / s2;
       ctx.drawImage(cropS.nat, sx, sy, sw, sh, 0, 0, outW, outH);
       cropS.item.edited = c.toDataURL('image/jpeg', 0.85); cropS.item.fit = false;
@@ -784,6 +789,21 @@
     if (modeFillBtn) modeFillBtn.addEventListener('click', function () { setMode('fill', true); });
     if (modeFitBtn) modeFitBtn.addEventListener('click', function () { setMode('fit', true); });
     cropZoom.addEventListener('input', function () { if (cropS) { cropS.zoom = parseFloat(cropZoom.value) || 1; applyCrop(); } });
+    if (cropBright) cropBright.addEventListener('input', function () { if (cropS) { cropS.bright = parseFloat(cropBright.value) || 1; applyCrop(); } });
+    if (cropContrast) cropContrast.addEventListener('input', function () { if (cropS) { cropS.contrast = parseFloat(cropContrast.value) || 1; applyCrop(); } });
+    if (cropRotBtn) cropRotBtn.addEventListener('click', function () {
+      if (!cropS) return;
+      cropS.rot = (cropS.rot + 90) % 360;
+      var o = cropS.orig, quarter = (cropS.rot === 90 || cropS.rot === 270);
+      var c = document.createElement('canvas');
+      c.width = quarter ? o.height : o.width; c.height = quarter ? o.width : o.height;
+      var cx = c.getContext('2d');
+      cx.translate(c.width / 2, c.height / 2); cx.rotate(cropS.rot * Math.PI / 180);
+      cx.drawImage(o, -o.width / 2, -o.height / 2);
+      var rotated = new Image();
+      rotated.onload = function () { cropS.nat = rotated; cropImg.src = rotated.src; cropBlur.src = rotated.src; setMode(cropS.mode, true); };
+      rotated.src = c.toDataURL('image/jpeg', 0.92);
+    });
     var drag = false, dx, dy, otx, oty;
     var cdown = function (x, y) { if (!cropS) return; drag = true; dx = x; dy = y; otx = cropS.tx; oty = cropS.ty; };
     var cmove = function (x, y) { if (!drag) return; cropS.tx = otx + (x - dx); cropS.ty = oty + (y - dy); applyCrop(); };
@@ -999,6 +1019,30 @@
       });
     });
   })();
+
+  /* ── "Say it clearly" — tidies what THEY wrote. Polish only: never invents, never softens a boundary.
+        Requires existing text, so it can never put words in someone's mouth. ── */
+  function wirePolish(fieldName, btnId) {
+    var el = form[fieldName], btn = $('#' + btnId);
+    if (!el || !btn) return;
+    var lbl = btn.getAttribute('data-field') || '';
+    btn.addEventListener('click', function () {
+      var src = (el.value || '').trim();
+      if (!src) { el.focus(); btn.textContent = 'Write something first'; setTimeout(function () { btn.textContent = '✨ Say it clearly'; }, 1600); return; }
+      var old = btn.textContent; btn.disabled = true; btn.textContent = '✨ Tidying…';
+      var done = false, to = setTimeout(function () { if (!done) { done = true; btn.disabled = false; btn.textContent = old; } }, 20000);
+      fetch(ENGINE_URL + '/ai/write', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: 'polish', text: src, field: lbl }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (done) return; done = true; clearTimeout(to);
+          if (j && j.text) { el.value = j.text; el.dispatchEvent(new Event('input', { bubbles: true })); }
+          btn.disabled = false; btn.textContent = old;
+        })
+        .catch(function () { if (done) return; done = true; clearTimeout(to); btn.disabled = false; btn.textContent = old; });
+    });
+  }
+  wirePolish('comfort', 'apComfortAi');
+  wirePolish('extra', 'apExtraAi');
 
   /* ══ autosave draft (text + video links; uploaded files can't persist across reloads) ══ */
   var textNames = ['name', 'contact', 'category', 'region', 'city', 'socials', 'about', 'tagline',
