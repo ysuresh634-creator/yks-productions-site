@@ -15,7 +15,7 @@
   'use strict';
   var WEB3FORMS_KEY = 'fbf5d037-af64-46a1-8ddc-5777379ec179';
   var WA_NUMBER = '919746679720';
-  var ENGINE_URL = '';   // ← paste the YKS Talents Engine URL (…workers.dev) here to feed the roster pipeline, then push
+  var ENGINE_URL = 'https://yks-talents-engine.ysuresh634.workers.dev';   // YKS Talents Engine — feeds the roster/management pipeline
   var DRAFT_KEY = 'yks_talent_draft2';   // bumped — abandons any stale demo draft so the preview starts on "YOUR NAME"
 
   var $ = function (s, c) { return (c || document).querySelector(s); };
