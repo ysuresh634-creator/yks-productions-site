@@ -713,7 +713,7 @@ main{overflow-x:clip}
     radial-gradient(120% 90% at 100% 0%,rgba(255,140,59,.14),transparent 55%),
     linear-gradient(180deg,#100c14,#0a0810)}
 .ap-shoot-glow{position:absolute;top:-40%;right:-10%;width:60%;height:120%;pointer-events:none;
-  background:radial-gradient(circle,rgba(255,140,59,.16),transparent 62%);filter:blur(20px)}
+  background:radial-gradient(circle,rgba(255,140,59,.14),transparent 66%)}
 .ap-shoot-grid{position:relative;display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:clamp(26px,4vw,52px);align-items:center}
 /* left: before/after contrast frames */
 .ap-shoot-visual{display:flex;align-items:center;justify-content:center;gap:14px}

@@ -74,7 +74,7 @@ img{display:block;max-width:100%}
 
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
   padding:20px 30px;transition:.45s var(--ease);mix-blend-mode:normal}
-.nav.scrolled{background:rgba(7,6,10,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding:13px 30px;border-bottom:1px solid var(--line)}
+.nav.scrolled{background:rgba(9,7,12,.95);padding:13px 30px;border-bottom:1px solid var(--line)}
 .brandmark{font-family:var(--font-d);font-size:21px;font-weight:600;letter-spacing:.03em}
 .brandmark span{color:var(--amber)}
 .brandmark em{font-style:normal;font-size:13px;opacity:.65;margin-left:2px;letter-spacing:.08em}
