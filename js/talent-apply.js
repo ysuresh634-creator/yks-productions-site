@@ -960,21 +960,65 @@
     var out = (length === 'short') ? (s1 + s3 + closer) : (s1 + ' ' + s2 + s3 + closer);
     return out.replace(/\s+/g, ' ').trim();
   }
+  /* ── AI writer: the YKS engine writes portfolio-grade copy from what they've told us.
+        Falls back to the built-in composer if the engine is unreachable, so the button always works. ── */
+  function writeFacts(kind) {
+    return {
+      kind: kind,
+      name: (form.name.value || '').trim(),
+      role: pick.role || (form.category.value || 'model'),
+      category: form.category.value || '',
+      city: (form.city.value || '').trim(),
+      loves: pick.loves || [],
+      proud: (($('#apProud') && $('#apProud').value) || '').trim(),
+      tone: pick.tone || 'warm',
+      exp: pick.exp || '',
+      length: pick.length || 'medium',
+      seed: pick.seed || 0
+    };
+  }
+  function aiWrite(kind) {
+    var facts = writeFacts(kind);
+    if (!facts.name) return Promise.resolve('');
+    return new Promise(function (res) {
+      var done = false, to = setTimeout(function () { if (!done) { done = true; res(''); } }, 20000);
+      fetch(ENGINE_URL + '/ai/write', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(facts) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) { if (done) return; done = true; clearTimeout(to); res((j && j.text) || ''); })
+        .catch(function () { if (done) return; done = true; clearTimeout(to); res(''); });
+    });
+  }
   var goBtn = $('#apAiGo'), regenBtn = $('#apAiRegen');
-  if (goBtn) goBtn.addEventListener('click', function () {
-    pick.seed = 0;
-    aboutBox.value = compose();
-    aboutBox.dispatchEvent(new Event('input'));
-    aboutBox.focus();
-    goBtn.textContent = 'Rewrite →';
-    if (regenBtn) regenBtn.hidden = false;
-  });
-  if (regenBtn) regenBtn.addEventListener('click', function () {
-    pick.seed = (pick.seed || 0) + 1;
-    aboutBox.value = compose();
-    aboutBox.dispatchEvent(new Event('input'));
-    aboutBox.focus();
-  });
+  function runWriter(btn, label) {
+    if (!aboutBox) return;
+    var old = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = '✨ Writing…'; }
+    aiWrite('about').then(function (text) {
+      aboutBox.value = text || compose();          // engine copy, or the built-in composer offline
+      aboutBox.dispatchEvent(new Event('input'));
+      aboutBox.focus();
+      if (btn) { btn.disabled = false; btn.textContent = label || old; }
+      if (regenBtn) regenBtn.hidden = false;
+      if (goBtn) goBtn.textContent = 'Rewrite →';
+    });
+  }
+  if (goBtn) goBtn.addEventListener('click', function () { pick.seed = 0; runWriter(goBtn, 'Rewrite →'); });
+  if (regenBtn) regenBtn.addEventListener('click', function () { pick.seed = (pick.seed || 0) + 1; runWriter(regenBtn, '↻ Another version'); });
+
+  /* ── signature line writer (portfolio cover) ── */
+  (function wireTaglineAI() {
+    var tagEl = form.tagline, btn = $('#apTagAi'); if (!tagEl || !btn) return;
+    btn.addEventListener('click', function () {
+      if (!(form.name.value || '').trim()) { tagEl.focus(); return; }
+      var old = btn.textContent; btn.disabled = true; btn.textContent = '✨ Writing…';
+      pick.seed = (pick.seed || 0) + 1;
+      aiWrite('tagline').then(function (text) {
+        if (text) { tagEl.value = text.slice(0, 46); tagEl.dispatchEvent(new Event('input')); }
+        else { var c = (form.category.value || 'Model'), ct2 = (form.city.value || '').trim(); tagEl.value = (DISC[c] || 'Fashion · Editorial').split(' · ').slice(0, 2).join(' & ') + (ct2 ? ' · ' + ct2 : ''); tagEl.dispatchEvent(new Event('input')); }
+        btn.disabled = false; btn.textContent = old;
+      });
+    });
+  })();
 
   /* ══ autosave draft (text + video links; uploaded files can't persist across reloads) ══ */
   var textNames = ['name', 'contact', 'category', 'region', 'city', 'socials', 'about', 'tagline',
