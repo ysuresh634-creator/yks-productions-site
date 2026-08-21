@@ -161,11 +161,35 @@
     dets = window.pico.cluster_detections(dets, 0.2);
     var best = null; for (var j = 0; j < dets.length; j++) if (!best || dets[j][3] > best[3]) best = dets[j];
     var q = best ? best[3] : 0, frac = best ? best[2] / H : 0;   // frac = face diameter ÷ image height
-    if (q < 6) return 'Full length';        // no confident frontal face → a body / turned-away shot
-    if (frac >= 0.32) return 'Beauty';      // face fills the frame (close beauty)
-    if (frac >= 0.20) return 'Headshots';   // head & shoulders
-    if (frac >= 0.13) return 'Fashion';     // waist / chest-up editorial
-    return 'Full length';                   // small face → whole body in frame
+    // no confident frontal face → could be a body shot OR a turned-away/profile portrait: that's the one case worth a second opinion
+    if (q < 6) return { cat: 'Full length', sure: false };
+    if (frac >= 0.32) return { cat: 'Beauty', sure: true };      // face fills the frame (close beauty)
+    if (frac >= 0.20) return { cat: 'Headshots', sure: true };   // head & shoulders
+    if (frac >= 0.13) return { cat: 'Fashion', sure: true };     // waist / chest-up editorial
+    return { cat: 'Full length', sure: true };                   // small face → whole body in frame
+  }
+  /* Second opinion from the YKS engine's vision model — used ONLY when the on-device pass is unsure
+     (no confident face). Measured: on-device beats the vision model on clear frames, so it stays authoritative. */
+  function engineOpinion(item) {
+    return new Promise(function (res) {
+      try {
+        var im = new Image();
+        im.onload = function () {
+          try {
+            var S = 448, sc = Math.min(S / im.naturalWidth, S / im.naturalHeight, 1);
+            var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(im.naturalWidth * sc)); c.height = Math.max(1, Math.round(im.naturalHeight * sc));
+            c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+            var to = setTimeout(function () { res(''); }, 12000);   // never make the talent wait
+            fetch(ENGINE_URL + '/ai/classify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: c.toDataURL('image/jpeg', 0.8) }) })
+              .then(function (r) { return r.json(); })
+              .then(function (j) { clearTimeout(to); res((j && j.category) || ''); })
+              .catch(function () { clearTimeout(to); res(''); });
+          } catch (e) { res(''); }
+        };
+        im.onerror = function () { res(''); };
+        im.src = item.edited || item.url;
+      } catch (e) { res(''); }
+    });
   }
   function clearDetecting(id) { var fig = thumbs.querySelector('.ap-thumb[data-id="' + id + '"]'); if (fig) { fig.classList.remove('ap-detecting'); var db = fig.querySelector('.ap-detbadge'); if (db) db.remove(); } return fig; }
   function autoSort(item) {
@@ -174,10 +198,21 @@
       var im = new Image();
       im.onload = function () {
         item.detecting = false;
-        if (!item.manual) { var cat; try { cat = classifyFraming(im); } catch (e) { cat = null; } if (cat && CATS.indexOf(cat) >= 0) { item.cat = cat; item.auto = true; } }
+        var r = null; try { r = classifyFraming(im); } catch (e) { r = null; }
+        if (!item.manual && r && CATS.indexOf(r.cat) >= 0) { item.cat = r.cat; item.auto = true; }
         var fig = clearDetecting(item.id);
         if (fig) { var s = fig.querySelector('.ap-thumb-cat'); if (s) s.value = item.cat; }
         updatePreview(); if (typeof refreshPosters === 'function') refreshPosters();
+        // unsure (no confident face) → quietly ask the engine for a second opinion; it only ever upgrades an uncertain guess
+        if (r && !r.sure && !item.manual) {
+          engineOpinion(item).then(function (cat) {
+            if (!cat || item.manual || CATS.indexOf(cat) < 0 || cat === item.cat) return;
+            item.cat = cat; item.auto = true;
+            var f2 = thumbs.querySelector('.ap-thumb[data-id="' + item.id + '"]');
+            if (f2) { var s2 = f2.querySelector('.ap-thumb-cat'); if (s2) s2.value = cat; }
+            updatePreview();
+          });
+        }
       };
       im.onerror = function () { item.detecting = false; clearDetecting(item.id); };
       im.src = item.edited || item.url;
