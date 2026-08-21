@@ -894,3 +894,7 @@ main{overflow-x:clip}
   .ap-crop{padding:10px}
   .ap-crop-sliders label{grid-template-columns:64px 1fr 34px;gap:8px}
 }
+
+/* WhatsApp drop: live progress / result */
+.ap-dl-wamsg{margin:12px 0 0;font-family:var(--mag-mono);font-size:12px;letter-spacing:.02em;color:var(--mag-accent);line-height:1.5}
+.ap-dl-wamsg a{color:var(--mag-accent);font-weight:600;text-decoration:underline;text-underline-offset:3px}

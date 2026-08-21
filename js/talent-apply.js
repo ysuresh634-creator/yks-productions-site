@@ -231,6 +231,7 @@
       var added = [];
       files.forEach(function (f) { var it = { file: f, id: ++uid, url: URL.createObjectURL(f), cat: activeCat, detecting: activeCat !== 'Digitals' }; photos.push(it); added.push(it); });
       renderThumbs();
+      warmPdfLibs();
       // downscale for the screen first, then classify — everything after this point works on the light copy
       added.forEach(function (it) {
         makePreview(it.file).then(function (pv) {
@@ -239,6 +240,13 @@
         });
       });   // Digitals is an explicit choice — respect it, don't auto-override
     });
+  }
+  // the PDF libraries are ~400KB; fetch them quietly once photos exist so the first export feels instant
+  var warmed = false;
+  function warmPdfLibs() {
+    if (warmed) return; warmed = true;
+    var go = function () { ensureJsPDF().catch(function () {}); ensureQR().catch(function () {}); };
+    if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 1500);
   }
   function idxOf(id) { for (var i = 0; i < photos.length; i++) if (photos[i].id === id) return i; return -1; }
   function renderThumbs() {
@@ -1381,9 +1389,9 @@
         var lk = LOOKS[CFG.look]; if (lk && lk.css !== 'none' && 'filter' in ctx) ctx.filter = lk.css;
         ctx.drawImage(img, (iw - cw) / 2, (ih - ch) / 2, cw, ch, 0, 0, oW, oH);
         res({ data: c.toDataURL('image/jpeg', 0.82), w: oW, h: oH });
-        URL.revokeObjectURL(img.src);
+        if (img.src.slice(0, 5) === 'blob:') URL.revokeObjectURL(img.src);
       };
-      img.onerror = rej; img.src = URL.createObjectURL(file);
+      img.onerror = rej; img.src = (typeof file === 'string') ? file : URL.createObjectURL(file);
     });
   }
   // apply the chosen look to an already-prepared dataURL (used for hand-cropped photos)
@@ -1409,11 +1417,11 @@
     var name = (form.name.value || '').trim();
     if (!name) { alert('Add your name first.'); if (form.name) form.name.focus(); return; }
     var orig = dlBtn.textContent; dlBtn.disabled = true; dlBtn.textContent = 'Building your portfolio…';
-    Promise.all([ensureJsPDF(), ensureFonts(), ensureQR()])
+    Promise.all([ensureJsPDF(), ensureQR()])
       .then(function (rr) {
         var JsPDF = rr[0];
         return Promise.all(photos.slice(0, 8).map(function (p) {
-          var pr = p.edited ? gradeDataURL(p.edited).then(function (d) { return { data: d, w: 900, h: 1125 }; }) : prepImg(p.file, 0.8, 1000);
+          var pr = p.edited ? gradeDataURL(p.edited).then(function (d) { return { data: d, w: 900, h: 1125 }; }) : prepImg(p.preview || p.file, 0.8, 1000);
           return pr.then(function (im) { im.cat = p.cat || ''; im.fit = !!p.fit; return im; });
         }))
           .then(function (imgs) {
@@ -1433,17 +1441,23 @@
 
   // "Drop it in my WhatsApp" — build the PDF, upload it, open a WhatsApp chat straight to YKS with the link.
   // This IS a submission: the talent lands in YKS's inbox with their book, opening a direct conversation.
+  var waMsgEl = $('#apDlWaMsg');
+  function waStatus(html, html_ok) { if (!waMsgEl) return; waMsgEl.hidden = false; if (html_ok) waMsgEl.innerHTML = html; else waMsgEl.textContent = String(html).replace(/<[^>]+>/g, ''); }
   var waBtn = $('#apDlWa');
   if (waBtn) waBtn.addEventListener('click', function () {
     if (!photos.length) { alert('Add at least one photo first — your portfolio is built from your photos.'); return; }
     var name = (form.name.value || '').trim();
     if (!name) { alert('Add your name first (in “The basics” above) — it goes on your cover.'); if (form.name) form.name.focus(); return; }
-    var orig = waBtn.textContent; waBtn.disabled = true; waBtn.textContent = 'Preparing your PDF…';
-    Promise.all([ensureJsPDF(), ensureFonts(), ensureQR()])
+    var orig = waBtn.textContent; waBtn.disabled = true; waBtn.textContent = 'Building your portfolio…';
+    // open the tab NOW, while we still have the click — filling it in later is what browsers block
+    var waWin = null; try { waWin = window.open('', '_blank'); } catch (e) {}
+    if (waWin) { try { waWin.document.write('<title>Opening WhatsApp…</title><body style="background:#0c0a10;color:#f4f0e8;font:15px system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">Preparing your portfolio…</body>'); } catch (e) {} }
+    waStatus('Building your portfolio — this takes a few seconds.');
+    Promise.all([ensureJsPDF(), ensureQR()])
       .then(function (rr) {
         var JsPDF = rr[0];
         return Promise.all(photos.slice(0, 8).map(function (p) {
-          var pr = p.edited ? gradeDataURL(p.edited).then(function (d) { return { data: d, w: 900, h: 1125 }; }) : prepImg(p.file, 0.8, 1000);
+          var pr = p.edited ? gradeDataURL(p.edited).then(function (d) { return { data: d, w: 900, h: 1125 }; }) : prepImg(p.preview || p.file, 0.8, 1000);
           return pr.then(function (im) { im.cat = p.cat || ''; im.fit = !!p.fit; return im; });
         })).then(function (imgs) {
           var th = THEMES[CFG.theme];
@@ -1456,7 +1470,7 @@
         });
       })
       .then(function (blob) {
-        waBtn.textContent = 'Sending to YKS…';
+        waBtn.textContent = 'Sending to YKS…'; waStatus('Uploading your PDF to YKS…');
         var file = new File([blob], name.replace(/\s+/g, '-') + '-YKS-portfolio.pdf', { type: 'application/pdf' });
         return upload(file, null, name + ' — WhatsApp');
       })
@@ -1464,10 +1478,20 @@
         unlockDownload();
         waBtn.textContent = 'Opening WhatsApp ✓';
         var msg = 'Hi Yedukrishna — here’s my YKS portfolio (' + name + '): ' + url;
-        window.open('https://wa.me/919746679720?text=' + encodeURIComponent(msg), '_blank');
+        var wa = 'https://wa.me/919746679720?text=' + encodeURIComponent(msg);
+        if (waWin && !waWin.closed) { try { waWin.location.href = wa; } catch (e) { waWin = null; } }
+        if (!waWin || waWin.closed) {                      // popup blocked — give them a link to tap
+          waStatus('Your portfolio is ready. <a href="' + wa + '" target="_blank" rel="noopener">Open WhatsApp to send it →</a>', true);
+        } else {
+          waStatus('✓ Sent to WhatsApp — your download is unlocked below.');
+        }
         setTimeout(function () { waBtn.textContent = orig; waBtn.disabled = false; }, 3000);
       })
-      .catch(function () { waBtn.textContent = orig; waBtn.disabled = false; alert('Couldn’t prepare it just now — please try again, or submit the form above.'); });
+      .catch(function () {
+        if (waWin && !waWin.closed) { try { waWin.close(); } catch (e) {} }
+        waBtn.textContent = orig; waBtn.disabled = false;
+        waStatus('Couldn’t prepare it just now — please try again, or submit the form above.');
+      });
   });
 
   // deliver the finished PDF: to the device (default) or hand the doc back via cfg.onDoc (WhatsApp/upload path)
