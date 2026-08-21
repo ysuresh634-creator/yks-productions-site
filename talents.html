@@ -43,7 +43,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=15" />
-<link rel="stylesheet" href="/css/talents.css?v=6" />
+<link rel="stylesheet" href="/css/talents.css?v=38" />
 
 <script type="application/ld+json">
 {
@@ -544,12 +544,47 @@
     <p class="tal-kicker">Casting</p>
     <h2>Looking to <em>cast someone?</em></h2>
     <p>Tell me the brief — the look, the city, the dates — and I'll come back with a shortlist and one all-in number.</p>
-    <div class="l-cta-row">
-      <a class="btn btn-fill" href="/quote.html">Send a casting brief</a>
-      <a class="btn btn-ghost" href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%27m%20looking%20to%20cast%20talent%20from%20your%20pool." target="_blank" rel="noopener">WhatsApp me</a>
-    </div>
+    <form class="cast-form" id="castForm" novalidate>
+      <div class="cast-row">
+        <label>Your name<input type="text" name="client_name" placeholder="You / your brand" required /></label>
+        <label>Email or phone<input type="text" name="client_contact" placeholder="How I reach you" required /></label>
+      </div>
+      <label>What are you casting?<textarea name="brief" rows="3" placeholder="The look, the usage, how many faces — a line or two is plenty." required></textarea></label>
+      <div class="cast-row3">
+        <label>City<input type="text" name="city" placeholder="Mumbai, Dubai…" /></label>
+        <label>Dates<input type="text" name="shoot_dates" placeholder="e.g. 12–13 Sep" /></label>
+        <label>Budget <span class="cast-opt">optional</span><input type="text" name="budget" placeholder="Ballpark's fine" /></label>
+      </div>
+      <div class="cast-actions">
+        <button type="submit" class="btn btn-fill">Send the brief →</button>
+        <a class="btn btn-ghost" href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%27m%20looking%20to%20cast%20talent%20from%20your%20pool." target="_blank" rel="noopener">Or WhatsApp me</a>
+      </div>
+      <p class="cast-ok" id="castOk" hidden>✓ Got it — I'll come back with a shortlist and one all-in number. Thank you.</p>
+    </form>
   </div>
 </section>
+
+<script>
+(function () {
+  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev';
+  var f = document.getElementById('castForm'); if (!f) return;
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!f.checkValidity()) { f.reportValidity(); return; }
+    var btn = f.querySelector('button[type="submit"]'), orig = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Sending…';
+    var d = { client_name: f.client_name.value, client_contact: f.client_contact.value, brief: f.brief.value, city: f.city.value, shoot_dates: f.shoot_dates.value, budget: f.budget.value };
+    fetch(ENGINE + '/bookings/new', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok) throw new Error('x');
+        f.reset(); document.getElementById('castOk').hidden = false; btn.textContent = 'Sent ✓';
+        if (window.gtag) gtag('event', 'casting_brief');
+      })
+      .catch(function () { btn.disabled = false; btn.textContent = orig; alert('Couldn’t send just now — please WhatsApp me instead and I’ll pick it up.'); });
+  });
+})();
+</script>
 
 </main>
 

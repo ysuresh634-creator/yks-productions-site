@@ -571,6 +571,21 @@ main{overflow-x:clip}
 .ap-poster-actions{display:flex;gap:10px;margin-top:14px}
 .ap-poster-actions .btn{flex:1 1 auto;justify-content:center}
 @media(max-width:820px){.ap-poster-wrap{grid-template-columns:1fr}.ap-poster-stage{position:static;max-width:360px;margin:0 auto}}
+
+/* ══ client casting-brief form (roster page) ══ */
+.cast-form{max-width:620px;margin:26px auto 0;text-align:left}
+.cast-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cast-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:14px}
+.cast-form>label{margin-top:14px}
+.cast-form label{display:flex;flex-direction:column;gap:7px;font-family:var(--mag-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mag-soft)}
+.cast-opt{font-size:9px;color:var(--mag-soft);opacity:.7;margin-left:6px}
+.cast-form input,.cast-form textarea{font-family:var(--mag-sans);font-size:16px;color:var(--mag-ink);background:rgba(244,237,226,.04);border:1px solid var(--mag-line-2);border-radius:9px;padding:12px;color-scheme:dark;text-transform:none;letter-spacing:0}
+.cast-form input::placeholder,.cast-form textarea::placeholder{color:rgba(244,237,226,.34)}
+.cast-form input:focus,.cast-form textarea:focus{outline:none;border-color:var(--mag-accent)}
+.cast-form textarea{resize:vertical;min-height:74px}
+.cast-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.cast-ok{color:var(--mag-accent);margin-top:16px;font-family:var(--mag-display);font-style:italic;font-size:18px}
+@media(max-width:640px){.cast-row,.cast-row3{grid-template-columns:1fr}}
 @media(max-width:520px){.ap-dl-actions{flex-direction:column}.ap-dl-actions .ap-dl,.ap-dl-wa{width:100%}}
 
 /* private "more about you" — sub-label for the preference chips */
