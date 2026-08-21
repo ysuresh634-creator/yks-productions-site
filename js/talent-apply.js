@@ -137,21 +137,69 @@
       });
     }).catch(function () { return f; });   // if convert fails, keep original (still uploads fine)
   }
+  /* ── AI shot-type auto-sort (client-side, no Claude at runtime): pico.js face detection → the face's size in frame
+        tells us the framing → Headshots / Full length / Fashion / Beauty. Instant, private (never leaves the browser),
+        works on mobile. Style calls (Commercial/Digitals) stay a one-tap override. ── */
+  var _picoP = null, _picoClassify = null;
+  function ensurePico() {
+    if (_picoP) return _picoP;
+    _picoP = new Promise(function (res, rej) {
+      function boot() { fetch('/js/vendor/facefinder').then(function (r) { return r.arrayBuffer(); }).then(function (buf) { _picoClassify = window.pico.unpack_cascade(new Int8Array(buf)); res(_picoClassify); }).catch(rej); }
+      if (window.pico && window.pico.unpack_cascade) return boot();
+      var s = document.createElement('script'); s.src = '/js/vendor/pico.js?v=1';
+      s.onload = boot; s.onerror = rej; document.head.appendChild(s);
+    });
+    return _picoP;
+  }
+  function classifyFraming(im) {
+    var TH = 480, sc = TH / im.naturalHeight, W = Math.max(1, Math.round(im.naturalWidth * sc)), H = TH;
+    var c = document.createElement('canvas'); c.width = W; c.height = H;
+    var ctx = c.getContext('2d'); ctx.drawImage(im, 0, 0, W, H);
+    var d = ctx.getImageData(0, 0, W, H).data, gray = new Uint8Array(W * H);
+    for (var i = 0; i < W * H; i++) gray[i] = (0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]) | 0;
+    var dets = window.pico.run_cascade({ pixels: gray, nrows: H, ncols: W, ldim: W }, _picoClassify, { shiftfactor: 0.1, minsize: Math.round(H * 0.05), maxsize: H, scalefactor: 1.1 });
+    dets = window.pico.cluster_detections(dets, 0.2);
+    var best = null; for (var j = 0; j < dets.length; j++) if (!best || dets[j][3] > best[3]) best = dets[j];
+    var q = best ? best[3] : 0, frac = best ? best[2] / H : 0;   // frac = face diameter ÷ image height
+    if (q < 6) return 'Full length';        // no confident frontal face → a body / turned-away shot
+    if (frac >= 0.32) return 'Beauty';      // face fills the frame (close beauty)
+    if (frac >= 0.20) return 'Headshots';   // head & shoulders
+    if (frac >= 0.13) return 'Fashion';     // waist / chest-up editorial
+    return 'Full length';                   // small face → whole body in frame
+  }
+  function clearDetecting(id) { var fig = thumbs.querySelector('.ap-thumb[data-id="' + id + '"]'); if (fig) { fig.classList.remove('ap-detecting'); var db = fig.querySelector('.ap-detbadge'); if (db) db.remove(); } return fig; }
+  function autoSort(item) {
+    if (item.manual) { item.detecting = false; clearDetecting(item.id); return; }
+    ensurePico().then(function () {
+      var im = new Image();
+      im.onload = function () {
+        item.detecting = false;
+        if (!item.manual) { var cat; try { cat = classifyFraming(im); } catch (e) { cat = null; } if (cat && CATS.indexOf(cat) >= 0) { item.cat = cat; item.auto = true; } }
+        var fig = clearDetecting(item.id);
+        if (fig) { var s = fig.querySelector('.ap-thumb-cat'); if (s) s.value = item.cat; }
+        updatePreview(); if (typeof refreshPosters === 'function') refreshPosters();
+      };
+      im.onerror = function () { item.detecting = false; clearDetecting(item.id); };
+      im.src = item.edited || item.url;
+    }).catch(function () { item.detecting = false; clearDetecting(item.id); });
+  }
   function addPhotos(list) {
     var arr = Array.prototype.slice.call(list).filter(isImageFile);
     if (!arr.length) return;
     var lbl = $('#apDropLabel');
     if (lbl && arr.some(isHeic)) lbl.textContent = 'Converting photos…';
     Promise.all(arr.map(normalizeFile)).then(function (files) {
-      files.forEach(function (f) { photos.push({ file: f, id: ++uid, url: URL.createObjectURL(f), cat: activeCat }); });
+      var added = [];
+      files.forEach(function (f) { var it = { file: f, id: ++uid, url: URL.createObjectURL(f), cat: activeCat, detecting: activeCat !== 'Digitals' }; photos.push(it); added.push(it); });
       renderThumbs();
+      added.forEach(function (it) { if (it.detecting) autoSort(it); });   // Digitals is an explicit choice — respect it, don't auto-override
     });
   }
   function idxOf(id) { for (var i = 0; i < photos.length; i++) if (photos[i].id === id) return i; return -1; }
   function renderThumbs() {
     thumbs.innerHTML = '';
     photos.forEach(function (item, idx) {
-      var fig = document.createElement('div'); fig.className = 'ap-thumb'; fig.dataset.id = item.id; fig.draggable = true;
+      var fig = document.createElement('div'); fig.className = 'ap-thumb' + (item.detecting ? ' ap-detecting' : ''); fig.dataset.id = item.id; fig.draggable = true;
       var media = document.createElement('div'); media.className = 'ap-thumb-media';
       var img = document.createElement('img'); img.src = item.edited || item.url; img.alt = '';
       img.addEventListener('click', function () { openCrop(item); }); media.appendChild(img);
@@ -168,9 +216,10 @@
       media.appendChild(rm);
       var bar = document.createElement('span'); bar.className = 'ap-thumb-bar'; media.appendChild(bar);
       fig.appendChild(media);
+      if (item.detecting) { var _db = document.createElement('span'); _db.className = 'ap-detbadge'; _db.textContent = '✨ sorting…'; media.appendChild(_db); }
       var sel = document.createElement('select'); sel.className = 'ap-thumb-cat';
       CATS.forEach(function (c) { var o = document.createElement('option'); o.value = c; o.textContent = c; if (c === (item.cat || CATS[0])) o.selected = true; sel.appendChild(o); });
-      sel.addEventListener('change', function () { item.cat = sel.value; updatePreview(); });
+      sel.addEventListener('change', function () { item.cat = sel.value; item.manual = true; item.auto = false; updatePreview(); });
       fig.appendChild(sel);
       fig.addEventListener('dragstart', function (e) { e.dataTransfer.setData('text/plain', String(item.id)); fig.classList.add('dragging'); });
       fig.addEventListener('dragend', function () { fig.classList.remove('dragging'); });
