@@ -167,7 +167,7 @@
           } catch (e) { res(''); }
         };
         im.onerror = function () { res(''); };
-        im.src = item.edited || item.url;
+        im.src = shownSrc(item);
       } catch (e) { res(''); }
     });
   }
@@ -195,9 +195,33 @@
         }
       };
       im.onerror = function () { item.detecting = false; clearDetecting(item.id); };
-      im.src = item.edited || item.url;
+      im.src = shownSrc(item);
     }).catch(function () { item.detecting = false; clearDetecting(item.id); });
   }
+  /* ── PERFORMANCE: a phone photo is ~4000x6000. Decoding that in the thumbnail grid, the cover, the live
+        preview, the poster picker AND the editor at once is what made the page blank on scroll, lag, and the
+        editor crawl. So each photo gets ONE downscaled screen copy; the original File is untouched and still
+        what the PDF is built from, so print quality is unchanged. ── */
+  var PREVIEW_MAX = 1600;   // big enough that a 4:5 crop still exceeds the 900px saved output (no upscaling), ~14x fewer pixels than a 24MP original
+  function makePreview(file) {
+    return new Promise(function (res) {
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function () {
+        var sc = Math.min(1, PREVIEW_MAX / Math.max(im.naturalWidth, im.naturalHeight));
+        if (sc === 1) { URL.revokeObjectURL(url); return res(null); }        // already small — keep the original
+        var c = document.createElement('canvas');
+        c.width = Math.round(im.naturalWidth * sc); c.height = Math.round(im.naturalHeight * sc);
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        try { res(c.toDataURL('image/jpeg', 0.86)); } catch (e) { res(null); }
+      };
+      im.onerror = function () { URL.revokeObjectURL(url); res(null); };
+      im.src = url;
+    });
+  }
+  // what every on-screen render should use: the hand-edited version, else the light preview, else the original
+  function shownSrc(it) { return it.edited || it.preview || it.url; }
+
   function addPhotos(list) {
     var arr = Array.prototype.slice.call(list).filter(isImageFile);
     if (!arr.length) return;
@@ -207,7 +231,13 @@
       var added = [];
       files.forEach(function (f) { var it = { file: f, id: ++uid, url: URL.createObjectURL(f), cat: activeCat, detecting: activeCat !== 'Digitals' }; photos.push(it); added.push(it); });
       renderThumbs();
-      added.forEach(function (it) { if (it.detecting) autoSort(it); });   // Digitals is an explicit choice — respect it, don't auto-override
+      // downscale for the screen first, then classify — everything after this point works on the light copy
+      added.forEach(function (it) {
+        makePreview(it.file).then(function (pv) {
+          if (pv) { it.preview = pv; var fig = thumbs.querySelector('.ap-thumb[data-id="' + it.id + '"] img'); if (fig) fig.src = shownSrc(it); }
+          if (it.detecting) autoSort(it); else updatePreview();
+        });
+      });   // Digitals is an explicit choice — respect it, don't auto-override
     });
   }
   function idxOf(id) { for (var i = 0; i < photos.length; i++) if (photos[i].id === id) return i; return -1; }
@@ -216,7 +246,7 @@
     photos.forEach(function (item, idx) {
       var fig = document.createElement('div'); fig.className = 'ap-thumb' + (item.detecting ? ' ap-detecting' : ''); fig.dataset.id = item.id; fig.draggable = true;
       var media = document.createElement('div'); media.className = 'ap-thumb-media';
-      var img = document.createElement('img'); img.src = item.edited || item.url; img.alt = '';
+      var img = document.createElement('img'); img.src = shownSrc(item); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
       img.addEventListener('click', function () { openCrop(item); }); media.appendChild(img);
       var ed = document.createElement('span'); ed.className = 'ap-edit-hint'; ed.textContent = '✎ Adjust';
       ed.addEventListener('click', function () { openCrop(item); }); media.appendChild(ed);
@@ -268,7 +298,7 @@
   // the hero cover (first photo) shown prominently — the frame a client sees first
   function renderCover() {
     var pic = $('#apCoverPic'); if (!pic) return;
-    if (photos[0]) { pic.innerHTML = '<img src="' + (photos[0].edited || photos[0].url) + '" alt="cover">'; pic.classList.add('has'); }
+    if (photos[0]) { pic.innerHTML = '<img src="' + shownSrc(photos[0]) + '" alt="cover" decoding="async">'; pic.classList.add('has'); }
     else { pic.innerHTML = '<span class="ap-cover-star">★</span>'; pic.classList.remove('has'); }
   }
   // casting-ready strength meter — which sections are covered, nudging a well-rounded book
@@ -568,7 +598,7 @@
     canvas.width = Math.round(FW * sc); canvas.height = Math.round(FH * sc);
     var ctx = canvas.getContext('2d');
     var pl = photos.length ? photos[POSTER.photo % photos.length] : null;
-    var src = pl ? (pl.edited || pl.url) : SAMPLE_COVER;
+    var src = pl ? shownSrc(pl) : SAMPLE_COVER;
     var draw = function () { pLoad(src).then(function (img) { if (sc !== 1) { ctx.save(); ctx.scale(sc, sc); } tpl.draw(ctx, FW, FH, img, posterData()); if (sc !== 1) ctx.restore(); if (cb) cb(); }).catch(function () { if (cb) cb(); }); };
     if (document.fonts && document.fonts.load) {
       Promise.all([document.fonts.load('700 90px "Bodoni Moda"'), document.fonts.load('600 26px "Space Grotesk"')]).then(draw, draw);
@@ -597,7 +627,7 @@
     wrap.innerHTML = '';
     photos.forEach(function (p, i) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-pph' + (i === POSTER.photo ? ' on' : '');
-      var im = document.createElement('img'); im.src = p.edited || p.url; b.appendChild(im);
+      var im = document.createElement('img'); im.src = shownSrc(p); im.decoding = 'async'; b.appendChild(im);
       b.addEventListener('click', function () { POSTER.photo = i; refreshPosters(); });
       wrap.appendChild(b);
     });
@@ -746,7 +776,7 @@
       if (cropBright) cropBright.value = 1; if (cropContrast) cropContrast.value = 1;
       setMode(cropS.mode, true);
     };
-    nat.src = item.url;
+    nat.src = shownSrc(item);
   }
   function baseFor(mode) { return mode === 'fit' ? Math.min(cropS.fw / cropS.nat.width, cropS.fh / cropS.nat.height) : Math.max(cropS.fw / cropS.nat.width, cropS.fh / cropS.nat.height); }
   function setMode(mode, recenter) {
@@ -1099,7 +1129,7 @@
     var nm = esc((form.name.value || 'Your name').trim().toUpperCase());
     var cat = (form.category.value || 'Model').trim();
     var disc = esc((DISC[cat] || 'Fashion · Editorial · Commercial').toUpperCase());
-    var cover = photos[0] ? (photos[0].edited || photos[0].url) : SAMPLE_COVER;
+    var cover = photos[0] ? shownSrc(photos[0]) : SAMPLE_COVER;
     var lkCss = (LOOKS[CFG.look] && LOOKS[CFG.look].css) || 'none';
     var tag = esc(stripContact((form.tagline && form.tagline.value || '').trim()));
     var wm = '';   // no tiled watermark — branding is the logo lockup + running header/footer
@@ -1164,7 +1194,7 @@
   }
   function renderTemplates() {
     var pW = $('#apTemplates'); if (!pW) return;
-    var cover = photos[0] ? (photos[0].edited || photos[0].url) : SAMPLE_COVER;
+    var cover = photos[0] ? shownSrc(photos[0]) : SAMPLE_COVER;
     pW.innerHTML = '';
     TEMPLATES.forEach(function (t) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ap-tpl' + (t.k === CFG.template ? ' on' : ''); b.title = t.label + ' — ' + (t.note || ''); b.dataset.tpl = t.k;
