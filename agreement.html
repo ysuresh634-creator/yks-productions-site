@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Terms of Engagement — YKS Productions</title>
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141118; --ink-soft:#4A4550; --rule:#E2DAD0; --rule-soft:#F0EAE2;
+  --gold:#C9A96E; --gold-dk:#A6864C; --peach:#E8B89A; --dark:#0D0B11; --dark2:#181521;
+  --paper:#FFFFFF; --wash:#FAF7F3; --green:#2E7D5B; --red:#B94040;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{background:#26232B;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     font-size:15px;line-height:1.65;padding:26px 14px 90px}
+
+.sheet{max-width:860px;margin:0 auto;background:var(--paper);border-radius:4px;
+       box-shadow:0 24px 70px rgba(0,0,0,.45);overflow:hidden}
+
+/* ── MASTHEAD ── */
+.mast{background:var(--dark);color:#fff;padding:34px 46px 28px;position:relative}
+.mast::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;
+             background:linear-gradient(90deg,var(--gold) 0%,var(--peach) 55%,var(--gold-dk) 100%)}
+.mast-row{display:flex;justify-content:space-between;align-items:flex-start;gap:22px;flex-wrap:wrap}
+.logo{font-family:'Playfair Display',Georgia,serif;font-size:31px;font-weight:700;letter-spacing:.5px;
+      color:#F8F4EF;line-height:1}
+.logo .dot{color:var(--peach)}
+.logo .sub{font-family:'Playfair Display',Georgia,serif;font-size:13px;font-weight:500;
+           letter-spacing:.6px;color:#B9B0A8;margin-left:5px}
+.tagline{font-family:'Space Grotesk',monospace;font-size:8.5px;letter-spacing:2.6px;color:#8C8480;
+         text-transform:uppercase;margin-top:9px}
+.doc-label{text-align:right}
+.doc-kind{font-family:'Playfair Display',Georgia,serif;font-size:20px;color:var(--gold);letter-spacing:.5px;line-height:1.25}
+.doc-meta{font-family:'Space Grotesk',monospace;font-size:9px;letter-spacing:1.4px;color:#8C8480;
+          text-transform:uppercase;margin-top:8px;line-height:1.9}
+.doc-meta b{color:#CFC6BC;font-weight:500}
+.mast-contact{font-family:'Space Grotesk',monospace;font-size:8.5px;letter-spacing:1.3px;color:#7E7772;
+              margin-top:20px;text-transform:uppercase}
+
+/* ── BODY ── */
+.body{padding:38px 46px 30px}
+.lede{font-size:14.5px;color:var(--ink-soft);border-left:2px solid var(--gold);padding:2px 0 2px 16px;margin-bottom:30px}
+h2{font-family:'Playfair Display',Georgia,serif;font-size:17.5px;font-weight:600;color:var(--ink);
+   margin:26px 0 9px;padding-bottom:6px;border-bottom:1px solid var(--rule-soft);letter-spacing:.2px}
+h2 .n{color:var(--gold);font-family:'Space Grotesk',monospace;font-size:12px;font-weight:500;margin-right:9px;letter-spacing:1px}
+h3{font-size:13px;font-weight:600;color:var(--ink);margin:15px 0 5px;letter-spacing:.1px}
+p{margin:0 0 9px}
+ul{margin:0 0 10px;padding-left:19px}
+li{margin-bottom:5px}
+strong{font-weight:600;color:var(--ink)}
+em{font-style:italic}
+.stat{background:var(--wash);border-left:2px solid var(--gold);padding:11px 15px;margin:11px 0;
+      font-size:13.5px;color:var(--ink-soft)}
+.stat b{color:var(--ink)}
+table{width:100%;border-collapse:collapse;margin:11px 0 14px;font-size:13.5px}
+th{background:var(--dark2);color:var(--gold);font-family:'Space Grotesk',monospace;font-size:8.5px;
+   letter-spacing:1.4px;text-transform:uppercase;padding:9px 13px;text-align:left;font-weight:500}
+td{padding:10px 13px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+tr:nth-child(even) td{background:var(--wash)}
+.blank{display:inline-block;min-width:74px;border-bottom:1px solid var(--gold);color:var(--gold-dk)}
+
+/* ── SIGNATURE ── */
+.sign{background:var(--dark);color:#EDE7E0;padding:34px 46px 40px;margin-top:34px}
+.sign-h{font-family:'Playfair Display',Georgia,serif;font-size:20px;color:var(--gold);margin-bottom:5px}
+.sign-sub{font-size:12.5px;color:#9A928C;margin-bottom:24px;max-width:62ch}
+.accept-line{background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.28);border-radius:3px;
+             padding:13px 16px;font-size:13px;color:#DED6CE;margin-bottom:26px;font-style:italic}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+.col-h{font-family:'Space Grotesk',monospace;font-size:8.5px;letter-spacing:2px;color:var(--gold);
+       text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid rgba(201,169,110,.3);margin-bottom:16px}
+.fld{margin-bottom:13px}
+.fld label{display:block;font-family:'Space Grotesk',monospace;font-size:8px;letter-spacing:1.5px;
+           color:#8C8480;text-transform:uppercase;margin-bottom:4px}
+.fld input{width:100%;background:transparent;border:none;border-bottom:1px solid #3A3440;color:#F5F0EA;
+           font-family:Inter,sans-serif;font-size:14px;padding:5px 2px;outline:none}
+.fld input:focus{border-bottom-color:var(--gold)}
+.fld input::placeholder{color:#524B58}
+.sig-wrap{margin-top:6px}
+.sig-pad{background:#FBF8F4;border:1px solid #3A3440;border-radius:3px;height:112px;width:100%;
+         display:block;cursor:crosshair;touch-action:none}
+.sig-bar{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.sig-hint{font-size:10px;color:#7E7772;letter-spacing:.3px}
+.sig-clear{background:none;border:1px solid #3A3440;color:#9A928C;border-radius:3px;
+           padding:4px 11px;font-size:10px;cursor:pointer;font-family:Inter,sans-serif}
+.sig-clear:hover{border-color:var(--gold);color:var(--gold)}
+.yks-sig{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:30px;color:var(--peach);
+         border-bottom:1px solid #3A3440;padding:14px 2px 12px;line-height:1}
+.yks-meta{font-size:11.5px;color:#9A928C;margin-top:9px;line-height:1.8}
+
+/* ── ACTION BAR ── */
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(13,11,17,.97);
+     border-top:1px solid rgba(201,169,110,.3);padding:13px 18px;display:flex;gap:11px;
+     align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(8px);
+     padding-bottom:calc(13px + env(safe-area-inset-bottom))}
+.bar-note{font-size:11.5px;color:#9A928C;margin-right:auto;max-width:44ch;line-height:1.5}
+.btn{border:none;border-radius:4px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer;
+     font-family:Inter,sans-serif;white-space:nowrap}
+.btn-go{background:var(--gold);color:#0D0B11}
+.btn-go:hover{background:var(--peach)}
+.btn-alt{background:none;border:1px solid #3A3440;color:#BDB4AC}
+.btn-alt:hover{border-color:var(--gold);color:var(--gold)}
+
+.foot{padding:20px 46px 26px;font-size:10.5px;color:#8C8480;background:var(--dark);
+      border-top:1px solid rgba(255,255,255,.06);line-height:1.75}
+
+@media (max-width:640px){
+  body{padding:12px 8px 96px}
+  .mast,.body,.sign,.foot{padding-left:22px;padding-right:22px}
+  .cols{grid-template-columns:1fr;gap:26px}
+  .doc-label{text-align:left}
+  .bar-note{display:none}
+  .btn{flex:1}
+}
+
+/* ── PRINT ── */
+@media print{
+  @page{size:A4;margin:14mm 13mm}
+  body{background:#fff;padding:0;font-size:10.4pt;line-height:1.5}
+  .sheet{max-width:none;box-shadow:none;border-radius:0}
+  .bar,.sig-bar,.print-hide{display:none!important}
+  .mast{padding:16pt 0 13pt;background:#fff!important;color:var(--ink)!important;
+        border-bottom:2.5pt solid var(--gold)}
+  .mast::after{display:none}
+  .logo{color:var(--ink)!important;font-size:22pt}
+  .logo .sub{color:#6A625C!important}
+  .tagline,.mast-contact,.doc-meta{color:#6A625C!important}
+  .doc-meta b{color:var(--ink)!important}
+  .doc-kind{color:var(--gold-dk)!important}
+  .body{padding:14pt 0 0}
+  .sign{background:#fff!important;color:var(--ink)!important;padding:16pt 0 0;
+        border-top:1.5pt solid var(--gold);margin-top:20pt;break-inside:avoid}
+  .sign-h{color:var(--gold-dk)!important}
+  .sign-sub,.sig-hint,.yks-meta{color:#6A625C!important}
+  .accept-line{background:#FAF7F3!important;color:var(--ink)!important;
+               border-color:var(--rule)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .col-h{color:var(--gold-dk)!important;border-bottom-color:var(--rule)!important}
+  .fld label{color:#6A625C!important}
+  .fld input{color:var(--ink)!important;border-bottom-color:#9A928C!important;font-size:10.5pt}
+  .sig-pad{border-color:#9A928C!important;background:#fff!important;height:88px}
+  .yks-sig{color:var(--gold-dk)!important;border-bottom-color:#9A928C!important}
+  .foot{background:#fff!important;color:#6A625C!important;padding:12pt 0 0;
+        border-top:.5pt solid var(--rule)}
+  th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  tr:nth-child(even) td,.stat{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  h2{break-after:avoid;font-size:12pt;margin-top:13pt}
+  h3{break-after:avoid}
+  p,li,table,.stat{break-inside:avoid}
+  .cols{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="sheet" id="sheet">
+
+  <!-- MASTHEAD -->
+  <div class="mast">
+    <div class="mast-row">
+      <div>
+        <div class="logo">YKS<span class="dot">.</span><span class="sub">Productions</span></div>
+        <div class="tagline">Cinematography · Film Stills · Brand Films</div>
+      </div>
+      <div class="doc-label">
+        <div class="doc-kind">Terms of<br>Engagement</div>
+        <div class="doc-meta">
+          Ref <b id="ref">—</b><br>
+          Issued <b id="issued">—</b>
+        </div>
+      </div>
+    </div>
+    <div class="mast-contact">yksproductions.com &nbsp;·&nbsp; @yks_photoworks</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <div id="prepared" style="display:none;background:var(--wash);border:1px solid var(--rule);border-radius:3px;padding:16px 18px;margin-bottom:26px">
+      <div style="font-family:'Space Grotesk',monospace;font-size:8.5px;letter-spacing:2px;color:var(--gold-dk);text-transform:uppercase;margin-bottom:9px">Prepared for</div>
+      <div id="p-org" style="font-family:'Playfair Display',Georgia,serif;font-size:19px;font-weight:600;color:var(--ink);line-height:1.3"></div>
+      <div id="p-name" style="font-size:13.5px;color:var(--ink-soft);margin-top:2px"></div>
+      <div id="p-proj" style="font-size:13px;color:var(--ink-soft);margin-top:8px;padding-top:8px;border-top:1px solid var(--rule-soft)"></div>
+    </div>
+
+    <p class="lede">These Terms, together with the quotation they accompany, form the whole agreement between
+    <strong>YKS Productions</strong> and the client named below. Written in plain English on purpose — a contract
+    you can actually read is a contract that holds.</p>
+
+    <h2><span class="n">01</span>What these terms are</h2>
+    <p>These Terms of Engagement ("Terms") together with the quotation they are attached to form the whole
+    agreement between <strong>YKS Productions</strong> ("YKS", "I") and the client named in the quotation
+    ("Client", "you"). This is a contract under the <strong>Indian Contract Act, 1872</strong>.</p>
+
+    <h2><span class="n">02</span>How the booking is confirmed</h2>
+    <p>The quotation is an <em>offer</em>. A binding contract is formed on the earlier of:</p>
+    <ul>
+      <li><strong>(a)</strong> you confirming acceptance in writing (email, WhatsApp, or a signed copy of this document); or</li>
+      <li><strong>(b)</strong> you paying the booking advance.</li>
+    </ul>
+    <div class="stat"><b>Paying the booking advance is itself acceptance of these Terms in full</b>, whether or not
+    anything is signed — acceptance by conduct under <b>Section 8, Indian Contract Act, 1872</b>. Acceptance by
+    email or WhatsApp is valid under <b>Section 10A, Information Technology Act, 2000</b>, and electronic records
+    are admissible under <b>Section 63, Bharatiya Sakshya Adhiniyam, 2023</b>.</div>
+    <p>Until the advance is received, no date is held.</p>
+
+    <h2><span class="n">03</span>Payment</h2>
+    <table>
+      <tr><th style="width:38%">Stage</th><th>When it is due</th></tr>
+      <tr><td><strong>Booking advance — <span id="t-adv">50%</span></strong></td><td>On confirmation. The date is not held until this is received.</td></tr>
+      <tr><td><strong>Balance — <span id="t-bal">50%</span></strong></td><td><strong>Before delivery of the finished work</strong>, and in any event within <strong><span id="t-days">7</span> days</strong> of <span id="t-from">the shoot completing</span>.</td></tr>
+    </table>
+    <ul>
+      <li>Amounts are in the currency stated on the quotation and are <strong>all-inclusive</strong> of fee, editing and normal post-production.</li>
+      <li>Payment counts only when funds are actually credited. Bank, remittance and conversion charges are yours.</li>
+      <li>Where you must deduct tax at source under the <strong>Income-tax Act, 1961</strong>, provide <strong>Form 16A</strong> within the statutory timeline.</li>
+      <li>All amounts are payable <strong>without set-off, counterclaim or deduction</strong>. A dispute about part of an invoice does not entitle you to withhold the remainder.</li>
+    </ul>
+
+    <h2><span class="n">04</span>Delivery is conditional on payment</h2>
+    <p><strong>The finished work is delivered only after the balance is received in full.</strong> Watermarked or
+    low-resolution previews may be shared beforehand for selection and approval only. They are not a delivery,
+    carry <strong>no licence</strong>, and publishing them before full payment is a breach of these Terms and an
+    infringement of copyright.</p>
+    <p>Where files are released before payment to meet an agreed campaign date, the licence in clause 07 is granted
+    <strong>conditionally on payment by the due date</strong>. If payment is not received within 15 days of that date,
+    the licence terminates automatically and all use must cease.</p>
+
+    <h2><span class="n">05</span>Approval, and what silence means</h2>
+    <div class="stat">Selections, proofs or previews shared for your approval are <b>deemed approved if you do not
+    respond within 7 days</b> of them being sent. Deemed approval has the same effect as written approval: the work
+    is treated as complete and the balance falls due.</div>
+    <p>Where the balance is unpaid and you have not responded for 14 days after the gallery is made available,
+    the engagement is treated as complete for invoicing purposes. The balance remains payable in full whether or
+    not you download the files.</p>
+
+    <h2><span class="n">06</span>Delivery media and drives</h2>
+    <ul>
+      <li><strong>Digital delivery is the standard method and is included.</strong> Files are supplied by a secure link, active for <strong>21 days</strong>.</li>
+      <li><strong>Physical delivery is not included.</strong> Either you supply a <strong>new, unused</strong> drive of adequate capacity, or I purchase one billed to you at cost plus handling, quoted in advance.</li>
+      <li>A drive is a transfer medium, not a backup. All media fails. Once a drive leaves my hands I give no warranty on it and am not responsible for data loss, corruption or damage. <strong>Copy the contents to your own storage on receipt and verify them.</strong></li>
+      <li>Where you supply the drive, I format it before writing. <strong>Anything already on it will be erased.</strong></li>
+      <li>Courier charges are yours, and risk passes when the drive is handed to the courier.</li>
+    </ul>
+
+    <h2><span class="n">07</span>Storage, archival and backup</h2>
+    <ul>
+      <li>Delivered files are retained for <strong>90 days</strong> from delivery as a courtesy — a grace period, not an archival service.</li>
+      <li><strong>After 90 days files are deleted.</strong> Retaining material longer than needed is also what the <strong>Digital Personal Data Protection Act, 2023</strong> expects where identifiable people appear in it.</li>
+      <li><strong>Take your own backup on the day you receive the files.</strong> Two copies, two locations.</li>
+      <li>Re-supply within 90 days is charged as a retrieval fee. After 90 days there is no guarantee — if the files no longer exist they cannot be recovered at any price.</li>
+      <li>Long-term archival is available as a paid add-on agreed in writing before delivery.</li>
+      <li><strong>Raw and unedited files are not delivered, licensed or sold.</strong> Editing is inseparable from the work.</li>
+    </ul>
+
+    <h2><span class="n">08</span>Copyright</h2>
+    <p><strong>Copyright in all photographs and films created under this engagement remains with YKS Productions.</strong>
+    This clause is deliberate and is agreed between us.</p>
+    <div class="stat">Under <b>Section 17(b), Copyright Act 1957</b>, where a photograph is taken at the instance of
+    any person for valuable consideration, that person is the first owner of the copyright — <b>"in the absence of
+    any agreement to the contrary."</b> This clause <i>is</i> that agreement to the contrary.</div>
+    <p>On payment in full you receive a <strong>licence</strong>, not ownership:</p>
+    <ul>
+      <li><strong>Scope:</strong> use of the delivered work for the purposes described in the quotation.</li>
+      <li><strong>Term and territory:</strong> perpetual and worldwide, unless the quotation says otherwise.</li>
+      <li><strong>Non-exclusive</strong>, non-transferable and non-sub-licensable.</li>
+      <li><strong>Personal to you.</strong> The licence does not extend to your vendors, venue, contractors, sponsors, partner brands, group companies or your own clients. Any third party wishing to use the work licenses it separately. If you supply the work to a third party who uses it, you are responsible for that use and the licence fee that would have applied.</li>
+      <li><strong>Moral rights</strong> retained under <strong>Section 57, Copyright Act 1957</strong>. You may not distort or modify the work in a way prejudicial to my reputation.</li>
+    </ul>
+    <p>I may show the work in my portfolio, website and social media unless an embargo is agreed in writing before the shoot.</p>
+
+    <h2><span class="n">09</span>What you may not do with the work</h2>
+    <ul>
+      <li><strong>Remove or alter the watermark, credit or embedded metadata.</strong> Rights management information is protected by <strong>Section 65B, Copyright Act 1957</strong> — knowingly removing it is an offence carrying up to two years' imprisonment.</li>
+      <li><strong>Circumvent any technical protection</strong> on previews or galleries — <strong>Section 65A</strong>.</li>
+      <li><strong>Use the work to train or develop any artificial intelligence or machine-learning model</strong>, or submit it to a third-party service that does so. No such right is granted.</li>
+      <li><strong>Re-sell, re-license or supply the work</strong> to another brand, agency or stock library.</li>
+      <li><strong>Claim authorship</strong> of the work.</li>
+    </ul>
+
+    <h2><span class="n">10</span>People in the images, and personal data</h2>
+    <ul>
+      <li>Images of identifiable individuals are <strong>personal data</strong> under the <strong>Digital Personal Data Protection Act, 2023</strong>. I handle them as a Data Fiduciary — collected for the agreed purpose, kept secure, erased when the purpose is served.</li>
+      <li><strong>Where you arrange the people appearing in the work</strong> — staff, models, customers, guests or property — <strong>you confirm you have their informed consent</strong> for the photography and the intended commercial use. If you have not, tell me before the shoot.</li>
+      <li>Where <strong>I</strong> engage talent, the release is my responsibility.</li>
+      <li><strong>Minors:</strong> no commercial use without verifiable parental or guardian consent.</li>
+    </ul>
+
+    <h2><span class="n">11</span>Late payment</h2>
+    <ul>
+      <li>Amounts unpaid after the due date carry interest at <strong>1.5% per month (18% per annum)</strong> from the due date until actual payment, as agreed liquidated compensation under <strong>Sections 73 and 74, Indian Contract Act 1872</strong>.</li>
+      <li>Where YKS Productions is registered as a micro or small enterprise under the <strong>MSMED Act, 2006</strong>, the statutory rate under <strong>Section 16</strong> applies where higher, with the timeline in <strong>Section 15</strong>.</li>
+      <li>Delivery, licence and further work stay suspended while any amount is overdue.</li>
+      <li>Reasonable recovery costs, including legal and court fees, are payable by you.</li>
+    </ul>
+
+    <h2><span class="n">12</span>Scope, revisions and additional work</h2>
+    <ul>
+      <li><strong>The brief is what is written.</strong> Deliverables, locations, hours and formats in the quotation are the entire scope. Anything outside it is additional work, quoted separately.</li>
+      <li><strong>Time on location:</strong> <span id="t-hrs">the quotation states the hours covered</span>. Time beyond that is billed at <span id="t-ot">the stated hourly rate</span>. Delay caused by you, your venue or your guests counts as part of the booked hours — it does not extend them.</li>
+      <li><strong>Revisions:</strong> the quotation includes <span id="t-rev">a set number of</span> rounds. A round is one consolidated set of feedback. Piecemeal feedback after a round has closed is chargeable.</li>
+    </ul>
+
+    <h2><span class="n">13</span>Standard of the work</h2>
+    <p>The work is delivered to the professional standard reasonably expected of a photographer or cinematographer
+    of my experience, consistent with the portfolio you saw before booking. My creative interpretation is part of
+    what you are engaging, exercised within the agreed brief.</p>
+    <div class="stat">Payment is <b>not</b> conditional on subjective satisfaction. A genuine defect — technical
+    failure, or a clear departure from the written brief — is corrected or reshot at my cost. Dissatisfaction with
+    a creative choice that falls within the brief is not a defect and is not a ground to withhold payment.</div>
+
+    <h2><span class="n">14</span>Cancellation and postponement</h2>
+    <ul>
+      <li><strong>By you, more than 7 days before the shoot:</strong> the advance is retained as compensation for the date held and work already done.</li>
+      <li><strong>By you, within 7 days:</strong> the full contract value is payable. A date cannot realistically be resold at that notice.</li>
+      <li><strong>Postponement:</strong> one free postponement if requested more than 7 days before, subject to availability. A postponed shoot must be completed within <strong>90 days</strong> of the original date, failing which it is treated as cancelled by you.</li>
+      <li><strong>By me:</strong> I will either arrange a replacement of equivalent standard with your approval, or refund everything received. My liability is limited to that refund.</li>
+    </ul>
+
+    <h2><span class="n">15</span>On location</h2>
+    <ul>
+      <li>Access, permissions, location fees, parking and entry passes are arranged and paid by you.</li>
+      <li>I may decline to shoot, or stop shooting, where conditions are <strong>unsafe or unlawful</strong>, or required permissions have not been obtained. Where the cause is on your side, the engagement is treated as cancelled by you.</li>
+      <li>I may end the engagement immediately, with the full fee payable, where I or anyone working with me is subjected to abuse, harassment or an unsafe environment.</li>
+      <li>You are responsible for loss of or damage to my equipment caused by you, your staff, guests or contractors, at replacement cost.</li>
+      <li>For shoots exceeding six hours, please arrange drinking water, a meal, safe equipment storage and parking.</li>
+    </ul>
+
+    <h2><span class="n">16</span>Force majeure</h2>
+    <p>Neither of us is liable for failure caused by events beyond reasonable control — natural disaster, flood,
+    epidemic, government order, curfew, riot, war, or general failure of transport or power, reflecting
+    <strong>Section 56, Indian Contract Act 1872</strong>. We reschedule in good faith and money already paid
+    applies to the new date. For outdoor shoots made unsafe or unachievable by weather, we reschedule; non-refundable
+    travel already booked is payable by you.</p>
+
+    <h2><span class="n">17</span>Liability, confidentiality and assignment</h2>
+    <ul>
+      <li><strong>Liability cap:</strong> my total liability, whatever the cause, is limited to the total amount you have actually paid me. I am not liable for indirect or consequential loss including loss of profit, business or opportunity. Nothing limits liability that cannot be limited by law.</li>
+      <li><strong>Indemnity:</strong> you indemnify me against claims arising from permissions or consents you were responsible for, brand material you supplied, use outside the licence, and third-party claims relating to people or property you arranged.</li>
+      <li><strong>Confidentiality:</strong> where you tell me in advance that a shoot is confidential, I will keep it so until you release it. Say so before the shoot — an embargo cannot be applied retrospectively.</li>
+      <li><strong>No assignment:</strong> you may not transfer this agreement or the licence to another entity, including a group or successor company, without my written consent.</li>
+    </ul>
+
+    <h2><span class="n">18</span>General</h2>
+    <ul>
+      <li><strong>Time of the essence</strong> applies to your payment obligations. Delivery timelines are estimates given in good faith.</li>
+      <li><strong>No waiver:</strong> accepting a late payment or allowing an extra revision once does not waive the term.</li>
+      <li><strong>Severability:</strong> if any clause is unenforceable, the rest continues and that clause is read down to the extent needed.</li>
+      <li><strong>Survival:</strong> clauses 07, 08, 09, 10, 11 and 17 survive completion or termination.</li>
+      <li><strong>Notices</strong> are validly given by email to the addresses below.</li>
+      <li><strong>The written record:</strong> these Terms, the quotation and the written correspondence between us — including email and WhatsApp — form the whole agreement. Nothing said verbally varies them unless confirmed in writing by both of us.</li>
+      <li><strong>Independent contractor:</strong> nothing here creates employment, partnership or agency.</li>
+    </ul>
+
+    <h2><span class="n">19</span>Governing law</h2>
+    <p>Governed by the laws of India. The courts at <strong>Bangalore, Karnataka</strong> have exclusive jurisdiction,
+    as permitted by <strong>Section 20, Code of Civil Procedure 1908</strong>. Before filing, we will attempt
+    resolution in good faith for 15 days. Neither of us is prevented from seeking urgent interim relief.</p>
+
+  </div>
+
+  <!-- SIGNATURE -->
+  <div class="sign">
+    <div class="sign-h">Acceptance</div>
+    <p class="sign-sub">Fill in your details, sign in the box, then use <strong>Save as PDF</strong> below and email
+    the signed copy back. Alternatively, simply reply <strong>"Confirmed"</strong> to the email carrying the
+    quotation, or pay the booking advance — either is acceptance under clause 02.</p>
+
+    <div class="accept-line">
+      "I have read and accept this quotation and the Terms of Engagement set out above."
+    </div>
+
+    <div class="cols">
+      <!-- CLIENT -->
+      <div>
+        <div class="col-h">Accepted by the Client</div>
+        <div class="fld"><label>Full name</label><input id="c-name" placeholder=" "></div>
+        <div class="fld"><label>Designation</label><input id="c-role" placeholder=" "></div>
+        <div class="fld"><label>Company / entity</label><input id="c-org" placeholder=" "></div>
+        <div class="fld"><label>Email</label><input id="c-email" type="email" placeholder=" "></div>
+        <div class="fld"><label>Phone</label><input id="c-phone" type="tel" placeholder=" "></div>
+        <div class="fld"><label>Date</label><input id="c-date" placeholder=" "></div>
+        <div class="sig-wrap">
+          <label style="display:block;font-family:'Space Grotesk',monospace;font-size:8px;letter-spacing:1.5px;color:#8C8480;text-transform:uppercase;margin-bottom:4px">Signature</label>
+          <canvas class="sig-pad" id="pad"></canvas>
+          <div class="sig-bar">
+            <span class="sig-hint">Sign with your mouse or finger</span>
+            <button class="sig-clear" onclick="clearPad()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- YKS -->
+      <div>
+        <div class="col-h">For YKS Productions</div>
+        <div class="fld"><label>Name</label>
+          <div style="color:#F5F0EA;font-size:14px;padding:5px 2px;border-bottom:1px solid #3A3440">Yedukrishna Suresh</div></div>
+        <div class="fld"><label>Designation</label>
+          <div style="color:#F5F0EA;font-size:14px;padding:5px 2px;border-bottom:1px solid #3A3440">Founder · Cinematographer</div></div>
+        <div class="fld"><label>Email</label>
+          <div style="color:#F5F0EA;font-size:14px;padding:5px 2px;border-bottom:1px solid #3A3440">hello@yksproductions.com</div></div>
+        <div class="fld"><label>Website</label>
+          <div style="color:#F5F0EA;font-size:14px;padding:5px 2px;border-bottom:1px solid #3A3440">yksproductions.com</div></div>
+        <div class="fld"><label>Date</label>
+          <div style="color:#F5F0EA;font-size:14px;padding:5px 2px;border-bottom:1px solid #3A3440" id="y-date">—</div></div>
+        <div class="sig-wrap">
+          <label style="display:block;font-family:'Space Grotesk',monospace;font-size:8px;letter-spacing:1.5px;color:#8C8480;text-transform:uppercase;margin-bottom:4px">Signature</label>
+          <div class="yks-sig">Yedukrishna</div>
+          <div class="yks-meta">YKS Productions · Bangalore &amp; Dubai<br>
+          Micro enterprise, MSMED Act 2006 · Udyam Reg. <span class="blank">&nbsp;</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <strong style="color:#BDB4AC">YKS Productions</strong> · Cinematography, film stills and brand films · Bangalore &amp; Dubai<br>
+    yksproductions.com · @yks_photoworks<br>
+    <span style="opacity:.72">This document is issued with, and forms part of, the quotation it accompanies.
+    Retain a copy for your records.</span>
+  </div>
+</div>
+
+<!-- ACTION BAR -->
+<div class="bar print-hide">
+  <span class="bar-note">Fill in your details and sign above, then save as PDF and email it back.</span>
+  <button class="btn btn-alt" onclick="resetAll()">Reset</button>
+  <button class="btn btn-go" onclick="savePdf()">Save as PDF</button>
+</div>
+
+<script>
+// ── personalisation ──
+// Details travel in the URL *fragment*, never the query string: fragments are
+// not sent to the server, do not appear in referrer headers, and stay out of
+// GitHub Pages' logs. Only business-card level data is carried — the client
+// still enters their own email and phone when signing.
+let CFG = {};
+try{
+  const raw = decodeURIComponent(location.hash.replace(/^#/,''));
+  if(raw){
+    // atob yields latin1 — decode the bytes as UTF-8 or em-dashes, rupee signs
+    // and accented names arrive mangled
+    const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
+    CFG = JSON.parse(new TextDecoder().decode(bytes));
+  }
+}catch(e){ CFG = {}; }
+
+function applyConfig(){
+  const set = (id,val) => { const el=document.getElementById(id); if(el && val!=null && val!=='') el.textContent = val; };
+
+  if(CFG.org || CFG.name){
+    document.getElementById('prepared').style.display = 'block';
+    set('p-org',  CFG.org || CFG.name);
+    set('p-name', CFG.org && CFG.name ? CFG.name : '');
+    set('p-proj', CFG.proj ? CFG.proj : '');
+    if(!CFG.proj) document.getElementById('p-proj').style.display='none';
+    if(CFG.name) { const f=document.getElementById('c-name'); f.value=CFG.name; f.setAttribute('value',CFG.name); }
+    if(CFG.org)  { const f=document.getElementById('c-org');  f.value=CFG.org;  f.setAttribute('value',CFG.org); }
+  }
+
+  if(CFG.adv){ set('t-adv', CFG.adv + '%'); set('t-bal', (100 - Number(CFG.adv)) + '%'); }
+  if(CFG.days){
+    set('t-days', CFG.days);
+    set('t-from', Number(CFG.days) >= 15 ? 'delivery' : 'the shoot completing');
+  }
+  if(CFG.hrs) set('t-hrs', 'this engagement covers ' + CFG.hrs + ' hours on location');
+  if(CFG.ot)  set('t-ot',  '\u20B9' + Number(CFG.ot).toLocaleString('en-IN') + ' per hour or part thereof');
+  if(CFG.rev) set('t-rev', CFG.rev);
+  return CFG.ref || null;
+}
+const cfgRef = applyConfig();
+
+// ── document reference + dates ──
+const now = new Date();
+const fmt = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+const fy  = (now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear()-1) % 100;
+const ref = 'TOE-' + fy + (fy+1) + '-' + String(Math.floor(now.getTime()/1000) % 1000).padStart(3,'0');
+
+document.getElementById('ref').textContent = cfgRef || ref;
+document.getElementById('issued').textContent = fmt(now);
+document.getElementById('y-date').textContent = fmt(now);
+document.getElementById('c-date').value = fmt(now);
+
+// ── signature pad ──
+const pad = document.getElementById('pad');
+const ctx = pad.getContext('2d');
+let drawing = false, dirty = false;
+
+function sizePad(){
+  const r = pad.getBoundingClientRect();
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  // preserve anything already drawn across a resize
+  const prev = dirty ? pad.toDataURL() : null;
+  pad.width  = Math.round(r.width  * dpr);
+  pad.height = Math.round(r.height * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.lineWidth = 1.9;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#141118';
+  if(prev){ const img = new Image(); img.onload = () => ctx.drawImage(img,0,0,r.width,r.height); img.src = prev; }
+}
+sizePad();
+addEventListener('resize', sizePad);
+
+function pos(e){
+  const r = pad.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+pad.addEventListener('pointerdown', e => {
+  drawing = true; dirty = true;
+  pad.setPointerCapture(e.pointerId);
+  const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+});
+pad.addEventListener('pointermove', e => {
+  if(!drawing) return;
+  const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke();
+});
+['pointerup','pointercancel','pointerleave'].forEach(ev =>
+  pad.addEventListener(ev, () => { drawing = false; }));
+
+function clearPad(){
+  const r = pad.getBoundingClientRect();
+  ctx.clearRect(0,0,r.width,r.height);
+  dirty = false;
+}
+
+// ── actions ──
+function savePdf(){
+  const name = document.getElementById('c-name').value.trim();
+  if(!name || !dirty){
+    const missing = [!name && 'your name', !dirty && 'your signature'].filter(Boolean).join(' and ');
+    if(!confirm('You have not added ' + missing + '.\n\nSave the PDF anyway?')) return;
+  }
+  document.title = 'YKS Terms of Engagement — ' + (name || 'unsigned') + ' — ' + ref;
+  window.print();
+}
+
+function resetAll(){
+  if(!confirm('Clear all details and the signature?')) return;
+  ['c-name','c-role','c-org','c-email','c-phone'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('c-date').value = fmt(new Date());
+  clearPad();
+}
+
+// keep typed values in the printed output
+document.querySelectorAll('input').forEach(i =>
+  i.addEventListener('input', () => i.setAttribute('value', i.value)));
+</script>
+</body>
+</html>

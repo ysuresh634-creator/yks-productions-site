@@ -456,6 +456,50 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
       <div class="total-grand"><span class="total-lbl">TOTAL</span><span class="total-val" id="t-total">₹0</span></div>
     </div>
     <div class="form-section">
+      <label class="form-label">Terms &amp; Agreement</label>
+      <p class="field-note" style="margin-bottom:12px">Builds a branded, signable Terms of Engagement for this
+      client, using the details above. They open it, sign on screen and save a PDF.</p>
+
+      <div class="form-field">
+        <label class="form-label">Company / entity (optional)</label>
+        <input class="form-input" id="ag-org" placeholder="Leave blank for an individual client">
+      </div>
+      <div class="form-row">
+        <div>
+          <label class="form-label">Client type</label>
+          <select class="form-input" id="ag-type" onchange="agTypeChanged()">
+            <option value="ind">Individual / small</option>
+            <option value="corp">Corporate / brand</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Balance due within</label>
+          <select class="form-input" id="ag-days">
+            <option value="7">7 days of the shoot</option>
+            <option value="15">15 days of delivery</option>
+            <option value="30">30 days of delivery</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Hours on location</label><input class="form-input" id="ag-hrs" type="number" min="1" placeholder="8"></div>
+        <div><label class="form-label">Overtime ₹/hour</label><input class="form-input" id="ag-ot" type="number" min="0" placeholder="3000"></div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Revision rounds</label>
+        <input class="form-input" id="ag-rev" type="number" min="0" placeholder="2">
+      </div>
+
+      <div class="quick-btns" style="margin-top:12px">
+        <button class="quick-btn" onclick="agOpen()">👁 Preview</button>
+        <button class="quick-btn" onclick="agCopy()">🔗 Copy link</button>
+        <button class="quick-btn" onclick="agWhatsApp()">💬 WhatsApp</button>
+        <button class="quick-btn" onclick="agEmail()">✉️ Email</button>
+      </div>
+      <p class="field-note" id="ag-note" style="margin-top:10px"></p>
+    </div>
+
+    <div class="form-section">
       <label class="form-label">Notes (optional)</label>
       <textarea class="form-input" id="f-notes" rows="2" placeholder="Thank you for your business!" style="resize:none;line-height:1.5"></textarea>
     </div>
@@ -940,6 +984,75 @@ function calcTotals(){
   document.getElementById('t-sub').textContent='₹'+sub.toLocaleString('en-IN');
   document.getElementById('t-adv').textContent='= ₹'+Math.round(sub*adv/100).toLocaleString('en-IN');
   document.getElementById('t-total').textContent='₹'+sub.toLocaleString('en-IN');
+}
+
+// ── Terms of Engagement link ───────────────────────────────────────────────
+// Client details ride in the URL *fragment*, not the query string: fragments
+// are never sent to the server, so nothing lands in GitHub Pages logs or in a
+// referrer header. Only name/company/project travel — the client types their
+// own email and phone when they sign.
+const AGREEMENT_URL = 'https://yksproductions.com/agreement.html';
+
+function agTypeChanged(){
+  const corp = v('ag-type')==='corp';
+  set('ag-days', corp ? '30' : '7');
+}
+
+function agBuild(){
+  const name = v('f-client').trim();
+  if(!name){ toast('Add the client name first'); return null; }
+  const cfg = {
+    name,
+    org : v('ag-org').trim(),
+    proj: v('f-event').trim(),
+    adv : parseInt(v('f-adv')) || 50,
+    days: v('ag-days') || '7'
+  };
+  if(v('ag-hrs')) cfg.hrs = v('ag-hrs');
+  if(v('ag-ot'))  cfg.ot  = v('ag-ot');
+  if(v('ag-rev')) cfg.rev = v('ag-rev');
+  const c = getCounters();
+  cfg.ref = 'QUO-2526-' + String(c.quo).padStart(3,'0');
+
+  // btoa is latin1-only; encode UTF-8 first so names with accents survive
+  const json = JSON.stringify(cfg);
+  const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(json)));
+  return AGREEMENT_URL + '#' + encodeURIComponent(b64);
+}
+
+function agOpen(){ const u=agBuild(); if(u) window.open(u,'_blank'); }
+
+function agCopy(){
+  const u=agBuild(); if(!u) return;
+  const done = () => { $('ag-note').textContent = 'Link copied — paste it to your client.'; toast('Link copied'); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(u).then(done).catch(()=>agFallback(u));
+  } else agFallback(u);
+}
+function agFallback(u){
+  const t=document.createElement('textarea');
+  t.value=u; t.style.position='fixed'; t.style.opacity='0';
+  document.body.appendChild(t); t.select();
+  try{ document.execCommand('copy'); toast('Link copied'); }
+  catch(e){ prompt('Copy this link:', u); }
+  t.remove();
+}
+
+function agWhatsApp(){
+  const u=agBuild(); if(!u) return;
+  const name=v('f-client').trim().split(' ')[0];
+  const msg='Hi '+name+' — here are the terms for our shoot. You can sign it right on the page and save a PDF:\n\n'+u;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function agEmail(){
+  const u=agBuild(); if(!u) return;
+  const name=v('f-client').trim().split(' ')[0];
+  const body='Hi '+name+',\n\nHere are the Terms of Engagement for our shoot. You can fill in your details, '
+    +'sign on the page and save it as a PDF:\n\n'+u+'\n\nAny questions, just reply to this.\n\n'
+    +'Yedukrishna\n📸 @yks_photoworks · yksproductions.com';
+  window.open('mailto:?subject='+encodeURIComponent('Terms of Engagement — YKS Productions')
+    +'&body='+encodeURIComponent(body),'_blank');
 }
 
 // ── Generate ───────────────────────────────────────────────────────────────
