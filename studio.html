@@ -899,7 +899,7 @@ function showScreen(name){
   }
   renderCount();
 }
-let curScreen='history', edBooted=false, edBooting=false, publishing=false;
+let curScreen='history', edBooted=false, edBooting=false, publishing=false, publishQueued=false;
 
 // ── Type ───────────────────────────────────────────────────────────────────
 function setType(t){
@@ -1973,12 +1973,16 @@ function renderCount(){
 
 // One tap from the bar: run the safety checks, then publish, showing the log.
 async function quickPublish(){
-  if(!changes.length || publishing) return;
-  const probs=guards(buildOutput());
-  openSave();
-  if(probs.length) return;          // openSave already lists the problems
-  await new Promise(r=>setTimeout(r,60));
-  doSave();
+  if(!changes.length || publishing || publishQueued) return;
+  publishQueued=true;               // claimed synchronously, before any await
+  try{
+    const probs=guards(buildOutput());
+    openSave();
+    if(probs.length) return;        // openSave already lists the problems
+    await new Promise(r=>setTimeout(r,60));
+    if(!changes.length) return;     // another run may have drained them
+    doSave();
+  } finally { publishQueued=false; }
 }
 function openChanges(){ if(!changes.length){ toast('No changes yet'); return; } renderChanges(); openSheet('sh-chg'); }
 function renderChanges(){
@@ -2053,6 +2057,7 @@ function slog(m,k='info'){ const d=document.createElement('div'); d.className='l
 
 async function doSave(){
   if(publishing) return;                       // a second tap must not start a rival run
+  if(!changes.length){ slog('Nothing left to publish.','info'); return; }
   const html=buildOutput(), probs=guards(html);
   if(probs.length){ slog('Blocked by safety checks.','bad'); return; }
   publishing=true;
