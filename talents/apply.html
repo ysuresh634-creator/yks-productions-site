@@ -41,7 +41,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=16" />
-<link rel="stylesheet" href="/css/talents.css?v=50" />
+<link rel="stylesheet" href="/css/talents.css?v=51" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -542,8 +542,17 @@
         <!-- About you + AI writer -->
         <div class="ap-block">
           <p class="ap-step">About you</p>
-          <p class="ap-hint">A few honest lines about you and your work. Not sure what to say? Let us draft it — you can edit every word.</p>
-          <button type="button" class="ap-ai-btn" id="apAiOpen">✨ Write it for me</button>
+          <p class="ap-hint">This is the paragraph a casting director reads first. Pick a style below and we'll draft it in your own voice — then edit every word.</p>
+          <p class="ap-bio-lbl">Bio style <span>— tap one to write it</span></p>
+          <div class="ap-bio-styles" id="apBioStyles">
+            <button type="button" data-s="professional"><b>Professional</b><i>The agency standard</i></button>
+            <button type="button" data-s="editorial"><b>Editorial</b><i>Magazine voice, crafted</i></button>
+            <button type="button" data-s="warm"><b>Warm</b><i>Human and approachable</i></button>
+            <button type="button" data-s="range"><b>Range</b><i>Proves you cover a lot</i></button>
+            <button type="button" data-s="newcomer"><b>Newcomer</b><i>Early on? Sell the attitude</i></button>
+            <button type="button" data-s="minimal"><b>Minimal</b><i>Two crisp lines</i></button>
+          </div>
+          <button type="button" class="ap-ai-btn" id="apAiOpen">✨ Fine-tune the details</button>
           <div class="ap-ai" id="apAi" hidden>
             <div class="ap-ai-row"><span>I'm a…</span><div class="ap-chips" data-k="role">
               <button type="button" data-v="model">Model</button>
@@ -968,6 +977,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=60"></script>
+<script src="/js/talent-apply.js?v=61"></script>
 </body>
 </html>

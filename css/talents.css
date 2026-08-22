@@ -898,3 +898,17 @@ main{overflow-x:clip}
 /* WhatsApp drop: live progress / result */
 .ap-dl-wamsg{margin:12px 0 0;font-family:var(--mag-mono);font-size:12px;letter-spacing:.02em;color:var(--mag-accent);line-height:1.5}
 .ap-dl-wamsg a{color:var(--mag-accent);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+
+/* ── About: bio style picker + the field itself ── */
+#apAbout{width:100%;min-height:120px;resize:vertical}
+.ap-bio-lbl{margin:18px 0 10px;font-family:var(--mag-mono);font-size:10px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--mag-ink)}
+.ap-bio-lbl span{color:var(--mag-soft);font-weight:400;letter-spacing:.02em;text-transform:none}
+.ap-bio-styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:14px}
+.ap-bio-styles button{display:flex;flex-direction:column;gap:3px;text-align:left;cursor:pointer;
+  background:rgba(244,237,226,.03);border:1px solid var(--mag-line);border-radius:11px;padding:11px 13px;transition:border-color .18s,background .18s}
+.ap-bio-styles button:hover{border-color:var(--mag-accent);background:rgba(255,140,59,.06)}
+.ap-bio-styles button.on{border-color:var(--mag-accent);background:rgba(255,140,59,.1)}
+.ap-bio-styles b{font-family:var(--mag-mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mag-ink)}
+.ap-bio-styles i{font-style:normal;font-family:var(--mag-sans);font-size:11.5px;color:var(--mag-soft);line-height:1.35}
+.ap-bio-styles button.busy{opacity:.6;cursor:default}

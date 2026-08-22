@@ -1029,6 +1029,7 @@
       tone: pick.tone || 'warm',
       exp: pick.exp || '',
       length: pick.length || 'medium',
+      style: pick.style || '',
       seed: pick.seed || 0
     };
   }
@@ -1059,6 +1060,27 @@
   }
   if (goBtn) goBtn.addEventListener('click', function () { pick.seed = 0; runWriter(goBtn, 'Rewrite →'); });
   if (regenBtn) regenBtn.addEventListener('click', function () { pick.seed = (pick.seed || 0) + 1; runWriter(regenBtn, '↻ Another version'); });
+
+  /* ── bio styles: each writes a genuinely different paragraph, in the talent's own voice ── */
+  (function wireBioStyles() {
+    var wrap = $('#apBioStyles'); if (!wrap || !aboutBox) return;
+    wrap.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || b.classList.contains('busy')) return;
+      if (!(form.name.value || '').trim()) { alert('Add your name first (in “The basics” below) — the writer uses it.'); if (form.name) form.name.focus(); return; }
+      // tapping the same style again gives a fresh take rather than the identical paragraph
+      pick.seed = (b.dataset.s === pick.style) ? (pick.seed || 0) + 1 : 0;
+      pick.style = b.dataset.s;
+      $$('#apBioStyles button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      var lbl = b.querySelector('b'), orig = lbl ? lbl.textContent : '';
+      b.classList.add('busy'); if (lbl) lbl.textContent = 'Writing…';
+      aiWrite('about').then(function (text) {
+        aboutBox.value = text || compose();
+        aboutBox.dispatchEvent(new Event('input'));
+        b.classList.remove('busy'); if (lbl) lbl.textContent = orig;
+        aboutBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
+  })();
 
   /* ── signature line writer (portfolio cover) ── */
   (function wireTaglineAI() {
