@@ -28,6 +28,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .pin-key{width:72px;height:72px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:22px;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none;transition:background .1s}
 .pin-key:active{background:var(--gold-lt);color:var(--gold)}
 .pin-key.del{font-size:16px;color:var(--sub)}
+.pin-enter{margin-top:22px;width:248px;padding:15px;border:none;border-radius:12px;
+  background:var(--gold);color:#0D0B11;font-size:15px;font-weight:700;letter-spacing:1.5px;
+  cursor:pointer;transition:opacity .15s}
+.pin-enter:disabled{background:var(--card);color:#4A4550;cursor:not-allowed;
+  border:1px solid var(--border)}
+.pin-enter:not(:disabled):active{opacity:.85}
 
 /* ── APP ── */
 .screen{display:none;min-height:100vh;padding-bottom:80px}
@@ -388,6 +394,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
     <button class="pin-key" onclick="pinKey('0')">0</button>
     <button class="pin-key del" onclick="pinDel()">⌫</button>
   </div>
+  <button class="pin-enter" id="pin-enter" onclick="checkPin()" disabled>Enter</button>
 </div>
 
 <!-- ══ HISTORY ══ -->
@@ -838,7 +845,7 @@ function getPin(){ return localStorage.getItem('yks_pin')||DEFAULT_PIN; }
 function pinKey(k){
   if(pinBuf.length>=4) return;
   pinBuf+=k; updateDots();
-  if(pinBuf.length===4) setTimeout(checkPin,120);
+  document.getElementById('pin-error').textContent='';
 }
 function pinDel(){
   pinBuf=pinBuf.slice(0,-1);
@@ -847,8 +854,11 @@ function pinDel(){
 }
 function updateDots(){
   for(let i=0;i<4;i++) document.getElementById('dot'+i).classList.toggle('filled',i<pinBuf.length);
+  const b=document.getElementById('pin-enter');
+  if(b) b.disabled = pinBuf.length!==4;
 }
 function checkPin(){
+  if(pinBuf.length!==4) return;
   if(pinBuf===getPin()){
     document.getElementById('lock-screen').classList.add('hidden');
     sessionStorage.setItem('yks_unlocked','1');
@@ -867,6 +877,14 @@ function lockApp(){
   document.getElementById('lock-screen').classList.remove('hidden');
   closeAI();
 }
+
+// Desktop: type the PIN, Enter to unlock, Backspace to correct.
+document.addEventListener('keydown', e => {
+  if(document.getElementById('lock-screen').classList.contains('hidden')) return;
+  if(e.key >= '0' && e.key <= '9'){ pinKey(e.key); e.preventDefault(); }
+  else if(e.key === 'Backspace'){ pinDel(); e.preventDefault(); }
+  else if(e.key === 'Enter'){ checkPin(); e.preventDefault(); }
+});
 
 // ── State ──────────────────────────────────────────────────────────────────
 let currentType='INVOICE';
