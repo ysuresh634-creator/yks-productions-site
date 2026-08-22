@@ -34,6 +34,23 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .pin-enter:disabled{background:var(--card);color:#4A4550;cursor:not-allowed;
   border:1px solid var(--border)}
 .pin-enter:not(:disabled):active{opacity:.85}
+@keyframes pinShake{
+  10%,90%{transform:translateX(-3px)} 20%,80%{transform:translateX(5px)}
+  30%,50%,70%{transform:translateX(-9px)} 40%,60%{transform:translateX(9px)}
+}
+.pin-dots.shake{animation:pinShake .5s cubic-bezier(.36,.07,.19,.97)}
+.pin-dot.bad{background:var(--red)!important;border-color:var(--red)!important}
+.pin-dot.good{background:var(--green)!important;border-color:var(--green)!important;
+  box-shadow:0 0 12px rgba(126,200,139,.65)}
+.pin-dot{transition:background .12s,border-color .12s,transform .12s}
+.pin-dot.pop{transform:scale(1.35)}
+.pin-key{transition:transform .08s,background .12s}
+.pin-key:active{transform:scale(.92)}
+#lock-screen{transition:opacity .28s,transform .28s}
+#lock-screen.leaving{opacity:0;transform:scale(1.04);pointer-events:none}
+.pin-pad.frozen{opacity:.35;pointer-events:none}
+.pin-enter.frozen{opacity:.35;pointer-events:none}
+@media (prefers-reduced-motion:reduce){ .pin-dots.shake{animation:none} }
 
 /* ── APP ── */
 .screen{display:none;min-height:100vh;padding-bottom:80px}
@@ -843,11 +860,17 @@ const DEFAULT_PIN='1234';
 let pinBuf='';
 function getPin(){ return localStorage.getItem('yks_pin')||DEFAULT_PIN; }
 function pinKey(k){
-  if(pinBuf.length>=4) return;
+  if(pinBuf.length>=4 || lockRemaining() > 0) return;
   pinBuf+=k; updateDots();
   document.getElementById('pin-error').textContent='';
+  if(navigator.vibrate) navigator.vibrate(12);
+  // pop the dot that just filled, so each press registers visually too
+  const d = document.getElementById('dot' + (pinBuf.length - 1));
+  if(d){ d.classList.add('pop'); setTimeout(() => d.classList.remove('pop'), 130); }
 }
 function pinDel(){
+  if(lockRemaining() > 0) return;
+  if(pinBuf.length && navigator.vibrate) navigator.vibrate(8);
   pinBuf=pinBuf.slice(0,-1);
   document.getElementById('pin-error').textContent='';
   updateDots();
@@ -855,16 +878,81 @@ function pinDel(){
 function updateDots(){
   for(let i=0;i<4;i++) document.getElementById('dot'+i).classList.toggle('filled',i<pinBuf.length);
   const b=document.getElementById('pin-enter');
-  if(b) b.disabled = pinBuf.length!==4;
+  if(b) b.disabled = pinBuf.length!==4 || lockRemaining() > 0;
 }
-function checkPin(){
-  if(pinBuf.length!==4) return;
-  if(pinBuf===getPin()){
-    document.getElementById('lock-screen').classList.add('hidden');
-    sessionStorage.setItem('yks_unlocked','1');
-  } else {
-    document.getElementById('pin-error').textContent='Wrong PIN. Try again.';
+// Wrong entries shake, flash red and buzz, and repeated failures freeze the
+// pad for a while. This is a deterrent against someone idly poking at the
+// screen — it is not real authentication, since the page is public and a
+// determined person can read localStorage directly.
+const LOCK_AFTER = 5;
+
+function lockRemaining(){
+  const until = parseInt(localStorage.getItem('yks_lockuntil')||'0');
+  return Math.max(0, until - Date.now());
+}
+
+function freezeUI(on){
+  document.querySelector('.pin-pad').classList.toggle('frozen', on);
+  document.getElementById('pin-enter').classList.toggle('frozen', on);
+}
+
+function tickLockout(){
+  const ms = lockRemaining();
+  if(ms <= 0){ freezeUI(false); document.getElementById('pin-error').textContent=''; return; }
+  const sec = Math.ceil(ms/1000);
+  document.getElementById('pin-error').textContent =
+    'Too many attempts — try again in ' + sec + 's';
+  freezeUI(true);
+  setTimeout(tickLockout, 400);
+}
+
+function failPin(){
+  const dots = document.getElementById('pin-dots');
+  document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('bad'));
+  dots.classList.remove('shake'); void dots.offsetWidth;   // restart the animation
+  dots.classList.add('shake');
+  if(navigator.vibrate) navigator.vibrate([40,60,40]);
+
+  const fails = (parseInt(localStorage.getItem('yks_fails')||'0')) + 1;
+  localStorage.setItem('yks_fails', fails);
+
+  setTimeout(() => {
+    dots.classList.remove('shake');
+    document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('bad'));
     pinBuf=''; updateDots();
+    if(fails >= LOCK_AFTER){
+      const wait = Math.min(300, 30 * Math.pow(2, fails - LOCK_AFTER)) * 1000;
+      localStorage.setItem('yks_lockuntil', Date.now() + wait);
+      tickLockout();
+    } else {
+      const left = LOCK_AFTER - fails;
+      document.getElementById('pin-error').textContent =
+        'Wrong PIN' + (left <= 2 ? ' — ' + left + ' attempt' + (left===1?'':'s') + ' left' : '. Try again.');
+    }
+  }, 500);
+}
+
+function checkPin(){
+  if(pinBuf.length!==4 || lockRemaining() > 0) return;
+  if(pinBuf===getPin()){
+    localStorage.removeItem('yks_fails');
+    localStorage.removeItem('yks_lockuntil');
+    document.getElementById('pin-error').textContent='';
+    sessionStorage.setItem('yks_unlocked','1');
+    // confirm the unlock before it disappears, so it does not feel like a glitch
+    document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('good'));
+    document.getElementById('pin-enter').disabled = true;
+    if(navigator.vibrate) navigator.vibrate(55);
+    const scr = document.getElementById('lock-screen');
+    setTimeout(() => scr.classList.add('leaving'), 220);
+    setTimeout(() => {
+      scr.classList.add('hidden');
+      scr.classList.remove('leaving');
+      document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('good','filled'));
+      pinBuf='';
+    }, 520);
+  } else {
+    failPin();
   }
 }
 function lockApp(){
@@ -2253,6 +2341,7 @@ window.addEventListener('resize',()=>{ if(pe && $('sh-photo').classList.contains
 (function init(){
   if(sessionStorage.getItem('yks_unlocked')==='1')
     document.getElementById('lock-screen').classList.add('hidden');
+  if(lockRemaining() > 0) tickLockout();   // a reload must not clear the cooldown
   const today=new Date(); const due=new Date(); due.setDate(due.getDate()+14);
   document.getElementById('f-date').value=today.toISOString().split('T')[0];
   document.getElementById('f-date2').value=due.toISOString().split('T')[0];
