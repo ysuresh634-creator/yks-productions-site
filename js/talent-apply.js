@@ -1439,6 +1439,10 @@
         else if (/\b(languages?|speaks?)\b/.test(low) && !o.languages) o.languages = v;
         else if (/\b(education|qualification|degree|studied)\b/.test(low) && !o.education) o.education = v;
         else if (/\b(occupation|profession|job|work)\b/.test(low) && !o.occupation) o.occupation = v;
+        else if (/\b(marital|relationship\s*status)\b/.test(low) && !o.marital) o.marital = v;
+        else if (/\bavailab/.test(low) && !o.availability) o.availability = v;
+        else if (/\btravel\b/.test(low) && !o.travel) o.travel = v;
+        else if (/\b(work|looking for|interested in|categor)/.test(low) && !o.preferences && /fashion|bridal|runway|commercial|catalogue|film|fitness|music|product/i.test(v)) o.preferences = v;
         else if (/\bstate\b/.test(low) && !o.state) o.state = v;
       });
       if (!o.name && (first || last)) o.name = (first + ' ' + last).trim();
@@ -1454,6 +1458,16 @@
       // where — phone code, city or state
       if (/\+971|\bu\.?a\.?e\.?\b|united arab emirates/i.test(t) || UAE_CITIES.test(o.city || '') || UAE_CITIES.test(t)) o.region = 'UAE';
       else if (/\+91\b|\bindia\b/i.test(t) || o.state || o.city) o.region = 'India';
+      function pickOne(v, opts) {
+        if (!v) return '';
+        var t = String(v).toLowerCase();
+        for (var i = 0; i < opts.length; i++) if (t.indexOf(opts[i][0]) >= 0) return opts[i][1];
+        return '';
+      }
+      if (o.marital) o.marital = pickOne(o.marital, [['single', 'Single'], ['relationship', 'In a relationship'], ['married', 'Married'], ['not to say', 'Prefer not to say']]);
+      if (o.availability) o.availability = pickOne(o.availability, [['full', 'Full-time'], ['weekend', 'Weekends & evenings'], ['evening', 'Weekends & evenings'], ['part', 'Part-time'], ['project', 'Project by project']]);
+      if (o.travel) o.travel = pickOne(o.travel, [['anywhere', 'Yes — anywhere'], ['abroad', 'Yes — anywhere'], ['country', 'Within my country'], ['india', 'Within my country'], ['city', 'Within my city only'], ['not right now', 'Not right now'], ['no', 'Not right now']]);
+      if (o.education) o.education = pickOne(o.education, [['in school', 'In school'], ['high school', 'High school'], ['diploma', 'Diploma'], ['bachelor', 'Bachelor\u2019s degree'], ['master', 'Master\u2019s or higher'], ['phd', 'Master\u2019s or higher'], ['degree', 'Bachelor\u2019s degree']]) || o.education;
       // gender → the options this form offers
       if (o.gender) {
         var g = o.gender.toLowerCase();
@@ -1482,6 +1496,21 @@
       if (m = t.match(/\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})\b/)) return m[3] + '-' + pad(+m[2]) + '-' + pad(+m[1]);   // dd/mm/yyyy
       return '';
     }
+    // "work you're looking for" is a chip group, not an input — tick the ones named and keep the hidden field in step
+    function setPrefs(val, filled) {
+      var group = $('#apPrefs'); if (!group || !val) return;
+      var want = String(val).split(',').map(function (x) { return x.trim().toLowerCase(); }).filter(Boolean);
+      var hit = 0;
+      $$('button', group).forEach(function (b) {
+        var v = (b.dataset.v || b.textContent).trim();
+        if (want.indexOf(v.toLowerCase()) >= 0 && !b.classList.contains('on')) { b.classList.add('on'); hit++; }
+      });
+      if (!hit) return;
+      if (form.preferences) form.preferences.value = $$('button.on', group).map(function (x) { return x.dataset.v; }).join(', ');
+      filled.push('preferences');
+      var wrap = group.closest('label') || group.parentElement;
+      if (wrap) { wrap.classList.remove('ap-just-filled'); void wrap.offsetWidth; wrap.classList.add('ap-just-filled'); setTimeout(function () { wrap.classList.remove('ap-just-filled'); }, 2200); }
+    }
     function setField(nm, val, filled) {
       var el = form[nm]; if (!el || !val) return;
       if (el.type === 'date') { val = toISODate(val); if (!val) return; }
@@ -1495,12 +1524,13 @@
       el.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
-    fillBtn.addEventListener('click', function () {
+    function runFill(raw, fillBtn, msg) {
       var text = (raw.value || '').trim();
       if (!text) { if (msg) { msg.textContent = 'Paste your details above first.'; msg.className = 'ap-statsmsg warn'; } return; }
       var o = parseProfile(text), filled = [];
-      ['name', 'contact', 'category', 'region', 'city', 'socials', 'dob', 'gender', 'languages', 'education', 'occupation']
-        .forEach(function (k) { setField(k, o[k], filled); });
+      ['name', 'contact', 'category', 'region', 'city', 'socials', 'dob', 'gender', 'languages', 'education',
+       'occupation', 'marital', 'availability', 'travel'].forEach(function (k) { setField(k, o[k], filled); });
+      if (o.preferences) setPrefs(o.preferences, filled);
       // the same paste usually carries the measurements too
       if (typeof PARSE_STATS === 'function') {
         var st = PARSE_STATS(text), map = { height: 'stat_height', bust: 'stat_bust', waist: 'stat_waist', hips: 'stat_hips', shoe: 'stat_shoe', hair: 'stat_hair', eyes: 'stat_eyes', skin: 'stat_skin' };
@@ -1526,11 +1556,25 @@
         .then(function (j) {
           if (done) return; done = true; clearTimeout(to);
           var fx = (j && j.fields) || {};
-          Object.keys(fx).forEach(function (k) { setField(k, fx[k], filled); });
+          Object.keys(fx).forEach(function (k) { if (k !== 'preferences') setField(k, fx[k], filled); });
+          if (fx.preferences) setPrefs(fx.preferences, filled);
           persistDraft(); updatePreview(); report();
         })
         .catch(function () { if (done) return; done = true; clearTimeout(to); report(); });
-    });
+    }
+    fillBtn.addEventListener('click', function () { runFill(raw, fillBtn, msg); });
+
+    // the same reader, offered again inside "More about you" so nobody has to scroll back up
+    var mOpen = $('#apMoreAiOpen'), mPanel = $('#apMorePaste'), mRaw = $('#apMoreRaw'),
+        mFill = $('#apMoreFill'), mMsg = $('#apMoreMsg');
+    if (mOpen && mPanel && mRaw && mFill) {
+      mOpen.addEventListener('click', function () {
+        mPanel.hidden = !mPanel.hidden;
+        mOpen.textContent = mPanel.hidden ? '✨ Paste it instead — I\'ll fill this section' : '✕ Close';
+        if (!mPanel.hidden) mRaw.focus();
+      });
+      mFill.addEventListener('click', function () { runFill(mRaw, mFill, mMsg); });
+    }
   })();
 
   /* ══ interactive "how it works" — the timeline walks itself; hover/tap to steer ══ */
