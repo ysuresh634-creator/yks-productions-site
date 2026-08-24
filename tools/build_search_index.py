@@ -77,6 +77,26 @@ def subjects(path):
     return [name for name, pat in SUBJECTS if re.search(pat, p)]
 
 
+SECTION = re.compile(r'<section\b[^>]*\bid="([^"]+)"[^>]*>', re.I)
+# structural shells, not places a visitor wants to be dropped
+SKIP_IDS = re.compile(r"^(act-hero|act-quote|act-book|contact-sheet|frames)$", re.I)
+
+
+def sections(body, cap=8):
+    """Yield (id, html-chunk) for each <section id> — chunk runs to the next
+    section start, which is enough to find that section's own heading."""
+    marks = [(m.group(1), m.end()) for m in SECTION.finditer(body)]
+    out = []
+    for i, (sid, pos) in enumerate(marks):
+        if SKIP_IDS.match(sid):
+            continue
+        end = marks[i + 1][1] if i + 1 < len(marks) else min(len(body), pos + 6000)
+        out.append((sid, body[pos:end]))
+        if len(out) >= cap:
+            break
+    return out
+
+
 def local_path(url):
     rel = url.replace(SITE, "").split("#")[0].split("?")[0]
     if rel in ("", "/"):
@@ -118,14 +138,38 @@ def main():
                 break
 
         heads_s = " · ".join(heads)
+        cat, subs = category(rel), subjects(rel)
         entries.append({
             "u": rel,
             "t": title or rel,
             "d": desc,
             "k": heads_s,
-            "c": category(rel),
-            "g": subjects(rel),
+            "c": cat,
+            "g": subs,
         })
+
+        # Section anchors — so a result can land on the exact part of the page
+        # (fashion.html#divya) instead of dropping the visitor at the top.
+        for sid, chunk in sections(body):
+            head = first(r"<h[1-3][^>]*>(.*?)</h[1-3]>", chunk)
+            if not head or len(head) > 80:
+                continue
+            # Headlines here are deliberately poetic ("Pick a thread.") — useless
+            # to search. The eyebrow above them is the plain label ("The work"),
+            # so prefer it for the title and keep the headline as context.
+            eyebrow = first(r'class="(?:l-)?eyebrow"[^>]*>(.*?)</', chunk)
+            eyebrow = re.sub(r"^\s*\d+\s*[—\-–·]?\s*", "", eyebrow).strip()
+            label = eyebrow if len(eyebrow) > 2 else head
+            entries.append({
+                "u": rel + "#" + sid,
+                "t": label,
+                "d": head if label != head else "",
+                "k": head + " " + eyebrow,    # both are searchable either way
+                "c": cat,
+                "g": subs,
+                "a": 1,                       # anchor entry
+                "p": title or rel,            # parent page, shown as the subtitle
+            })
 
     entries.sort(key=lambda e: (e["c"] != "Home", e["c"], e["t"]))
     out = os.path.join(ROOT, "search-index.json")

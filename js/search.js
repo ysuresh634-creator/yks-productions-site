@@ -72,6 +72,8 @@
     'line-height:1.45;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
     '.yks-sr mark,.yks-sfix mark{background:none;color:#ff8c3b}',
     '.yks-sr.on,.yks-sr:hover{background:rgba(255,140,59,.10);border-left-color:#ff8c3b}',
+    '.yks-anch b::before{content:"§";color:#ff8c3b;opacity:.75;margin-right:7px;font-weight:400}',
+    '.yks-anch s{color:rgba(244,237,226,.40);font-size:11.5px;letter-spacing:.02em}',
     '.yks-smsg{padding:24px 18px;color:rgba(244,237,226,.5);font-size:13.5px;text-align:center;line-height:1.6}',
     '.yks-sfix{padding:9px 18px;font-size:12.5px;color:rgba(244,237,226,.55)}',
     '.yks-sfix button{background:none;border:0;color:#ff8c3b;cursor:pointer;font:inherit;padding:0}',
@@ -296,9 +298,20 @@
       if (!best) return 0;
       total += best;
     }
-    if (e.c === 'Home') total += 3;
-    if (e.c === 'Work') total += 2;
+    total += (CAT_BOOST[e.c] || 0);
+    if (e.a) total += 2;              // a section match is more precise than a page
     return total;
+  }
+
+  /* Section priority. The portfolio is the point of the site — someone
+     filtering "Real estate" wants to SEE the work, not read a pricing
+     article about it, so Work leads and Journal/Info trail. */
+  var CAT_ORDER = ['Work', 'Market', 'Services', 'Talent', 'Journal', 'Info', 'Home'];
+  var CAT_BOOST = { Work: 7, Home: 3, Market: 3, Services: 2, Talent: 2, Journal: 0, Info: 0 };
+
+  function catRank(c) {
+    var i = CAT_ORDER.indexOf(c);
+    return i < 0 ? 99 : i;
   }
 
   function inFilter(e) { return !activeSub || (e.g && e.g.indexOf(activeSub) !== -1); }
@@ -486,12 +499,16 @@
 
       // a chip with no query = browse that subject end to end
       if (activeSub && index) {
-        results = index.filter(inFilter);
+        results = index.filter(inFilter).sort(function (a, b) {
+          return catRank(a.c) - catRank(b.c) || a.t.localeCompare(b.t);
+        });
         var b = '', bg = '', bi = 0;
         results.forEach(function (e) {
           if (e.c !== bg) { bg = e.c; b += '<div class="yks-sgrp">' + esc(bg) + '</div>'; }
-          b += '<a class="yks-sr" role="option" data-i="' + (bi++) + '" href="' + esc(e.u) + '">' +
-            '<b>' + esc(e.t) + '</b><s>' + esc(e.d || e.k) + '</s></a>';
+          b += '<a class="yks-sr' + (e.a ? ' yks-anch' : '') + '" role="option" data-i="' + (bi++) +
+            '" href="' + esc(e.u) + '">' +
+            '<b>' + esc(e.t) + '</b><s>' +
+            (e.a ? 'section of ' + esc(e.p) : esc(e.d || e.k)) + '</s></a>';
         });
         list.innerHTML = b || '<div class="yks-smsg">Nothing under ' + esc(activeSub) + ' yet.</div>';
         bind(q); active = 0; paint();
@@ -523,7 +540,12 @@
         if (alt.length) { results = alt; corrected = fixed.join(' '); t = fixed; }
       }
     }
-    results = results.slice(0, 24);
+    // Relevance decides WHICH pages make the cut; section priority decides the
+    // order they're shown in — so the portfolio is never buried under blog posts
+    // and service pages for a query about work he actually shot.
+    results = results.slice(0, 24).sort(function (a, b) {
+      return catRank(a.c) - catRank(b.c);
+    });
 
     var ai = aiReady();
     var key = q.toLowerCase().trim();
@@ -542,8 +564,10 @@
     var group = '';
     results.forEach(function (e) {
       if (e.c !== group) { group = e.c; out += '<div class="yks-sgrp">' + esc(group) + '</div>'; }
-      out += '<a class="yks-sr" role="option" data-i="' + (i++) + '" href="' + esc(e.u) + '">' +
-        '<b>' + hl(e.t, t) + '</b><s>' + hl(e.d || e.k, t) + '</s></a>';
+      out += '<a class="yks-sr' + (e.a ? ' yks-anch' : '') + '" role="option" data-i="' + (i++) +
+        '" href="' + esc(e.u) + '">' +
+        '<b>' + hl(e.t, t) + '</b><s>' +
+        (e.a ? 'section of ' + esc(e.p) : hl(e.d || e.k, t)) + '</s></a>';
     });
 
     if (ai && !aiFirst) out += '<div class="yks-sgrp">Ask</div>' + aiRow(q, i++);
@@ -562,6 +586,17 @@
     paint();
   }
 
+  /* An anchor on the page we're already on won't reload, so the overlay would
+     stay up covering the very section it just jumped to. Close, then scroll. */
+  function samePage(href) {
+    var h = href.indexOf('#');
+    if (h < 1) return null;
+    var path = href.slice(0, h), id = href.slice(h + 1);
+    var here = location.pathname;
+    if (path === here || (path === '/index.html' && (here === '/' || here === '/index.html'))) return id;
+    return null;
+  }
+
   function bind(q) {
     rows = Array.prototype.slice.call(list.querySelectorAll('[data-i]'));
     rows.forEach(function (el) {
@@ -570,6 +605,8 @@
       if (el.dataset.recent) el.addEventListener('click', function (ev) {
         ev.preventDefault(); input.value = el.dataset.recent; render(input.value);
       });
+      var id = !el.dataset.ai && !el.dataset.recent && samePage(el.getAttribute('href') || '');
+      if (id) el.addEventListener('click', function (ev) { ev.preventDefault(); jump(id, q); });
     });
     var ex = list.querySelector('[data-exact]');
     if (ex) ex.addEventListener('click', function () { corrected = ''; askAI(q); });
@@ -585,6 +622,19 @@
   }
 
   function go(q) { recent(q); askAI(q); }
+
+  function jump(id, q) {
+    if (q) recent(q);
+    close();
+    setTimeout(function () {
+      var el = document.getElementById(id);
+      if (!el) { location.hash = id; return; }
+      // Lenis owns the scroll on the homepage — go through it or the two fight
+      if (window.lenis && window.lenis.scrollTo) window.lenis.scrollTo(el, { offset: -70 });
+      else el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      try { history.replaceState(null, '', '#' + id); } catch (e) {}
+    }, 230);
+  }
 
   function paint() {
     rows.forEach(function (r, i) {
@@ -606,7 +656,11 @@
       if (!pick) return;
       if (pick.dataset.ai) go(lastQuery);
       else if (pick.dataset.recent) { input.value = pick.dataset.recent; render(input.value); }
-      else { recent(lastQuery); location.href = pick.getAttribute('href'); }
+      else {
+        var href = pick.getAttribute('href'), id = samePage(href || '');
+        if (id) jump(id, lastQuery);
+        else { recent(lastQuery); location.href = href; }
+      }
       return;
     }
     if (!rows.length) return;

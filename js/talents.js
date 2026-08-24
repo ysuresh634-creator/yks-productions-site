@@ -321,3 +321,65 @@
 
   render();
 })();
+
+/* ══ Casting plan — the client describes the shoot and gets a real plan back before giving
+      any contact details. Value first: it is the client-side answer to the free portfolio
+      we give talent. The engine refuses to quote a price or promise availability. ══ */
+(function () {
+  var box = document.getElementById('talPlanIn'), go = document.getElementById('talPlanGo'),
+      out = document.getElementById('talPlanOut'), grid = document.getElementById('talGrid');
+  if (!box || !go || !out) return;
+  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev', WA = '919746679720';
+  var cards = grid ? Array.prototype.slice.call(grid.querySelectorAll('.tal')) : [];
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function payload() {
+    return cards.map(function (c) {
+      return { code: c.dataset.code, type: c.dataset.cat, region: c.dataset.region, city: c.dataset.city, tags: c.dataset.tags };
+    });
+  }
+  function ul(items) { return items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join(''); }
+
+  go.addEventListener('click', function () {
+    var brief = (box.value || '').trim();
+    if (!brief) { box.focus(); return; }
+    var orig = go.textContent; go.disabled = true; go.textContent = '✨ Working on it…';
+    out.hidden = false;
+    out.innerHTML = '<p class="tal-plan-wait">Reading your brief…</p>';
+    var done = false, to = setTimeout(function () { if (!done) { done = true; go.disabled = false; go.textContent = orig; out.innerHTML = '<p class="tal-plan-wait">That took too long — try again, or just send the brief and I\'ll reply myself.</p>'; } }, 30000);
+    fetch(ENGINE + '/ai/plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brief: brief, cards: payload() }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (done) return; done = true; clearTimeout(to);
+        go.disabled = false; go.textContent = orig;
+        var p = j && j.plan;
+        if (!p) { out.innerHTML = '<p class="tal-plan-wait">Couldn\'t read that one — send it to me directly and I\'ll come back myself.</p>'; return; }
+        var waMsg = 'Hi Yedukrishna, here\'s my shoot: ' + brief
+          + (p.codes && p.codes.length ? '\n\nFrom your roster I\'m interested in: ' + p.codes.join(', ').toUpperCase() : '');
+        var html = '<div class="tal-plan-card">';
+        if (p.read) html += '<p class="tal-plan-read">' + esc(p.read) + (p.faces ? ' <span>· usually ' + esc(p.faces) + '</span>' : '') + '</p>';
+        html += '<div class="tal-plan-cols">';
+        if (p.looks && p.looks.length) html += '<div><h4>Looks it usually covers</h4><ul>' + ul(p.looks) + '</ul></div>';
+        if (p.prep && p.prep.length) html += '<div><h4>Worth sorting first</h4><ul>' + ul(p.prep) + '</ul></div>';
+        if (p.questions && p.questions.length) html += '<div><h4>What I\'d need to know</h4><ul>' + ul(p.questions) + '</ul></div>';
+        html += '</div>';
+        html += '<div class="tal-plan-actions">'
+             +  '<a class="tal-plan-send" target="_blank" rel="noopener" href="https://wa.me/' + WA + '?text=' + encodeURIComponent(waMsg) + '">Send this brief to YKS →</a>'
+             +  (p.codes && p.codes.length ? '<button type="button" class="tal-plan-show" data-codes="' + esc(p.codes.join(',')) + '">Show the ' + p.codes.length + ' who fit</button>' : '')
+             +  '</div>';
+        html += '<p class="tal-plan-note">A plan, not a quote — I\'ll confirm availability and come back with one all-in number.</p>';
+        html += '</div>';
+        out.innerHTML = html;
+        var show = out.querySelector('.tal-plan-show');
+        if (show) show.addEventListener('click', function () {
+          var codes = show.dataset.codes.split(',');
+          cards.forEach(function (c) { c.hidden = codes.indexOf(c.dataset.code) < 0; });
+          if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      })
+      .catch(function () {
+        if (done) return; done = true; clearTimeout(to);
+        go.disabled = false; go.textContent = orig;
+        out.innerHTML = '<p class="tal-plan-wait">Couldn\'t reach the planner — send me the brief directly and I\'ll reply myself.</p>';
+      });
+  });
+})();
