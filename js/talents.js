@@ -593,7 +593,18 @@
         }).join('') + '</dl>' +
       '</div>';
     }).join('');
-    msgEl.hidden = true;
+    // if any of these faces already carry a hold, say so plainly — that is real urgency
+    var av = window.YKS_AVAIL || {}, clashes = current.map(function (c) {
+      var a = av[(c.dataset.code || '').toLowerCase()];
+      return a ? { code: (c.dataset.code || '').toUpperCase(), state: a.state, dates: a.dates } : null;
+    }).filter(Boolean);
+    if (clashes.length) {
+      msgEl.hidden = false;
+      msgEl.className = 'tal-hold-msg warn';
+      msgEl.textContent = clashes.map(function (x) {
+        return x.code + ' is ' + (x.state === 'booked' ? 'booked' : 'on hold') + (x.dates ? ' for ' + x.dates : '');
+      }).join(' · ') + ' — put your dates in anyway and I\'ll tell you where it stands.';
+    } else { msgEl.hidden = true; }
     panel.hidden = false;
     document.documentElement.style.overflow = 'hidden';
   };
@@ -611,7 +622,7 @@
     msgEl.hidden = false; msgEl.className = 'tal-hold-msg'; msgEl.textContent = 'Sending your hold…';
     fetch(ENGINE + '/bookings/new', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client_name: who, client_contact: contact, brief: brief, shoot_dates: dates, city: (current[0] && current[0].dataset.city) || '' })
+      body: JSON.stringify({ client_name: who, client_contact: contact, brief: brief, shoot_dates: dates, city: (current[0] && current[0].dataset.city) || '', talent_codes: codes.map(function (c) { return c.toLowerCase(); }) })
     }).then(function (r) { return r.json(); })
       .then(function (j) {
         btn.disabled = false; btn.textContent = orig;
@@ -629,4 +640,52 @@
           encodeURIComponent('Hi Yedukrishna, I\'d like to hold ' + codes.join(', ') + ' for ' + dates + '. — ' + who) + '">send it on WhatsApp instead →</a>';
       });
   });
+})();
+
+/* ══ Honest scarcity — the only urgency on this page comes from real holds and real bookings.
+      Nothing is invented: no fake view counts, no countdowns, no "3 people are looking".
+      If a face carries a badge it is because a client actually put dates on it. ══ */
+(function () {
+  var grid = document.getElementById('talGrid');
+  if (!grid) return;
+  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev';
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.tal'));
+  if (!cards.length) return;
+  window.YKS_AVAIL = {};
+
+  fetch(ENGINE + '/availability')
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      var codes = (j && j.codes) || {};
+      window.YKS_AVAIL = codes;
+      var taken = 0;
+      cards.forEach(function (c) {
+        var a = codes[(c.dataset.code || '').toLowerCase()];
+        if (!a) return;
+        taken++;
+        c.classList.add('tal-taken');
+        var b = document.createElement('span');
+        b.className = 'tal-avail ' + (a.state === 'booked' ? 'is-booked' : 'is-held');
+        b.textContent = (a.state === 'booked' ? 'Booked' : 'On hold') + (a.dates ? ' · ' + a.dates : '');
+        b.title = a.state === 'booked'
+          ? 'Confirmed for these dates — ask me about other dates.'
+          : 'A client has these dates on hold. Not confirmed yet — worth asking.';
+        // the badge belongs ON the photo — as a sibling it anchors to the whole card and
+        // can land over the copy on the taller text cards
+        var media = c.querySelector('.tal-media');
+        if (media) media.appendChild(b); else c.appendChild(b);
+      });
+      // one honest line about the roster as a whole — only when something is genuinely taken
+      if (taken > 0) {
+        var open = cards.length - taken;
+        var note = document.querySelector('.tal-seed-note');
+        if (note) {
+          note.classList.add('tal-scarce');
+          note.innerHTML = '<b>' + taken + ' of ' + cards.length + '</b> ' +
+            (taken === 1 ? 'face is' : 'faces are') + ' already held or booked — ' +
+            (open > 0 ? '<b>' + open + '</b> still open.' : 'ask me about other dates.');
+        }
+      }
+    })
+    .catch(function () { /* availability is a bonus — the roster works without it */ });
 })();
