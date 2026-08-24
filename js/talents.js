@@ -257,6 +257,7 @@
   bar.innerHTML =
     '<span class="tal-sl-count"></span>' +
     '<div class="tal-sl-actions">' +
+      '<button type="button" class="tal-sl-btn" data-act="compare">Compare &amp; hold</button>' +
       '<button type="button" class="tal-sl-btn" data-act="pdf">↓ Lookbook</button>' +
       '<button type="button" class="tal-sl-btn" data-act="copy">Copy share link</button>' +
       '<a class="tal-sl-btn tal-sl-go" data-act="send" target="_blank" rel="noopener">Send to YKS →</a>' +
@@ -306,6 +307,9 @@
     var b = e.target.closest('[data-act]'); if (!b) return;
     var act = b.dataset.act;
     if (act === 'clear') { picked = []; viewingShared = false; save(); render(); showOnly(null); }
+    if (act === 'compare') {
+      if (picked.length && typeof window.openCompare === 'function') window.openCompare(picked.slice());
+    }
     if (act === 'pdf') {
       if (!picked.length || typeof window.buildShortlistPDF !== 'function') return;
       var lbl = b.textContent; b.disabled = true; b.textContent = 'Building…';
@@ -527,4 +531,102 @@
       });
     });
   };
+})();
+
+/* ══ Compare + hold — the two things a client actually does at the end.
+      Compare puts the shortlisted faces side by side on the SAME stat rows, because that is
+      the real decision. Hold is a deliberately small, reversible yes: much easier to say than
+      "book", and honest — a hold is an enquiry with dates on it, never a confirmed booking. ══ */
+(function () {
+  var grid = document.getElementById('talGrid');
+  if (!grid) return;
+  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev', WA = '919746679720';
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function cardFor(code) { return grid.querySelector('.tal[data-code="' + code + '"]'); }
+  function statsOf(c) {
+    var o = {};
+    (c.dataset.stats || '').split('|').filter(Boolean).forEach(function (r) {
+      var i = r.indexOf(':'); if (i > 0) o[r.slice(0, i).trim()] = r.slice(i + 1).trim();
+    });
+    return o;
+  }
+
+  var panel = document.createElement('div');
+  panel.className = 'tal-cmp'; panel.hidden = true;
+  panel.innerHTML = '<div class="tal-cmp-box">' +
+      '<div class="tal-cmp-head"><p>Side by side</p><button type="button" class="tal-cmp-x" aria-label="Close">&times;</button></div>' +
+      '<div class="tal-cmp-scroll"><div class="tal-cmp-cols"></div></div>' +
+      '<div class="tal-cmp-foot">' +
+        '<div class="tal-hold">' +
+          '<input type="text" class="tal-hold-dates" placeholder="Which dates? e.g. 12–13 Sep" />' +
+          '<input type="text" class="tal-hold-who" placeholder="Your name" />' +
+          '<input type="text" class="tal-hold-contact" placeholder="Phone or email" />' +
+          '<button type="button" class="tal-hold-go">Hold these dates →</button>' +
+        '</div>' +
+        '<p class="tal-hold-note">A hold isn’t a booking — it tells me who and when, and I’ll come back to confirm availability and one all-in number. Nothing is charged and you can drop it any time.</p>' +
+        '<p class="tal-hold-msg" hidden></p>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(panel);
+
+  var colsEl = panel.querySelector('.tal-cmp-cols'), msgEl = panel.querySelector('.tal-hold-msg');
+  panel.querySelector('.tal-cmp-x').addEventListener('click', close);
+  panel.addEventListener('click', function (e) { if (e.target === panel) close(); });
+  function close() { panel.hidden = true; document.documentElement.style.overflow = ''; }
+
+  var current = [];
+  window.openCompare = function (codes) {
+    current = (codes || []).map(cardFor).filter(Boolean);
+    if (!current.length) return;
+    // every column shares the same rows, so the eye can scan across instead of hunting
+    var labels = [];
+    current.forEach(function (c) { Object.keys(statsOf(c)).forEach(function (k) { if (labels.indexOf(k) < 0) labels.push(k); }); });
+    colsEl.innerHTML = current.map(function (c) {
+      var st = statsOf(c), img = (c.dataset.gallery || '').split('|')[0];
+      return '<div class="tal-cmp-col">' +
+        '<div class="tal-cmp-media"><img src="' + esc(img) + '" alt="" loading="lazy" /></div>' +
+        '<b class="tal-cmp-code">' + esc((c.dataset.code || '').toUpperCase()) + '</b>' +
+        '<span class="tal-cmp-where">' + esc(c.dataset.cat || '') + ' · ' + esc(c.dataset.city || '') + '</span>' +
+        '<span class="tal-cmp-tags">' + esc(c.dataset.tags || '') + '</span>' +
+        '<dl class="tal-cmp-stats">' + labels.map(function (k) {
+          return '<div><dt>' + esc(k) + '</dt><dd>' + (st[k] ? esc(st[k]) : '—') + '</dd></div>';
+        }).join('') + '</dl>' +
+      '</div>';
+    }).join('');
+    msgEl.hidden = true;
+    panel.hidden = false;
+    document.documentElement.style.overflow = 'hidden';
+  };
+
+  panel.querySelector('.tal-hold-go').addEventListener('click', function () {
+    var btn = this;
+    var dates = panel.querySelector('.tal-hold-dates').value.trim();
+    var who = panel.querySelector('.tal-hold-who').value.trim();
+    var contact = panel.querySelector('.tal-hold-contact').value.trim();
+    var codes = current.map(function (c) { return (c.dataset.code || '').toUpperCase(); });
+    if (!dates) { panel.querySelector('.tal-hold-dates').focus(); return; }
+    if (!who || !contact) { panel.querySelector(who ? '.tal-hold-contact' : '.tal-hold-who').focus(); return; }
+    var brief = 'HOLD REQUEST — ' + codes.join(', ') + '\nDates: ' + dates;
+    var orig = btn.textContent; btn.disabled = true; btn.textContent = 'Sending…';
+    msgEl.hidden = false; msgEl.className = 'tal-hold-msg'; msgEl.textContent = 'Sending your hold…';
+    fetch(ENGINE + '/bookings/new', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_name: who, client_contact: contact, brief: brief, shoot_dates: dates, city: (current[0] && current[0].dataset.city) || '' })
+    }).then(function (r) { return r.json(); })
+      .then(function (j) {
+        btn.disabled = false; btn.textContent = orig;
+        if (j && j.ok) {
+          msgEl.className = 'tal-hold-msg ok';
+          msgEl.innerHTML = '✓ Held. I’ve got ' + esc(codes.join(', ')) + ' down for ' + esc(dates) + ' and I’ll come back to confirm. ' +
+            '<a target="_blank" rel="noopener" href="https://wa.me/' + WA + '?text=' +
+            encodeURIComponent('Hi Yedukrishna, I just put a hold on ' + codes.join(', ') + ' for ' + dates + '. — ' + who) + '">Tell me on WhatsApp too →</a>';
+        } else { throw new Error('bad'); }
+      })
+      .catch(function () {
+        btn.disabled = false; btn.textContent = orig;
+        msgEl.className = 'tal-hold-msg warn';
+        msgEl.innerHTML = 'Couldn’t send that just now — <a target="_blank" rel="noopener" href="https://wa.me/' + WA + '?text=' +
+          encodeURIComponent('Hi Yedukrishna, I\'d like to hold ' + codes.join(', ') + ' for ' + dates + '. — ' + who) + '">send it on WhatsApp instead →</a>';
+      });
+  });
 })();
