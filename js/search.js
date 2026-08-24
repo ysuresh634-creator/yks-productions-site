@@ -136,7 +136,7 @@
     list = ov.querySelector('.yks-slist');
     ov.querySelector('.yks-sesc').addEventListener('click', close);
     ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
-    input.addEventListener('input', function () { run(input.value); });
+    input.addEventListener('input', function () { render(input.value); });
     input.addEventListener('keydown', onKey);
   }
 
@@ -224,27 +224,36 @@
 
   /* ---------- typo tolerance ----------
      Only runs for a term that matched nothing, so the common path stays free. */
-  function edits1(a, b) {
-    if (Math.abs(a.length - b.length) > 1) return false;
-    var i = 0, j = 0, diff = 0;
-    while (i < a.length && j < b.length) {
-      if (a[i] === b[j]) { i++; j++; continue; }
-      if (++diff > 1) return false;
-      if (a.length > b.length) i++;
-      else if (a.length < b.length) j++;
-      else { i++; j++; }
+  // Levenshtein, abandoned as soon as every cell in a row exceeds max
+  function dist(a, b, max) {
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    var prev = [], cur = [], i, j;
+    for (j = 0; j <= b.length; j++) prev[j] = j;
+    for (i = 1; i <= a.length; i++) {
+      cur[0] = i;
+      var best = i;
+      for (j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1,
+                          prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+        if (cur[j] < best) best = cur[j];
+      }
+      if (best > max) return max + 1;
+      prev = cur.slice();
     }
-    return diff + (a.length - i) + (b.length - j) <= 1;
+    return prev[b.length];
   }
 
   function fix(w) {
     if (!vocab || w.length < 4) return null;
-    var best = null;
+    // longer words absorb more damage before they stop being recognisable
+    var max = w.length >= 7 ? 2 : 1;
+    var best = null, bd = max + 1;
     for (var i = 0; i < vocab.length; i++) {
       var v = vocab[i];
-      if (Math.abs(v.length - w.length) > 1) continue;
-      if (v[0] !== w[0]) continue;                 // typos rarely hit the first letter
-      if (edits1(w, v)) { best = v; break; }
+      if (Math.abs(v.length - w.length) > max) continue;
+      if (v.charAt(0) !== w.charAt(0)) continue;   // typos rarely hit the first letter
+      var d = dist(w, v, max);
+      if (d < bd) { bd = d; best = v; if (d === 1) break; }
     }
     return best;
   }
