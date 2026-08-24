@@ -171,6 +171,20 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
 /* SETTINGS */
 .settings-wrap{padding:16px}
 .field-note{font-size:10px;color:var(--sub);margin-top:5px;line-height:1.5}
+.hc-actions{display:flex;flex-wrap:wrap;gap:6px}
+.hc-row{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border-radius:8px;margin-bottom:6px;font-size:12px;line-height:1.5;border:1px solid var(--border)}
+.hc-row.pass{background:rgba(126,200,139,.07);border-color:rgba(126,200,139,.22)}
+.hc-row.warn{background:rgba(224,163,74,.08);border-color:rgba(224,163,74,.28)}
+.hc-row.fail{background:rgba(192,57,43,.08);border-color:rgba(192,57,43,.28)}
+.hc-ico{flex-shrink:0;font-size:13px;line-height:1.3}
+.hc-row b{color:var(--text);font-weight:600}
+.hc-row .hc-fix{color:var(--sub);display:block;margin-top:2px}
+.glitch{position:fixed;left:0;right:0;top:0;z-index:300;background:var(--red);color:#fff;
+  padding:9px 14px;padding-top:calc(9px + env(safe-area-inset-top));font-size:12.5px;font-weight:600;
+  display:none;align-items:center;gap:10px;box-shadow:0 3px 14px rgba(0,0,0,.4)}
+.glitch.on{display:flex}
+.glitch button{margin-left:auto;background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0}
+.glitch .g-x{background:none;padding:5px 8px;margin-left:0;font-size:16px}
 
 /* ── WEBSITE EDITOR ── */
 
@@ -385,6 +399,13 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
 </head>
 <body>
+
+<!-- ══ GLITCH BANNER ══ -->
+<div class="glitch" id="glitch">
+  <span>⚠️ Something glitched — a self-check can sort it.</span>
+  <button onclick="gotoSelfCheck()">Fix it</button>
+  <button class="g-x" onclick="document.getElementById('glitch').classList.remove('on')">×</button>
+</div>
 
 <!-- ══ PIN LOCK ══ -->
 <div id="lock-screen">
@@ -628,6 +649,17 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
         <div><label class="form-label">Next Quote #</label><input class="form-input" id="s-quo-num" type="number" min="1"></div>
       </div>
     </div>
+    <div class="form-section">
+      <label class="form-label">Self-check &amp; Recover</label>
+      <p class="field-note" style="margin-bottom:12px">If anything misbehaves, run this. It checks the moving parts, fixes the safe ones itself, and gives you a report to send.</p>
+      <div class="hc-actions">
+        <button class="quick-btn" onclick="runHealthCheck()">🩺 Run check</button>
+        <button class="quick-btn" onclick="recover()">🔧 Auto-recover</button>
+        <button class="quick-btn" onclick="copyReport()">📋 Copy report</button>
+      </div>
+      <div id="hc-results" style="margin-top:12px"></div>
+    </div>
+
     <button class="btn-generate" onclick="saveSettings()">Save Settings</button>
     <div style="margin-top:12px">
       <button onclick="clearAll()" style="width:100%;padding:14px;background:none;border:1px solid var(--red);color:var(--red);border-radius:10px;font-size:14px;cursor:pointer">Delete All Documents</button>
@@ -1872,6 +1904,7 @@ const FRAME_JS=`
       src:src, alt:el.getAttribute('alt')||'', href:el.getAttribute('href')||'',
       slotAR:slotAR},'*');
   },true);
+  window.onerror=function(m,src,line){ try{ parent.postMessage({yks:'frameError',msg:String(m),line:line||0},'*'); }catch(_){} return false; };
   window.addEventListener('message',function(e){
     var d=e.data||{};
     if(d.yks==='mode'){ mode=d.mode; paint(); }
@@ -1920,6 +1953,7 @@ window.addEventListener('message',e=>{
   if(d.yks==='pick') onPick(d);
   if(d.yks==='pickStyle') openStyle(d);
   if(d.yks==='navigate') goToLink(d.href);
+  if(d.yks==='frameError') logErr('editor preview', d.msg, {line:d.line});
   if(d.yks==='unstuck'){ window.__diag={...(window.__diag||{}),hidden:d.hidden,shown:d.shown}; }
   if(d.yks==='painted'){ window.__diag={...(window.__diag||{}),mode:d.mode,hot:d.hot};
     if(d.hot===0 && d.mode!=='off' && d.mode!=='style' && curScreen==='website') toast('Nothing editable found in this mode'); }
@@ -2636,6 +2670,142 @@ window.addEventListener('resize',()=>{ if(pe && $('sh-photo').classList.contains
 
 
 
+// ══ SELF-CHECK & RECOVER ENGINE ════════════════════════════════════════════
+// Catches every error so nothing fails silently, heals the known-safe failure
+// modes, and produces a scrubbed report to send. Never changes site code.
+window.__yksErr = window.__yksErr || [];
+
+// Strip anything secret before it can reach a report or the screen.
+function scrub(v){
+  return String(v==null?'':v)
+    .replace(/github_pat_[A-Za-z0-9_]+/g,'[github-token]')
+    .replace(/ghp_[A-Za-z0-9]+/g,'[github-token]')
+    .replace(/sk-[A-Za-z0-9_-]+/g,'[api-key]')
+    .replace(/AIza[A-Za-z0-9_-]+/g,'[api-key]');
+}
+function logErr(kind, msg, extra){
+  try{
+    window.__yksErr.push(Object.assign({t:new Date().toISOString().slice(11,19), kind, msg:scrub(msg).slice(0,220)}, extra||{}));
+    if(window.__yksErr.length>30) window.__yksErr.shift();
+    const g=document.getElementById('glitch'); if(g) g.classList.add('on');
+  }catch(_){}
+}
+function gotoSelfCheck(){
+  document.getElementById('glitch').classList.remove('on');
+  if(sessionStorage.getItem('yks_unlocked')==='1'){ showScreen('settings'); setTimeout(runHealthCheck,200); }
+}
+
+function hcRow(state, title, fix){
+  const ico={pass:'✓',warn:'!',fail:'✗'}[state];
+  return `<div class="hc-row ${state}"><span class="hc-ico">${ico}</span><span><b>${esc(title)}</b>${fix?`<span class="hc-fix">${esc(fix)}</span>`:''}</span></div>`;
+}
+
+async function runHealthCheck(){
+  const box=$('hc-results'); box.innerHTML='<div class="hc-row"><span class="hc-ico">…</span><span>Checking…</span></div>';
+  const rows=[]; window.__hc={};
+
+  // storage
+  let storageOK=true; try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); }catch(e){ storageOK=false; }
+  rows.push(storageOK ? hcRow('pass','Browser storage works') : hcRow('fail','Browser storage is blocked','Turn off private/incognito mode, or allow site data for yksproductions.com.'));
+
+  // token
+  const tok=localStorage.getItem('yks_ghtoken')||'';
+  if(!tok){ rows.push(hcRow('fail','No GitHub token saved','Open the Website tab and paste your token in the setup card.')); window.__hc.token='missing'; }
+  else {
+    try{
+      const r=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}`,{headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json'}});
+      if(r.status===401){ rows.push(hcRow('fail','GitHub token rejected (expired or revoked)','Generate a new fine-grained token and paste it in the Website tab.')); window.__hc.token='invalid'; }
+      else if(!r.ok){ rows.push(hcRow('warn','GitHub returned '+r.status,'Try again in a moment.')); window.__hc.token='http'+r.status; }
+      else { const d=await r.json(); const push=!!(d.permissions&&d.permissions.push);
+        rows.push(push ? hcRow('pass','GitHub token valid, with write access') : hcRow('fail','Token can read but not write','It needs Contents: Read and write. Generate a new one with that permission.'));
+        window.__hc.token = push?'ok':'readonly'; window.__hc.repo=d.full_name;
+      }
+    }catch(e){ rows.push(hcRow('fail','Could not reach GitHub','Check your internet connection.')); window.__hc.token='offline'; logErr('healthcheck',e.message); }
+  }
+
+  // pages / editor
+  const pages = (typeof sitePages!=='undefined') ? sitePages.length : 0;
+  if(tok){
+    rows.push(pages>0 ? hcRow('pass',pages+' pages loaded and editable')
+                      : hcRow('warn','No pages loaded yet','Open the Website tab — if it stays empty, tap Auto-recover.'));
+  }
+  window.__hc.pages=pages;
+
+  // AI worker (optional — only powers the invoice assistant)
+  try{
+    const r=await fetch(AI_WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'ping'})});
+    rows.push(r.ok||r.status===400 ? hcRow('pass','AI assistant online') : hcRow('warn','AI assistant unreachable','Only affects the ✦ Ask AI helper — publishing is unaffected.'));
+  }catch(e){ rows.push(hcRow('warn','AI assistant unreachable','Only affects the ✦ Ask AI helper — publishing is unaffected.')); }
+
+  // unsaved work
+  const chg = (typeof changes!=='undefined') ? changes.length : 0;
+  if(chg>0) rows.push(hcRow('warn',chg+' change'+(chg>1?'s':'')+' staged but not published','Go to the Website tab and tap Publish.'));
+
+  // recent errors
+  if(window.__yksErr.length){
+    rows.push(hcRow('warn',window.__yksErr.length+' error(s) caught this session','Tap Copy report and send it — details are in the report.'));
+  } else {
+    rows.push(hcRow('pass','No errors caught this session'));
+  }
+
+  box.innerHTML=rows.join('');
+  return window.__hc;
+}
+
+function recover(){
+  const done=[];
+  // 1. unstick the editor boot
+  if(typeof edBooting!=='undefined'){ if(edBooting){ edBooting=false; done.push('cleared a stuck load'); } }
+  if(localStorage.getItem('yks_ghtoken') && typeof sitePages!=='undefined' && !sitePages.length && typeof boot==='function'){
+    edBooted=false; edBooting=false; boot(); done.push('restarted the editor');
+  }
+  // 2. clear a stale lockout
+  if(localStorage.getItem('yks_lockuntil')){ localStorage.removeItem('yks_lockuntil'); localStorage.removeItem('yks_fails'); done.push('cleared the PIN lockout');
+    const pf=document.querySelector('.pin-pad'); if(pf) pf.classList.remove('frozen'); }
+  // 3. reset a stuck publish
+  if(typeof publishing!=='undefined' && (publishing||publishQueued)){ publishing=false; publishQueued=false; const g=document.querySelector('.pb-go'); if(g)g.disabled=false; done.push('reset the publish button'); }
+  // 4. close orphaned sheets when nothing is staged
+  if(typeof changes!=='undefined' && !changes.length){ if(typeof closeSheets==='function') closeSheets(); }
+  document.getElementById('glitch').classList.remove('on');
+
+  const box=$('hc-results');
+  box.innerHTML = hcRow('pass', done.length? 'Recovered: '+done.join(', ') : 'Nothing needed fixing',
+    done.length? 'Run the check again to confirm all clear.' : 'If a problem persists, tap Copy report and send it.');
+  toast(done.length? 'Recovered — re-run the check' : 'Nothing needed fixing');
+}
+
+function buildReport(){
+  const L=[];
+  L.push('YKS STUDIO — DIAGNOSTIC REPORT');
+  L.push('Time: '+new Date().toString());
+  L.push('URL: '+location.origin+location.pathname);
+  L.push('Screen: '+(typeof curScreen!=='undefined'?curScreen:'?'));
+  L.push('Page loaded: '+(typeof curPath!=='undefined'&&curPath?curPath:'none'));
+  L.push('Pages available: '+(typeof sitePages!=='undefined'?sitePages.length:'?'));
+  L.push('Unsaved changes: '+(typeof changes!=='undefined'?changes.length:'?'));
+  L.push('GitHub token: '+(localStorage.getItem('yks_ghtoken')?'present':'MISSING'));
+  const hc=window.__hc||{}; if(Object.keys(hc).length) L.push('Last check: '+scrub(JSON.stringify(hc)));
+  L.push('Editor booted: '+(typeof edBooted!=='undefined'?edBooted:'?'));
+  L.push('Screen size: '+innerWidth+'×'+innerHeight+' · DPR '+(window.devicePixelRatio||1));
+  L.push('Browser: '+scrub(navigator.userAgent));
+  L.push('');
+  L.push('ERRORS CAUGHT ('+window.__yksErr.length+'):');
+  if(window.__yksErr.length) window.__yksErr.forEach(e=>L.push(`  [${e.t}] ${e.kind}: ${e.msg}`+(e.line?(' (line '+e.line+')'):'')));
+  else L.push('  none');
+  return scrub(L.join('\n'));
+}
+
+function copyReport(){
+  const txt=buildReport();
+  const done=()=>{ toast('Report copied — paste it to Yedukrishna/Claude'); };
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackCopy(txt)); }
+  else fallbackCopy(txt);
+}
+function fallbackCopy(txt){
+  const t=document.createElement('textarea'); t.value=txt; t.style.position='fixed'; t.style.opacity='0';
+  document.body.appendChild(t); t.select(); try{ document.execCommand('copy'); toast('Report copied'); }catch(e){ prompt('Copy this report:', txt); } t.remove();
+}
+
 // ── Init ───────────────────────────────────────────────────────────────────
 (function init(){
   if(sessionStorage.getItem('yks_unlocked')==='1')
@@ -2646,6 +2816,8 @@ window.addEventListener('resize',()=>{ if(pe && $('sh-photo').classList.contains
   document.getElementById('f-date2').value=due.toISOString().split('T')[0];
   addItem();
   renderHistory();
+  window.addEventListener('error', e=>logErr('script', e.message, {src:(e.filename||'').split('/').pop(), line:e.lineno}));
+  window.addEventListener('unhandledrejection', e=>logErr('promise', (e.reason&&e.reason.message)||e.reason));
   if(location.hash==='#website') showScreen('website');
   window.addEventListener('beforeunload',e=>{
     const dirtyInvoice = curScreen==='new' && (v('f-client').trim() || getItems().length>0);
