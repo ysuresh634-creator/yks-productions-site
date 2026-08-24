@@ -1062,3 +1062,33 @@ main{overflow-x:clip}
 .tal-taken .tal-media img{filter:saturate(.85)}
 .tal-scarce{color:var(--mag-soft)}
 .tal-scarce b{color:var(--mag-accent);font-weight:600}
+
+/* ── profile: sticky book bar ── */
+.pf-stick{position:fixed;left:50%;bottom:18px;transform:translate(-50%,150%);z-index:200;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;
+  background:rgba(12,10,16,.97);border:1px solid var(--mag-line-2);border-radius:999px;
+  padding:10px 12px 10px 22px;box-shadow:0 18px 44px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:transform .28s cubic-bezier(.2,.7,.2,1),opacity .28s}
+.pf-stick.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.pf-stick-who{display:flex;flex-direction:column;line-height:1.25}
+.pf-stick-who b{font-family:var(--mag-display);font-size:15px;color:var(--mag-ink)}
+.pf-stick-who i{font-style:normal;font-family:var(--mag-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mag-soft)}
+.pf-stick-acts{display:flex;align-items:center;gap:8px}
+.pf-stick-btn{cursor:pointer;background:none;border:1px solid var(--mag-line-2);border-radius:999px;padding:9px 15px;
+  font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mag-soft);
+  text-decoration:none;white-space:nowrap;transition:border-color .18s,color .18s}
+.pf-stick-btn:hover{border-color:var(--mag-accent);color:var(--mag-ink)}
+.pf-stick-btn[disabled]{opacity:.6;cursor:default}
+.pf-stick-go{background:var(--mag-accent);border-color:var(--mag-accent);color:#0a0810;font-weight:600}
+.pf-stick-go:hover{color:#0a0810}
+/* ── profile: what a client actually gets ── */
+.pf-gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px 26px;margin-top:8px}
+.pf-gets div{border-top:1px solid var(--mag-line);padding-top:12px}
+.pf-gets b{display:block;font-family:var(--mag-mono);font-size:10px;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--mag-accent);margin-bottom:6px}
+.pf-gets p{margin:0;font-family:var(--mag-sans);font-size:13px;line-height:1.55;color:var(--mag-soft)}
+@media(max-width:560px){
+  .pf-stick{left:12px;right:12px;bottom:12px;transform:translateY(150%);border-radius:16px;padding:12px 14px;justify-content:space-between}
+  .pf-stick.on{transform:translateY(0)}
+  .pf-stick-btn{padding:8px 12px;font-size:10px}
+}

@@ -171,7 +171,7 @@ def profile(t, plate):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=15" />
-<link rel="stylesheet" href="/css/talents.css?v=59" />
+<link rel="stylesheet" href="/css/talents.css?v=60" />
 </head>
 <body data-wa="{wa}">
 
@@ -239,6 +239,18 @@ def profile(t, plate):
   </div>
 </section>
 
+<section class="l-section pf-getssec">
+  <div class="wrap">
+    <p class="pf-block-k">What you get, booking through me</p>
+    <div class="pf-gets">
+      <div><b>One all-in number</b><p>Talent, my time and the usage you need, quoted as a single figure. Nothing added later.</p></div>
+      <div><b>Usage sorted</b><p>I handle the release and agree the usage up front — where the images run, and for how long.</p></div>
+      <div><b>Availability confirmed first</b><p>I check the dates before you commit to anything. A hold is never a booking until I say so.</p></div>
+      <div><b>One point of contact</b><p>You deal with me, not with talent directly. Briefing, changes and payment all run through one place.</p></div>
+    </div>
+  </div>
+</section>
+
 <section class="l-cta">
   <div class="wrap">
     <p class="tal-kicker">Casting</p>
@@ -269,6 +281,7 @@ def profile(t, plate):
 </footer>
 
 <script src="/js/talent-names.js?v=2"></script>
+<script src="/js/talent-profile.js?v=3"></script>
 <script src="/js/landing.js?v=4"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=4"></script>
