@@ -604,6 +604,15 @@
         <!-- The basics -->
         <div class="ap-block">
           <p class="ap-step">The basics</p>
+          <button type="button" class="ap-ai-btn" id="apProfAiOpen">✨ Paste your details — I'll fill the whole form</button>
+          <div class="ap-statspaste" id="apProfPaste" hidden>
+            <textarea id="apProfRaw" rows="4" placeholder="Paste anything you already have — an agency profile, a comp card, a WhatsApp message. e.g.&#10;First Name - Shiba&#10;Last Name - Das&#10;Phone - 9394822179&#10;City - Bangalore&#10;Height - 5'7, Waist - 28&#10;Instagram - @shiba.das"></textarea>
+            <div class="ap-statspaste-row">
+              <button type="button" class="ap-statspaste-go" id="apProfFill">Fill my form →</button>
+              <span class="ap-mini" id="apProfMsg"></span>
+            </div>
+            <small class="ap-mini">Read on your device first. If it's written as a paragraph rather than a list, it's sent to YKS's own reader to pull the details out — nothing is stored until you submit.</small>
+          </div>
           <div class="row2">
             <label>Full name<input type="text" name="name" placeholder="Your name" required /></label>
             <label>Phone / WhatsApp<input type="tel" name="contact" placeholder="+91 / +971 …" required /></label>
@@ -977,6 +986,6 @@
 </footer>
 
 <script src="/js/landing.js?v=10"></script>
-<script src="/js/talent-apply.js?v=62"></script>
+<script src="/js/talent-apply.js?v=65"></script>
 </body>
 </html>

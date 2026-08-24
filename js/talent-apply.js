@@ -1193,6 +1193,7 @@
       : (tl + '  ·  sample cover — add your photos');
     $$('.ap-live-meta').forEach(function (m) { m.textContent = metaTxt; });
   }
+  var PARSE_STATS = null;   // set by the stats paste module, reused by the whole-form paste
   function mark(wrap, btn) { $$('button', wrap).forEach(function (x) { x.classList.remove('on'); }); btn.classList.add('on'); }
   // ONE unified mini-cover for every design — identical structure, differs only by palette + font (neat, classy, consistent)
   function tplMini(layout, kit, label, photoUrl) {
@@ -1277,6 +1278,7 @@
     if (!openBtn || !panel || !fillBtn) return;
     openBtn.addEventListener('click', function () { panel.hidden = !panel.hidden; if (!panel.hidden && raw) raw.focus(); });
     function cap(s) { return s.replace(/\b[a-z]/g, function (c) { return c.toUpperCase(); }); }
+    PARSE_STATS = parseStats;   // shared with the whole-form paste below
     function parseStats(text) {
       var o = {};
       function num(s) { var m = String(s).match(/(\d{1,3}(?:\.\d)?)/); return m ? m[1] : ''; }
@@ -1341,6 +1343,137 @@
         msg.className = 'ap-statsmsg ' + (n ? 'ok' : 'warn');
       }
       if (n) { var gridEl = $('.ap-stats'); if (gridEl && gridEl.scrollIntoView) gridEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    });
+  })();
+
+  /* ══ Paste-everything: read a whole agency profile / comp card in one go and fill the form.
+        Runs entirely on the device — a paste contains a phone number and often an address,
+        so none of it leaves the browser until they actually submit. ══ */
+  (function wireProfilePaste() {
+    var openBtn = $('#apProfAiOpen'), panel = $('#apProfPaste'), raw = $('#apProfRaw'),
+        fillBtn = $('#apProfFill'), msg = $('#apProfMsg');
+    if (!openBtn || !panel || !raw || !fillBtn) return;
+    openBtn.addEventListener('click', function () {
+      panel.hidden = !panel.hidden;
+      openBtn.textContent = panel.hidden ? '✨ Paste your details — I\'ll fill the whole form' : '✕ Close';
+      if (!panel.hidden) raw.focus();
+    });
+
+    var UAE_CITIES = /\b(dubai|abu dhabi|sharjah|ajman|fujairah|ras al khaimah|umm al quwain|al ain)\b/i;
+    function lineVal(line) { var i = line.search(/[:\-–]/); return i < 0 ? '' : line.slice(i + 1).replace(/^[\s:–-]+/, '').trim(); }
+    function clean(v) { return String(v || '').replace(/[.,;]+$/, '').trim(); }
+
+    function parseProfile(text) {
+      var o = {}, lines = String(text).split(/[\n\r]+/), first = '', last = '';
+      lines.forEach(function (line) {
+        if (!line.trim()) return;
+        var low = line.toLowerCase(), v = clean(lineVal(line));
+        if (!v) return;
+        if (/\bfirst\s*name\b/.test(low)) first = v;
+        else if (/\blast\s*name\b|\bsurname\b/.test(low)) last = v;
+        else if (/\b(full\s*name|^name)\b/.test(low) && !o.name) o.name = v;
+        else if (/\b(phone|phone\s*no|ph|mob|mobile|whats\s*app|whatsapp|contact\s*(no|number)?)\b/.test(low) && !o.contact) {
+          var d = v.replace(/[^\d+]/g, '');
+          if (d.replace(/\D/g, '').length >= 8) o.contact = d;
+        }
+        else if (/\bcity\b|\bbased\b|\blocation\b|\bloc\b/.test(low) && !o.city) o.city = v.split(/[,/]/)[0].trim();
+        else if (/\b(instagram|insta|ig|social|handle)\b/.test(low) && !o.socials) o.socials = v;
+        else if (/\b(date\s*of\s*birth|dob|birth\s*date)\b/.test(low) && !o.dob) o.dob = v;
+        else if (/\bgender\b/.test(low) && !o.gender) o.gender = v;
+        else if (/\b(languages?|speaks?)\b/.test(low) && !o.languages) o.languages = v;
+        else if (/\b(education|qualification|degree|studied)\b/.test(low) && !o.education) o.education = v;
+        else if (/\b(occupation|profession|job|work)\b/.test(low) && !o.occupation) o.occupation = v;
+        else if (/\bstate\b/.test(low) && !o.state) o.state = v;
+      });
+      if (!o.name && (first || last)) o.name = (first + ' ' + last).trim();
+      var t = ' ' + String(text).replace(/\s+/g, ' ') + ' ', low = t.toLowerCase(), m;
+      // fallbacks for unlabelled pastes
+      if (!o.contact && (m = t.match(/\+?\d[\d\s().-]{7,17}\d/))) { var dg = m[0].replace(/[^\d+]/g, ''); if (dg.replace(/\D/g, '').length >= 9) o.contact = dg; }
+      if (!o.socials && (m = t.match(/(?:instagram\.com\/|@)([A-Za-z0-9._]{3,30})/))) o.socials = '@' + m[1];
+      if (o.socials) o.socials = o.socials.replace(/[.,;]+$/, '');
+      // what they do
+      if (/\bactor|acting|film\s*artist\b/.test(low)) o.category = 'Actor';
+      else if (/\binfluencer|content creator|creator\b/.test(low)) o.category = 'Influencer / Creator';
+      else if (/\bmodel(ling|ing)?\b/.test(low)) o.category = 'Model';
+      // where — phone code, city or state
+      if (/\+971|\bu\.?a\.?e\.?\b|united arab emirates/i.test(t) || UAE_CITIES.test(o.city || '') || UAE_CITIES.test(t)) o.region = 'UAE';
+      else if (/\+91\b|\bindia\b/i.test(t) || o.state || o.city) o.region = 'India';
+      // gender → the options this form offers
+      if (o.gender) {
+        var g = o.gender.toLowerCase();
+        o.gender = /^f|woman|female/.test(g) ? 'Woman' : /^m\b|man|male/.test(g) ? 'Man'
+          : /non.?binary|nb|enby/.test(g) ? 'Non-binary' : /not to say|private/.test(g) ? 'Prefer not to say' : '';
+      }
+      return o;
+    }
+
+    function flash(el) {
+      var wrap = el.closest ? el.closest('label') : null; if (!wrap) return;
+      wrap.classList.remove('ap-just-filled'); void wrap.offsetWidth; wrap.classList.add('ap-just-filled');
+      setTimeout(function () { wrap.classList.remove('ap-just-filled'); }, 2200);
+    }
+    var MONTHS = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
+    function toISODate(v) {
+      var t = String(v).trim(), m;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+      var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+      if (m = t.match(/(\d{1,2})\s*(?:st|nd|rd|th)?[\s.\-\/]+([A-Za-z]{3,})[\s.,\-\/]+(\d{4})/)) {        // 15th Nov 1999
+        var mo = MONTHS[m[2].slice(0, 3).toLowerCase()]; if (mo) return m[3] + '-' + pad(mo) + '-' + pad(+m[1]);
+      }
+      if (m = t.match(/([A-Za-z]{3,})[\s.,\-\/]+(\d{1,2})\s*(?:st|nd|rd|th)?[\s.,\-\/]+(\d{4})/)) {        // Nov 15, 1999
+        var mo2 = MONTHS[m[1].slice(0, 3).toLowerCase()]; if (mo2) return m[3] + '-' + pad(mo2) + '-' + pad(+m[2]);
+      }
+      if (m = t.match(/\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})\b/)) return m[3] + '-' + pad(+m[2]) + '-' + pad(+m[1]);   // dd/mm/yyyy
+      return '';
+    }
+    function setField(nm, val, filled) {
+      var el = form[nm]; if (!el || !val) return;
+      if (el.type === 'date') { val = toISODate(val); if (!val) return; }
+      if (el.tagName === 'SELECT') {   // only accept a value the dropdown actually offers
+        var ok = Array.prototype.some.call(el.options, function (op) { return (op.value || op.textContent).trim() === val; });
+        if (!ok) return;
+      }
+      if ((el.value || '').trim()) return;      // never overwrite something they already typed
+      el.value = val; filled.push(nm); flash(el);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    fillBtn.addEventListener('click', function () {
+      var text = (raw.value || '').trim();
+      if (!text) { if (msg) { msg.textContent = 'Paste your details above first.'; msg.className = 'ap-statsmsg warn'; } return; }
+      var o = parseProfile(text), filled = [];
+      ['name', 'contact', 'category', 'region', 'city', 'socials', 'dob', 'gender', 'languages', 'education', 'occupation']
+        .forEach(function (k) { setField(k, o[k], filled); });
+      // the same paste usually carries the measurements too
+      if (typeof PARSE_STATS === 'function') {
+        var st = PARSE_STATS(text), map = { height: 'stat_height', bust: 'stat_bust', waist: 'stat_waist', hips: 'stat_hips', shoe: 'stat_shoe', hair: 'stat_hair', eyes: 'stat_eyes', skin: 'stat_skin' };
+        Object.keys(map).forEach(function (k) { setField(map[k], st[k], filled); });
+      }
+      persistDraft(); updatePreview();
+      function report() {
+        if (msg) {
+          msg.textContent = filled.length ? '✓ Filled ' + filled.length + ' field' + (filled.length > 1 ? 's' : '') + ' — check them and fix anything.'
+                                          : '✕ Couldn\'t read that — try one detail per line, e.g. “Phone - 9876543210”.';
+          msg.className = 'ap-statsmsg ' + (filled.length ? 'ok' : 'warn');
+        }
+        if (filled.length) { var f0 = form[filled[0]]; if (f0 && f0.scrollIntoView) f0.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      }
+      // free-form prose ("I'm an actor based in Dubai…") has no labels to match, so hand it to the engine
+      // ask the engine unless the essentials are already in — a field count alone is a poor test
+      var haveKey = ['name', 'city', 'contact'].every(function (k) { return form[k] && (form[k].value || '').trim(); });
+      if (haveKey) return report();
+      if (msg) { msg.textContent = '✨ Reading it with AI…'; msg.className = 'ap-statsmsg'; }
+      var done = false, to = setTimeout(function () { if (!done) { done = true; report(); } }, 20000);
+      fetch(ENGINE_URL + '/ai/extract', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (done) return; done = true; clearTimeout(to);
+          var fx = (j && j.fields) || {};
+          Object.keys(fx).forEach(function (k) { setField(k, fx[k], filled); });
+          persistDraft(); updatePreview(); report();
+        })
+        .catch(function () { if (done) return; done = true; clearTimeout(to); report(); });
     });
   })();
 
