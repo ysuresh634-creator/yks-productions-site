@@ -971,3 +971,15 @@ main{overflow-x:clip}
   .tal-shortlist.on{transform:translateY(0)}
   .tal-sl-btn{padding:8px 12px;font-size:10px}
 }
+
+/* ── edit link banner ── */
+.ap-editbar{margin:0 0 22px;padding:14px 18px;border-radius:12px;border:1px solid var(--mag-line-2);
+  background:rgba(244,237,226,.04);font-family:var(--mag-sans);font-size:13.5px;line-height:1.55;color:var(--mag-soft)}
+.ap-editbar b{color:var(--mag-ink)}
+.ap-editbar.ok{border-color:rgba(123,216,143,.4);background:rgba(123,216,143,.07)}
+.ap-editbar.warn{border-color:rgba(255,160,122,.45);background:rgba(255,160,122,.07);color:#ffc7ad}
+.ap-editbar-link{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.ap-editbar-link input{flex:1;min-width:200px;background:rgba(10,8,16,.6);border:1px solid var(--mag-line);
+  border-radius:8px;padding:9px 11px;color:var(--mag-ink);font-family:var(--mag-mono);font-size:11.5px}
+.ap-editbar-copy{cursor:pointer;background:var(--mag-accent);border:0;border-radius:8px;padding:9px 15px;color:#0a0810;
+  font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}

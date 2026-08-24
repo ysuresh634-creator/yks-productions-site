@@ -50,3 +50,34 @@ for k in sorted(issues, key=lambda k:-len(issues[k]))[:14]:
         key=msg.split("'")[0]
         if key in seen and len(seen)>3: continue
         seen.add(key); print("   ",msg)
+
+# ── Contact-leak guard ────────────────────────────────────────────────────────────────────
+# Bookings must always route through YKS. A talent controls the bio and the signature line,
+# so the generator scrubs them — this proves nothing they type reaches the printed book.
+YKS_OK = ['9746679720', '97466 79720', 'yksproductions893@gmail.com', 'YKSPRODUCTIONS893@GMAIL.COM']
+LEAK_PAT = [
+    (r'9876543210|98765 43210', 'talent phone number'),
+    (r'shiba\.das@gmail\.com|shiba\.das', 'talent email / handle'),
+    (r'shibadas\.com|instagram\.com', 'talent link'),
+]
+def contact_audit():
+    import re
+    bad = []
+    for f in sorted(glob.glob(os.path.join(OUT, '*contactleak*.pdf'))):
+        d = fitz.open(f)
+        text = '\n'.join(d[i].get_text() for i in range(d.page_count))
+        d.close()
+        for pat, what in LEAK_PAT:
+            if re.search(pat, text, re.I):
+                bad.append(f'{os.path.basename(f)}: leaked {what}')
+        if not any(ok in text for ok in YKS_OK):
+            bad.append(f'{os.path.basename(f)}: YKS contact missing from the book')
+    return bad
+
+leaks = contact_audit()
+print()
+if leaks:
+    print('CONTACT LEAKS (%d):' % len(leaks))
+    for l in leaks: print('   ', l)
+else:
+    print('contact guard: clean — every book carries only YKS contact details')

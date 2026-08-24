@@ -19,6 +19,14 @@ const start=src.indexOf('function buildPortfolio(');
 let i=src.indexOf('{',start),depth=0,end=-1;
 for(let p=i;p<src.length;p++){ if(src[p]==='{')depth++; else if(src[p]==='}'){depth--; if(depth===0){end=p+1;break;}} }
 const fnSrc=src.slice(start,end);
+// use the REAL scrubber from the source, never a stub — the contact guard exists to prove the
+// shipped function keeps a talent's own number, email and links out of the printed book.
+const REAL_STRIP=(function(){
+  const i=src.indexOf('function stripContact');
+  let j=src.indexOf('{',i),depth=0,end2=-1;
+  for(let p=j;p<src.length;p++){ if(src[p]==='{')depth++; else if(src[p]==='}'){depth--; if(!depth){end2=p+1;break;}} }
+  return new Function(src.slice(i,end2)+'\n; return stripContact;')();
+})();
 
 function run(scn){
   const values=Object.assign({category:'Model',city:'Bangalore',about:'',tagline:'',
@@ -27,7 +35,7 @@ function run(scn){
   const DISC={'Model':scn.disc||'Fashion · Editorial · Runway · Commercial','Actor':'Film · Ad · Editorial · Screen'};
   let captured=null;
   const factory=new Function('jsPDF','form','DISC','stripContact','registerFonts','deliver','window', fnSrc+'\n; return buildPortfolio;');
-  const buildPortfolio=factory(jsPDF,form,DISC,(s)=>s,()=>{},(doc)=>{captured=doc;},{qrcode:null});
+  const buildPortfolio=factory(jsPDF,form,DISC,REAL_STRIP,()=>{},(doc)=>{captured=doc;},{qrcode:null});
   buildPortfolio(jsPDF, POOL.slice(0,scn.photos==null?8:scn.photos), scn.name||'Shiba Das',
     {bg:[12,10,16],text:[244,240,232],sub:[176,168,146],accent:scn.accent||[226,74,42],font:'helvetica',template:scn.tpl});
   return captured;
@@ -44,6 +52,11 @@ const SCN=[
   {id:'longstats', values:{stat_hair:'Dark brown with blonde highlights',stat_skin:'Medium warm dusky tone',stat_eyes:'Dark brown almost black',about:"I'm a model."}},
   {id:'onephoto', photos:1, values:{about:"I'm a model."}},
   {id:'twophotos', photos:2, values:{about:"I'm a model."}},
+  // A talent trying to route bookings around YKS: contact details stuffed into every field
+  // they control. The book must come out carrying ONLY YKS's own number and address.
+  {id:'contactleak', values:{
+    about:"I'm a model. WhatsApp me directly on 9876543210 or email shiba.das@gmail.com — find me at instagram.com/shiba.das, my site is shibadas.com. Call +91 98765 43210.",
+    tagline:'Book me direct 9876543210 @shiba.das'}},
   {id:'longtag', values:{tagline:'Fashion & Editorial · Runway · Bangalore & Mumbai', about:"I'm a model."}}
 ];
 let n=0;

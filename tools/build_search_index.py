@@ -50,6 +50,33 @@ def category(path):
     return "Services"
 
 
+# Subject tags drive the filter chips — a client who only wants weddings
+# should be able to see weddings and nothing else, whatever the page type.
+#
+# Matched against the URL PATH ONLY, deliberately. The paths here are already
+# descriptive (wedding-photographer-dubai.html, real-estate-videographer-*),
+# whereas descriptions and headings mention every service on every page — going
+# near them tagged gear.html as "Real estate" and faq.html as "Weddings".
+# A general page (faq, gear, quote, photographer-<city>) getting no subject is
+# the right answer: it isn't a wedding page, so a Weddings filter must not list it.
+SUBJECTS = [
+    ("Weddings",    r"wedding|haldi|bride|engagement"),
+    ("Real estate", r"real-?estate|property"),
+    ("Fashion",     r"fashion|editorial|lookbook"),
+    ("Models",      r"models-in-|casting|talents"),
+    ("Films",       r"^/films|film-stills|soothravakyam|baby-?girl|\bbts\b"),
+    ("Portraits",   r"portrait|headshot|maternity"),
+    ("Corporate",   r"corporate|marriott|social-?media|content-?creator"),
+    ("Events",      r"event|nights|party"),
+    ("Food",        r"food"),
+]
+
+
+def subjects(path):
+    p = path.lower()
+    return [name for name, pat in SUBJECTS if re.search(pat, p)]
+
+
 def local_path(url):
     rel = url.replace(SITE, "").split("#")[0].split("?")[0]
     if rel in ("", "/"):
@@ -90,12 +117,14 @@ def main():
             if len(heads) >= 14:
                 break
 
+        heads_s = " · ".join(heads)
         entries.append({
             "u": rel,
             "t": title or rel,
             "d": desc,
-            "k": " · ".join(heads),
+            "k": heads_s,
             "c": category(rel),
+            "g": subjects(rel),
         })
 
     entries.sort(key=lambda e: (e["c"] != "Home", e["c"], e["t"]))
@@ -104,11 +133,17 @@ def main():
         json.dump(entries, f, ensure_ascii=False, separators=(",", ":"))
 
     size = os.path.getsize(out)
-    by_cat = {}
+    by_cat, by_sub = {}, {}
     for e in entries:
         by_cat[e["c"]] = by_cat.get(e["c"], 0) + 1
+        for g in e["g"]:
+            by_sub[g] = by_sub.get(g, 0) + 1
     print(f"indexed {len(entries)} pages -> search-index.json ({size/1024:.1f} KB)")
-    print("  " + "  ".join(f"{k}:{v}" for k, v in sorted(by_cat.items())))
+    print("  sections: " + "  ".join(f"{k}:{v}" for k, v in sorted(by_cat.items())))
+    print("  subjects: " + "  ".join(f"{k}:{v}" for k, v in sorted(by_sub.items())))
+    untagged = [e["u"] for e in entries if not e["g"]]
+    if untagged:
+        print(f"  untagged ({len(untagged)}): {untagged[:6]}")
     if missing:
         print(f"  WARNING: {len(missing)} sitemap URLs have no local file: {missing[:5]}")
 

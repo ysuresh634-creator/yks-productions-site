@@ -80,7 +80,7 @@
       .replace(/\S+@\S+\.\S+/g, '')                                        // emails
       .replace(/\b(?:https?:\/\/|www\.)\S+/gi, '')                         // urls
       .replace(/@[\w.]+/g, '')                                             // @handles
-      .replace(/\b[a-z0-9-]+\.(?:com|in|net|co|org|me|link|io|to|xyz)\b/gi, '') // bare domains
+      .replace(/\b[a-z0-9-]+\.(?:com|in|net|co|org|me|link|io|to|xyz)\b(?:\/[^\s]*)?/gi, '') // bare domains, with any path
       .replace(/[+(]?\d[\d\s().\-]{6,}\d/g, '')                            // phone numbers
       .replace(/\s{2,}/g, ' ').replace(/^[\s·|,\-]+|[\s·|,\-]+$/g, '').trim();
   }
@@ -1121,6 +1121,62 @@
   wirePolish('comfort', 'apComfortAi');
   wirePolish('extra', 'apExtraAi');
 
+
+  /* ══ Edit link — a talent reopens their own submission and changes anything.
+        The id issued at submit is the credential, so the link is private: it is shown to them
+        once and never published. What they CANNOT change is the branding, the booking route or
+        their own contact — the book is generated with YKS's mark and number hardcoded, and any
+        contact detail is scrubbed out of the bio and signature line before it is printed. ══ */
+  var EDIT_ID = (function () { try { return new URLSearchParams(location.search).get('edit') || ''; } catch (e) { return ''; } })();
+  function setVal(nm, v) {
+    var el = form[nm]; if (!el || v == null || v === '') return;
+    if (el.tagName === 'SELECT') {
+      var ok = Array.prototype.some.call(el.options, function (o) { return (o.value || o.textContent).trim() === v; });
+      if (!ok) return;
+    }
+    el.value = v;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function hydrateFromSaved(d) {
+    ['name', 'contact', 'category', 'city', 'socials', 'about', 'tagline', 'dob', 'gender', 'marital',
+     'education', 'languages', 'occupation', 'availability', 'travel', 'comfort', 'extra',
+     'age_group', 'guardian_name', 'guardian_contact',
+     'stat_height', 'stat_bust', 'stat_waist', 'stat_hips', 'stat_shoe', 'stat_hair', 'stat_eyes', 'stat_skin'
+    ].forEach(function (k) { setVal(k, d[k]); });
+    setVal('region', d.based_in || d.region);
+    if (d.work_preferences && form.preferences) form.preferences.value = d.work_preferences;
+    // photos come back as the URLs already uploaded — no re-upload needed
+    (d.photos || []).forEach(function (p) {
+      if (!p || !p.url) return;
+      photos.push({ id: ++uid, url: p.url, preview: p.url, cat: p.cat || 'Headshots', remote: true });
+    });
+    (d.video_links || []).forEach(function (u) { if (u) videos.push({ id: ++uid, kind: 'link', url: u, name: linkName(u) }); });
+    renderThumbs(); if (typeof renderVids === 'function') renderVids();
+    updatePreview();
+  }
+  function showEditBanner(msg, cls) {
+    var b = document.getElementById('apEditBar');
+    if (!b) {
+      b = document.createElement('div'); b.id = 'apEditBar'; b.className = 'ap-editbar';
+      var host = document.querySelector('.ap-form-sec .wrap') || document.querySelector('main');
+      if (host) host.insertBefore(b, host.firstChild);
+    }
+    b.className = 'ap-editbar' + (cls ? ' ' + cls : '');
+    b.innerHTML = msg;
+  }
+  if (EDIT_ID) {
+    showEditBanner('Loading your portfolio…');
+    fetch(ENGINE_URL + '/edit/' + encodeURIComponent(EDIT_ID))
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok || !j.data) { showEditBanner('That edit link isn’t valid any more. You can fill the form again below.', 'warn'); return; }
+        hydrateFromSaved(j.data);
+        showEditBanner('<b>Editing your portfolio.</b> Change anything below, then send it again — it replaces what YKS has. Keep this link to edit again later.');
+      })
+      .catch(function () { showEditBanner('Couldn’t load that link just now — check your connection and refresh.', 'warn'); });
+  }
+
   /* ══ autosave draft (text + video links; uploaded files can't persist across reloads) ══ */
   var textNames = ['name', 'contact', 'category', 'region', 'city', 'socials', 'about', 'tagline',
     'dob', 'gender', 'marital', 'education', 'languages', 'occupation', 'availability', 'travel', 'comfort', 'extra', 'preferences',
@@ -1660,7 +1716,10 @@
     var W = 595.28, H = 841.89, M = 48, CW = W - 2 * M;
     var BG = cfg.bg, TX = cfg.text, SUB = cfg.sub, AC = cfg.accent, F = cfg.font;
     if ((F === 'Playfair' || F === 'Oswald') && !doc.getFontList()[F]) F = 'helvetica';   // font failed to load → safe fallback
-    var cat = (form.category.value || 'Model').trim(), city = (form.city.value || '').trim(), about = (form.about.value || '').trim();
+    var cat = (form.category.value || 'Model').trim(), city = (form.city.value || '').trim();
+    // the bio prints in the book, so it is scrubbed exactly like the tagline — a talent must never be
+    // able to slip a number, handle or link into the portfolio and route bookings around YKS.
+    var about = stripContact((form.about.value || '').trim());
     var disc = DISC[cat] || 'Fashion · Editorial · Commercial', NM = name.toUpperCase();
     var TAG = stripContact((form.tagline && form.tagline.value || '').trim());   // signature line, contact scrubbed
     function st(k) { var el = form['stat_' + k]; return el && el.value.trim() ? el.value.trim() : ''; }
@@ -2020,7 +2079,27 @@
             age_group: g('age_group'), guardian_name: g('guardian_name'), guardian_contact: g('guardian_contact'),
             photos: ephotos, cover_url: (ephotos[0] && ephotos[0].url) || '', videos: (up.videos || []), video_links: vidLinks
           };
-          fetch(ENGINE_URL.replace(/\/+$/, '') + '/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(submission) }).catch(function () {});
+          // editing an existing submission replaces it; otherwise this creates a new one and the
+          // id we get back becomes their private edit link
+          var endpoint = EDIT_ID ? ('/edit/' + encodeURIComponent(EDIT_ID)) : '/submit';
+          fetch(ENGINE_URL.replace(/\/+$/, '') + endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(submission) })
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
+              var id = (j && j.id) || EDIT_ID;
+              if (!id) return;
+              var link = location.origin + location.pathname + '?edit=' + id;
+              try { localStorage.setItem('yks_edit_link', link); } catch (e) {}
+              showEditBanner('<b>Saved.</b> Keep this private link to edit your portfolio later — it opens everything exactly as you left it.'
+                + '<span class="ap-editbar-link"><input type="text" readonly value="' + link + '" onclick="this.select()" />'
+                + '<button type="button" class="ap-editbar-copy">Copy link</button></span>', 'ok');
+              var cp = document.querySelector('.ap-editbar-copy');
+              if (cp) cp.addEventListener('click', function () {
+                var t = cp.textContent;
+                var done = function () { cp.textContent = 'Copied ✓'; setTimeout(function () { cp.textContent = t; }, 1800); };
+                if (navigator.clipboard) navigator.clipboard.writeText(link).then(done, done); else done();
+              });
+            })
+            .catch(function () {});
         } catch (e) {}
       }
       return fetch('https://api.web3forms.com/submit', {

@@ -1700,6 +1700,34 @@ const FRAME_JS=`
   // friends were never editable. Target anything holding its own text instead,
   // and just exclude containers whose text is not page copy.
   var TEXT_SKIP='script,style,noscript,template,select,option,head,title,svg,iframe,canvas,audio,video';
+  var STYLE_SKIP='script,style,noscript,template,head,title,meta,link,br,hr,svg,canvas,iframe,audio,source,html,body';
+  function rgbHex(c){
+    var m=(c||'').match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/); if(!m) return '#000000';
+    return '#'+[m[1],m[2],m[3]].map(function(x){return ('0'+(+x).toString(16)).slice(-2);}).join('');
+  }
+  function computedStyleOf(el){
+    var cs=getComputedStyle(el), fs=parseFloat(cs.fontSize)||16;
+    var bg=cs.backgroundColor||'', bgAlpha=(bg.match(/rgba?\\([^)]*,\\s*([\\d.]+)\\)/)||[])[1];
+    var pr=el.parentElement, pw=pr?pr.getBoundingClientRect().width:0, w=el.getBoundingClientRect().width;
+    return {
+      fontSize: Math.round(fs),
+      letterSpacing: cs.letterSpacing==='normal'?0:Math.round(parseFloat(cs.letterSpacing)*10)/10,
+      wordSpacing: cs.wordSpacing==='normal'?0:Math.round(parseFloat(cs.wordSpacing)*10)/10,
+      lineHeight: cs.lineHeight==='normal'?1.4:Math.round((parseFloat(cs.lineHeight)/fs)*100)/100,
+      fontWeight: parseInt(cs.fontWeight)||400,
+      textAlign: cs.textAlign,
+      textTransform: cs.textTransform,
+      italic: cs.fontStyle==='italic',
+      color: rgbHex(cs.color),
+      padding: Math.round(parseFloat(cs.paddingTop)||0),
+      marginTop: Math.round(parseFloat(cs.marginTop)||0),
+      marginBottom: Math.round(parseFloat(cs.marginBottom)||0),
+      radius: Math.round(parseFloat(cs.borderTopLeftRadius)||0),
+      widthPct: (pw>0)?Math.round(w/pw*100):100,
+      bg: (bgAlpha!==undefined && parseFloat(bgAlpha)===0)?'':rgbHex(bg),
+      hasBg: !(bgAlpha!==undefined && parseFloat(bgAlpha)===0)
+    };
+  }
   function hasOwnText(el){
     for(var i=0;i<el.childNodes.length;i++){
       var n=el.childNodes[i];
@@ -1726,7 +1754,8 @@ const FRAME_JS=`
   }
   function paint(){
     [].slice.call(document.querySelectorAll('[data-yks-hot]')).forEach(function(e){e.removeAttribute('data-yks-hot');});
-    if(mode!=='off') targets().forEach(function(e){e.setAttribute('data-yks-hot','1');});
+    if(mode!=='off' && mode!=='style') targets().forEach(function(e){e.setAttribute('data-yks-hot','1');});
+    if(mode!=='style'){ var h=document.querySelector('[data-yks-hover]'); if(h) h.removeAttribute('data-yks-hover'); }
     parent.postMessage({yks:'painted',mode:mode,hot:document.querySelectorAll('[data-yks-hot]').length},'*');
   }
 
@@ -1774,6 +1803,15 @@ const FRAME_JS=`
   function blockNav(e){
     if(e.target.closest && e.target.closest('a,button,form,[onclick]')){ e.preventDefault(); e.stopPropagation(); }
   }
+  // Style mode: outline whatever is under the cursor, so you can pick any
+  // element — a heading, a caption, or a whole box — not only text blocks.
+  document.addEventListener('mouseover',function(e){
+    if(mode!=='style') return;
+    var el=e.target;
+    if(!el || el.nodeType!==1 || (el.closest && el.closest(STYLE_SKIP))) return;
+    var prev=document.querySelector('[data-yks-hover]'); if(prev) prev.removeAttribute('data-yks-hover');
+    el.setAttribute('data-yks-hover','1');
+  },true);
   document.addEventListener('mousedown',blockNav,true);
   document.addEventListener('auxclick',blockNav,true);
   document.addEventListener('submit',function(e){ if(mode!=='off'){ e.preventDefault(); e.stopPropagation(); } },true);
@@ -1781,6 +1819,16 @@ const FRAME_JS=`
   document.addEventListener('click',function(e){
     e.preventDefault(); e.stopPropagation();   // the preview itself never navigates
     var link=e.target.closest && e.target.closest('a[href]');
+
+    if(mode==='style'){
+      var t=e.target;
+      if(t && t.closest && t.closest(STYLE_SKIP)) return;
+      if(!t || t===document.body || t===document.documentElement){ return; }
+      parent.postMessage({yks:'pickStyle', id:t.getAttribute('data-yks-id'),
+        tag:t.tagName.toLowerCase(), text:(t.textContent||'').trim().slice(0,40),
+        computed:computedStyleOf(t)},'*');
+      return;
+    }
 
     // Browse mode: taps are purely for getting around the site
     if(mode==='off'){
@@ -1833,7 +1881,13 @@ const FRAME_JS=`
       if(d.alt!==undefined) el.setAttribute('alt',d.alt);
       if(d.href!==undefined) el.setAttribute('href',d.href);
       el.setAttribute('data-yks-dirty','1');
-      el.scrollIntoView({block:'center'});
+      if(d.noScroll!==true) el.scrollIntoView({block:'center'});
+    }
+    if(d.yks==='style'){
+      var se=document.querySelector('[data-yks-id="'+d.id+'"]'); if(!se) return;
+      if(d.props){ for(var k in d.props){ if(d.props[k]===null||d.props[k]==='') se.style.removeProperty(k); else se.style.setProperty(k,d.props[k]); } }
+      if(d.styleAttr!==undefined){ if(d.styleAttr) se.setAttribute('style',d.styleAttr); else se.removeAttribute('style'); }
+      se.setAttribute('data-yks-dirty','1');
     }
     if(d.yks==='undirty'){ var q=document.querySelector('[data-yks-id="'+d.id+'"]'); if(q) q.removeAttribute('data-yks-dirty'); }
     if(d.yks==='relayout'){ unstick(); paint(); }
@@ -1856,17 +1910,18 @@ window.addEventListener('message',e=>{
   const d=e.data||{};
   if(d.yks==='ready') sendMode();
   if(d.yks==='pick') onPick(d);
+  if(d.yks==='pickStyle') openStyle(d);
   if(d.yks==='navigate') goToLink(d.href);
   if(d.yks==='unstuck'){ window.__diag={...(window.__diag||{}),hidden:d.hidden,shown:d.shown}; }
   if(d.yks==='painted'){ window.__diag={...(window.__diag||{}),mode:d.mode,hot:d.hot};
-    if(d.hot===0 && d.mode!=='off' && curScreen==='website') toast('Nothing editable found in this mode'); }
+    if(d.hot===0 && d.mode!=='off' && d.mode!=='style' && curScreen==='website') toast('Nothing editable found in this mode'); }
 });
 function sendMode(){ const f=$('frame').contentWindow; if(f) f.postMessage({yks:'mode',mode},'*'); }
 function patch(o){ const f=$('frame').contentWindow; if(f) f.postMessage({yks:'patch',...o},'*'); }
 
 function setMode(m){
   mode=m;
-  ['text','photo','link','off'].forEach(x=>$('m-'+x).classList.toggle('on',x===m));
+  ['text','photo','link','style','off'].forEach(x=>$('m-'+x).classList.toggle('on',x===m));
   sendMode();
 }
 
@@ -1896,6 +1951,8 @@ function onPick(d){
     setTimeout(()=>peLoad(url, d.slotAR||1, name), 120);
   } else if(mode==='link'){
     $('l-text').value=d.text; $('l-href').value=d.href; openSheet('sh-link');
+  } else if(mode==='style'){
+    openStyle(d);
   }
 }
 
@@ -1997,6 +2054,165 @@ function commitLink(){
   if(t!==sel.text){ setOwnText(el,t); patch({id:sel.id,text:t}); addChange({id:sel.id,kind:'text',label:'LINK TEXT',before:sel.text,after:t}); }
   if(h!==sel.href){ el.setAttribute('href',h); patch({id:sel.id,href:h}); addChange({id:sel.id,kind:'href',label:'LINK URL',before:sel.href,after:h}); }
   closeSheets(); toast('Staged — tap Publish to go live');
+}
+
+// ══ STYLE EDITOR ═══════════════════════════════════════════════════════════
+// Per-element inline styles only — surgical and fully reversible, the same
+// safe model as the text editor. Each element stores its original style
+// attribute so one tap restores it exactly.
+let stEl=null, stBefore='', stComputed=null;
+
+// What tasteful spacing looks like, by the role of the element. Photographers
+// shouldn't have to know px — the guide shows the pleasing range and flags
+// when a value drifts out of it.
+function stRole(tag, c){
+  if(/^h[1-6]$/.test(tag) || c.fontSize>=28) return 'display';
+  if(c.fontSize<=13 || c.textTransform==='uppercase') return 'label';
+  return 'body';
+}
+const ST_GUIDE = {
+  display:{ ls:[-1.5,0.5],  lh:[0.95,1.25], note:'Big headings read best tight — letters close, lines snug.' },
+  body:   { ls:[0,0.4],     lh:[1.45,1.75], note:'Body copy wants roomy lines (≈1.6) and near-zero letter spacing.' },
+  label:  { ls:[0.5,3],     lh:[1,1.5],     note:'Small caps/labels look intentional with wide letter spacing.' }
+};
+// One-tap tasteful presets: ideal letter-spacing + line-height for the role.
+const ST_PRESET = {
+  display:{ tight:{ls:-0.5,lh:1.05}, balanced:{ls:0,lh:1.15},  airy:{ls:0.5,lh:1.3} },
+  body:   { tight:{ls:0,lh:1.4},     balanced:{ls:0,lh:1.6},   airy:{ls:0.2,lh:1.8} },
+  label:  { tight:{ls:0.5,lh:1.2},   balanced:{ls:1.5,lh:1.4}, airy:{ls:3,lh:1.6} }
+};
+
+function openStyle(d){
+  const el=mEl(d.id); if(!el){ toast('Element not found'); return; }
+  sel=d; stEl=d.id; stComputed=d.computed;
+  // capture the original style once — reuse it if this element is already staged
+  const existing=changes.find(x=>x.id===d.id && x.kind==='style');
+  stBefore = existing ? existing.before : (el.getAttribute('style')||'');
+
+  const c=d.computed, role=stRole(d.tag, c);
+  $('st-tag').textContent = d.tag.toUpperCase() + (d.text? ' · "'+d.text.slice(0,22)+(d.text.length>22?'…':'')+'"' : '');
+
+  const setv=(id,val)=>{ const e=$(id); if(e) e.value=val; };
+  setv('st-fs',c.fontSize);   $('st-fs-v').textContent=c.fontSize+'px';
+  setv('st-ls',c.letterSpacing); $('st-ls-v').textContent=c.letterSpacing+'px';
+  setv('st-ws',c.wordSpacing); $('st-ws-v').textContent=c.wordSpacing+'px';
+  setv('st-lh',c.lineHeight); $('st-lh-v').textContent=c.lineHeight;
+  setv('st-fw',c.fontWeight); $('st-fw-v').textContent=c.fontWeight;
+  setv('st-pad',c.padding);   $('st-pad-v').textContent=c.padding+'px';
+  setv('st-mt',c.marginTop);  $('st-mt-v').textContent=c.marginTop+'px';
+  setv('st-mb',c.marginBottom);$('st-mb-v').textContent=c.marginBottom+'px';
+  setv('st-w',c.widthPct);    $('st-w-v').textContent=c.widthPct+'%';
+  setv('st-br',c.radius);     $('st-br-v').textContent=c.radius+'px';
+  setv('st-col',c.color);
+  setv('st-bg', c.hasBg ? c.bg : '#181521');
+  markChip('st-align', c.textAlign);
+  markChip('st-tt', c.textTransform);
+  $('st-italic').classList.toggle('on', c.italic);
+
+  stBuildGuide(role, c);
+  stTab('type');
+  openSheet('sh-style');
+}
+
+function markChip(groupId, val){
+  document.querySelectorAll('#'+groupId+' .pe-chip').forEach(b=>b.classList.toggle('on', b.dataset.v===val));
+}
+
+// Guidance strip: role note, tasteful presets, and a live in-zone check.
+function stBuildGuide(role, c){
+  const g=ST_GUIDE[role], pr=ST_PRESET[role];
+  let box=$('st-guide');
+  if(!box){
+    box=document.createElement('div'); box.id='st-guide';
+    box.style.cssText='background:var(--gold-lt);border:1px solid rgba(201,169,110,.28);border-radius:9px;padding:11px 13px;margin-bottom:14px';
+    $('stp-type').insertBefore(box, $('stp-type').firstChild);
+  }
+  box.innerHTML =
+    '<div style="font-size:9px;letter-spacing:1.4px;color:var(--gold);text-transform:uppercase;margin-bottom:5px">'
+      + ({display:'Heading',body:'Body text',label:'Label / caption'}[role]) + ' · spacing guide</div>'
+    + '<div style="font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:9px">'+g.note+'</div>'
+    + '<div class="pe-chips">'
+      + '<button class="pe-chip" onclick="stApplyPreset(\''+role+'\',\'tight\')">Tight</button>'
+      + '<button class="pe-chip" onclick="stApplyPreset(\''+role+'\',\'balanced\')">Balanced ✓</button>'
+      + '<button class="pe-chip" onclick="stApplyPreset(\''+role+'\',\'airy\')">Airy</button>'
+    + '</div>';
+  stCheckZone(role);
+}
+
+function stCheckZone(role){
+  role=role||stRole(sel.tag, stComputed);
+  const g=ST_GUIDE[role]; if(!g) return;
+  const ls=parseFloat($('st-ls').value), lh=parseFloat($('st-lh').value);
+  const zone=(v,r)=> v>=r[0]&&v<=r[1];
+  $('st-ls-v').style.color = zone(ls,g.ls) ? 'var(--green)' : '#E0A34A';
+  $('st-lh-v').style.color = zone(lh,g.lh) ? 'var(--green)' : '#E0A34A';
+}
+
+function stApplyPreset(role, kind){
+  const pr=ST_PRESET[role][kind];
+  $('st-ls').value=pr.ls; $('st-ls-v').textContent=pr.ls+'px'; stSet('letter-spacing',pr.ls+'px',true);
+  $('st-lh').value=pr.lh; $('st-lh-v').textContent=pr.lh;      stSet('line-height',String(pr.lh),true);
+  stCheckZone(role);
+  toast(kind.charAt(0).toUpperCase()+kind.slice(1)+' spacing applied');
+}
+
+// core apply — writes to masterDoc, previews in the frame, stages the change
+function stSet(prop, val, quiet){
+  const el=mEl(stEl); if(!el) return;
+  if(val===null||val==='') el.style.removeProperty(prop); else el.style.setProperty(prop, val);
+  patchStyle({props:{[prop]:val}});
+  const label=({['font-size']:'Size',['letter-spacing']:'Spacing',['line-height']:'Line height',['font-weight']:'Weight',['text-align']:'Align',['text-transform']:'Case',['color']:'Colour',['padding']:'Padding',['margin-top']:'Margin',['margin-bottom']:'Margin',['width']:'Width',['border-radius']:'Radius',['background-color']:'Background',['font-style']:'Italic',['display']:'Visibility'})[prop]||'Style';
+  stStage(label);
+  // live readouts
+  const vmap={['font-size']:'st-fs-v',['letter-spacing']:'st-ls-v',['word-spacing']:'st-ws-v',['line-height']:'st-lh-v',['font-weight']:'st-fw-v',['padding']:'st-pad-v',['margin-top']:'st-mt-v',['margin-bottom']:'st-mb-v',['width']:'st-w-v',['border-radius']:'st-br-v'};
+  if(vmap[prop]) $(vmap[prop]).textContent = (prop==='line-height'? val : val);
+  stCheckZone();
+}
+
+function stPick(prop, val, btn){
+  markChip(btn.parentElement.id, val);
+  stSet(prop, val);
+}
+function stItalic(){
+  const el=mEl(stEl); if(!el) return;
+  const on=!$('st-italic').classList.contains('on');
+  $('st-italic').classList.toggle('on', on);
+  stSet('font-style', on?'italic':'normal');
+}
+function stClear(prop){
+  const el=mEl(stEl); if(!el) return;
+  el.style.removeProperty(prop);
+  patchStyle({props:{[prop]:null}});
+  stStage('Style');
+  if(prop==='width') $('st-w-v').textContent='auto';
+}
+function stHide(){
+  if(!confirm('Hide this element on the live site? You can undo it before publishing.')) return;
+  stSet('display','none');
+  toast('Hidden — Publish to apply'); closeSheets();
+}
+function stResetAll(){
+  const el=mEl(stEl); if(!el) return;
+  if(stBefore) el.setAttribute('style', stBefore); else el.removeAttribute('style');
+  patchStyle({styleAttr: stBefore||''});
+  // drop the staged change for this element entirely
+  changes = changes.filter(x=>!(x.id===stEl && x.kind==='style'));
+  renderCount(); if(!changes.length) $('savebtn').disabled=true;
+  toast('Reset to original'); closeSheets();
+}
+
+function patchStyle(o){ const f=$('frame').contentWindow; if(f) f.postMessage({yks:'style',id:stEl,...o},'*'); }
+
+function stStage(label){
+  const el=mEl(stEl); if(!el) return;
+  const after=el.getAttribute('style')||'';
+  if(after===stBefore){ changes=changes.filter(x=>!(x.id===stEl && x.kind==='style')); renderCount(); if(!changes.length)$('savebtn').disabled=true; return; }
+  addChange({id:stEl, kind:'style', label:'STYLE · '+label, before:stBefore, after,
+             beforeAttr:true});
+}
+
+function stTab(t){
+  ['type','box'].forEach(x=>{ $('stt-'+x).classList.toggle('on',x===t); $('stp-'+x).classList.toggle('on',x===t); });
 }
 
 // ══ PHOTO EDITOR ══════════════════════════════════════════════════════════
@@ -2295,6 +2511,10 @@ function undo(i){
     if(c.kind==='photo'||c.kind==='video'){
       setMediaSrc(el,c.before);
       patch({id:c.id,src:/^https?:|^data:/.test(c.before)?c.before:SITE+c.before.replace(/^\//,'')});
+    }
+    if(c.kind==='style'){
+      if(c.before) el.setAttribute('style',c.before); else el.removeAttribute('style');
+      const f=$('frame').contentWindow; if(f) f.postMessage({yks:'style',id:c.id,styleAttr:c.before||''},'*');
     }
   }
   changes.splice(i,1); renderCount(); renderChanges();

@@ -21,7 +21,7 @@
   var INDEX_URL = '/search-index.json';
   var RECENT_KEY = 'yksRecent';
   var index = null, vocab = null, loading = null;
-  var results = [], rows = [], active = -1, lastQuery = '', corrected = '';
+  var results = [], rows = [], active = -1, lastQuery = '', corrected = '', activeSub = '';
   var answers = {};        // question -> {text, cites} for this tab
   var pending = false;
 
@@ -54,6 +54,15 @@
     '.yks-sesc{background:none;border:1px solid rgba(244,237,226,.22);color:rgba(244,237,226,.6);',
     'border-radius:6px;font-size:10px;letter-spacing:.1em;padding:4px 8px;cursor:pointer;flex:none}',
     '.yks-sesc:hover{color:#f4ede2;border-color:rgba(244,237,226,.5)}',
+    '.yks-schips{display:flex;gap:7px;padding:11px 18px;overflow-x:auto;scrollbar-width:none;',
+    'border-bottom:1px solid rgba(244,237,226,.10)}',
+    '.yks-schips::-webkit-scrollbar{display:none}',
+    '.yks-schips button{flex:none;background:none;border:1px solid rgba(244,237,226,.20);',
+    'color:rgba(244,237,226,.72);border-radius:30px;padding:5px 12px;font:inherit;font-size:11.5px;',
+    'cursor:pointer;white-space:nowrap;transition:.2s}',
+    '.yks-schips button:hover{color:#f4ede2;border-color:rgba(244,237,226,.45)}',
+    '.yks-schips button.on{background:#ff8c3b;border-color:#ff8c3b;color:#0b0910;font-weight:600}',
+    '.yks-schips button i{font-style:normal;opacity:.55;margin-left:5px;font-size:10.5px}',
     '.yks-slist{max-height:min(60vh,500px);overflow-y:auto;overscroll-behavior:contain}',
     '.yks-sgrp{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,237,226,.38);',
     'padding:14px 18px 6px}',
@@ -124,16 +133,18 @@
         'spellcheck="false" placeholder="Search or ask anything…" aria-label="Search this site" />' +
         '<button class="yks-sesc" type="button">ESC</button>' +
       '</div>' +
+      '<div class="yks-schips" role="tablist" aria-label="Filter by subject"></div>' +
       '<div class="yks-slist" role="listbox"></div>' +
       '<div class="yks-sfoot"><span>↑↓ move</span><span>↵ open</span><span>esc close</span></div>' +
     '</div>';
 
-  var input, list, lastFocus = null;
+  var input, list, chips, lastFocus = null;
 
   function mount() {
     document.body.appendChild(ov);
     input = ov.querySelector('.yks-sin');
     list = ov.querySelector('.yks-slist');
+    chips = ov.querySelector('.yks-schips');
     ov.querySelector('.yks-sesc').addEventListener('click', close);
     ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
     input.addEventListener('input', function () { render(input.value); });
@@ -290,11 +301,44 @@
     return total;
   }
 
+  function inFilter(e) { return !activeSub || (e.g && e.g.indexOf(activeSub) !== -1); }
+
   function rank(t) {
-    return index.map(function (e) { return { e: e, s: score(e, t) }; })
+    return index.filter(inFilter)
+      .map(function (e) { return { e: e, s: score(e, t) }; })
       .filter(function (r) { return r.s > 0; })
       .sort(function (a, b) { return b.s - a.s; })
       .map(function (r) { return r.e; });
+  }
+
+  /* ---------- subject filters ----------
+     "I only want to see weddings" is a browse, not a search — so a chip on
+     its own (empty query) lists every page in that subject. */
+  var SUB_ORDER = ['Weddings', 'Real estate', 'Fashion', 'Portraits', 'Films',
+                   'Models', 'Corporate', 'Events', 'Food'];
+
+  function drawChips() {
+    if (!index || !chips) return;
+    var count = {};
+    index.forEach(function (e) {
+      (e.g || []).forEach(function (g) { count[g] = (count[g] || 0) + 1; });
+    });
+    var have = SUB_ORDER.filter(function (g) { return count[g]; });
+    var h = '<button type="button" data-sub="" class="' + (activeSub ? '' : 'on') + '">All' +
+      '<i>' + index.length + '</i></button>';
+    have.forEach(function (g) {
+      h += '<button type="button" data-sub="' + esc(g) + '" class="' + (activeSub === g ? 'on' : '') +
+        '">' + esc(g) + '<i>' + count[g] + '</i></button>';
+    });
+    chips.innerHTML = h;
+    Array.prototype.forEach.call(chips.querySelectorAll('[data-sub]'), function (b) {
+      b.addEventListener('click', function () {
+        activeSub = b.dataset.sub || '';
+        drawChips();
+        render(input.value);
+        input.focus();
+      });
+    });
   }
 
   /* ---------- html helpers ---------- */
@@ -439,15 +483,29 @@
 
     if (!q) {
       results = []; rows = []; active = -1; lastQuery = '';
+
+      // a chip with no query = browse that subject end to end
+      if (activeSub && index) {
+        results = index.filter(inFilter);
+        var b = '', bg = '', bi = 0;
+        results.forEach(function (e) {
+          if (e.c !== bg) { bg = e.c; b += '<div class="yks-sgrp">' + esc(bg) + '</div>'; }
+          b += '<a class="yks-sr" role="option" data-i="' + (bi++) + '" href="' + esc(e.u) + '">' +
+            '<b>' + esc(e.t) + '</b><s>' + esc(e.d || e.k) + '</s></a>';
+        });
+        list.innerHTML = b || '<div class="yks-smsg">Nothing under ' + esc(activeSub) + ' yet.</div>';
+        bind(q); active = 0; paint();
+        return;
+      }
+
       var r = recent();
-      var htm = r.length
+      list.innerHTML = r.length
         ? '<div class="yks-sgrp">Recent</div>' + r.map(function (s, i) {
             return '<a class="yks-sr" data-i="' + i + '" data-recent="' + esc(s) + '" href="#">' +
               '<b>' + esc(s) + '</b></a>';
           }).join('')
-        : '<div class="yks-smsg">Search the whole site — work, cities, services, journal.' +
-          (aiReady() ? '<br>Or ask a real question and Iris answers it.' : '') + '</div>';
-      list.innerHTML = htm;
+        : '<div class="yks-smsg">Search the whole site, or pick a subject above.' +
+          (aiReady() ? '<br>Ask a real question and Iris answers it.' : '') + '</div>';
       bind(q);
       return;
     }
@@ -490,8 +548,11 @@
 
     if (ai && !aiFirst) out += '<div class="yks-sgrp">Ask</div>' + aiRow(q, i++);
     if (!results.length && !hasAnswer) {
-      out += '<div class="yks-smsg">No page matches “' + esc(q) + '”' +
-        (ai ? ' — Iris can still answer.' : '.') + '</div>';
+      out += '<div class="yks-smsg">No ' + (activeSub ? esc(activeSub).toLowerCase() + ' ' : '') +
+        'page matches “' + esc(q) + '”' +
+        (activeSub ? ' — <button type="button" data-clearsub="1" style="background:none;border:0;' +
+          'color:#ff8c3b;cursor:pointer;font:inherit">search everything</button>' : '') +
+        (ai ? '<br>Iris can still answer.' : '') + '</div>';
     }
 
     list.innerHTML = out;
@@ -512,6 +573,10 @@
     });
     var ex = list.querySelector('[data-exact]');
     if (ex) ex.addEventListener('click', function () { corrected = ''; askAI(q); });
+    var cs = list.querySelector('[data-clearsub]');
+    if (cs) cs.addEventListener('click', function () {
+      activeSub = ''; drawChips(); render(input.value); input.focus();
+    });
     Array.prototype.forEach.call(list.querySelectorAll('[data-fu]'), function (b) {
       b.addEventListener('click', function () {
         input.value = b.dataset.fu; render(input.value); askAI(b.dataset.fu);
@@ -564,6 +629,7 @@
     input.focus();
     load().then(function (ok) {
       if (!ok) { list.innerHTML = '<div class="yks-smsg">Search is unavailable right now.</div>'; return; }
+      drawChips();
       if (ov.classList.contains('on')) render(input.value);
     });
   }
