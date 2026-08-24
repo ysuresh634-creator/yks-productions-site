@@ -257,6 +257,7 @@
   bar.innerHTML =
     '<span class="tal-sl-count"></span>' +
     '<div class="tal-sl-actions">' +
+      '<button type="button" class="tal-sl-btn" data-act="pdf">↓ Lookbook</button>' +
       '<button type="button" class="tal-sl-btn" data-act="copy">Copy share link</button>' +
       '<a class="tal-sl-btn tal-sl-go" data-act="send" target="_blank" rel="noopener">Send to YKS →</a>' +
       '<button type="button" class="tal-sl-btn tal-sl-clear" data-act="clear" aria-label="Clear shortlist">Clear</button>' +
@@ -305,6 +306,13 @@
     var b = e.target.closest('[data-act]'); if (!b) return;
     var act = b.dataset.act;
     if (act === 'clear') { picked = []; viewingShared = false; save(); render(); showOnly(null); }
+    if (act === 'pdf') {
+      if (!picked.length || typeof window.buildShortlistPDF !== 'function') return;
+      var lbl = b.textContent; b.disabled = true; b.textContent = 'Building…';
+      window.buildShortlistPDF(picked.slice())
+        .then(function () { b.textContent = 'Saved ✓'; setTimeout(function () { b.disabled = false; b.textContent = lbl; }, 1800); })
+        .catch(function () { b.textContent = 'Try again'; setTimeout(function () { b.disabled = false; b.textContent = lbl; }, 1800); });
+    }
     if (act === 'copy') {
       var url = shareURL();
       var done = function () { var t = b.textContent; b.textContent = 'Link copied ✓'; setTimeout(function () { b.textContent = t; }, 1800); };
@@ -382,4 +390,141 @@
         out.innerHTML = '<p class="tal-plan-wait">Couldn\'t reach the planner — send me the brief directly and I\'ll reply myself.</p>';
       });
   });
+})();
+
+/* ══ Shortlist lookbook — the client's shortlist as a YKS-branded PDF they can send to their
+      team. This is the point of the shortlist: it makes the CLIENT look organised to their
+      boss, and every page carries YKS's mark and booking route.
+      Talent are identified by roster CODE, never by name — a PDF travels by email, and names
+      stay on the roster where a human has to be looking at the site to see them. ══ */
+(function () {
+  var grid = document.getElementById('talGrid');
+  if (!grid) return;
+
+  function ensureJsPDF() {
+    return new Promise(function (res, rej) {
+      if (window.jspdf && window.jspdf.jsPDF) return res(window.jspdf.jsPDF);
+      var s = document.createElement('script');
+      s.src = '/js/vendor/jspdf.umd.min.js';
+      s.onload = function () { (window.jspdf && window.jspdf.jsPDF) ? res(window.jspdf.jsPDF) : rej(new Error('lib')); };
+      s.onerror = function () { rej(new Error('lib')); };
+      document.head.appendChild(s);
+    });
+  }
+  // same-origin images, so the canvas stays clean
+  function loadImg(src) {
+    return new Promise(function (res, rej) {
+      var im = new Image(); im.onload = function () { res(im); }; im.onerror = rej; im.src = src;
+    });
+  }
+  function toJpeg(im, maxW) {
+    var sc = Math.min(1, maxW / im.naturalWidth);
+    var c = document.createElement('canvas');
+    c.width = Math.round(im.naturalWidth * sc); c.height = Math.round(im.naturalHeight * sc);
+    c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+    return { data: c.toDataURL('image/jpeg', 0.86), w: c.width, h: c.height };
+  }
+
+  window.buildShortlistPDF = function (codes) {
+    var cards = codes.map(function (code) {
+      return grid.querySelector('.tal[data-code="' + code + '"]');
+    }).filter(Boolean);
+    if (!cards.length) return Promise.reject(new Error('empty'));
+
+    return ensureJsPDF().then(function (JsPDF) {
+      var jobs = cards.map(function (c) {
+        var first = (c.dataset.gallery || '').split('|')[0];
+        return loadImg(first).then(function (im) { return { card: c, img: toJpeg(im, 1100) }; })
+                             .catch(function () { return { card: c, img: null }; });
+      });
+      return Promise.all(jobs).then(function (items) {
+        var doc = new JsPDF({ unit: 'pt', format: 'a4', compress: true });
+        var W = 595.28, H = 841.89, M = 48, CW = W - 2 * M;
+        var NIGHT = [12, 10, 16], PAPER = [255, 255, 255], INK = [20, 20, 22], INKSUB = [140, 138, 134],
+            LIGHT = [244, 240, 232], MUTE = [196, 190, 180], GOLD = [184, 145, 47];
+        var HF = 'helvetica', LG = 'times';
+        function ct(c) { doc.setTextColor.apply(doc, c); }
+        function bg(c) { doc.setFillColor.apply(doc, c); doc.rect(0, 0, W, H, 'F'); }
+        function tk(t, x, y, sz, c, o) {
+          o = o || {}; doc.setFont(HF, o.bold ? 'bold' : 'normal'); doc.setFontSize(sz); ct(c);
+          var s = o.upper === false ? String(t) : String(t).toUpperCase(), ls = o.ls == null ? 1.3 : o.ls;
+          if (o.align === 'right') x -= doc.getTextWidth(s) + Math.max(0, s.length - 1) * ls;
+          doc.text(s, x, y, { charSpace: ls });
+        }
+        function hair(x1, y, x2, c, w) { doc.setDrawColor.apply(doc, c); doc.setLineWidth(w || 0.8); doc.line(x1, y, x2, y); }
+        function logoBox(x, y, w, c) {
+          var h = w * 0.6, cx = x + w / 2;
+          doc.setDrawColor.apply(doc, c); doc.setLineWidth(0.9); doc.rect(x, y, w, h);
+          doc.setFont(LG, 'normal'); ct(c); doc.setFontSize(w * 0.285);
+          doc.text('YKS', cx, y + h * 0.5, { align: 'center', charSpace: 1 });
+          var py = y + h * 0.8, word = 'PRODUCTIONS', ws = 1.3;
+          doc.setFont(HF, 'normal'); doc.setFontSize(w * 0.064);
+          var tw = doc.getTextWidth(word) + (word.length - 1) * ws;
+          doc.text(word, cx, py, { align: 'center', charSpace: ws });
+          doc.setLineWidth(0.5);
+          var g = w * 0.05, dsh = w * 0.085;
+          doc.line(cx - tw / 2 - g - dsh, py - 2.5, cx - tw / 2 - g, py - 2.5);
+          doc.line(cx + tw / 2 + g, py - 2.5, cx + tw / 2 + g + dsh, py - 2.5);
+        }
+        function cover(im, x, y, bw, bh) {
+          var s = Math.max(bw / im.w, bh / im.h), w = im.w * s, h = im.h * s;
+          doc.saveGraphicsState(); doc.rect(x, y, bw, bh, null); doc.clip(); doc.discardPath();
+          doc.addImage(im.data, 'JPEG', x + (bw - w) / 2, y + (bh - h) / 2, w, h);
+          doc.restoreGraphicsState();
+        }
+        var today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        /* ── cover ── */
+        bg(NIGHT);
+        logoBox(M, 60, 118, LIGHT);
+        tk('CASTING SHORTLIST', M, 300, 9, GOLD, { bold: true, ls: 3 });
+        doc.setFont(HF, 'bold'); doc.setFontSize(44); ct(LIGHT);
+        doc.text(String(items.length), M, 372);
+        doc.setFontSize(30);
+        doc.text(items.length > 1 ? 'faces, shortlisted' : 'face, shortlisted', M, 410);
+        hair(M, 440, W - M, GOLD, 0.9);
+        tk(today, M, 466, 9, MUTE, { ls: 2 });
+        tk('PREPARED BY YKS PRODUCTIONS', M, 486, 9, MUTE, { ls: 2 });
+        doc.setFont(HF, 'normal'); doc.setFontSize(10.5); ct(MUTE);
+        doc.text(doc.splitTextToSize('Every face here is booked through YKS. Reply with the codes you want and I’ll confirm availability and come back with one all-in number.', CW * 0.72), M, H - 150, { lineHeightFactor: 1.5 });
+        tk('+91 97466 79720   ·   YKSPRODUCTIONS893@GMAIL.COM', M, H - 60, 8, GOLD, { ls: 1.4 });
+
+        /* ── one page per face ── */
+        items.forEach(function (it, i) {
+          var c = it.card, code = (c.dataset.code || '').toUpperCase();
+          doc.addPage(); bg(PAPER);
+          tk('CASTING SHORTLIST', M, 60, 8, INK, { bold: true, ls: 1.5 });
+          tk(String(i + 1).padStart(2, '0') + ' / ' + String(items.length).padStart(2, '0'), W - M, 60, 8, INK, { bold: true, ls: 1.5, align: 'right' });
+          hair(M, 72, W - M, INK, 1.1);
+          var iw = 268, ih = iw / 0.8, ix = W - M - iw, iy = 104;
+          if (it.img) cover(it.img, ix, iy, iw, ih);
+          doc.setFont(HF, 'bold'); doc.setFontSize(34); ct(INK); doc.text(code, M, 150);
+          tk((c.dataset.cat || 'talent') + '  ·  ' + (c.dataset.city || ''), M, 172, 9, INKSUB, { ls: 1.4 });
+          var y = 212;
+          tk('CASTABLE FOR', M, y, 9, INKSUB, { bold: true, ls: 2 }); y += 22;
+          doc.setFont(HF, 'normal'); doc.setFontSize(10); ct(INK);
+          doc.splitTextToSize((c.dataset.tags || '').replace(/\s*·\s*/g, ' · '), iw - 40).forEach(function (ln) { doc.text(ln, M, y); y += 15; });
+          y += 26;
+          var stats = (c.dataset.stats || '').split('|').filter(Boolean);
+          if (stats.length) {
+            tk('MEASUREMENTS', M, y, 9, INKSUB, { bold: true, ls: 2 }); y += 8;
+            stats.slice(0, 9).forEach(function (row) {
+              var p = row.split(':');
+              y += 22; hair(M, y - 15, M + 210, INK, 0.5);
+              tk(p[0] || '', M, y, 8, INKSUB, { ls: 1.2 });
+              doc.setFont(HF, 'bold'); doc.setFontSize(9.5); ct(INK);
+              doc.text((p[1] || '').trim(), M + 210, y, { align: 'right' });
+            });
+          }
+          tk('BOOK THIS FACE — QUOTE ' + code, M, H - 96, 9, GOLD, { bold: true, ls: 1.6 });
+          hair(M, H - 56, W - M, INK, 1.1);
+          tk('+91 97466 79720', M, H - 40, 7.5, INKSUB, { ls: 1.1 });
+          tk('YKSPRODUCTIONS893@GMAIL.COM', W - M, H - 40, 7.5, INKSUB, { ls: 1.1, align: 'right' });
+        });
+
+        doc.save('YKS-casting-shortlist.pdf');
+        return true;
+      });
+    });
+  };
 })();

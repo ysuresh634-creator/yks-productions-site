@@ -1700,7 +1700,16 @@ const FRAME_JS=`
   // friends were never editable. Target anything holding its own text instead,
   // and just exclude containers whose text is not page copy.
   var TEXT_SKIP='script,style,noscript,template,select,option,head,title,svg,iframe,canvas,audio,video';
-  var STYLE_SKIP='script,style,noscript,template,head,title,meta,link,br,hr,svg,canvas,iframe,audio,source,html,body';
+  // closest() matches ancestors too, so body/html must NOT go in the closest()
+  // set or every element (all inside body) would be skipped. Check own tag for
+  // those; use closest() only for genuine containers we never descend into.
+  var STYLE_SKIP_IN='script,style,noscript,template,head,svg,canvas,iframe,audio,video,source';
+  function styleSkip(el){
+    if(!el || el.nodeType!==1) return true;
+    var t=el.tagName;
+    if(t==='BODY'||t==='HTML'||t==='BR'||t==='HR'||t==='META'||t==='LINK'||t==='TITLE') return true;
+    return !!(el.closest && el.closest(STYLE_SKIP_IN));
+  }
   function rgbHex(c){
     var m=(c||'').match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/); if(!m) return '#000000';
     return '#'+[m[1],m[2],m[3]].map(function(x){return ('0'+(+x).toString(16)).slice(-2);}).join('');
@@ -1808,7 +1817,7 @@ const FRAME_JS=`
   document.addEventListener('mouseover',function(e){
     if(mode!=='style') return;
     var el=e.target;
-    if(!el || el.nodeType!==1 || (el.closest && el.closest(STYLE_SKIP))) return;
+    if(styleSkip(el)) return;
     var prev=document.querySelector('[data-yks-hover]'); if(prev) prev.removeAttribute('data-yks-hover');
     el.setAttribute('data-yks-hover','1');
   },true);
@@ -1822,8 +1831,7 @@ const FRAME_JS=`
 
     if(mode==='style'){
       var t=e.target;
-      if(t && t.closest && t.closest(STYLE_SKIP)) return;
-      if(!t || t===document.body || t===document.documentElement){ return; }
+      if(styleSkip(t)) return;
       parent.postMessage({yks:'pickStyle', id:t.getAttribute('data-yks-id'),
         tag:t.tagName.toLowerCase(), text:(t.textContent||'').trim().slice(0,40),
         computed:computedStyleOf(t)},'*');
