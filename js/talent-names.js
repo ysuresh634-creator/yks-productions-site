@@ -40,3 +40,18 @@
     });
   }
 })();
+
+/* ── profile gallery sets: one tap switches between Portfolio / Digitals / Client work ── */
+(function () {
+  var tabs = document.querySelectorAll('.pf-tab');
+  if (!tabs.length) return;
+  Array.prototype.forEach.call(tabs, function (tab) {
+    tab.addEventListener('click', function () {
+      var want = tab.dataset.set;
+      Array.prototype.forEach.call(tabs, function (t) { t.classList.toggle('on', t === tab); });
+      Array.prototype.forEach.call(document.querySelectorAll('.pf-gallery'), function (g) {
+        g.hidden = g.dataset.set !== want;
+      });
+    });
+  });
+})();

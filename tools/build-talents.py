@@ -96,11 +96,48 @@ def profile(t, plate):
         f'          <div class="pf-row"><dt>{e(k)}</dt><dd>{e(v)}</dd></div>'
         for k, v in (t.get('specs') or {}).items())
     cast = '\n'.join(f'            <li>{e(c)}</li>' for c in t.get('castableFor', []))
-    plates = '\n'.join(
-        f'      <figure class="pf-plate"><img src="{img(t, g["file"])}" alt="{cat} · {e(t["city"])} — {e(g["alt"])}" loading="lazy" />'
-        f'<figcaption><b>Plate {i+2:02d}</b><span>{e(g["label"])}</span></figcaption></figure>'
-        for i, g in enumerate(t.get('gallery', [])))
+    # Galleries are grouped into sets so a client can jump straight to what they need —
+    # the polished book, the plain digitals, or real client work. A talent's photos already
+    # carry a category on the apply form; `set` is where that lands. Everything is
+    # "Portfolio" unless told otherwise, and the tabs only appear once a second set exists.
+    SET_ORDER = ['Portfolio', 'Digitals', 'Client work']
+    def gset(g):
+        s = (g.get('set') or '').strip()
+        if s in SET_ORDER:
+            return s
+        low = s.lower()
+        if low in ('digital', 'digitals', 'snap', 'snaps', 'polaroid'):
+            return 'Digitals'
+        if low in ('client', 'client work', 'campaign', 'brand'):
+            return 'Client work'
+        return 'Portfolio'
+    groups = {}
+    for i, g in enumerate(t.get('gallery', [])):
+        groups.setdefault(gset(g), []).append((i, g))
+    sets = [k for k in SET_ORDER if groups.get(k)]
     ngal = len(t.get('gallery', []))
+
+    def plate_html(i, g):
+        return ('        <figure class="pf-plate"><img src="%s" alt="%s · %s — %s" loading="lazy" decoding="async" />'
+                '<figcaption><b>Plate %02d</b><span>%s</span></figcaption></figure>'
+                % (img(t, g['file']), cat, e(t['city']), e(g['alt']), i + 2, e(g['label'])))
+
+    tabs = ''
+    if len(sets) > 1:
+        tabs = ('      <div class="pf-tabs" role="tablist">\n' + '\n'.join(
+            '        <button type="button" class="pf-tab%s" data-set="%s" role="tab">%s <i>%d</i></button>'
+            % (' on' if n == 0 else '', e(k), e(k), len(groups[k]))
+            for n, k in enumerate(sets)) + '\n      </div>\n')
+    panels = '\n'.join(
+        '      <div class="pf-gallery" data-set="%s"%s>\n%s\n      </div>'
+        % (e(k), '' if n == 0 else ' hidden', '\n'.join(plate_html(i, g) for i, g in groups[k]))
+        for n, k in enumerate(sets))
+    plates = tabs + panels
+
+    # optional video introduction — rendered only when the roster entry has one
+    vid = (t.get('video') or '').strip()
+    video_html = ('          <a class="pf-intro" href="%s" target="_blank" rel="noopener">'
+                  '<span class="pf-intro-play" aria-hidden="true">&#9654;</span> Watch intro</a>\n' % e(vid)) if vid else ''
 
     return f'''<!DOCTYPE html>
 <html lang="en">
@@ -134,7 +171,7 @@ def profile(t, plate):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=15" />
-<link rel="stylesheet" href="/css/talents.css?v=6" />
+<link rel="stylesheet" href="/css/talents.css?v=53" />
 </head>
 <body data-wa="{wa}">
 
@@ -160,7 +197,7 @@ def profile(t, plate):
         <p class="tal-kicker">{cat} · {e(where)}</p>
         <h1 class="pf-name" data-tname="{t['code']}" data-nosnippet>{cat} {code}</h1>
         <p class="pf-disc">{e(' · '.join(t.get('tags', [])))}</p>
-        <div class="pf-cta">
+{video_html}        <div class="pf-cta">
           <a class="btn btn-fill" data-tbook="{t['code']}" href="https://wa.me/{wa}?text={msg}" target="_blank" rel="noopener">Enquire to book <span data-tfirst="{t['code']}">this talent</span> →</a>
         </div>
         <p class="pf-priv">Booked only through YKS — no direct contact is shared, and this profile is not published to search engines. I handle availability, rates and the shoot.</p>
@@ -198,9 +235,7 @@ def profile(t, plate):
       <h2>Selected work</h2>
       <span>Plates 02 – {ngal + 1:02d}</span>
     </div>
-    <div class="pf-gallery">
 {plates}
-    </div>
   </div>
 </section>
 
@@ -233,7 +268,7 @@ def profile(t, plate):
   </div>
 </footer>
 
-<script src="/js/talent-names.js?v=1"></script>
+<script src="/js/talent-names.js?v=2"></script>
 <script src="/js/landing.js?v=4"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=4"></script>
