@@ -1593,22 +1593,69 @@
     var NIGHT = [12, 10, 16], PAPER = [255, 255, 255], INK = [20, 20, 22], INKSUB = [140, 138, 134], LIGHT = [244, 240, 232], MUTE = [196, 190, 180], GOLD = [184, 145, 47], HFA = AC;
     var HF = 'helvetica', LG = 'times', hsPg = 1;
     function hbg(c) { doc.setFillColor.apply(doc, c); doc.rect(0, 0, W, H, 'F'); }
-    function htk(str, x, y, sz, c, o) { o = o || {}; doc.setFont(HF, o.bold ? 'bold' : 'normal'); doc.setFontSize(sz); ct(c); doc.text(o.upper === false ? String(str) : String(str).toUpperCase(), x, y, { align: o.align || 'left', charSpace: o.ls == null ? 1.3 : o.ls }); }
+    function hWidth(txt, ls) { return doc.getTextWidth(txt) + Math.max(0, txt.length - 1) * ls; }
+    function htk(str, x, y, sz, c, o) {
+      o = o || {}; doc.setFont(HF, o.bold ? 'bold' : 'normal'); doc.setFontSize(sz); ct(c);
+      var txt = o.upper === false ? String(str) : String(str).toUpperCase();
+      var ls = o.ls == null ? 1.3 : o.ls, align = o.align || 'left';
+      // jsPDF aligns on the UNSPACED width, so letter-spaced right/centre text spills past the margin.
+      // Measure it ourselves and draw from the left instead.
+      if (align !== 'left') {
+        var w = hWidth(txt, ls);
+        x = (align === 'right') ? x - w : x - w / 2;
+        align = 'left';
+      }
+      doc.text(txt, x, y, { align: align, charSpace: ls });
+    }
     function hhair(x1, y, x2, c, lw) { doc.setDrawColor.apply(doc, c); doc.setLineWidth(lw || 0.8); doc.line(x1, y, x2, y); }
     function hnp(c) { doc.addPage(); hsPg++; hbg(c); }
     function hlum(c) { return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; }
     function hnbleed(im, x, y, bw, bh) { if (im.fit) { doc.setFillColor.apply(doc, NIGHT); doc.rect(x, y, bw, bh, 'F'); var s = Math.min(bw / im.w, bh / im.h), w = im.w * s, h = im.h * s; doc.addImage(im.data, 'JPEG', x + (bw - w) / 2, y + (bh - h) / 2, w, h); } else coverFill(im, x, y, bw, bh); }
     function hlogoBox(x, y, w, c) { var h = w * 0.60, cx = x + w / 2; doc.setDrawColor.apply(doc, c); doc.setLineWidth(0.9); doc.rect(x, y, w, h); doc.setFont(LG, 'normal'); ct(c); doc.setFontSize(w * 0.285); doc.text('YKS', cx, y + h * 0.50, { align: 'center', charSpace: 1 }); var py = y + h * 0.80, word = 'PRODUCTIONS', ws = 1.3; doc.setFont(HF, 'normal'); doc.setFontSize(w * 0.064); var tw = doc.getTextWidth(word) + (word.length - 1) * ws; doc.text(word, cx, py, { align: 'center', charSpace: ws }); doc.setLineWidth(0.5); var gap = w * 0.05, dash = w * 0.085; doc.line(cx - tw / 2 - gap - dash, py - 2.5, cx - tw / 2 - gap, py - 2.5); doc.line(cx + tw / 2 + gap, py - 2.5, cx + tw / 2 + gap + dash, py - 2.5); }
-    function hRunHead(left, onDark) { var c = onDark ? LIGHT : INK; htk(left, M, 60, 8, c, { bold: true, ls: 1.5 }); htk(NM + '  /  ' + ('0' + hsPg).slice(-2), W - M, 60, 8, c, { bold: true, align: 'right', ls: 1.5 }); hhair(M, 72, W - M, onDark ? GOLD : INK, 1.1); }
+    // a very long name would run into the left-hand label, so the running head uses a short form
+    var NM_SHORT = (function () {
+      var parts = NM.split(/\s+/);
+      if (NM.length <= 26 || parts.length < 2) return NM.slice(0, 26);
+      var last = parts[parts.length - 1], first = parts[0];
+      var short = first + ' ' + last;
+      return short.length <= 26 ? short : (first.slice(0, 14) + ' ' + last.charAt(0));
+    })();
+    function hRunHead(left, onDark) {
+      var c = onDark ? LIGHT : INK;
+      htk(left, M, 60, 8, c, { bold: true, ls: 1.5 });
+      htk(NM_SHORT + '  /  ' + ('0' + hsPg).slice(-2), W - M, 60, 8, c, { bold: true, align: 'right', ls: 1.5 });
+      hhair(M, 72, W - M, onDark ? GOLD : INK, 1.1);
+    }
     function hPaperFoot() { hhair(M, H - 56, W - M, INK, 1.1); htk('+91 97466 79720', M, H - 40, 7.5, INKSUB, { ls: 1.1 }); htk('YKSPRODUCTIONS893@GMAIL.COM', W - M, H - 40, 7.5, INKSUB, { align: 'right', ls: 1.1 }); }
-    function hPlateFoot(cap) { hhair(M, H - 44, W - M, GOLD, 0.8); htk(cap, M, H - 28, 8, GOLD, { bold: true, ls: 1.5 }); htk(NM + '  /  ' + ('0' + hsPg).slice(-2), W - M, H - 28, 8, GOLD, { align: 'right', ls: 1.5 }); }
-    function hFit(str, f, wt, start, min, maxW) { var s = start; doc.setFont(f, wt); while (s > min) { doc.setFontSize(s); if (doc.getTextWidth(String(str).toUpperCase()) <= maxW) break; s -= 1; } return s; }
+    function hPlateFoot(cap) { hhair(M, H - 44, W - M, GOLD, 0.8); htk(cap, M, H - 28, 8, GOLD, { bold: true, ls: 1.5 }); htk(NM_SHORT + '  /  ' + ('0' + hsPg).slice(-2), W - M, H - 28, 8, GOLD, { align: 'right', ls: 1.5 }); }
+    function hFit(str, f, wt, start, min, maxW, ls) { var s = start, t = String(str).toUpperCase(); doc.setFont(f, wt); while (s > min) { doc.setFontSize(s); if (doc.getTextWidth(t) + Math.max(0, t.length - 1) * (ls || 0) <= maxW) break; s -= 1; } return s; }
     // the talent's own voice — this is THEIR portfolio, so it reads first person, never YKS describing them
     function hBio() { if (about) return about; var role = (cat === 'Actor' ? 'actor' : (/Influencer|Creator/i.test(cat) ? 'model and digital creator' : 'model')); var where = city ? ' based in ' + city : ''; return "I'm a " + role + where + ', working across ' + disc.toLowerCase() + ". I'm equally at home on a controlled studio call and on looser, content-led shoots — so I'm as castable for a lookbook as for a campaign built to live on a phone. I take direction quickly, I'm precise on the marks, and I can hold a look for as long as the frame needs."; }
-    function hsCover(hero) { hbg(NIGHT); var bandH = 166; hnbleed(hero, 0, 0, W, H - bandH); shade(0, 150, 0.2); hhair(M, H - bandH, W - M, GOLD, 0.9); hlogoBox(M, 44, 118, LIGHT); var by = H - bandH; htk(disc, M, by + 40, 8.5, GOLD, { bold: true, ls: 2 }); var parts = NM.split(' '), l1 = parts[0], l2 = parts.slice(1).join(' '); if (!l2) l1 = NM; var ns = hFit(l2 || l1, HF, 'bold', 40, 22, W * 0.55); doc.setFont(HF, 'bold'); doc.setFontSize(ns); ct(LIGHT); if (l2) { doc.text(l1, M, by + 82); doc.text(l2, M, by + 82 + ns * 0.9); } else doc.text(l1, M, by + 104); htk('TALENT PORTFOLIO', W - M, by + 62, 8.5, MUTE, { align: 'right', ls: 2 }); htk('EDITION 2026 / 01', W - M, by + 80, 8.5, MUTE, { align: 'right', ls: 2 }); htk('EXCLUSIVE · YKS', W - M, by + 98, 8.5, GOLD, { align: 'right', ls: 2 }); return l1; }
-    function hsProfile(figImg) { hnp(PAPER); hRunHead('YKS PRODUCTIONS — TALENT PORTFOLIO'); htk('PROFILE', M, 116, 9, INKSUB, { bold: true, ls: 2 }); doc.setFont(HF, 'bold'); doc.setFontSize(30); ct(INK); doc.text(NM, M, 150); var LCW = 250; doc.setFont(HF, 'normal'); doc.setFontSize(10.5); ct(INK); var bl = doc.splitTextToSize(hBio(), LCW).slice(0, 11); doc.text(bl, M, 190, { lineHeightFactor: 1.5 }); var ly = 190 + bl.length * 15.6 + 30; htk('CASTABLE FOR', M, ly, 9, INKSUB, { bold: true, ls: 2 }); ly += 24; var cx2 = M, cy2 = ly; doc.setFont(HF, 'normal'); doc.setFontSize(9.5); disc.split(' · ').forEach(function (t) { var tw = doc.getTextWidth(t) + 22; if (cx2 + tw > M + LCW) { cx2 = M; cy2 += 32; } doc.setDrawColor.apply(doc, HFA); doc.setLineWidth(0.9); doc.roundedRect(cx2, cy2 - 14, tw, 24, 3, 3, 'S'); ct(INK); doc.text(t, cx2 + 11, cy2 + 2); cx2 += tw + 8; }); var RW = 200, rx = W - M - RW, fy = 130, fig = figImg || imgs[1] || imgs[0]; if (fig) { place(fig, rx, fy, RW); var fby = fy + RW / 0.8; htk('FIG. 01 — ' + ((fig.cat || 'FULL LENGTH')), rx, fby + 22, 8, GOLD, { bold: true, ls: 1.5 }); hhair(rx, fby + 32, W - M, GOLD, 0.8); } var my = fy + RW / 0.8 + 70; htk('MEASUREMENTS', rx, my, 9, INKSUB, { bold: true, ls: 2 }); my += 6; STATS.slice(0, 9).forEach(function (r) { my += 22; hhair(rx, my - 15, W - M, INK, 0.5); htk(r[0], rx, my, 8, INKSUB, { ls: 1.2 }); doc.setFont(HF, 'bold'); doc.setFontSize(9.5); ct(INK); doc.text(r[1], W - M, my, { align: 'right' }); }); htk('REPRESENTED BY', M, H - 150, 9, INKSUB, { bold: true, ls: 2 }); hlogoBox(M, H - 138, 96, INK); htk('+91 97466 79720', M + 112, H - 116, 9, INK, { bold: true, ls: 0.5, upper: false }); htk('yksproductions893@gmail.com', M + 112, H - 100, 8.5, INKSUB, { ls: 0.5, upper: false }); hPaperFoot(); }
+    function hsCover(hero) { hbg(NIGHT); var bandH = 166; hnbleed(hero, 0, 0, W, H - bandH); shade(0, 150, 0.2); hhair(M, H - bandH, W - M, GOLD, 0.9); hlogoBox(M, 44, 118, LIGHT); var by = H - bandH;
+      // the edition block on the right is fixed-width, so the name must live in what is left of the band
+      var edW = 150, nameMaxW = W - M - edW - 26 - M;
+      var discLs = 2, discSize = hFit(disc, HF, 'bold', 8.5, 5.5, CW, discLs);
+      if (discSize < 7) { discLs = 1; discSize = hFit(disc, HF, 'bold', 8.5, 5.5, CW, discLs); }   // tighten spacing before shrinking further
+      htk(disc, M, by + 40, discSize, GOLD, { bold: true, ls: discLs });
+      var parts = NM.split(' '), l1 = parts[0], l2 = parts.slice(1).join(' '); if (!l2) l1 = NM;
+      var ns = hFit(l2 || l1, HF, 'bold', 40, 13, nameMaxW);   // low floor so even very long names fit
+      doc.setFont(HF, 'bold'); doc.setFontSize(ns); ct(LIGHT);
+      if (l2) { doc.text(l1, M, by + 78); doc.text(l2, M, by + 78 + ns * 1.06); } else doc.text(l1, M, by + 104); htk('TALENT PORTFOLIO', W - M, by + 62, 8.5, MUTE, { align: 'right', ls: 2 }); htk('EDITION 2026 / 01', W - M, by + 80, 8.5, MUTE, { align: 'right', ls: 2 }); htk('EXCLUSIVE · YKS', W - M, by + 98, 8.5, GOLD, { align: 'right', ls: 2 }); return l1; }
+    function hsProfile(figImg) { hnp(PAPER); hRunHead('YKS PRODUCTIONS — TALENT PORTFOLIO'); htk('PROFILE', M, 116, 9, INKSUB, { bold: true, ls: 2 }); var pns = hFit(NM, HF, 'bold', 30, 15, CW); doc.setFont(HF, 'bold'); doc.setFontSize(pns); ct(INK); doc.text(NM, M, 150); var LCW = 250; doc.setFont(HF, 'normal'); doc.setFontSize(10.5); ct(INK); var bl = doc.splitTextToSize(hBio(), LCW).slice(0, 11); doc.text(bl, M, 190, { lineHeightFactor: 1.5 }); var ly = 190 + bl.length * 15.6 + 30; htk('CASTABLE FOR', M, ly, 9, INKSUB, { bold: true, ls: 2 }); ly += 24; var cx2 = M, cy2 = ly; doc.setFont(HF, 'normal'); doc.setFontSize(9.5); disc.split(' · ').forEach(function (t) { var tw = doc.getTextWidth(t) + 22; if (cx2 + tw > M + LCW) { cx2 = M; cy2 += 32; } doc.setDrawColor.apply(doc, HFA); doc.setLineWidth(0.9); doc.roundedRect(cx2, cy2 - 14, tw, 24, 3, 3, 'S'); ct(INK); doc.text(t, cx2 + 11, cy2 + 2); cx2 += tw + 8; }); var RW = 200, rx = W - M - RW, fy = 130, fig = figImg || imgs[1] || imgs[0]; if (fig) { place(fig, rx, fy, RW); var fby = fy + RW / 0.8; htk('FIG. 01 — ' + ((fig.cat || 'FULL LENGTH')), rx, fby + 22, 8, GOLD, { bold: true, ls: 1.5 }); hhair(rx, fby + 32, W - M, GOLD, 0.8); } var my = fy + RW / 0.8 + 70; htk('MEASUREMENTS', rx, my, 9, INKSUB, { bold: true, ls: 2 }); my += 6; STATS.slice(0, 9).forEach(function (r) { my += 22; hhair(rx, my - 15, W - M, INK, 0.5); htk(r[0], rx, my, 8, INKSUB, { ls: 1.2 }); doc.setFont(HF, 'bold'); doc.setFontSize(9.5); ct(INK); doc.text(r[1], W - M, my, { align: 'right' }); }); htk('REPRESENTED BY', M, H - 150, 9, INKSUB, { bold: true, ls: 2 }); hlogoBox(M, H - 138, 96, INK); htk('+91 97466 79720', M + 112, H - 116, 9, INK, { bold: true, ls: 0.5, upper: false }); htk('yksproductions893@gmail.com', M + 112, H - 100, 8.5, INKSUB, { ls: 0.5, upper: false }); hPaperFoot(); }
     function hsPlate(im, cap) { hnp(NIGHT); hnbleed(im, 0, 0, W, H); shade(H - 90, 90, 0.34); hPlateFoot(cap); }
-    function hsSpread(a, b, section, capA, capB, statement) { hnp(PAPER); hRunHead(section); var g = 22, cw = (CW - g) / 2, yy = 100, ph = cw / 0.8; [a, b].forEach(function (im, k) { if (im) place(im, M + k * (cw + g), yy, cw); }); [a, b].forEach(function (im, k) { if (im) htk(k ? capB : capA, M + k * (cw + g), yy + ph + 22, 8, INKSUB, { ls: 1.3 }); }); if (statement) { hhair(M, H - 150, W - M, INK, 1.1); doc.setFont(HF, 'bold'); doc.setFontSize(25); ct(INK); var ds = disc.split(' · '), half = Math.ceil(ds.length / 2); doc.text(ds.slice(0, half).join(' · ').toUpperCase() + ' ·', M, H - 118); doc.text(ds.slice(half).join(' · ').toUpperCase(), M, H - 92); doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(INKSUB); doc.text(doc.splitTextToSize('Straight colour or a black-and-white conversion — no retouching. Full-resolution files, additional looks and video on request.', 190), W - M, H - 128, { align: 'right', lineHeightFactor: 1.4 }); htk('SELECTED WORK', W - M, H - 92, 8, INKSUB, { align: 'right', ls: 1.3 }); } hPaperFoot(); }
+    function hsSpread(a, b, section, capA, capB, statement) { hnp(PAPER); hRunHead(section); var g = 22, cw = (CW - g) / 2, yy = 100, ph = cw / 0.8; [a, b].forEach(function (im, k) { if (im) place(im, M + k * (cw + g), yy, cw); }); [a, b].forEach(function (im, k) { if (im) htk(k ? capB : capA, M + k * (cw + g), yy + ph + 22, 8, INKSUB, { ls: 1.3 }); }); if (statement) {
+        hhair(M, H - 150, W - M, INK, 1.1);
+        // the statement gets its own column so it can never run into the note on the right
+        var noteW = 186, gap2 = 22, stW = CW - noteW - gap2;
+        var ds = disc.split(' · ').map(function (x) { return x.toUpperCase(); });
+        var l1s = ds.slice(0, Math.ceil(ds.length / 2)).join(' · ') + ' ·', l2s = ds.slice(Math.ceil(ds.length / 2)).join(' · ');
+        var ss = hFit(l1s.length > l2s.length ? l1s : l2s, HF, 'bold', 25, 11, stW);
+        doc.setFont(HF, 'bold'); doc.setFontSize(ss); ct(INK);
+        doc.text(l1s, M, H - 122); doc.text(l2s, M, H - 122 + ss * 1.12);
+        doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(INKSUB);
+        doc.text(doc.splitTextToSize('Straight colour or a black-and-white conversion — no retouching. Full-resolution files, additional looks and video on request.', noteW), W - M, H - 128, { align: 'right', lineHeightFactor: 1.4 });
+        htk('SELECTED WORK', W - M, H - 88, 8, INKSUB, { align: 'right', ls: 1.3 });
+      } hPaperFoot(); }
     function hsCenter(im, cap) { hnp(PAPER); hRunHead('PLATE — ' + ((im.cat || 'SELECTED'))); var w = 336, x = (W - w) / 2, y = 118; place(im, x, y, w); htk(cap, W / 2, y + w / 0.8 + 26, 8, GOLD, { bold: true, ls: 1.5, align: 'center' }); hhair(W / 2 - 40, y + w / 0.8 + 36, W / 2 + 40, GOLD, 0.8); hPaperFoot(); }
     /* comp-card back — the agency standard: 2×2 of range + a measurements band */
     function hsCompBack() {
@@ -1663,7 +1710,7 @@
       shade(H - 74, 74, 0.42);
       hPlateFoot(cap || 'DIPTYCH');
     }
-    function hsClosing(firstName) { hnp(HFA); var onA = hlum(HFA) > 0.62 ? INK : [255, 255, 255], onAsub = hlum(HFA) > 0.62 ? [80, 70, 60] : [255, 255, 255]; htk('BOOKING', M, 60, 8, onA, { bold: true, ls: 1.6 }); htk(NM + '  /  ' + ('0' + hsPg).slice(-2), W - M, 60, 8, onA, { bold: true, align: 'right', ls: 1.6 }); hhair(M, 72, W - M, onA, 1.1); doc.setFont(HF, 'bold'); doc.setFontSize(58); ct(onA); doc.text('BOOK', M, 400); doc.text(firstName, M, 460); htk('PHONE', M, 512, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('+91 97466 79720', M + 110, 512); htk('EMAIL', M, 540, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('yksproductions893@gmail.com', M + 110, 540, { charSpace: 0 }); hhair(M, H - 96, W - M, onA, 1.1); doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(onA); doc.text(doc.splitTextToSize('Represented exclusively by YKS Productions. Rates, availability and full-resolution files on request.', 320), M, H - 76, { lineHeightFactor: 1.4 }); hlogoBox(W - M - 100, H - 108, 100, onA); }
+    function hsClosing(firstName) { hnp(HFA); var onA = hlum(HFA) > 0.62 ? INK : [255, 255, 255], onAsub = hlum(HFA) > 0.62 ? [80, 70, 60] : [255, 255, 255]; htk('BOOKING', M, 60, 8, onA, { bold: true, ls: 1.6 }); htk(NM_SHORT + '  /  ' + ('0' + hsPg).slice(-2), W - M, 60, 8, onA, { bold: true, align: 'right', ls: 1.6 }); hhair(M, 72, W - M, onA, 1.1); var cs2 = hFit(firstName, HF, 'bold', 58, 18, CW); doc.setFont(HF, 'bold'); doc.setFontSize(cs2); ct(onA); doc.text('BOOK', M, 400); doc.text(firstName, M, 400 + cs2 * 1.08); htk('PHONE', M, 512, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('+91 97466 79720', M + 110, 512); htk('EMAIL', M, 540, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('yksproductions893@gmail.com', M + 110, 540, { charSpace: 0 }); hhair(M, H - 96, W - M, onA, 1.1); doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(onA); doc.text(doc.splitTextToSize('Represented exclusively by YKS Productions. Rates, availability and full-resolution files on request.', 320), M, H - 76, { lineHeightFactor: 1.4 }); hlogoBox(W - M - 100, H - 108, 100, onA); }
 
     /* ── TEMPLATE: Lookbook (fashion, photo-forward — full-bleed plates) ── */
     function tplLookbook() { var fn = hsCover(imgs[0]); var n = 1; imgs.slice(1, 8).forEach(function (im) { hsPlate(im, 'LOOK ' + ('0' + (n++)).slice(-2) + ' — ' + ((im.cat || 'EDITORIAL'))); }); hsProfile(); hsClosing(fn); }
