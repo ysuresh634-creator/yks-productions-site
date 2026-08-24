@@ -1,9 +1,17 @@
 /* ═══════════════════════════════════════════════════════════════
-   YKS SITE SEARCH
+   YKS SITE SEARCH  ·  retrieval + grounded AI answers
+   ───────────────────────────────────────────────────────────────
    Self-contained: injects its own trigger, overlay and styles, so it
    drops onto both page shells (.nav on the homepage, .l-nav on the
    ~70 landing pages) without touching either stylesheet.
-   The index (search-index.json) is fetched lazily on first open.
+
+   Two layers:
+     1. INSTANT — local scoring over search-index.json. Typo-tolerant,
+        synonym-aware, grouped by section. Runs on every keystroke.
+     2. ANSWER  — the question plus the top-scoring pages go to the Iris
+        worker, which answers grounded in those pages and cites them.
+        The worker caps 30 messages/IP/day, so this NEVER fires on a
+        keystroke: it needs Enter or a click, and answers are cached.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -11,8 +19,11 @@
   window.__yksSearch = true;
 
   var INDEX_URL = '/search-index.json';
-  var index = null, loading = null;
-  var results = [], active = -1, rows = [], lastQuery = '';
+  var RECENT_KEY = 'yksRecent';
+  var index = null, vocab = null, loading = null;
+  var results = [], rows = [], active = -1, lastQuery = '', corrected = '';
+  var answers = {};        // question -> {text, cites} for this tab
+  var pending = false;
 
   /* ---------- styles ---------- */
   var css = document.createElement('style');
@@ -30,44 +41,70 @@
     'background:rgba(6,5,10,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);',
     'opacity:0;transition:opacity .22s ease}',
     '.yks-sov.on{display:block}.yks-sov.in{opacity:1}',
-    '.yks-sbox{max-width:660px;margin:0 auto;background:#100d16;border:1px solid rgba(244,237,226,.14);',
+    '.yks-sbox{max-width:680px;margin:0 auto;background:#100d16;border:1px solid rgba(244,237,226,.14);',
     'border-radius:18px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.6);',
     'transform:translateY(-10px);transition:transform .22s ease}',
     '.yks-sov.in .yks-sbox{transform:none}',
     '.yks-sfield{display:flex;align-items:center;gap:12px;padding:16px 18px;',
     'border-bottom:1px solid rgba(244,237,226,.10)}',
-    '.yks-sfield svg{width:17px;height:17px;flex:none;opacity:.5;color:#f4ede2}',
+    '.yks-sfield>svg{width:17px;height:17px;flex:none;opacity:.5;color:#f4ede2}',
     '.yks-sin{flex:1;background:none;border:0;outline:0;color:#f4ede2;font-size:16px;',
-    "font-family:'Inter',system-ui,sans-serif}",
+    "font-family:'Inter',system-ui,sans-serif;min-width:0}",
     '.yks-sin::placeholder{color:rgba(244,237,226,.42)}',
     '.yks-sesc{background:none;border:1px solid rgba(244,237,226,.22);color:rgba(244,237,226,.6);',
-    'border-radius:6px;font-size:10px;letter-spacing:.1em;padding:4px 8px;cursor:pointer}',
+    'border-radius:6px;font-size:10px;letter-spacing:.1em;padding:4px 8px;cursor:pointer;flex:none}',
     '.yks-sesc:hover{color:#f4ede2;border-color:rgba(244,237,226,.5)}',
-    '.yks-slist{max-height:min(58vh,460px);overflow-y:auto;overscroll-behavior:contain}',
+    '.yks-slist{max-height:min(60vh,500px);overflow-y:auto;overscroll-behavior:contain}',
     '.yks-sgrp{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,237,226,.38);',
     'padding:14px 18px 6px}',
     '.yks-sr{display:block;padding:11px 18px;text-decoration:none;border-left:2px solid transparent}',
     '.yks-sr b{display:block;color:#f4ede2;font-size:14.5px;font-weight:500;line-height:1.35}',
     '.yks-sr s{display:block;color:rgba(244,237,226,.52);font-size:12.5px;text-decoration:none;',
     'line-height:1.45;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
-    '.yks-sr mark{background:none;color:#ff8c3b}',
+    '.yks-sr mark,.yks-sfix mark{background:none;color:#ff8c3b}',
     '.yks-sr.on,.yks-sr:hover{background:rgba(255,140,59,.10);border-left-color:#ff8c3b}',
-    '.yks-smsg{padding:26px 18px;color:rgba(244,237,226,.5);font-size:13.5px;text-align:center}',
+    '.yks-smsg{padding:24px 18px;color:rgba(244,237,226,.5);font-size:13.5px;text-align:center;line-height:1.6}',
+    '.yks-sfix{padding:9px 18px;font-size:12.5px;color:rgba(244,237,226,.55)}',
+    '.yks-sfix button{background:none;border:0;color:#ff8c3b;cursor:pointer;font:inherit;padding:0}',
+
+    /* ask row */
     '.yks-sai{display:flex;align-items:center;gap:11px;width:100%;text-align:left;cursor:pointer;',
     'background:none;border:0;border-left:2px solid transparent;padding:12px 18px;font:inherit}',
     '.yks-sai:hover,.yks-sai.on{background:rgba(255,140,59,.10);border-left-color:#ff8c3b}',
-    '.yks-sai u{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;',
-    'text-decoration:none;background:linear-gradient(135deg,#ff8c3b,#ff2f87);color:#0b0910;',
-    'font-size:11px;font-weight:700;font-style:normal}',
+    '.yks-sai u,.yks-ans-h u{flex:none;width:26px;height:26px;border-radius:50%;display:grid;',
+    'place-items:center;text-decoration:none;background:linear-gradient(135deg,#ff8c3b,#ff2f87);',
+    'color:#0b0910;font-size:11px;font-weight:700;font-style:normal}',
     '.yks-sai div{min-width:0}',
     '.yks-sai b{display:block;color:#f4ede2;font-size:14px;font-weight:500;line-height:1.35;',
     'overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
     '.yks-sai s{display:block;color:rgba(244,237,226,.5);font-size:12px;text-decoration:none;margin-top:1px}',
+
+    /* answer card */
+    '.yks-ans{margin:4px 14px 12px;padding:14px 16px;border-radius:14px;',
+    'background:rgba(255,140,59,.055);border:1px solid rgba(255,140,59,.20)}',
+    '.yks-ans-h{display:flex;align-items:center;gap:9px;margin-bottom:9px}',
+    '.yks-ans-h b{color:#f4ede2;font-size:12px;letter-spacing:.13em;text-transform:uppercase;font-weight:500}',
+    '.yks-ans-t{color:rgba(244,237,226,.90);font-size:14px;line-height:1.62;white-space:pre-wrap;',
+    'word-wrap:break-word}',
+    '.yks-ans-t a{color:#ff8c3b}',
+    '.yks-cites{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}',
+    '.yks-cites a{display:inline-block;padding:5px 11px;border-radius:30px;font-size:11.5px;',
+    'text-decoration:none;color:rgba(244,237,226,.82);border:1px solid rgba(244,237,226,.20)}',
+    '.yks-cites a:hover{border-color:#ff8c3b;color:#ff8c3b}',
+    '.yks-more{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}',
+    '.yks-more button{background:none;border:1px solid rgba(255,140,59,.35);color:#ff8c3b;',
+    'border-radius:30px;padding:5px 11px;font:inherit;font-size:11.5px;cursor:pointer}',
+    '.yks-more button:hover{background:rgba(255,140,59,.12)}',
+    '.yks-dots span{display:inline-block;width:5px;height:5px;margin-right:4px;border-radius:50%;',
+    'background:#ff8c3b;animation:yksb 1s infinite}',
+    '.yks-dots span:nth-child(2){animation-delay:.15s}.yks-dots span:nth-child(3){animation-delay:.3s}',
+    '@keyframes yksb{0%,60%,100%{opacity:.25}30%{opacity:1}}',
+
     '.yks-sfoot{display:flex;gap:16px;padding:10px 18px;border-top:1px solid rgba(244,237,226,.10);',
     'font-size:10px;letter-spacing:.1em;color:rgba(244,237,226,.35)}',
     '@media(max-width:640px){.yks-sov{padding:0}.yks-sbox{border-radius:0;max-width:none;height:100%;',
     'display:flex;flex-direction:column}.yks-slist{max-height:none;flex:1}.yks-sfoot{display:none}}',
-    '@media(prefers-reduced-motion:reduce){.yks-sov,.yks-sbox{transition:none}}'
+    '@media(prefers-reduced-motion:reduce){.yks-sov,.yks-sbox{transition:none}.yks-dots span{animation:none}}'
   ].join('');
   document.head.appendChild(css);
 
@@ -84,12 +121,11 @@
     '<div class="yks-sbox">' +
       '<div class="yks-sfield">' + ICON +
         '<input class="yks-sin" type="search" autocomplete="off" autocorrect="off" ' +
-        'spellcheck="false" placeholder="Search — try &quot;Dubai real estate&quot;, &quot;models in Mumbai&quot;, &quot;pricing&quot;" ' +
-        'aria-label="Search this site" />' +
+        'spellcheck="false" placeholder="Search or ask anything…" aria-label="Search this site" />' +
         '<button class="yks-sesc" type="button">ESC</button>' +
       '</div>' +
       '<div class="yks-slist" role="listbox"></div>' +
-      '<div class="yks-sfoot"><span>↑↓ to move</span><span>↵ to open</span><span>esc to close</span></div>' +
+      '<div class="yks-sfoot"><span>↑↓ move</span><span>↵ open</span><span>esc close</span></div>' +
     '</div>';
 
   var input, list, lastFocus = null;
@@ -115,16 +151,23 @@
           e._h = (e.t + ' ' + e.d + ' ' + e.k + ' ' + e.u).toLowerCase();
           return e;
         });
+        // vocabulary powers typo correction
+        var seen = {};
+        index.forEach(function (e) {
+          (e.t + ' ' + e.k).toLowerCase().split(/[^a-z0-9]+/).forEach(function (w) {
+            if (w.length > 3) seen[w] = 1;
+          });
+        });
+        vocab = Object.keys(seen);
         return index;
       })
       .catch(function () { loading = null; index = null; return null; });
     return loading;
   }
 
-  /* ---------- synonyms ----------
-     Visitors search their own vocabulary, not the site's. Nobody writes
-     "pricing" here — the pages say quote, cost, rate — so map the common
-     asks onto the words that actually exist. */
+  /* ---------- vocabulary: synonyms + stopwords ----------
+     Visitors search their own words, not the site's. Nobody writes
+     "pricing" here — the pages say quote, cost, rate. */
   var SYN = {
     pricing: ['price', 'cost', 'rate', 'quote', 'budget', 'charge', 'fee'],
     price: ['pricing', 'cost', 'rate', 'quote', 'budget', 'charge', 'fee'],
@@ -138,7 +181,7 @@
     charges: ['charge', 'price', 'cost', 'quote'],
     budget: ['price', 'cost', 'quote'],
     quote: ['price', 'cost', 'pricing'],
-    contact: ['quote', 'book', 'enquire', 'hire', 'get in touch'],
+    contact: ['quote', 'book', 'enquire', 'hire'],
     hire: ['book', 'quote', 'booking'],
     book: ['booking', 'quote', 'hire'],
     booking: ['book', 'quote', 'hire'],
@@ -166,71 +209,6 @@
     ads: ['campaign', 'brand', 'commercial']
   };
 
-  /* ---------- scoring ---------- */
-  function hit(e, t, w) {
-    if (e._h.indexOf(w) === -1) return 0;
-    var s = 1;
-    if (t.indexOf(w) !== -1) s += 10;              // title hit
-    if (t.split(/\W+/).indexOf(w) !== -1) s += 8;  // whole word in title
-    if (t.indexOf(w) === 0) s += 6;                // title starts with it
-    if (e.k.toLowerCase().indexOf(w) !== -1) s += 4;
-    if (e.d.toLowerCase().indexOf(w) !== -1) s += 2;
-    if (e.u.toLowerCase().indexOf(w) !== -1) s += 3;
-    return s;
-  }
-
-  function score(e, terms) {
-    var t = e.t.toLowerCase(), total = 0;
-    for (var i = 0; i < terms.length; i++) {
-      var w = terms[i];
-      var best = hit(e, t, w);
-      if (!best) {                                  // fall back to synonyms
-        var alts = SYN[w] || [];
-        for (var j = 0; j < alts.length; j++) {
-          var s = hit(e, t, alts[j]) * 0.45;        // never outranks a literal match
-          if (s > best) best = s;
-        }
-      }
-      if (!best) return 0;                          // every term must land somehow
-      total += best;
-    }
-    if (e.c === 'Home') total += 3;
-    if (e.c === 'Work') total += 2;
-    return total;
-  }
-
-  function esc(s) {
-    return s.replace(/[&<>"]/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
-    });
-  }
-
-  function hl(s, terms) {
-    var out = esc(s);
-    terms.forEach(function (w) {
-      if (!w) return;
-      out = out.replace(new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'),
-        '<mark>$1</mark>');
-    });
-    return out;
-  }
-
-  /* ---------- AI hand-off ----------
-     Iris (js/chat.js) is already on every page and already carries the
-     anti-fabrication guards, so search doesn't add a second assistant —
-     it just hands the question over. */
-  function aiReady() { return !!(window.yksIris && window.YKS_CHAT_ENDPOINT); }
-
-  // a real question deserves an answer, not a list of pages
-  function isQuestion(q) {
-    return /\?$/.test(q) ||
-      /^(who|what|when|where|why|how|can|do|does|is|are|will|would|should|could|any|whats|what's)\b/i.test(q) ||
-      q.split(/\s+/).length >= 5;
-  }
-
-  /* Natural questions carry filler that matches no page. Drop it before
-     scoring, so "do you shoot weddings in dubai?" still surfaces the
-     wedding pages under the Ask row instead of returning nothing. */
   var STOP = ('a an the do does did you your i me my we our is are was be been am can could will '
     + 'would should shall may might have has had of for to in on at by with from as and or but if '
     + 'it its this that these those there here what when where how why who whom which any some '
@@ -239,82 +217,300 @@
   ).split(' ');
 
   function terms(q) {
-    var raw = q.toLowerCase().replace(/[?!.,;:]/g, ' ').split(/\s+/).filter(Boolean);
+    var raw = q.toLowerCase().replace(/[?!.,;:'"]/g, ' ').split(/\s+/).filter(Boolean);
     var kept = raw.filter(function (w) { return STOP.indexOf(w) === -1; });
-    return kept.length ? kept : raw;   // an all-filler query still gets to try
+    return kept.length ? kept : raw;
   }
 
-  function aiRow(q, i) {
-    return '<button class="yks-sai" type="button" data-ai="1" data-i="' + i + '">' +
-      '<u>✦</u><div><b>Ask Iris — “' + esc(q) + '”</b>' +
-      '<s>Get a straight answer about gear, pricing, availability or a shoot</s></div></button>';
+  /* ---------- typo tolerance ----------
+     Only runs for a term that matched nothing, so the common path stays free. */
+  function edits1(a, b) {
+    if (Math.abs(a.length - b.length) > 1) return false;
+    var i = 0, j = 0, diff = 0;
+    while (i < a.length && j < b.length) {
+      if (a[i] === b[j]) { i++; j++; continue; }
+      if (++diff > 1) return false;
+      if (a.length > b.length) i++;
+      else if (a.length < b.length) j++;
+      else { i++; j++; }
+    }
+    return diff + (a.length - i) + (b.length - j) <= 1;
   }
 
-  function fireAI(q) {
-    close();
-    setTimeout(function () { window.yksIris.ask(q); }, 220);
+  function fix(w) {
+    if (!vocab || w.length < 4) return null;
+    var best = null;
+    for (var i = 0; i < vocab.length; i++) {
+      var v = vocab[i];
+      if (Math.abs(v.length - w.length) > 1) continue;
+      if (v[0] !== w[0]) continue;                 // typos rarely hit the first letter
+      if (edits1(w, v)) { best = v; break; }
+    }
+    return best;
+  }
+
+  /* ---------- scoring ---------- */
+  function hit(e, t, w) {
+    if (e._h.indexOf(w) === -1) return 0;
+    var s = 1;
+    if (t.indexOf(w) !== -1) s += 10;
+    if (t.split(/\W+/).indexOf(w) !== -1) s += 8;
+    if (t.indexOf(w) === 0) s += 6;
+    if (e.k.toLowerCase().indexOf(w) !== -1) s += 4;
+    if (e.d.toLowerCase().indexOf(w) !== -1) s += 2;
+    if (e.u.toLowerCase().indexOf(w) !== -1) s += 3;
+    return s;
+  }
+
+  function score(e, t) {
+    var title = e.t.toLowerCase(), total = 0;
+    for (var i = 0; i < t.length; i++) {
+      var w = t[i], best = hit(e, title, w);
+      if (!best) {
+        var alts = SYN[w] || [];
+        for (var j = 0; j < alts.length; j++) {
+          var s = hit(e, title, alts[j]) * 0.45;   // synonyms never outrank a literal hit
+          if (s > best) best = s;
+        }
+      }
+      if (!best) return 0;
+      total += best;
+    }
+    if (e.c === 'Home') total += 3;
+    if (e.c === 'Work') total += 2;
+    return total;
+  }
+
+  function rank(t) {
+    return index.map(function (e) { return { e: e, s: score(e, t) }; })
+      .filter(function (r) { return r.s > 0; })
+      .sort(function (a, b) { return b.s - a.s; })
+      .map(function (r) { return r.e; });
+  }
+
+  /* ---------- html helpers ---------- */
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  function hl(s, t) {
+    var out = esc(s);
+    t.forEach(function (w) {
+      if (!w) return;
+      out = out.replace(new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>');
+    });
+    return out;
+  }
+
+  // the worker replies in light markdown
+  function md(s) {
+    return esc(s)
+      .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  }
+
+  /* ---------- recent searches ---------- */
+  function recent(add) {
+    var r = [];
+    try { r = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch (e) {}
+    if (add) {
+      r = r.filter(function (x) { return x !== add; });
+      r.unshift(add);
+      r = r.slice(0, 6);
+      try { localStorage.setItem(RECENT_KEY, JSON.stringify(r)); } catch (e) {}
+    }
+    return r;
+  }
+
+  /* ---------- AI ---------- */
+  function aiReady() { return !!window.YKS_CHAT_ENDPOINT; }
+
+  function isQuestion(q) {
+    return /\?$/.test(q) ||
+      /^(who|what|when|where|why|how|can|do|does|is|are|will|would|should|could|any|whats|what's)\b/i.test(q) ||
+      q.split(/\s+/).length >= 5;
+  }
+
+  /* The worker holds Iris's system prompt and her anti-fabrication guards —
+     search doesn't add a second brain, it just gives her the pages that
+     match so the answer is grounded and can cite them. */
+  function askAI(q) {
+    if (pending) return;
+    var key = q.toLowerCase().trim();
+    if (answers[key]) { render(input.value); return; }   // cached — costs no quota
+
+    var cites = rank(terms(q)).slice(0, 5);
+    pending = true;
+    render(input.value);
+
+    var ctxLines = cites.map(function (e, i) {
+      return (i + 1) + '. ' + e.t + ' — ' + e.u + (e.d ? ' — ' + e.d : '');
+    }).join('\n');
+
+    var msg = q + (ctxLines
+      ? '\n\n---\nPages on yksproductions.com that may be relevant:\n' + ctxLines +
+        '\nAnswer from these and what you know about Yedukrishna. If they do not cover it, say so plainly rather than guessing.'
+      : '');
+
+    fetch(window.YKS_CHAT_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: msg }],
+        ctx: {
+          page: (document.title || '').slice(0, 120),
+          path: location.pathname,
+          lang: navigator.language || ''
+        }
+      })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        answers[key] = {
+          text: (j && j.reply) || 'That one did not reach me. Try again, or message Yedukrishna directly.',
+          cites: cites
+        };
+      })
+      .catch(function () {
+        answers[key] = { text: '__ERR__', cites: cites };
+      })
+      .then(function () { pending = false; render(input.value); });
+  }
+
+  function followUps(q) {
+    var l = q.toLowerCase(), out = [];
+    if (!/cost|price|quote|much/.test(l)) out.push('What would this cost?');
+    if (!/dubai|india|bangalore/.test(l)) out.push('Do you shoot in Dubai?');
+    if (!/available|date|when/.test(l)) out.push('Are you available in 2026?');
+    return out.slice(0, 3);
   }
 
   /* ---------- render ---------- */
-  function run(q) {
+  function aiRow(q, i) {
+    return '<button class="yks-sai" type="button" data-ai="1" data-i="' + i + '">' +
+      '<u>✦</u><div><b>Ask Iris — “' + esc(q) + '”</b>' +
+      '<s>A grounded answer, with the pages it came from</s></div></button>';
+  }
+
+  function answerCard(q) {
+    var a = answers[q.toLowerCase().trim()];
+    if (pending && !a) {
+      return '<div class="yks-ans"><div class="yks-ans-h"><u>✦</u><b>Iris</b></div>' +
+        '<div class="yks-ans-t yks-dots"><span></span><span></span><span></span></div></div>';
+    }
+    if (!a) return '';
+    if (a.text === '__ERR__') {
+      return '<div class="yks-ans"><div class="yks-ans-h"><u>✦</u><b>Iris</b></div>' +
+        '<div class="yks-ans-t">I can’t reach my brain right now — but the pages below should cover it, ' +
+        'or message Yedukrishna on <a href="https://wa.me/971501955122" target="_blank" rel="noopener">WhatsApp</a>.' +
+        '</div></div>';
+    }
+    var h = '<div class="yks-ans"><div class="yks-ans-h"><u>✦</u><b>Iris</b></div>' +
+      '<div class="yks-ans-t">' + md(a.text) + '</div>';
+    if (a.cites.length) {
+      h += '<div class="yks-cites">' + a.cites.slice(0, 4).map(function (e) {
+        return '<a href="' + esc(e.u) + '">' + esc(e.t.split('|')[0].split('—')[0].trim()) + '</a>';
+      }).join('') + '</div>';
+    }
+    var fu = followUps(q);
+    if (fu.length) {
+      h += '<div class="yks-more">' + fu.map(function (s) {
+        return '<button type="button" data-fu="' + esc(s) + '">' + esc(s) + '</button>';
+      }).join('') + '</div>';
+    }
+    return h + '</div>';
+  }
+
+  function render(q) {
     q = (q || '').trim();
+    corrected = '';
+
     if (!q) {
       results = []; rows = []; active = -1; lastQuery = '';
-      list.innerHTML = '<div class="yks-smsg">Search the whole site — work, cities, services, journal.' +
-        (aiReady() ? '<br>Or ask a full question and Iris will answer it.' : '') + '</div>';
+      var r = recent();
+      var htm = r.length
+        ? '<div class="yks-sgrp">Recent</div>' + r.map(function (s, i) {
+            return '<a class="yks-sr" data-i="' + i + '" data-recent="' + esc(s) + '" href="#">' +
+              '<b>' + esc(s) + '</b></a>';
+          }).join('')
+        : '<div class="yks-smsg">Search the whole site — work, cities, services, journal.' +
+          (aiReady() ? '<br>Or ask a real question and Iris answers it.' : '') + '</div>';
+      list.innerHTML = htm;
+      bind(q);
       return;
     }
+
     if (!index) { list.innerHTML = '<div class="yks-smsg">Loading…</div>'; return; }
 
     var t = terms(q);
-    results = index.map(function (e) { return { e: e, s: score(e, t) }; })
-      .filter(function (r) { return r.s > 0; })
-      .sort(function (a, b) { return b.s - a.s; })
-      .slice(0, 24)
-      .map(function (r) { return r.e; });
+    results = rank(t);
+
+    // nothing matched — try correcting each term once
+    if (!results.length) {
+      var fixed = t.map(function (w) { return fix(w) || w; });
+      if (fixed.join(' ') !== t.join(' ')) {
+        var alt = rank(fixed);
+        if (alt.length) { results = alt; corrected = fixed.join(' '); t = fixed; }
+      }
+    }
+    results = results.slice(0, 24);
 
     var ai = aiReady();
-    // question-shaped, or nothing matched → AI leads; otherwise it tails the list
-    var aiFirst = ai && (isQuestion(q) || !results.length);
-    var htm = '';
+    var key = q.toLowerCase().trim();
+    var hasAnswer = !!answers[key] || pending;
+    var aiFirst = ai && (isQuestion(q) || !results.length || hasAnswer);
+    var out = '', i = 0;
 
-    if (!results.length && !ai) {
-      list.innerHTML = '<div class="yks-smsg">Nothing for “' + esc(q) + '”.<br>' +
-        'Try a city, a service, or a kind of shoot.</div>';
-      return;
-    }
+    if (hasAnswer) out += '<div class="yks-sgrp">Answer</div>' + answerCard(q);
+    else if (aiFirst) out += '<div class="yks-sgrp">Ask</div>' + aiRow(q, i++);
 
-    if (aiFirst) {
-      htm += '<div class="yks-sgrp">Ask</div>' + aiRow(q, 0);
+    if (corrected) {
+      out += '<div class="yks-sfix">Showing results for <b>' + esc(corrected) + '</b> — ' +
+        '<button type="button" data-exact="1">search ' + esc(q) + ' instead</button></div>';
     }
 
     var group = '';
-    results.forEach(function (e, n) {
-      var i = n + (aiFirst ? 1 : 0);
-      if (e.c !== group) { group = e.c; htm += '<div class="yks-sgrp">' + esc(group) + '</div>'; }
-      htm += '<a class="yks-sr" role="option" data-i="' + i + '" href="' + esc(e.u) + '">' +
+    results.forEach(function (e) {
+      if (e.c !== group) { group = e.c; out += '<div class="yks-sgrp">' + esc(group) + '</div>'; }
+      out += '<a class="yks-sr" role="option" data-i="' + (i++) + '" href="' + esc(e.u) + '">' +
         '<b>' + hl(e.t, t) + '</b><s>' + hl(e.d || e.k, t) + '</s></a>';
     });
 
-    if (ai && !aiFirst) {
-      htm += '<div class="yks-sgrp">Ask</div>' + aiRow(q, results.length);
-    }
-    if (!results.length && ai) {
-      htm += '<div class="yks-smsg">No page matches “' + esc(q) + '” — Iris can still answer.</div>';
+    if (ai && !aiFirst) out += '<div class="yks-sgrp">Ask</div>' + aiRow(q, i++);
+    if (!results.length && !hasAnswer) {
+      out += '<div class="yks-smsg">No page matches “' + esc(q) + '”' +
+        (ai ? ' — Iris can still answer.' : '.') + '</div>';
     }
 
-    list.innerHTML = htm;
-    // rows array mirrors what's on screen, so arrows/enter treat AI as one of them
-    rows = Array.prototype.slice.call(list.querySelectorAll('[data-i]'));
+    list.innerHTML = out;
+    lastQuery = q;
+    bind(q);
     active = 0;
     paint();
+  }
 
+  function bind(q) {
+    rows = Array.prototype.slice.call(list.querySelectorAll('[data-i]'));
     rows.forEach(function (el) {
       el.addEventListener('mouseenter', function () { active = +el.dataset.i; paint(); });
-      if (el.dataset.ai) el.addEventListener('click', function () { fireAI(q); });
+      if (el.dataset.ai) el.addEventListener('click', function (ev) { ev.preventDefault(); go(q); });
+      if (el.dataset.recent) el.addEventListener('click', function (ev) {
+        ev.preventDefault(); input.value = el.dataset.recent; render(input.value);
+      });
     });
-    lastQuery = q;
+    var ex = list.querySelector('[data-exact]');
+    if (ex) ex.addEventListener('click', function () { corrected = ''; askAI(q); });
+    Array.prototype.forEach.call(list.querySelectorAll('[data-fu]'), function (b) {
+      b.addEventListener('click', function () {
+        input.value = b.dataset.fu; render(input.value); askAI(b.dataset.fu);
+      });
+    });
   }
+
+  function go(q) { recent(q); askAI(q); }
 
   function paint() {
     rows.forEach(function (r, i) {
@@ -328,34 +524,38 @@
 
   function onKey(e) {
     if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      var pick = rows[active] || rows[0];
+      // a question with no row selected still deserves an answer
+      if (!pick && aiReady() && input.value.trim()) { go(input.value.trim()); return; }
+      if (!pick) return;
+      if (pick.dataset.ai) go(lastQuery);
+      else if (pick.dataset.recent) { input.value = pick.dataset.recent; render(input.value); }
+      else { recent(lastQuery); location.href = pick.getAttribute('href'); }
+      return;
+    }
     if (!rows.length) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); active = (active + 1) % rows.length; paint(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); active = (active - 1 + rows.length) % rows.length; paint(); }
-    else if (e.key === 'Enter') {
-      e.preventDefault();
-      var pick = rows[active] || rows[0];
-      if (!pick) return;
-      if (pick.dataset.ai) fireAI(lastQuery);
-      else location.href = pick.getAttribute('href');
-    }
   }
 
   /* ---------- open / close ---------- */
-  function open() {
+  function open(seed) {
     if (!input) mount();
     lastFocus = document.activeElement;
     ov.classList.add('on');
-    // rAF throttles in background/low-power tabs; without the timeout fallback
-    // the overlay can sit at opacity 0 while still swallowing clicks
     requestAnimationFrame(function () { ov.classList.add('in'); });
+    // rAF throttles in background tabs; without this the overlay can sit
+    // invisible while still swallowing clicks
     setTimeout(function () { if (ov.classList.contains('on')) ov.classList.add('in'); }, 60);
     document.documentElement.style.overflow = 'hidden';
-    input.value = '';
-    run('');
+    input.value = seed || '';
+    render(input.value);
     input.focus();
     load().then(function (ok) {
       if (!ok) { list.innerHTML = '<div class="yks-smsg">Search is unavailable right now.</div>'; return; }
-      if (ov.classList.contains('on')) run(input.value);
+      if (ov.classList.contains('on')) render(input.value);
     });
   }
 
@@ -373,30 +573,24 @@
     b.className = 'yks-sbtn';
     b.setAttribute('aria-label', 'Search this site');
     b.innerHTML = ICON + '<span>Search</span><i>/</i>';
-    b.addEventListener('click', open);
+    b.addEventListener('click', function () { open(); });
     return b;
   }
 
   function attach() {
-    // homepage shell
-    var links = document.querySelector('.nav .links');
-    if (links) {
-      var cta = links.querySelector('.nav-panel-cta');
-      links.insertBefore(button(), cta || null);
+    var links = document.querySelector('.nav .links');           // homepage shell
+    if (links && !links.querySelector('.yks-sbtn')) {
+      links.insertBefore(button(), links.querySelector('.nav-panel-cta') || null);
     }
-    // landing-page shell
-    var lnav = document.querySelector('.l-nav');
+    var lnav = document.querySelector('.l-nav');                 // landing-page shell
     if (lnav && !lnav.querySelector('.yks-sbtn')) {
-      var back = lnav.querySelector('.l-back');
-      lnav.insertBefore(button(), back || null);
+      lnav.insertBefore(button(), lnav.querySelector('.l-back') || null);
     }
-    // anything the markup opts in explicitly
     Array.prototype.forEach.call(document.querySelectorAll('[data-search-open]'), function (el) {
-      el.addEventListener('click', function (ev) { ev.preventDefault(); open(); });
+      el.addEventListener('click', function (ev) { ev.preventDefault(); open(el.dataset.searchOpen); });
     });
   }
 
-  // "/" anywhere, and cmd/ctrl-K, open search
   addEventListener('keydown', function (e) {
     var tag = (e.target.tagName || '').toLowerCase();
     var typing = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
@@ -407,5 +601,5 @@
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', attach);
   else attach();
 
-  window.yksSearch = { open: open, close: close };
+  window.yksSearch = { open: open, close: close, ask: function (q) { open(q); askAI(q); } };
 })();

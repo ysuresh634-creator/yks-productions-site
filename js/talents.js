@@ -229,3 +229,95 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('on')) closeModal(); });
   }
 })();
+
+/* ══ Client shortlist — tick the faces you want, then share or send the set.
+      The list lives in the URL (?list=m01,a02) so a client can paste it to their team
+      with no account and no login, and it survives a reload via localStorage. ══ */
+(function () {
+  var grid = document.getElementById('talGrid');
+  if (!grid) return;
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.tal'));
+  if (!cards.length) return;
+  var KEY = 'yks_shortlist', WA = '919746679720';
+  var picked = [];
+  try { picked = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { picked = []; }
+
+  // a shared link wins over whatever was saved on this device
+  var shared = (new URLSearchParams(location.search).get('list') || '').split(',').filter(Boolean);
+  var viewingShared = shared.length > 0;
+  if (viewingShared) picked = shared.slice(0, 40);
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(picked)); } catch (e) {} }
+  function has(code) { return picked.indexOf(code) >= 0; }
+  function shareURL() { return location.origin + location.pathname + '?list=' + picked.join(','); }
+
+  /* ── the bar that appears once something is picked ── */
+  var bar = document.createElement('div');
+  bar.className = 'tal-shortlist';
+  bar.innerHTML =
+    '<span class="tal-sl-count"></span>' +
+    '<div class="tal-sl-actions">' +
+      '<button type="button" class="tal-sl-btn" data-act="copy">Copy share link</button>' +
+      '<a class="tal-sl-btn tal-sl-go" data-act="send" target="_blank" rel="noopener">Send to YKS →</a>' +
+      '<button type="button" class="tal-sl-btn tal-sl-clear" data-act="clear" aria-label="Clear shortlist">Clear</button>' +
+    '</div>';
+  document.body.appendChild(bar);
+
+  function render() {
+    cards.forEach(function (c) {
+      var btn = c.querySelector('.tal-pick');
+      if (btn) {
+        var on = has(c.dataset.code);
+        btn.classList.toggle('on', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.title = on ? 'Remove from shortlist' : 'Add to shortlist';
+        btn.textContent = on ? '✓' : '+';
+      }
+    });
+    var n = picked.length;
+    bar.classList.toggle('on', n > 0);
+    bar.querySelector('.tal-sl-count').textContent = n
+      ? n + ' shortlisted' + (viewingShared ? ' · shared list' : '')
+      : '';
+    var msg = 'Hi Yedukrishna, I\'d like to enquire about these talents from your roster: '
+      + picked.map(function (c) { return c.toUpperCase(); }).join(', ')
+      + '. Here\'s the shortlist: ' + shareURL();
+    bar.querySelector('.tal-sl-go').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(msg);
+  }
+
+  // a pick button on every card
+  cards.forEach(function (c) {
+    if (c.querySelector('.tal-pick')) return;
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'tal-pick'; b.textContent = '+';
+    b.addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      var code = c.dataset.code;
+      if (has(code)) picked = picked.filter(function (x) { return x !== code; });
+      else picked.push(code);
+      viewingShared = false;
+      save(); render();
+    });
+    c.appendChild(b);
+  });
+
+  bar.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var act = b.dataset.act;
+    if (act === 'clear') { picked = []; viewingShared = false; save(); render(); showOnly(null); }
+    if (act === 'copy') {
+      var url = shareURL();
+      var done = function () { var t = b.textContent; b.textContent = 'Link copied ✓'; setTimeout(function () { b.textContent = t; }, 1800); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
+      else { window.prompt('Copy this shortlist link:', url); }
+    }
+  });
+
+  // opening a shared link shows just those faces
+  function showOnly(codes) {
+    cards.forEach(function (c) { c.hidden = codes ? codes.indexOf(c.dataset.code) < 0 : false; });
+  }
+  if (viewingShared) { showOnly(picked); }
+
+  render();
+})();
