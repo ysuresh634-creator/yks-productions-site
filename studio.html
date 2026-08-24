@@ -556,6 +556,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
   <button class="mode on" id="m-text"  onclick="setMode('text')">✏️ Text</button>
   <button class="mode"    id="m-photo" onclick="setMode('photo')">🖼 Photos</button>
   <button class="mode"    id="m-link"  onclick="setMode('link')">🔗 Links</button>
+  <button class="mode"    id="m-style" onclick="setMode('style')">🎨 Style</button>
   <button class="mode"    id="m-off"   onclick="setMode('off')">🧭 Navigate</button>
   <span class="chg-count" id="chgcount" onclick="openChanges()"></span>
 </div>
@@ -769,6 +770,75 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
     <div class="row2">
       <button class="btn btn-ghost" onclick="closeSheets()">Cancel</button>
       <button class="btn btn-save" onclick="commitVideo()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- STYLE SHEET -->
+<div class="sheet tall" id="sh-style">
+  <div class="sh-hd"><span class="sh-title">🎨 <span id="st-tag">STYLE</span></span><button class="sh-x" onclick="closeSheets()">×</button></div>
+  <div class="sh-body">
+    <p class="field-note" id="st-hint" style="margin-bottom:12px">Adjust and watch it change live. Every tweak is staged — nothing goes live until you Publish.</p>
+
+    <div class="pe-tabs">
+      <button class="pe-tab on" id="stt-type" onclick="stTab('type')">Type</button>
+      <button class="pe-tab"    id="stt-box"  onclick="stTab('box')">Box &amp; colour</button>
+    </div>
+
+    <!-- TYPE -->
+    <div class="pe-pane on" id="stp-type">
+      <div class="pe-slider"><span>Size</span><input type="range" id="st-fs"  min="8"  max="120" step="1"   oninput="stSet('font-size',this.value+'px')"><b id="st-fs-v">—</b></div>
+      <div class="pe-slider"><span>Letter&nbsp;spacing</span><input type="range" id="st-ls" min="-3" max="24" step="0.5" oninput="stSet('letter-spacing',this.value+'px')"><b id="st-ls-v">—</b></div>
+      <div class="pe-slider"><span>Word&nbsp;spacing</span><input type="range" id="st-ws" min="-3" max="40" step="0.5" oninput="stSet('word-spacing',this.value+'px')"><b id="st-ws-v">—</b></div>
+      <div class="pe-slider"><span>Line&nbsp;height</span><input type="range" id="st-lh" min="0.8" max="3" step="0.05" oninput="stSet('line-height',this.value)"><b id="st-lh-v">—</b></div>
+      <div class="pe-slider"><span>Weight</span><input type="range" id="st-fw" min="100" max="900" step="100" oninput="stSet('font-weight',this.value)"><b id="st-fw-v">—</b></div>
+
+      <label class="lbl" style="margin-top:6px">Align</label>
+      <div class="pe-chips" id="st-align">
+        <button class="pe-chip" data-v="left"    onclick="stPick('text-align','left',this)">Left</button>
+        <button class="pe-chip" data-v="center"  onclick="stPick('text-align','center',this)">Centre</button>
+        <button class="pe-chip" data-v="right"   onclick="stPick('text-align','right',this)">Right</button>
+        <button class="pe-chip" data-v="justify" onclick="stPick('text-align','justify',this)">Justify</button>
+      </div>
+
+      <label class="lbl">Case &amp; emphasis</label>
+      <div class="pe-chips" id="st-tt">
+        <button class="pe-chip" data-v="none"       onclick="stPick('text-transform','none',this)">Normal</button>
+        <button class="pe-chip" data-v="uppercase"  onclick="stPick('text-transform','uppercase',this)">UPPER</button>
+        <button class="pe-chip" data-v="lowercase"  onclick="stPick('text-transform','lowercase',this)">lower</button>
+        <button class="pe-chip" data-v="capitalize" onclick="stPick('text-transform','capitalize',this)">Title</button>
+      </div>
+      <div class="pe-btns">
+        <button class="pe-mini" id="st-italic" onclick="stItalic()">Italic</button>
+      </div>
+
+      <div class="pe-slider" style="margin-top:12px"><span>Text&nbsp;colour</span>
+        <input type="color" id="st-col" oninput="stSet('color',this.value)" style="flex:1;height:34px;background:none;border:1px solid var(--border);border-radius:8px;cursor:pointer">
+        <button class="pe-mini" onclick="stClear('color')">Reset</button>
+      </div>
+    </div>
+
+    <!-- BOX -->
+    <div class="pe-pane" id="stp-box">
+      <div class="pe-slider"><span>Padding</span><input type="range" id="st-pad" min="0" max="96" step="1" oninput="stSet('padding',this.value+'px')"><b id="st-pad-v">—</b></div>
+      <div class="pe-slider"><span>Space&nbsp;above</span><input type="range" id="st-mt" min="-40" max="120" step="1" oninput="stSet('margin-top',this.value+'px')"><b id="st-mt-v">—</b></div>
+      <div class="pe-slider"><span>Space&nbsp;below</span><input type="range" id="st-mb" min="-40" max="120" step="1" oninput="stSet('margin-bottom',this.value+'px')"><b id="st-mb-v">—</b></div>
+      <div class="pe-slider"><span>Width</span><input type="range" id="st-w" min="10" max="100" step="1" oninput="stSet('width',this.value+'%')"><b id="st-w-v">—</b></div>
+      <div class="pe-btns"><button class="pe-mini" onclick="stClear('width')">Width: auto</button></div>
+      <div class="pe-slider"><span>Corner&nbsp;radius</span><input type="range" id="st-br" min="0" max="80" step="1" oninput="stSet('border-radius',this.value+'px')"><b id="st-br-v">—</b></div>
+
+      <div class="pe-slider" style="margin-top:12px"><span>Background</span>
+        <input type="color" id="st-bg" oninput="stSet('background-color',this.value)" style="flex:1;height:34px;background:none;border:1px solid var(--border);border-radius:8px;cursor:pointer">
+        <button class="pe-mini" onclick="stClear('background-color')">None</button>
+      </div>
+    </div>
+
+    <div class="pe-btns" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+      <button class="pe-mini" onclick="stHide()" style="color:var(--red);border-color:rgba(192,57,43,.4)">Hide this element</button>
+      <button class="pe-mini" onclick="stResetAll()">Reset all</button>
+    </div>
+    <div class="row2" style="margin-top:14px">
+      <button class="btn btn-ghost" onclick="closeSheets()">Done</button>
     </div>
   </div>
 </div>
@@ -1593,6 +1663,7 @@ function renderFrame(){
     /* preloaders / splash screens never clear because we disable the page's JS */
     #loader,.loader,#preloader,.preloader,.page-loader,.site-loader,
     .splash,.intro,.intro-overlay,#intro,.curtain,.page-transition{display:none!important}
+    [data-yks-hover]{outline:2px solid rgba(201,169,110,.9)!important;outline-offset:-2px;cursor:pointer!important;background:rgba(201,169,110,.10)!important}
     [data-yks-hot]{outline:2px dashed rgba(201,169,110,.85)!important;outline-offset:-2px;cursor:pointer!important}
     [data-yks-hot]:hover{outline-style:solid!important;background:rgba(201,169,110,.14)!important}
     /* images often sit inside overflow:hidden cards, which clips an outline —
