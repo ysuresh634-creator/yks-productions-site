@@ -88,23 +88,72 @@
   }
 
   /* filters */
-  var state = { cat: 'all', region: 'all' };
+  var state = { cat: 'all', region: 'all', q: '', aiCodes: null };
+  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev';
+  // build one searchable string per card from the data it already carries (never contacts)
+  cards.forEach(function (c) {
+    var d = c.dataset;
+    c._hay = [d.city, d.tags, d.cat, d.region, (c.querySelector('.tal-name') || {}).textContent || '']
+      .join(' ').toLowerCase();
+  });
   var empty = $('#talEmpty');
   function doFilter() {
     var shown = 0;
     cards.forEach(function (c) {
       var ok = (state.cat === 'all' || c.dataset.cat === state.cat) &&
-               (state.region === 'all' || c.dataset.region === state.region);
+               (state.region === 'all' || c.dataset.region === state.region) &&
+               (!state.q || (state.aiCodes ? state.aiCodes.indexOf(c.dataset.code) >= 0
+                                            : state.q.split(/\s+/).every(function (w) { return c._hay.indexOf(w) >= 0; })));
       c.hidden = !ok;
       if (ok) { c.classList.add('in'); shown++; }
     });
     if (empty) empty.hidden = shown > 0;
+    var cnt = $('#talSearchCount');
+    if (cnt) {
+      if (state.q) { cnt.hidden = false; cnt.textContent = shown ? shown + ' match' + (shown > 1 ? 'es' : '') : 'No match'; }
+      else cnt.hidden = true;
+    }
   }
   function applyFilter() {
     if (reduced) { doFilter(); return; }
     grid.classList.add('tal-refreshing');
     setTimeout(function () { doFilter(); grid.classList.remove('tal-refreshing'); }, 170);
   }
+  (function wireSearch() {
+    var box = $('#talSearch'), clr = $('#talSearchX'), cnt = $('#talSearchCount'); if (!box) return;
+    var t = null, seq = 0;
+    // only the non-identifying card data is ever sent — names stay in the roster
+    function payload() {
+      return cards.map(function (c) {
+        return { code: c.dataset.code, type: c.dataset.cat, region: c.dataset.region, city: c.dataset.city, tags: c.dataset.tags };
+      });
+    }
+    function askAI(q, mine) {
+      if (cnt) { cnt.hidden = false; cnt.textContent = '✨ Thinking…'; }
+      fetch(ENGINE + '/ai/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: q, cards: payload() }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (mine !== seq) return;                       // a newer keystroke already won
+          state.aiCodes = (j && j.codes && j.codes.length) ? j.codes : null;
+          doFilter();
+          if (cnt && state.aiCodes) cnt.textContent = state.aiCodes.length + ' AI match' + (state.aiCodes.length > 1 ? 'es' : '');
+        })
+        .catch(function () { if (mine === seq) doFilter(); });
+    }
+    function run() {
+      state.q = (box.value || '').trim().toLowerCase();
+      state.aiCodes = null;
+      if (clr) clr.hidden = !state.q;
+      doFilter();
+      if (!state.q) return;
+      var shown = cards.filter(function (c) { return !c.hidden; }).length;
+      // hand it to the engine when the words don't match literally, or when they've typed a real sentence
+      if (shown === 0 || state.q.split(/\s+/).length >= 3) askAI(box.value.trim(), ++seq);
+    }
+    box.addEventListener('input', function () { clearTimeout(t); t = setTimeout(run, 260); });
+    box.addEventListener('search', run);
+    if (clr) clr.addEventListener('click', function () { box.value = ''; run(); box.focus(); });
+  })();
   $$('.tal-fgroup').forEach(function (group) {
     var key = group.dataset.filter;
     group.addEventListener('click', function (e) {

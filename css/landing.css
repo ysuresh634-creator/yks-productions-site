@@ -349,7 +349,8 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
 .l-promise{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 30px;
   max-width:760px;margin:0 auto 6px;padding:0}
 .l-promise li{display:flex;align-items:flex-start;gap:9px;text-align:left;
-  font-size:.93rem;line-height:1.55;color:var(--paper-dim);max-width:230px}
+  font-size:.93rem;line-height:1.55;color:var(--paper-dim);flex:0 1 230px;min-width:0}
+.l-promise li>span{flex:1;min-width:0}
 .l-promise li::before{content:"";flex:none;width:7px;height:7px;margin-top:8px;border-radius:50%;
   background:var(--amber);box-shadow:0 0 10px rgba(255,140,59,.6)}
 .l-promise b{display:block;color:var(--paper);font-weight:600}

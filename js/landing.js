@@ -275,13 +275,15 @@
   /* Casting pages face two audiences — someone deciding whether to trust us
      with their name, and a brand deciding whether to brief us. "Preview in
      48h" answers neither, so those pages get their own three. */
+  // each promise is wrapped in a <span>: the <li> is a flex row, so an unwrapped text node would
+  // become its own flex item and sit BESIDE the bold lead-in instead of under it.
   promise.innerHTML = document.body.dataset.page === 'casting'
-    ? '<li><b>Free to join.</b> No registration fee, no portfolio package, ever.</li>'
-      + '<li><b>Your details stay private.</b> Contact is never published or passed on.</li>'
-      + '<li><b>Same day.</b> You get a reply today — not "we\'ll revert".</li>'
-    : '<li><b>Same day.</b> You get a reply today — not "we\'ll revert".</li>'
-      + '<li><b>One all-in number.</b> Nothing added later, no surprise line items.</li>'
-      + '<li><b>Preview in 48h.</b> First edited frames within two days of the shoot.</li>';
+    ? '<li><span><b>Free to join.</b> No registration fee, no portfolio package, ever.</span></li>'
+      + '<li><span><b>Your details stay private.</b> Contact is never published or passed on.</span></li>'
+      + '<li><span><b>Same day.</b> You get a reply today — not "we\'ll revert".</span></li>'
+    : '<li><span><b>Same day.</b> You get a reply today — not "we\'ll revert".</span></li>'
+      + '<li><span><b>One all-in number.</b> Nothing added later, no surprise line items.</span></li>'
+      + '<li><span><b>Preview in 48h.</b> First edited frames within two days of the shoot.</span></li>';
   if (wrap) cta.insertBefore(promise, wrap); else cta.appendChild(promise);
 
   /* ── micro-copy under the send button: removes the last hesitation ── */

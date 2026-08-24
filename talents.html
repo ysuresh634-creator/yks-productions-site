@@ -42,8 +42,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/landing.css?v=16" />
-<link rel="stylesheet" href="/css/talents.css?v=51" />
+<link rel="stylesheet" href="/css/landing.css?v=17" />
+<link rel="stylesheet" href="/css/talents.css?v=52" />
 
 <script type="application/ld+json">
 {
@@ -453,6 +453,15 @@
     </div>
 
     <!-- filters -->
+    <div class="tal-search">
+      <label class="tal-search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="talSearch" placeholder="Search or describe the shoot — “bridal in Mumbai”" aria-label="Search talent" autocomplete="off" />
+        <button type="button" class="tal-search-x" id="talSearchX" aria-label="Clear search" hidden>&times;</button>
+      </label>
+      <span class="tal-search-count" id="talSearchCount" hidden></span>
+    </div>
+
     <div class="tal-filters" role="tablist" aria-label="Filter talent">
       <div class="tal-fgroup" data-filter="cat">
         <button class="tal-chip on" data-val="all">All</button>
@@ -635,12 +644,13 @@
   </div>
 </footer>
 
-<script src="/js/landing.js?v=10"></script>
+<script src="/js/landing.js?v=11"></script>
 <script src="/js/fx.js?v=6"></script>
 <script src="/js/lead.js?v=2"></script>
 <script src="/js/talent-names.js?v=1"></script>
-<script src="/js/talents.js?v=6"></script>
+<script src="/js/talents.js?v=8"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=5"></script>
+  <script src="/js/search.js?v=1" defer></script>
 </body>
 </html>

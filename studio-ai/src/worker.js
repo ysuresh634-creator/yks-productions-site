@@ -3,6 +3,10 @@ const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3
 const ALLOWED_ORIGINS = [
   'https://yksproductions.com',
   'https://www.yksproductions.com',
+  // XINIX Studio (shares this key; the Worker still cannot write anything)
+  'https://xinix-studio.ysuresh634.workers.dev',
+  'https://www.xinixinnovations.com',
+  'https://xinixinnovations.com',
 ];
 
 const MAX_BODY = 256 * 1024; // the invoice form is tiny; anything larger is abuse
@@ -43,6 +47,7 @@ export default {
     if (!key) return err('GEMINI_API_KEY secret not set', 500, origin);
 
     if (body.type === 'invoice_ai') return invoiceAI(body, key, origin);
+    if (body.type === 'xinix_quote_ai') return xinixQuoteAI(body, key, origin);
     return err('Unknown type', 400, origin);
   },
 };
@@ -83,5 +88,36 @@ async function invoiceAI({ context, message }, key, origin) {
     if (p.text) text += p.text;
     if (p.functionCall) toolCalls.push({ name: p.functionCall.name, input: p.functionCall.args || {} });
   }
+  return ok({ text: text || null, tool_calls: toolCalls }, origin);
+}
+
+
+// ── XINIX Studio — quotation / invoice AI ─────────────────────────────────
+async function xinixQuoteAI({ context, message, catalogue }, key, origin) {
+  const sys = `You are the assistant inside XINIX Studio, editing quotations and invoices for XINIX Innovations LLP, a rehabilitation and physiotherapy equipment manufacturer in Ernakulam, Kerala (GSTIN 32AAAFX5132E1ZN). Current document state: ${JSON.stringify(context)}. ${catalogue ? 'Catalogue excerpt (code · name): ' + JSON.stringify(catalogue).slice(0, 6000) : ''} Use tools to edit the form. Currency is INR. Items use 0-based indexing. When the user names a product, prefer an item from the catalogue and put its controlled item code in the code field. Never invent prices — if no rate is given, set rate 0 and say the rate is needed. Be brief.`;
+  const functions = [
+    { name:'add_item',    description:'Add a line item', parameters:{ type:'OBJECT', properties:{ code:{type:'STRING'}, description:{type:'STRING'}, qty:{type:'NUMBER'}, unit:{type:'STRING'}, rate:{type:'NUMBER'} }, required:['description'] } },
+    { name:'remove_item', description:'Remove line item by 0-based index', parameters:{ type:'OBJECT', properties:{ index:{type:'INTEGER'} }, required:['index'] } },
+    { name:'update_item', description:'Update a line item by 0-based index', parameters:{ type:'OBJECT', properties:{ index:{type:'INTEGER'}, code:{type:'STRING'}, description:{type:'STRING'}, qty:{type:'NUMBER'}, unit:{type:'STRING'}, rate:{type:'NUMBER'} }, required:['index'] } },
+    { name:'set_client',  description:'Set client details', parameters:{ type:'OBJECT', properties:{ name:{type:'STRING'}, org:{type:'STRING'}, phone:{type:'STRING'}, email:{type:'STRING'}, address:{type:'STRING'}, gstin:{type:'STRING'} } } },
+    { name:'set_terms',   description:'Set commercial terms', parameters:{ type:'OBJECT', properties:{ gst:{type:'NUMBER'}, taxMode:{type:'STRING', enum:['intra','inter','none']}, discount:{type:'NUMBER'}, advance:{type:'NUMBER'}, validity:{type:'STRING'}, delivery:{type:'STRING'}, payment:{type:'STRING'} } } },
+    { name:'set_notes',   description:'Set notes', parameters:{ type:'OBJECT', properties:{ text:{type:'STRING'} }, required:['text'] } },
+    { name:'set_type',    description:'Switch to QUOTATION or INVOICE', parameters:{ type:'OBJECT', properties:{ type:{type:'STRING', enum:['QUOTATION','INVOICE']} }, required:['type'] } },
+    { name:'clear_items', description:'Remove all items', parameters:{ type:'OBJECT', properties:{} } },
+  ];
+  const res = await fetch(`${GEMINI}?key=${key}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: sys }] },
+      contents: [{ role: 'user', parts: [{ text: message }] }],
+      tools: [{ function_declarations: functions }],
+      tool_config: { function_calling_config: { mode: 'AUTO' } },
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) return err(data.error?.message || 'Gemini error', 502, origin);
+  const parts = data.candidates?.[0]?.content?.parts || [];
+  const toolCalls = []; let text = '';
+  for (const p of parts) { if (p.text) text += p.text; if (p.functionCall) toolCalls.push({ name: p.functionCall.name, input: p.functionCall.args || {} }); }
   return ok({ text: text || null, tool_calls: toolCalls }, origin);
 }

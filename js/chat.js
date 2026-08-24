@@ -561,6 +561,16 @@
     bar.classList.remove('hide');
   }
 
+  /* public hook — site search hands unanswered questions straight to Iris */
+  window.yksIris = {
+    open: open,
+    close: close,
+    ask: function (text) {
+      open();
+      if (text) setTimeout(function () { ask(text); }, 60);
+    }
+  };
+
   panel.querySelector('.yc-hbtn.x').onclick = close;
   send.onclick = function () { ask(); };
   document.addEventListener('keydown', function (e) {
