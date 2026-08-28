@@ -82,10 +82,31 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .doc-client{font-size:14px;font-weight:600;margin-top:4px}
 .doc-meta{font-size:11px;color:var(--sub);margin-top:3px}
 .doc-total{font-size:16px;font-weight:700;color:var(--text);margin-top:8px}
-.doc-actions{display:flex;gap:8px;margin-top:10px}
+.doc-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .btn-sm{padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer}
 .btn-view{background:var(--gold-lt);color:var(--gold)}
 .btn-del{background:rgba(192,57,43,.1);color:var(--red)}
+.btn-agree{background:rgba(232,184,154,.12);color:var(--peach)}
+
+/* ARCHIVE — search, filters, financial-year grouping, backup */
+.arc-tools{padding:0 16px 4px}
+.arc-search{width:100%;background:var(--input);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-size:14px;outline:none;-webkit-appearance:none;font-family:inherit}
+.arc-search:focus{border-color:var(--gold)}
+.arc-chips{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.arc-chip{background:var(--card);border:1px solid var(--border);color:var(--sub);border-radius:20px;padding:6px 13px;font-size:12px;cursor:pointer;white-space:nowrap}
+.arc-chip.on{background:var(--gold-lt);border-color:var(--gold);color:var(--gold);font-weight:600}
+.fy-head{display:flex;justify-content:space-between;align-items:baseline;padding:16px 20px 8px;gap:10px}
+.fy-name{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase}
+.fy-sum{font-size:10px;color:var(--sub);letter-spacing:.5px;text-align:right}
+.arc-count{font-size:10px;color:var(--sub);letter-spacing:.5px}
+.bk-bar{margin:0 16px 12px;border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.5;border:1px solid}
+.bk-warn{background:rgba(192,57,43,.08);border-color:rgba(192,57,43,.45);color:#E9A79E}
+.bk-ok{background:rgba(126,200,139,.07);border-color:rgba(126,200,139,.3);color:var(--sub)}
+.bk-bar b{color:var(--text)}
+.bk-acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.bk-btn{padding:7px 13px;border-radius:7px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px;font-weight:600;cursor:pointer}
+.bk-btn.primary{background:var(--gold);border-color:var(--gold);color:#0D0B11}
+.doc-logged{font-size:9px;letter-spacing:.5px;color:var(--sub);border:1px solid var(--border);border-radius:4px;padding:1px 5px;margin-left:6px}
 
 /* FORM */
 .form-wrap{padding:16px}
@@ -443,8 +464,21 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
       <button onclick="lockApp()" style="background:none;border:none;color:var(--sub);font-size:11px;cursor:pointer;letter-spacing:1px">LOCK</button>
     </div>
   </div>
-  <div class="history-header"><span class="section-title">Your Documents</span></div>
+  <div class="history-header">
+    <span class="section-title">Your Documents</span>
+    <span class="arc-count" id="arc-count"></span>
+  </div>
+  <div id="backup-bar"></div>
+  <div class="arc-tools">
+    <input class="arc-search" id="arc-q" type="search" placeholder="Search client, number or project" autocomplete="off" oninput="renderHistory()">
+    <div class="arc-chips">
+      <button class="arc-chip on" id="chip-all"  onclick="setArcFilter('all')">All</button>
+      <button class="arc-chip"    id="chip-quo"  onclick="setArcFilter('QUOTATION')">Quotations</button>
+      <button class="arc-chip"    id="chip-inv"  onclick="setArcFilter('INVOICE')">Invoices</button>
+    </div>
+  </div>
   <div id="history-list"></div>
+  <input type="file" id="arc-restore-file" accept="application/json,.json" style="display:none" onchange="restoreBackup(this)">
 </div>
 
 <!-- ══ NEW DOC ══ -->
@@ -500,6 +534,37 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
       </div>
       <div class="total-grand"><span class="total-lbl">TOTAL</span><span class="total-val" id="t-total">₹0</span></div>
     </div>
+    <div class="form-section" id="sec-quote-terms" style="display:none">
+      <label class="form-label">Quotation Terms</label>
+      <p class="field-note" style="margin-bottom:12px">These print at the foot of the quote, and each quote saves
+      its own set. Changing the numbers below rewrites the list — until you edit the list by hand, after which it
+      is left alone.</p>
+
+      <div class="form-row">
+        <div><label class="form-label">Quote valid for (days)</label><input class="form-input" id="q-valid" type="number" min="1" value="30" oninput="qValidChanged()"></div>
+        <div><label class="form-label">Delivery (working days)</label><input class="form-input" id="q-deliv" type="number" min="1" value="10" oninput="syncQuoteTerms()"></div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Terms printed on the quote — one per line</label>
+        <textarea class="form-input" id="q-terms" rows="7" style="resize:vertical;line-height:1.5" oninput="qTermsEdited()"></textarea>
+      </div>
+      <div class="quick-btns" style="margin-top:4px">
+        <button class="quick-btn" onclick="syncQuoteTerms(true)">↺ Reset to standard terms</button>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Licensed Purpose</label>
+      <p class="field-note" style="margin-bottom:12px">Clause 08 of the Terms of Engagement grants a licence for
+      "the purposes described in the quotation" — so this box is what that clause points at. Leave it blank and the
+      licensed purpose is undefined. Term and territory default to perpetual and worldwide; to narrow either, say so
+      as a line in the Quotation Terms above.</p>
+      <textarea class="form-input" id="f-purpose" rows="4" style="resize:vertical;line-height:1.5"></textarea>
+      <div class="quick-btns" style="margin-top:8px">
+        <button class="quick-btn" onclick="resetPurpose()">↺ Reset to standard licence</button>
+      </div>
+    </div>
+
     <div class="form-section">
       <label class="form-label">Terms &amp; Agreement</label>
       <p class="field-note" style="margin-bottom:12px">Builds a branded, signable Terms of Engagement for this
@@ -626,6 +691,12 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
       <div class="form-field"><label class="form-label">UAE Phone</label><input class="form-input" id="s-phone-ae" type="tel" placeholder="+971 XX XXX XXXX"></div>
       <div class="form-field"><label class="form-label">Website</label><input class="form-input" id="s-web" type="text" placeholder="yksproductions.com"></div>
       <div class="form-field"><label class="form-label">Instagram</label><input class="form-input" id="s-ig" type="text" placeholder="@yks_photoworks"></div>
+      <div class="form-field"><label class="form-label">Udyam registration no.</label>
+        <input class="form-input" id="s-udyam" type="text" placeholder="UDYAM-KL-01-0041092">
+        <p class="field-note">Printed on every document. It is what makes the MSMED Act 45-day payment cap
+        bite on a corporate buyer — they can only claim the expense once they have actually paid you
+        (Income Tax s.43B(h)). Leave blank to print nothing.</p>
+      </div>
     </div>
     <div class="form-section">
       <label class="form-label">Website Editor</label>
@@ -678,6 +749,50 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 </div>
 
 <div class="ov" id="ov" onclick="closeSheets()"></div>
+
+<!-- AGREEMENT-FOR-A-DOCUMENT SHEET -->
+<div class="sheet" id="sh-agree">
+  <div class="sh-hd"><span class="sh-title">📝 AGREEMENT</span><button class="sh-x" onclick="closeSheets()">&times;</button></div>
+  <div class="sh-body">
+    <p class="field-note" id="ag2-for" style="margin-bottom:12px"></p>
+    <div class="form-field">
+      <label class="form-label">Company / entity (optional)</label>
+      <input class="form-input" id="ag2-org" placeholder="Leave blank for an individual client">
+    </div>
+    <div class="form-row">
+      <div>
+        <label class="form-label">Client type</label>
+        <select class="form-input" id="ag2-type" onchange="ag2TypeChanged()">
+          <option value="ind">Individual / small</option>
+          <option value="corp">Corporate / brand</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Balance due within</label>
+        <select class="form-input" id="ag2-days">
+          <option value="7">7 days of the shoot</option>
+          <option value="15">15 days of delivery</option>
+          <option value="30">30 days of delivery</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div><label class="form-label">Hours on location</label><input class="form-input" id="ag2-hrs" type="number" min="1" placeholder="8"></div>
+      <div><label class="form-label">Overtime ₹/hour</label><input class="form-input" id="ag2-ot" type="number" min="0" placeholder="3000"></div>
+    </div>
+    <div class="form-row">
+      <div><label class="form-label">Revision rounds</label><input class="form-input" id="ag2-rev" type="number" min="0" placeholder="2"></div>
+      <div><label class="form-label">Advance %</label><input class="form-input" id="ag2-adv" type="number" min="0" max="100" placeholder="50"></div>
+    </div>
+    <div class="quick-btns" style="margin-top:14px">
+      <button class="quick-btn" onclick="ag2Open()">👁 Preview</button>
+      <button class="quick-btn" onclick="ag2Copy()">🔗 Copy link</button>
+      <button class="quick-btn" onclick="ag2WhatsApp()">💬 WhatsApp</button>
+      <button class="quick-btn" onclick="ag2Email()">✉️ Email</button>
+    </div>
+    <p class="field-note" id="ag2-note" style="margin-top:10px"></p>
+  </div>
+</div>
 
 <!-- TEXT SHEET -->
 <div class="sheet" id="sh-text">
@@ -1082,13 +1197,20 @@ let currentType='INVOICE';
 // ── Settings ───────────────────────────────────────────────────────────────
 const DEFAULTS={name:'Yedukrishna Suresh',company:'YKS Productions',
   phoneIn:'+91 XXXXX XXXXX',phoneAe:'+971 XX XXX XXXX',
-  web:'yksproductions.com',ig:'@yks_photoworks'};
-function getSettings(){ return JSON.parse(localStorage.getItem('yks_settings')||'null')||DEFAULTS; }
+  web:'yksproductions.com',ig:'@yks_photoworks',
+  udyam:'UDYAM-KL-01-0041092'};
+function getSettings(){
+  const st=JSON.parse(localStorage.getItem('yks_settings')||'null');
+  // merge, so settings saved before a field existed still pick that field's
+  // default up — otherwise a phone with an old yks_settings blob would print
+  // documents with no Udyam number until he re-saved Settings by hand
+  return st ? Object.assign({}, DEFAULTS, st) : DEFAULTS;
+}
 function loadSettingsForm(){
   const s=getSettings(); const c=getCounters();
   set('s-name',s.name); set('s-company',s.company);
   set('s-phone-in',s.phoneIn); set('s-phone-ae',s.phoneAe);
-  set('s-web',s.web); set('s-ig',s.ig);
+  set('s-web',s.web); set('s-ig',s.ig); set('s-udyam',s.udyam||'');
   set('s-inv-num',c.inv); set('s-quo-num',c.quo);
   if(localStorage.getItem('yks_ghtoken')) document.getElementById('s-ghtoken').value=localStorage.getItem('yks_ghtoken');
 }
@@ -1107,7 +1229,8 @@ function saveSettings(){
   }
   const s={name:v('s-name')||DEFAULTS.name,company:v('s-company')||DEFAULTS.company,
     phoneIn:v('s-phone-in')||DEFAULTS.phoneIn,phoneAe:v('s-phone-ae')||DEFAULTS.phoneAe,
-    web:v('s-web')||DEFAULTS.web,ig:v('s-ig')||DEFAULTS.ig};
+    web:v('s-web')||DEFAULTS.web,ig:v('s-ig')||DEFAULTS.ig,
+    udyam:v('s-udyam').trim()};
   localStorage.setItem('yks_settings',JSON.stringify(s));
   const c=getCounters();
   c.inv=parseInt(v('s-inv-num'))||c.inv;
@@ -1124,9 +1247,125 @@ function bumpCounter(type){
 }
 
 // ── Docs ───────────────────────────────────────────────────────────────────
-function getDocs(){ return JSON.parse(localStorage.getItem('yks_docs')||'[]'); }
-function saveDoc(doc){ const docs=getDocs(); docs.unshift(doc); localStorage.setItem('yks_docs',JSON.stringify(docs)); }
-function deleteDoc(id){ localStorage.setItem('yks_docs',JSON.stringify(getDocs().filter(d=>d.id!==id))); renderHistory(); }
+function getDocs(){ try{ return JSON.parse(localStorage.getItem('yks_docs')||'[]'); }catch(e){ return []; } }
+// A failed write here used to be silent: the document rendered, he sent it,
+// and it was never in the archive. Storage can refuse a write when it is full
+// or when the browser is in a private window, so say so rather than lose it.
+function writeDocs(docs){
+  try{ localStorage.setItem('yks_docs',JSON.stringify(docs)); return true; }
+  catch(e){
+    alert('This document could NOT be saved to the archive.\n\n'+(e&&e.name==='QuotaExceededError'
+      ? 'Storage is full. Back up now, then delete a few old documents.'
+      : 'Your browser refused to save it (private browsing blocks storage).')+
+      '\n\nThe document itself is fine \u2014 export the PDF before you leave this screen.');
+    return false;
+  }
+}
+function saveDoc(doc){ const docs=getDocs(); docs.unshift(doc); writeDocs(docs); }
+function deleteDoc(id){ writeDocs(getDocs().filter(d=>d.id!==id)); renderHistory(); }
+
+// ── BACKUP & RESTORE ───────────────────────────────────────────────────────
+// The archive lives only in this browser. iOS Safari clears script-written
+// storage for a site left unvisited for 7 days, so an un-exported archive is
+// not safe by default. This is the whole reason the bar exists.
+// The numbering series stamped into every document number. It is deliberately
+// fixed rather than derived from the date: changing it renumbers future
+// documents, which is an accounting decision, not an automatic one.
+const DOC_SERIES='2526';
+const BK_KEY='yks_lastbackup';
+function backupState(docs){
+  const last=parseInt(localStorage.getItem(BK_KEY)||'0',10);
+  const newest=docs.reduce((m,d)=>Math.max(m,d.createdAt||0),0);
+  return {last, stale: !last || newest>last, days: last?Math.floor((Date.now()-last)/864e5):null};
+}
+function renderBackupBar(docs){
+  const bar=document.getElementById('backup-bar'); if(!bar) return;
+  if(!docs.length){ bar.innerHTML=`<div class="bk-bar bk-ok">Nothing stored on this device yet. If you have a backup file from another phone or laptop, restore it here.<div class="bk-acts"><button class="bk-btn" onclick="pickRestore()">Restore from backup</button></div></div>`; return; }
+  const st=backupState(docs);
+  const acts=`<div class="bk-acts">
+      <button class="bk-btn primary" onclick="exportBackup()">Back up now</button>
+      <button class="bk-btn" onclick="exportCSV()">Export CSV</button>
+      <button class="bk-btn" onclick="pickRestore()">Restore</button>
+    </div>`;
+  if(st.stale){
+    bar.innerHTML=`<div class="bk-bar bk-warn"><b>${st.last?'Documents changed since your last backup.':'This archive has never been backed up.'}</b> It exists only in this browser \u2014 clearing site data, or leaving the site unopened for a week on iPhone, deletes all ${docs.length} of them.${acts}</div>`;
+  } else {
+    bar.innerHTML=`<div class="bk-bar bk-ok">Backed up ${st.days===0?'today':st.days+' day'+(st.days>1?'s':'')+' ago'} \u00B7 ${docs.length} documents.${acts}</div>`;
+  }
+}
+function dlFile(name,text,mime){
+  try{
+    const b=new Blob([text],{type:mime||'application/json'});
+    const u=URL.createObjectURL(b), a=document.createElement('a');
+    a.href=u; a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(u); a.remove();},1500);
+    return true;
+  }catch(e){ alert('Could not create the file: '+e.message); return false; }
+}
+function stamp(){ const d=new Date(),p=n=>String(n).padStart(2,'0'); return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes()); }
+function exportBackup(){
+  const docs=getDocs();
+  if(!docs.length){ toast('Nothing to back up'); return; }
+  const payload={format:'yks-studio-backup',version:1,exportedAt:new Date().toISOString(),
+    settings:getSettings(),counters:getCounters(),docs};
+  if(dlFile('yks-studio-backup-'+stamp()+'.json',JSON.stringify(payload,null,2))){
+    localStorage.setItem(BK_KEY,String(Date.now()));
+    toast('Backup saved \u2014 keep it somewhere safe');
+    renderHistory();
+  }
+}
+function csvCell(x){ return '"'+String(x==null?'':x).replace(/"/g,'""')+'"'; }
+function exportCSV(){
+  const docs=getDocs();
+  if(!docs.length){ toast('Nothing to export'); return; }
+  const rows=[['Document No','Type','Date','Client','Project','Phone','Line items','Amount (INR)']];
+  docs.forEach(d=>rows.push([d.id,d.type,d.date||'',(d.client&&d.client.name)||'',(d.client&&d.client.event)||'',
+    (d.client&&d.client.phone)||'',(d.items||[]).map(i=>i.desc+' @ '+i.rate).join(' | '),docTotal(d)]));
+  dlFile('yks-documents-'+stamp()+'.csv','\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n'),'text/csv');
+  toast('CSV exported');
+}
+function pickRestore(){ const el=document.getElementById('arc-restore-file'); if(el){ el.value=''; el.click(); } }
+// Restore MERGES, it never replaces: this is also how two devices are combined.
+function restoreBackup(input){
+  const f=input.files&&input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    let data;
+    try{ data=JSON.parse(r.result); }catch(e){ alert('That file is not a valid backup (could not read it as JSON).'); return; }
+    const incoming=Array.isArray(data)?data:(data&&data.docs);
+    if(!Array.isArray(incoming)){ alert('That file does not contain any documents.'); return; }
+    const mine=getDocs(), byId={};
+    mine.forEach(d=>byId[d.id]=d);
+    let added=0, updated=0;
+    incoming.forEach(d=>{
+      if(!d||!d.id) return;
+      const cur=byId[d.id];
+      if(!cur){ byId[d.id]=d; added++; }
+      else if((d.createdAt||0)>(cur.createdAt||0)){ byId[d.id]=d; updated++; }
+    });
+    const merged=Object.keys(byId).map(k=>byId[k]).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if(!writeDocs(merged)) return;
+    // never let a restored number be handed out again
+    const c=getCounters();
+    merged.forEach(d=>{
+      // Only advance past numbers in the CURRENT numbering series. A restored
+      // document from an earlier series must not push this year's counter
+      // forward and leave a gap in the sequence.
+      const m=/^(?:INV|QUO)-(\d+)-(\d+)$/.exec(d.id||''); if(!m) return;
+      if(m[1]!==DOC_SERIES) return;
+      const n=parseInt(m[2],10)+1, k=d.type==='INVOICE'?'inv':'quo';
+      if(n>(c[k]||1)) c[k]=n;
+    });
+    try{ localStorage.setItem('yks_ctrs',JSON.stringify(c)); }catch(e){}
+    if(data && data.settings && !localStorage.getItem('yks_settings')){
+      try{ localStorage.setItem('yks_settings',JSON.stringify(data.settings)); }catch(e){}
+    }
+    renderHistory(); showScreen('history');
+    alert('Restored.\n\nAdded: '+added+'\nUpdated: '+updated+'\nAlready had: '+(incoming.length-added-updated)+'\n\nTotal in archive: '+merged.length);
+  };
+  r.onerror=()=>alert('Could not read that file.');
+  r.readAsText(f);
+}
 
 // ── Nav ────────────────────────────────────────────────────────────────────
 function showScreen(name){
@@ -1159,7 +1398,10 @@ function setType(t){
   document.getElementById('type-invoice').className='type-btn'+(t==='INVOICE'?' active-inv':'');
   document.getElementById('type-quote').className='type-btn'+(t==='QUOTATION'?' active-quo':'');
   document.getElementById('date2-lbl').textContent=t==='INVOICE'?'Due Date':'Valid Until';
-  const d=new Date(); d.setDate(d.getDate()+(t==='INVOICE'?14:30));
+  const qs=document.getElementById('sec-quote-terms');
+  if(qs) qs.style.display = t==='QUOTATION' ? '' : 'none';
+  syncQuoteTerms();
+  const d=new Date(); d.setDate(d.getDate()+(t==='INVOICE'?14:qValid()));
   document.getElementById('f-date2').value=d.toISOString().split('T')[0];
 }
 
@@ -1192,7 +1434,65 @@ function calcTotals(){
   document.getElementById('t-sub').textContent='₹'+sub.toLocaleString('en-IN');
   document.getElementById('t-adv').textContent='= ₹'+Math.round(sub*adv/100).toLocaleString('en-IN');
   document.getElementById('t-total').textContent='₹'+sub.toLocaleString('en-IN');
+  syncQuoteTerms();
 }
+
+// ── Quotation terms ────────────────────────────────────────────────────────
+// Deliberately neutral between event and brand work — "the shoot", never "the
+// event". Validity and delivery come off the form so a quote can no longer
+// contradict a delivery promise made in the project notes (QUO-2526-001 shipped
+// with a note saying 10 working days and terms saying 30). The licence line
+// matches clause 08 of agreement.html: full payment buys a licence, not
+// copyright, so it must not say rights "transfer".
+const QUOTE_DEFAULTS = { valid:30, deliv:10 };
+let qTermsDirty = false;
+
+function quoteTermsFor(advPct, valid, deliv){
+  return [
+    `This quotation is valid for ${valid} days from the date of issue.`,
+    `${advPct}% advance confirms the booking. The balance is due on completion of the shoot, before final delivery.`,
+    'Cancellation within 48 hours of the shoot date: the advance is non-refundable.',
+    `Edited photos & films are delivered within ${deliv} working days of the shoot.`,
+    'On payment in full you receive a licence to use the delivered work for the agreed purpose. Copyright remains with YKS Productions.'
+  ];
+}
+function qValid(){ return parseInt(v('q-valid')) || QUOTE_DEFAULTS.valid; }
+function qDeliv(){ return parseInt(v('q-deliv')) || QUOTE_DEFAULTS.deliv; }
+function qAdv(){ return parseFloat(v('f-adv')) || 50; }
+
+// force=true is the Reset button: it also clears the hand-edited flag
+function syncQuoteTerms(force){
+  const box = document.getElementById('q-terms'); if(!box) return;
+  if(qTermsDirty && !force) return;
+  if(force) qTermsDirty = false;
+  box.value = quoteTermsFor(qAdv(), qValid(), qDeliv()).join('\n');
+}
+function qTermsEdited(){ qTermsDirty = true; }
+
+// keep the printed "Valid Until" date honest against the "valid for N days" line
+function qValidChanged(){
+  syncQuoteTerms();
+  if(currentType!=='QUOTATION') return;
+  const d = new Date(); d.setDate(d.getDate() + qValid());
+  set('f-date2', d.toISOString().split('T')[0]);
+}
+
+function getQuoteTerms(){
+  const lines = v('q-terms').split('\n').map(t=>t.trim()).filter(Boolean);
+  return lines.length ? lines : quoteTermsFor(qAdv(), qValid(), qDeliv());
+}
+
+// ── Licensed purpose ───────────────────────────────────────────────────────
+// Clause 08 of agreement.html sets licence scope as "use of the delivered work
+// for the purposes described in the quotation" — it delegates scope to this
+// document. Until now the template never stated one, so the clause pointed at
+// nothing. Carried on invoices too: he does small jobs with no quote first, and
+// an undefined scope there is the same hole.
+const LICENCE_PURPOSE_DEFAULT =
+  "the client's own marketing — website, organic social and paid social advertising; " +
+  "personal to the client, not extending to retail partners, resellers or third-party brands";
+
+function resetPurpose(){ set('f-purpose', LICENCE_PURPOSE_DEFAULT); }
 
 // ── Terms of Engagement link ───────────────────────────────────────────────
 // Client details ride in the URL *fragment*, not the query string: fragments
@@ -1220,9 +1520,13 @@ function agBuild(){
   if(v('ag-ot'))  cfg.ot  = v('ag-ot');
   if(v('ag-rev')) cfg.rev = v('ag-rev');
   const c = getCounters();
-  cfg.ref = 'QUO-2526-' + String(c.quo).padStart(3,'0');
-
-  // btoa is latin1-only; encode UTF-8 first so names with accents survive
+  const pfx = currentType==='INVOICE' ? 'INV' : 'QUO';
+  const num = currentType==='INVOICE' ? c.inv : c.quo;
+  cfg.ref = pfx+'-'+DOC_SERIES+'-'+String(num).padStart(3,'0');
+  return agEncode(cfg);
+}
+// btoa is latin1-only; encode UTF-8 first so names with accents survive
+function agEncode(cfg){
   const json = JSON.stringify(cfg);
   const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(json)));
   return AGREEMENT_URL + '#' + encodeURIComponent(b64);
@@ -1263,6 +1567,76 @@ function agEmail(){
     +'&body='+encodeURIComponent(body),'_blank');
 }
 
+// ── AGREEMENT FOR AN ALREADY-ISSUED DOCUMENT ───────────────────────────────
+// The form-based builder above only works while the New Document screen still
+// holds the client's details. This rebuilds the same agreement from a saved
+// document, so any past quotation or invoice can produce its own — with the
+// document's real number as the reference, not the next counter value.
+let agDocId=null;
+function ag2TypeChanged(){ set('ag2-days', v('ag2-type')==='corp' ? '30' : '7'); }
+function openAgreeFor(id){
+  const doc=getDocs().find(d=>d.id===id);
+  if(!doc){ toast('Document not found'); return; }
+  agDocId=id;
+  const a=doc.ag||{};
+  set('ag2-org', a.org||'');
+  set('ag2-type', a.type||'corp');
+  set('ag2-days', a.days||(a.type==='ind'?'7':'30'));
+  set('ag2-hrs', a.hrs||'');
+  set('ag2-ot',  a.ot||'');
+  set('ag2-rev', a.rev||'');
+  set('ag2-adv', doc.advPct==null?50:doc.advPct);
+  const note=document.getElementById('ag2-for');
+  if(note) note.textContent=(doc.client&&doc.client.name?doc.client.name:'Client')+' \u00B7 '+doc.id
+    +(doc.ag?'' : ' \u2014 this document predates saved agreement settings, so check the fields below.');
+  const n2=document.getElementById('ag2-note'); if(n2) n2.textContent='';
+  openSheet('sh-agree');
+}
+function ag2Doc(){ return getDocs().find(d=>d.id===agDocId); }
+function ag2Link(){
+  const doc=ag2Doc(); if(!doc){ toast('Document not found'); return null; }
+  const cfg={ name:(doc.client&&doc.client.name)||'', org:v('ag2-org').trim(),
+    proj:(doc.client&&doc.client.event)||'', adv:parseInt(v('ag2-adv'))||50,
+    days:v('ag2-days')||'7', ref:doc.id };
+  if(v('ag2-hrs')) cfg.hrs=v('ag2-hrs');
+  if(v('ag2-ot'))  cfg.ot =v('ag2-ot');
+  if(v('ag2-rev')) cfg.rev=v('ag2-rev');
+  // keep what he tweaked here, so the next time this document is opened it remembers
+  const docs=getDocs(), t=docs.find(d=>d.id===agDocId);
+  if(t){ t.ag={org:v('ag2-org').trim(),type:v('ag2-type'),days:v('ag2-days'),
+    hrs:v('ag2-hrs'),ot:v('ag2-ot'),rev:v('ag2-rev')}; writeDocs(docs); }
+  return agEncode(cfg);
+}
+function ag2Open(){ const u=ag2Link(); if(u) window.open(u,'_blank'); }
+function ag2Copy(){
+  const u=ag2Link(); if(!u) return;
+  const done=()=>{ const n=document.getElementById('ag2-note'); if(n) n.textContent='Link copied — paste it to your client.'; toast('Link copied'); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(u).then(done).catch(()=>agFallback(u));
+  } else agFallback(u);
+}
+function ag2Msg(doc,u){
+  const first=String((doc.client&&doc.client.name)||'').trim().split(' ')[0];
+  return 'Hi '+first+' \u2014 here are the terms for our shoot ('+doc.id+'). '
+    +'You can sign it right on the page and save a PDF:\n\n'+u;
+}
+function ag2WhatsApp(){
+  const u=ag2Link(); if(!u) return; const doc=ag2Doc();
+  // send straight to the client when the document carries a usable number
+  const digits=String((doc.client&&doc.client.phone)||'').replace(/\D/g,'');
+  const to = digits.length>=10 ? (digits.length===10?'91'+digits:digits) : '';
+  window.open('https://wa.me/'+to+'?text='+encodeURIComponent(ag2Msg(doc,u)),'_blank');
+}
+function ag2Email(){
+  const u=ag2Link(); if(!u) return; const doc=ag2Doc();
+  const first=String((doc.client&&doc.client.name)||'').trim().split(' ')[0];
+  const body='Hi '+first+',\n\nHere are the Terms of Engagement for our shoot ('+doc.id+'). '
+    +'You can fill in your details, sign on the page and save it as a PDF:\n\n'+u
+    +'\n\nAny questions, just reply to this.\n\nYedukrishna\n\uD83D\uDCF8 @yks_photoworks \u00B7 yksproductions.com';
+  window.open('mailto:?subject='+encodeURIComponent('Terms of Engagement \u2014 '+doc.id+' \u2014 YKS Productions')
+    +'&body='+encodeURIComponent(body),'_blank');
+}
+
 // ── Generate ───────────────────────────────────────────────────────────────
 function generateDoc(){
   const items=getItems();
@@ -1270,11 +1644,18 @@ function generateDoc(){
   if(!items.length){alert('Please add at least one service');return;}
   const num=bumpCounter(currentType);
   const prefix=currentType==='INVOICE'?'INV':'QUO';
-  const docId=`${prefix}-2526-${String(num).padStart(3,'0')}`;
-  const doc={id:docId,type:currentType,num,
+  const docId=`${prefix}-${DOC_SERIES}-${String(num).padStart(3,'0')}`;
+  const ag={org:v('ag-org').trim(),type:v('ag-type'),days:v('ag-days'),
+    hrs:v('ag-hrs'),ot:v('ag-ot'),rev:v('ag-rev')};
+  const doc={id:docId,type:currentType,num,ag,
     client:{name:v('f-client'),phone:v('f-phone'),event:v('f-event')},
     date:v('f-date'),date2:v('f-date2'),items,
     notes:v('f-notes'),advPct:parseFloat(v('f-adv'))||50,createdAt:Date.now()};
+  const purpose=v('f-purpose').trim();
+  if(purpose) doc.purpose=purpose;
+  if(currentType==='QUOTATION'){
+    doc.terms=getQuoteTerms(); doc.validDays=qValid(); doc.delivDays=qDeliv();
+  }
   saveDoc(doc); previewDoc(doc);
 }
 
@@ -1290,16 +1671,22 @@ function buildDocHTML(doc){
   const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
   const fmtD=d=>{if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});};
   const isInv=doc.type==='INVOICE';
+  // Udyam is read off settings, not off the doc: it is a fact about the business,
+  // not about the job, and a re-print of an old doc should carry today's status.
+  const udyam=(s.udyam||'').trim();
   const terms=isInv?[
     'Payment is due on or before the date mentioned above.',
     'Images remain property of YKS Productions until full payment is received.',
     'Cancellations within 48 hours of shoot: full fee applies.'
-  ]:[
-    'This quotation is valid for 30 days from the date of issue.',
-    '50% advance required to confirm the booking. Balance due on event day.',
-    'Cancellations within 48 hours of the event: advance is non-refundable.',
-    'Edited photos & films delivered within 30 working days.'
-  ];
+  ]:(Array.isArray(doc.terms)&&doc.terms.length ? doc.terms.slice()
+     : quoteTermsFor(doc.advPct||50, doc.validDays||QUOTE_DEFAULTS.valid, doc.delivDays||QUOTE_DEFAULTS.deliv));
+  // Not back-filled from a default: a document already issued without a stated
+  // purpose must not silently acquire one when it is re-printed.
+  if(doc.purpose) terms.push(`Licensed purpose: ${doc.purpose}.`);
+  // MSMED Act s.15 caps a buyer's payment to a registered micro supplier at 45 days,
+  // but only once the buyer knows of the registration — which is the point of printing it.
+  // Nothing above may therefore set a payment term longer than 45 days.
+  if(udyam) terms.push(`YKS Productions is a Micro Enterprise registered under the MSMED Act, 2006 (Udyam ${udyam}). The payment terms above are set within the limit prescribed by Section 15 of that Act.`);
   const rows=doc.items.map((it,i)=>`<tr><td>${i+1}</td><td>${esc(it.desc)}</td><td style="text-align:right">${fmt(it.rate)}</td><td style="text-align:right">${fmt(it.rate)}</td></tr>`).join('');
   return`<div class="doc-preview">
     <div class="dp-header">
@@ -1308,6 +1695,7 @@ function buildDocHTML(doc){
         <div class="dp-badge ${isInv?'inv':''}">${doc.type}</div>
       </div>
       <div class="dp-contact">${esc(s.web)} · ${esc(s.ig)} · ${esc(s.phoneIn)}</div>
+      ${udyam?`<div class="dp-contact" style="margin-top:4px">Udyam Reg. No. ${esc(udyam)} · Registered Micro Enterprise, Ministry of MSME, Govt. of India</div>`:''}
     </div>
     <div class="dp-gold-line"></div>
     <div class="dp-body">
@@ -1339,34 +1727,103 @@ function buildDocHTML(doc){
       ${doc.notes?`<div style="background:#FAF7F3;padding:10px;border-radius:6px;margin-top:10px;font-size:10px;color:#8C8480;font-style:italic">${esc(doc.notes)}</div>`:''}
     </div>
     <div class="dp-grand"><span class="dp-grand-lbl">${isInv?'TOTAL DUE':'TOTAL'}</span><span class="dp-grand-val">${fmt(sub)}</span></div>
-    <div class="dp-footer">Currency: INR (₹) · All amounts are inclusive</div>
-    <div class="dp-terms"><div class="dp-terms-title">Terms & Conditions</div>${terms.map(t=>`<div class="dp-term">${t}</div>`).join('')}</div>
+    <div class="dp-footer">Currency: INR (₹) · All amounts are inclusive · Not registered for GST — no GST is charged or collectable on this ${isInv?'invoice':'quotation'}</div>
+    <div class="dp-terms"><div class="dp-terms-title">Terms & Conditions</div>${terms.map(t=>`<div class="dp-term">${esc(t)}</div>`).join('')}</div>
   </div>`;
 }
 
 // ── History ────────────────────────────────────────────────────────────────
+// ── ARCHIVE ────────────────────────────────────────────────────────────────
+// Everything he has ever issued lives here. Documents are stored in this
+// browser's localStorage and nowhere else, which is exactly why the backup
+// bar below is not optional decoration — see backupState().
+let arcFilter='all';
+function setArcFilter(f){
+  arcFilter=f;
+  document.getElementById('chip-all').className='arc-chip'+(f==='all'?' on':'');
+  document.getElementById('chip-quo').className='arc-chip'+(f==='QUOTATION'?' on':'');
+  document.getElementById('chip-inv').className='arc-chip'+(f==='INVOICE'?' on':'');
+  renderHistory();
+}
+// Indian financial year: 1 April to 31 March.
+function fyOf(dateStr,fallbackMs){
+  let d = dateStr ? new Date(dateStr+'T00:00:00') : new Date(fallbackMs||Date.now());
+  if(isNaN(d)) d = new Date(fallbackMs||Date.now());
+  const y=d.getFullYear(), fy = d.getMonth()>=3 ? y : y-1;
+  return fy+'\u2013'+String(fy+1).slice(2);
+}
+function docTotal(doc){ return (doc.items||[]).reduce((a,i)=>a+(Number(i.rate)||0),0); }
+
 function renderHistory(){
-  const docs=getDocs(); const list=document.getElementById('history-list');
-  if(!docs.length){
-    list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><p>No documents yet.<br>Tap <b>Invoice</b> to create your first.</p></div>`;
+  const all=getDocs(); const list=document.getElementById('history-list');
+  renderBackupBar(all);
+  // The chips scope the search box. Say so in the placeholder, otherwise the
+  // two read as unrelated controls and searching within one type looks missing.
+  const box=document.getElementById('arc-q');
+  if(box) box.placeholder = arcFilter==='INVOICE'   ? 'Search invoices \u2014 client, number, amount'
+                          : arcFilter==='QUOTATION' ? 'Search quotations \u2014 client, number, amount'
+                          :                           'Search all documents \u2014 client, number, amount';
+  const q=(v('arc-q')||'').trim().toLowerCase();
+  const docs=all.filter(d=>{
+    if(arcFilter!=='all' && d.type!==arcFilter) return false;
+    if(!q) return true;
+    const hay=[d.id,d.client&&d.client.name,d.client&&d.client.event,d.client&&d.client.phone,
+      d.date,d.notes,d.purpose,docTotal(d)]
+      .concat((d.items||[]).map(i=>i.desc)).join(' ').toLowerCase();
+    if(hay.indexOf(q)>-1) return true;
+    // so "37,000", "\u20B937000" and "37000" all find the same document
+    const bare=x=>x.replace(/[\u20B9,\s]/g,'');
+    return bare(q).length>0 && bare(hay).indexOf(bare(q))>-1;
+  });
+
+  const cnt=document.getElementById('arc-count');
+  if(cnt) cnt.textContent = all.length ? (docs.length===all.length ? all.length+' total' : docs.length+' of '+all.length) : '';
+
+  const fmt=n=>'\u20B9'+Number(n).toLocaleString('en-IN');
+  const fmtD=d=>{if(!d)return'';const dt=new Date(d+'T00:00:00');return isNaN(dt)?'':dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});};
+
+  if(!all.length){
+    list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><p>No documents on this device.<br>Tap <b>Invoice</b> to create one \u2014 or <b>Restore</b> above if you have a backup file.</p></div>`;
     return;
   }
-  const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
-  const fmtD=d=>{if(!d)return'';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});};
-  list.innerHTML=docs.map(doc=>{
-    const sub=doc.items.reduce((a,i)=>a+i.rate,0);
-    const isInv=doc.type==='INVOICE';
-    return`<div class="doc-card">
-      <div class="doc-card-top">
-        <div><div class="doc-num">${doc.id}</div><div class="doc-client">${esc(doc.client.name)}</div><div class="doc-meta">${esc(doc.client.event||'')}${doc.date?' · '+fmtD(doc.date):''}</div></div>
-        <span class="doc-badge ${isInv?'badge-inv':'badge-quo'}">${doc.type}</span>
-      </div>
-      <div class="doc-total">${fmt(sub)}</div>
-      <div class="doc-actions">
-        <button class="btn-sm btn-view" onclick="openDoc('${doc.id}')">View / Print</button>
-        <button class="btn-sm btn-del" onclick="confirmDelete('${doc.id}')">Delete</button>
-      </div>
-    </div>`;
+  if(!docs.length){
+    list.innerHTML=`<div class="empty-state"><p>Nothing matches that search.</p></div>`;
+    return;
+  }
+
+  // newest first, then grouped under the financial year they belong to
+  const sorted=docs.slice().sort((a,b)=>{
+    const ad=a.date||'', bd=b.date||'';
+    if(ad!==bd) return ad<bd?1:-1;
+    return (b.createdAt||0)-(a.createdAt||0);
+  });
+  const groups=[];
+  sorted.forEach(d=>{
+    const fy=fyOf(d.date,d.createdAt);
+    let g=groups[groups.length-1];
+    if(!g||g.fy!==fy){ g={fy,docs:[]}; groups.push(g); }
+    g.docs.push(d);
+  });
+
+  list.innerHTML=groups.map(g=>{
+    const gTotal=g.docs.reduce((a,d)=>a+docTotal(d),0);
+    const head=`<div class="fy-head"><span class="fy-name">FY ${g.fy}</span><span class="fy-sum">${g.docs.length} document${g.docs.length>1?'s':''} \u00B7 ${fmt(gTotal)}</span></div>`;
+    const cards=g.docs.map(doc=>{
+      const isInv=doc.type==='INVOICE';
+      return`<div class="doc-card">
+        <div class="doc-card-top">
+          <div><div class="doc-num">${esc(doc.id)}${doc.logged?'<span class="doc-logged">LOGGED</span>':''}</div><div class="doc-client">${esc(doc.client&&doc.client.name)}</div><div class="doc-meta">${esc((doc.client&&doc.client.event)||'')}${doc.date?' \u00B7 '+fmtD(doc.date):''}</div></div>
+          <span class="doc-badge ${isInv?'badge-inv':'badge-quo'}">${esc(doc.type)}</span>
+        </div>
+        <div class="doc-total">${fmt(docTotal(doc))}</div>
+        <div class="doc-actions">
+          <button class="btn-sm btn-view" onclick="openDoc('${esc(doc.id)}')">View / Print</button>
+          <button class="btn-sm btn-agree" onclick="openAgreeFor('${esc(doc.id)}')">Agreement</button>
+          <button class="btn-sm btn-del" onclick="confirmDelete('${esc(doc.id)}')">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+    return head+cards;
   }).join('');
 }
 function openDoc(id){ const doc=getDocs().find(d=>d.id===id); if(doc) previewDoc(doc); }
@@ -1410,7 +1867,8 @@ function appendAIMsg(role,text,isDone){
 function getFormContext(){
   const rows=Array.from(document.querySelectorAll('#items-container .item-row'));
   const items=rows.map((r,i)=>{const ins=r.querySelectorAll('input');return{index:i,description:ins[0].value.trim(),rate:parseFloat(ins[1].value)||0};});
-  return{document_type:currentType,client_name:v('f-client'),client_phone:v('f-phone'),event:v('f-event'),date:v('f-date'),date2:v('f-date2'),items,advance_pct:parseFloat(v('f-adv'))||50,subtotal:items.reduce((a,i)=>a+i.rate,0),notes:v('f-notes')};
+  return{document_type:currentType,client_name:v('f-client'),client_phone:v('f-phone'),event:v('f-event'),date:v('f-date'),date2:v('f-date2'),items,advance_pct:parseFloat(v('f-adv'))||50,subtotal:items.reduce((a,i)=>a+i.rate,0),notes:v('f-notes'),
+    delivery_working_days:qDeliv(),quote_valid_days:qValid(),licensed_purpose:v('f-purpose').trim(),quote_terms:currentType==='QUOTATION'?getQuoteTerms():undefined};
 }
 function execInvoiceTool(name,input){
   switch(name){
@@ -2815,6 +3273,8 @@ function fallbackCopy(txt){
   document.getElementById('f-date').value=today.toISOString().split('T')[0];
   document.getElementById('f-date2').value=due.toISOString().split('T')[0];
   addItem();
+  syncQuoteTerms();
+  resetPurpose();
   renderHistory();
   window.addEventListener('error', e=>logErr('script', e.message, {src:(e.filename||'').split('/').pop(), line:e.lineno}));
   window.addEventListener('unhandledrejection', e=>logErr('promise', (e.reason&&e.reason.message)||e.reason));
