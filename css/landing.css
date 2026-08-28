@@ -503,3 +503,13 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
   font-family:var(--mono);font-size:11px;color:var(--amber);
   border:1px solid rgba(255,140,59,.42);background:rgba(255,140,59,.07)}
 .ap-check b{color:var(--paper);font-weight:600}
+
+/* Common questions — the Q&A block under the guides. Answer-shaped, so it
+   reads as a list of answers rather than more prose. */
+.l-faq{border-top:1px solid var(--line);margin-top:6px}
+.l-faq h3{font-family:var(--sans);font-size:1.02rem;font-weight:600;letter-spacing:0;
+  margin:26px 0 8px;color:var(--paper)}
+.l-faq p{margin:0;color:var(--paper-dim)}
+.l-ptable caption{caption-side:bottom;text-align:left;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim);opacity:.7;
+  padding-top:10px;line-height:1.6}
