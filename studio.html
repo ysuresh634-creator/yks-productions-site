@@ -750,6 +750,36 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 
 <div class="ov" id="ov" onclick="closeSheets()"></div>
 
+<!-- LOG A PAST DOCUMENT SHEET -->
+<div class="sheet" id="sh-past">
+  <div class="sh-hd"><span class="sh-title">📁 ADD A PAST DOCUMENT</span><button class="sh-x" onclick="closeSheets()">&times;</button></div>
+  <div class="sh-body">
+    <p class="field-note" style="margin-bottom:12px">For quotations and invoices you issued before this tool, or from another device. Keep the original number and date so the archive matches your records.</p>
+    <div class="form-row">
+      <div>
+        <label class="form-label">Type</label>
+        <select class="form-input" id="pd-type" onchange="pdSuggestNum()">
+          <option value="INVOICE">Invoice</option>
+          <option value="QUOTATION">Quotation</option>
+        </select>
+      </div>
+      <div><label class="form-label">Document number</label><input class="form-input" id="pd-id" placeholder="INV-2526-001"></div>
+    </div>
+    <div class="form-row">
+      <div><label class="form-label">Date issued</label><input class="form-input" id="pd-date" type="date"></div>
+      <div><label class="form-label">Amount (₹)</label><input class="form-input" id="pd-amt" type="number" min="0" placeholder="37000"></div>
+    </div>
+    <div class="form-field"><label class="form-label">Client</label><input class="form-input" id="pd-client" placeholder="Client name"></div>
+    <div class="form-field"><label class="form-label">Project</label><input class="form-input" id="pd-event" placeholder="What the job was"></div>
+    <div class="form-field"><label class="form-label">Description</label><input class="form-input" id="pd-desc" placeholder="Photography &amp; video coverage"></div>
+    <p class="field-note" id="pd-note" style="margin:4px 0 12px"></p>
+    <div class="row2">
+      <button class="btn btn-ghost" onclick="closeSheets()">Cancel</button>
+      <button class="btn btn-save" onclick="savePastDoc()">Add to archive</button>
+    </div>
+  </div>
+</div>
+
 <!-- AGREEMENT-FOR-A-DOCUMENT SHEET -->
 <div class="sheet" id="sh-agree">
   <div class="sh-hd"><span class="sh-title">📝 AGREEMENT</span><button class="sh-x" onclick="closeSheets()">&times;</button></div>
@@ -1280,11 +1310,12 @@ function backupState(docs){
 }
 function renderBackupBar(docs){
   const bar=document.getElementById('backup-bar'); if(!bar) return;
-  if(!docs.length){ bar.innerHTML=`<div class="bk-bar bk-ok">Nothing stored on this device yet. If you have a backup file from another phone or laptop, restore it here.<div class="bk-acts"><button class="bk-btn" onclick="pickRestore()">Restore from backup</button></div></div>`; return; }
+  if(!docs.length){ bar.innerHTML=''; return; }
   const st=backupState(docs);
   const acts=`<div class="bk-acts">
       <button class="bk-btn primary" onclick="exportBackup()">Back up now</button>
       <button class="bk-btn" onclick="exportCSV()">Export CSV</button>
+      <button class="bk-btn" onclick="openPastDoc()">Add past</button>
       <button class="bk-btn" onclick="pickRestore()">Restore</button>
     </div>`;
   if(st.stale){
@@ -1365,6 +1396,46 @@ function restoreBackup(input){
   };
   r.onerror=()=>alert('Could not read that file.');
   r.readAsText(f);
+}
+
+// ── LOG A PAST DOCUMENT ────────────────────────────────────────────────────
+// The archive can only show what it was told about. Anything issued before
+// this tool existed, or from another device, has to be entered by hand \u2014
+// keeping its original number and date so the record matches his books.
+function openPastDoc(){
+  ['pd-id','pd-client','pd-event','pd-desc','pd-amt'].forEach(i=>set(i,''));
+  set('pd-type','INVOICE');
+  set('pd-date',new Date().toISOString().split('T')[0]);
+  const n=document.getElementById('pd-note'); if(n) n.textContent='';
+  pdSuggestNum();
+  openSheet('sh-past');
+}
+function pdSuggestNum(){
+  const c=getCounters(), inv=v('pd-type')==='INVOICE';
+  set('pd-id',(inv?'INV':'QUO')+'-'+DOC_SERIES+'-'+String(inv?c.inv:c.quo).padStart(3,'0'));
+}
+function savePastDoc(){
+  const note=document.getElementById('pd-note');
+  const say=m=>{ if(note) note.textContent=m; };
+  const id=v('pd-id').trim(), client=v('pd-client').trim(), amt=parseFloat(v('pd-amt'));
+  if(!id){ say('Give it a document number \u2014 the one on the original.'); return; }
+  if(!client){ say('Add the client name.'); return; }
+  if(!(amt>=0) || isNaN(amt)){ say('Add the amount.'); return; }
+  const docs=getDocs();
+  if(docs.some(d=>d.id===id)){ say(id+' is already in the archive.'); return; }
+  const type=v('pd-type'), date=v('pd-date')||new Date().toISOString().split('T')[0];
+  const doc={id,type,client:{name:client,phone:'',event:v('pd-event').trim()},
+    date,date2:date,items:[{desc:v('pd-desc').trim()||'Photography & video services',rate:amt}],
+    notes:'',advPct:0,createdAt:new Date(date+'T00:00:00').getTime()||Date.now(),logged:true};
+  docs.unshift(doc);
+  if(!writeDocs(docs)) return;
+  // keep the counter ahead of anything hand-entered in the current series
+  const m=/^(?:INV|QUO)-(\d+)-(\d+)$/.exec(id);
+  if(m && m[1]===DOC_SERIES){
+    const c=getCounters(), k=type==='INVOICE'?'inv':'quo', n=parseInt(m[2],10)+1;
+    if(n>(c[k]||1)){ c[k]=n; try{ localStorage.setItem('yks_ctrs',JSON.stringify(c)); }catch(e){} }
+  }
+  closeSheets(); renderHistory(); showScreen('history'); toast(id+' added to the archive');
 }
 
 // ── Nav ────────────────────────────────────────────────────────────────────
@@ -1783,7 +1854,7 @@ function renderHistory(){
   const fmtD=d=>{if(!d)return'';const dt=new Date(d+'T00:00:00');return isNaN(dt)?'':dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});};
 
   if(!all.length){
-    list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><p>No documents on this device.<br>Tap <b>Invoice</b> to create one \u2014 or <b>Restore</b> above if you have a backup file.</p></div>`;
+    list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><p>No documents on this device.<br>Tap <b>Invoice</b> to create a new one, or add ones you have already issued.</p><div class="bk-acts" style="justify-content:center;margin-top:16px"><button class="bk-btn primary" onclick="openPastDoc()">Add a past document</button><button class="bk-btn" onclick="pickRestore()">Restore from backup</button></div></div>`;
     return;
   }
   if(!docs.length){
