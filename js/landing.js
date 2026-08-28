@@ -18,6 +18,7 @@
           subject: form.dataset.subject || 'New enquiry — YKS Productions',
           from_name: 'YKS Productions website',
           Source: form.dataset.source || 'Landing page',
+          "Found via": (window.YKSSource && window.YKSSource.label()) || '\u2014',
           Name: get('name'),
           Contact: get('contact'),
           Email: get('email') || '—',

@@ -457,6 +457,7 @@
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         access_key: 'fbf5d037-af64-46a1-8ddc-5777379ec179',
+        "Found via": (window.YKSSource && window.YKSSource.label()) || '\u2014',
         subject: 'New shoot enquiry — ' + v('f-type') + ' — ' + v('f-name'),
         from_name: 'YKS Productions website',
         Name: v('f-name'),
@@ -512,6 +513,7 @@
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           access_key: 'fbf5d037-af64-46a1-8ddc-5777379ec179',
+        "Found via": (window.YKSSource && window.YKSSource.label()) || '\u2014',
           subject: 'Masterclass waitlist — ' + email,
           from_name: 'YKS Productions website',
           Email: email,
