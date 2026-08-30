@@ -814,3 +814,61 @@ main{overflow-x:clip}
 .l-faq details{padding:6px 0}
 .l-faq summary{padding:16px 0}
 .l-faq p{margin:2px 0 18px}
+
+/* ═══════════════════════════════════════════════════════════════
+   SURFACES — giving the dark somewhere to stand
+
+   Measured, the palette had three "different" darks at luminance 7,
+   12 and 13 out of 255. They are the same colour. Everything on the
+   page was therefore one of two values — near-black or cream — and
+   four of the six card types had no background at all, so they read
+   as hairline wireframes floating on a void rather than as objects
+   sitting on a page. That flatness is what "visually poor" was.
+
+   Same hue, same brand. What changes is that there is now a real
+   tonal ladder (10 → 18 → 26 → 36), cards have material, and the
+   amber is spent on actions instead of on every border and rule.
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --mag-paper:#0A0910;          /* page ground, a touch warm  lum 10 */
+  --mag-paper-2:#12101A;        /* alternating sections       lum 18 */
+  --mag-panel:#1A1724;          /* cards                      lum 26 */
+  --mag-panel-2:#241F31;        /* raised / hover             lum 36 */
+  --mag-ink:#F6F1E9;
+  --mag-ink-2:rgba(246,241,233,.82);
+  --mag-soft:rgba(246,241,233,.56);
+  --mag-line:rgba(246,241,233,.10);
+  --mag-line-2:rgba(246,241,233,.22);
+  --mag-accent:#FF9448;
+  --mag-good:#63C793;
+  --card-shadow:0 1px 0 rgba(246,241,233,.04) inset,0 18px 40px -24px rgba(0,0,0,.9);
+}
+
+/* cards become objects: a surface, a softer edge, and a shadow that
+   lifts them off the ground instead of a 28%-opacity outline */
+.tal-proof-card{background:var(--mag-panel);border:1px solid var(--mag-line);
+  border-top:2px solid var(--mag-accent);border-radius:3px;padding:26px 24px;
+  box-shadow:var(--card-shadow)}
+.tal-vs-col{background:var(--mag-panel);border-color:var(--mag-line);box-shadow:var(--card-shadow)}
+.tal-vs-mine{background:linear-gradient(168deg,rgba(255,148,72,.10),rgba(255,148,72,.03));
+  border-color:rgba(255,148,72,.42)}
+.tal-safe{background:var(--mag-line);border-color:var(--mag-line)}
+.tal-safe > div{background:var(--mag-panel);padding:28px 26px}
+.tal-usage > div{background:var(--mag-panel);border:1px solid var(--mag-line);border-radius:3px;
+  padding:24px 22px;box-shadow:var(--card-shadow)}
+.tal-usage h3{padding-top:0;border-top:0}
+.l-faq details{background:var(--mag-panel);border:1px solid var(--mag-line);border-radius:3px;
+  padding:2px 22px;margin-bottom:10px;transition:border-color .22s,background .22s}
+.l-faq details:hover{border-color:var(--mag-line-2)}
+.l-faq details[open]{background:var(--mag-panel-2);border-color:rgba(255,148,72,.3)}
+.l-citygrid a{background:var(--mag-panel);border-color:var(--mag-line)}
+.l-citygrid a:hover{background:var(--mag-panel-2);border-color:var(--mag-accent)}
+.tal-sl{background:linear-gradient(168deg,var(--mag-panel),var(--mag-paper-2))}
+.tal-sl-dot{background:var(--mag-good);box-shadow:0 0 0 3px rgba(99,199,147,.16)}
+.tal-steps li{border-color:var(--mag-line)}
+.cast-form input,.cast-form textarea{background:var(--mag-panel)!important}
+
+/* the accent was doing structural work everywhere, so it had stopped
+   meaning "act here" — hand the rules back to ink */
+.tal-usage h3{color:var(--mag-ink)}
+.tal-usage > div{border-top:2px solid var(--mag-accent)}
