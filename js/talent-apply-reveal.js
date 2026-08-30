@@ -39,13 +39,34 @@
     el.style.setProperty('--apr-d', Math.min(i % 3, 2) * 90 + 'ms');
   });
 
+  function light(el) {
+    el.classList.add('is-lit');
+    io.unobserve(el);
+  }
+
+  /* Generous top/bottom margin: a block starts developing before it is on
+     screen, so it is resolved by the time it is read rather than resolving
+     under the reader's eyes. */
   var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      e.target.classList.add('is-lit');
-      io.unobserve(e.target);
-    });
-  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    entries.forEach(function (e) { if (e.isIntersecting) light(e.target); });
+  }, { rootMargin: '300px 0px 300px 0px', threshold: 0.01 });
 
   targets.forEach(function (el) { io.observe(el); });
+
+  /* FAILSAFE — the important part.
+     Anything gated on scroll is invisible to something that never scrolls,
+     and a rendering crawler is exactly that: it lays the page out in a tall
+     viewport and reads it where it stands. Leaving a thousand words of FAQ
+     at opacity 0 to buy a scroll effect is a bad trade, so everything
+     resolves on its own shortly after load whether or not anyone moved. A
+     reader who has already scrolled will never see this fire; one who sat
+     still gets a finished page, which is the right failure. */
+  var settled = false;
+  function settle() {
+    if (settled) return;
+    settled = true;
+    targets.forEach(light);
+  }
+  setTimeout(settle, 2600);
+  window.addEventListener('load', function () { setTimeout(settle, 1200); });
 })();
