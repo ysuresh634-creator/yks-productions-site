@@ -690,3 +690,82 @@ main{overflow-x:clip}
    APPLY — tap instead of write (talent-apply-assist.js)
    ═══════════════════════════════════════════════════════════════ */
 .apa{margin:2px 0 12px}
+/* ═══════════════════════════════════════════════════════════════
+   ROSTER HERO — rebuilt
+   There was not a single button on this page. The primary action and
+   the talent link were both 12px uppercase text, and the talent one
+   was set at 52% opacity with a transparent border, which made the
+   half of the page that recruits effectively invisible.
+   ═══════════════════════════════════════════════════════════════ */
+.tal-hero{padding:104px 0 clamp(40px,5vw,64px)}
+.tal-hero-grid{display:grid;grid-template-columns:1.08fr .92fr;
+  gap:clamp(28px,5vw,64px);align-items:center;margin-top:clamp(26px,4vw,44px)}
+.tal-hero-txt{min-width:0}
+.tal-masthead{font-size:clamp(46px,7vw,96px)!important;margin-bottom:14px}
+.tal-h1sub{font-size:11px;letter-spacing:.2em}
+.tal-stand{border-left:2px solid var(--mag-accent);padding-left:18px;margin:22px 0 26px;
+  max-width:52ch;font-size:clamp(15px,1.4vw,16.5px);line-height:1.7;color:var(--mag-ink-2)}
+.tal-index{margin:0 0 28px}
+
+/* actual buttons */
+.tal-cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.tal-cta-main{display:inline-block;background:var(--mag-accent);color:#0a0810;border-radius:2px;
+  padding:17px 30px;font-family:var(--mag-mono);font-size:11.5px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;transition:background .22s,transform .22s;
+  box-shadow:0 14px 34px -16px rgba(255,140,59,.85)}
+.tal-cta-main:hover{background:#ffc9a3;transform:translateY(-1px)}
+.tal-cta-ghost{display:inline-block;border:1px solid var(--mag-line-2);border-radius:2px;
+  padding:16px 26px;color:var(--mag-ink);font-family:var(--mag-mono);font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;transition:all .2s}
+.tal-cta-ghost:hover{border-color:var(--mag-accent);color:var(--mag-accent)}
+.tal-cta-main:focus-visible,.tal-cta-ghost:focus-visible{outline:2px solid var(--mag-accent);outline-offset:3px}
+
+/* the shortlist artefact — what a brief actually gets back */
+.tal-hero-art{min-width:0}
+.tal-sl{border:1px solid var(--mag-line-2);border-radius:4px;overflow:hidden;
+  background:linear-gradient(168deg,#15121c,#0c0a11);
+  box-shadow:0 40px 90px -34px rgba(0,0,0,.95)}
+.tal-sl-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  padding:16px 18px;border-bottom:1px solid var(--mag-line)}
+.tal-sl-top b{font-family:var(--mag-display);font-size:20px;font-weight:600;color:var(--mag-ink)}
+.tal-sl-top span{font-family:var(--mag-mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mag-accent)}
+.tal-sl-row{display:flex;align-items:center;gap:14px;padding:15px 18px;
+  border-bottom:1px solid var(--mag-line)}
+.tal-sl-code{font-family:var(--mag-mono);font-size:11px;letter-spacing:.14em;color:var(--mag-accent);
+  border:1px solid var(--mag-line-2);border-radius:2px;padding:7px 9px;flex:0 0 auto}
+.tal-sl-meta{flex:1;min-width:0;font-family:var(--mag-sans);font-size:13.5px;color:var(--mag-ink-2);
+  display:flex;flex-direction:column;gap:3px}
+.tal-sl-meta i{font-style:normal;font-family:var(--mag-mono);font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mag-soft)}
+.tal-sl-dot{width:7px;height:7px;border-radius:50%;background:#5fc08a;flex:0 0 auto;
+  box-shadow:0 0 0 3px rgba(95,192,138,.16)}
+.tal-sl-foot{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:14px 18px;
+  background:rgba(255,140,59,.06)}
+.tal-sl-foot span{font-family:var(--mag-mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mag-soft)}
+.tal-sl-foot b{font-family:var(--mag-display);font-size:15px;color:var(--mag-ink);font-weight:600}
+
+/* the talent door — lit, not whispered */
+.tal-talent-band{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 22px;
+  margin-top:clamp(30px,4vw,46px);padding:22px 26px;border-radius:3px;
+  border:1px solid rgba(255,140,59,.42);background:rgba(255,140,59,.07);transition:all .24s}
+.tal-talent-band:hover{background:rgba(255,140,59,.13);border-color:var(--mag-accent);
+  transform:translateY(-1px)}
+.tal-tb-kick{grid-column:1;font-family:var(--mag-mono);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--mag-accent)}
+.tal-tb-main{grid-column:1;font-family:var(--mag-display);font-size:clamp(20px,2.4vw,27px);
+  font-weight:600;color:var(--mag-ink);line-height:1.15;margin-top:5px}
+.tal-tb-note{grid-column:1;font-size:13px;color:var(--mag-soft);margin-top:6px}
+.tal-tb-go{grid-column:2;grid-row:1/4;background:var(--mag-accent);color:#0a0810;border-radius:2px;
+  padding:15px 26px;font-family:var(--mag-mono);font-size:11px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;white-space:nowrap}
+.tal-talent-band:focus-visible{outline:2px solid var(--mag-accent);outline-offset:4px}
+
+@media(max-width:900px){
+  .tal-hero-grid{grid-template-columns:1fr;gap:34px}
+  .tal-hero-art{max-width:420px}
+  .tal-talent-band{grid-template-columns:1fr}
+  .tal-tb-go{grid-column:1;grid-row:auto;text-align:center;margin-top:14px}
+  .tal-cta-main,.tal-cta-ghost{flex:1;text-align:center}
+}

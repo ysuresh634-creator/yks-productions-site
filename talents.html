@@ -42,7 +42,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=17" />
-<link rel="stylesheet" href="/css/talents.css?v=79" />
+<link rel="stylesheet" href="/css/talents.css?v=82" />
 
 <script type="application/ld+json">
 {
@@ -502,20 +502,45 @@
       <span>YKS Productions</span>
       <span>The Talent Edit — 2026 / 01</span>
     </div>
-    <p class="tal-kicker">Talents at YKS</p>
-    <h1 class="tal-masthead">The <em>Faces</em><span class="tal-h1sub">Casting for brands across India &amp; the UAE</span></h1>
-    <p class="tal-stand">Send me the brief and you'll have a shortlist inside 24 hours — real options, and one all-in number covering the talent and the shoot together. No agency layer. No booking fee stacked on top. One desk from the brief to the delivered files.</p>
-    <p class="tal-index" id="talStats">
-      <span><b>24h</b> to a shortlist</span><i></i>
-      <span><b>12</b> cities, India &amp; UAE</span><i></i>
-      <span><b>One</b> number — talent &amp; shoot</span><i></i>
-      <span><b>Releases</b> in writing</span>
-    </p>
-    <div class="tal-hero-links">
-      <a href="#brief">↓ Start a brief</a>
-      <a href="#roster">See the edit</a>
-      <a class="tal-hero-alt" href="#join">I'm talent →</a>
+
+    <div class="tal-hero-grid">
+      <div class="tal-hero-txt">
+        <p class="tal-kicker">Talents at YKS</p>
+        <h1 class="tal-masthead">The <em>Faces</em><span class="tal-h1sub">Casting for brands across India &amp; the UAE</span></h1>
+        <p class="tal-stand">Send me the brief and you'll have a shortlist inside 24 hours — real options, and one all-in number covering the talent and the shoot together. No agency layer. No booking fee stacked on top.</p>
+        <p class="tal-index" id="talStats">
+          <span><b>24h</b> to a shortlist</span><i></i>
+          <span><b>12</b> cities, India &amp; UAE</span><i></i>
+          <span><b>One</b> number — talent &amp; shoot</span><i></i>
+          <span><b>Releases</b> in writing</span>
+        </p>
+        <div class="tal-cta-row">
+          <a class="tal-cta-main" href="#cast">Send a casting brief</a>
+          <a class="tal-cta-ghost" href="#roster">See the edit</a>
+        </div>
+      </div>
+
+      <!-- what a brief actually gets back, drawn rather than photographed —
+           no faces and no names, which is the roster's whole rule -->
+      <div class="tal-hero-art" aria-hidden="true">
+        <div class="tal-sl">
+          <div class="tal-sl-top"><b>Shortlist</b><span>Within 24 hours</span></div>
+          <div class="tal-sl-row"><span class="tal-sl-code">M—</span><span class="tal-sl-meta">Fashion · Editorial<i>Mumbai</i></span><span class="tal-sl-dot"></span></div>
+          <div class="tal-sl-row"><span class="tal-sl-code">M—</span><span class="tal-sl-meta">Commercial · Print<i>Bangalore</i></span><span class="tal-sl-dot"></span></div>
+          <div class="tal-sl-row"><span class="tal-sl-code">A—</span><span class="tal-sl-meta">Film &amp; TV<i>Dubai</i></span><span class="tal-sl-dot"></span></div>
+          <div class="tal-sl-foot"><span>One all-in number</span><b>talent + shoot</b></div>
+        </div>
+      </div>
     </div>
+
+    <!-- the other door. It was 12px grey text at 52% opacity, which made the
+         half of this page that recruits effectively invisible. -->
+    <a class="tal-talent-band" href="/talents/apply.html">
+      <span class="tal-tb-kick">Are you a model, actor or creator?</span>
+      <span class="tal-tb-main">Join the edit — free, about 3 minutes</span>
+      <span class="tal-tb-note">No fee, ever · your name stays private · a portfolio you keep</span>
+      <span class="tal-tb-go">Apply →</span>
+    </a>
   </div>
 </section>
 
