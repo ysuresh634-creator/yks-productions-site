@@ -772,3 +772,45 @@ main{overflow-x:clip}
   .tal-tb-go{grid-column:1;grid-row:auto;text-align:center;margin-top:14px}
   .tal-cta-main,.tal-cta-ghost{flex:1;text-align:center}
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY — spacing pass
+   Measured on the live page and every number below was wrong:
+
+     h2 leading      0.98   two-line headings nearly touched
+     FAQ answers     98 characters per line
+     talent band     143 characters per line
+     section padding 70px against a 64px heading
+     head → content  30px
+
+   Comfortable measure is 45–75 characters; past about 80 the eye
+   loses its place returning to the next line, which on a dark ground
+   reads as "hard to look at" long before anyone names it as measure.
+   This file is loaded only by the talents pages, so it scopes itself.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* headings: room for a second line */
+.l-head h2,.l-cta h2,.tal-join h2{line-height:1.09}
+.l-head h2{margin-bottom:4px}
+
+/* measure — cap every run of prose */
+.l-head > p{max-width:64ch}
+.l-faq summary{max-width:64ch}
+.l-faq p{max-width:72ch}
+.tal-steps p{max-width:66ch}
+.tal-vs-col li{max-width:58ch;line-height:1.7}
+.tal-safe p{line-height:1.7}
+.tal-usage p{line-height:1.75}
+.tal-proof-card p{line-height:1.7}
+.tal-tb-note{max-width:72ch}
+.tal-join-lede{max-width:64ch}
+.l-note{max-width:78ch;line-height:1.7}
+
+/* vertical rhythm — a 64px heading cannot sit in 70px of padding */
+.l-section{padding:clamp(76px,7vw,112px) 0}
+.l-head{margin-bottom:clamp(32px,3.4vw,46px)}
+
+/* the FAQ was the densest block on the page */
+.l-faq details{padding:6px 0}
+.l-faq summary{padding:16px 0}
+.l-faq p{margin:2px 0 18px}
