@@ -41,7 +41,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=17" />
-<link rel="stylesheet" href="/css/talents.css?v=61" />
+<link rel="stylesheet" href="/css/talents.css?v=78" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -358,35 +358,71 @@
 
 <main>
 
-<!-- HEADER -->
-<section class="tal-hero">
-  <div class="wrap ap-hero2">
-    <div class="ap-hero2-txt">
-      <p class="tal-kicker">Submissions — Open</p>
-      <h1 class="pf-name">Join the <em>Edit</em><span class="tal-h1sub">Modelling &amp; casting opportunities across India — free to join</span></h1>
-      <p class="ap-hero2-sub">Models, actors and creators across <b>India &amp; the UAE</b>. Add a few phone photos and, in two minutes, walk away with a real portfolio to keep — <b>free</b>. You're only ever booked through YKS, and your number stays private.</p>
-      <ul class="ap-hero2-chips">
-        <li>No fee, ever — we never ask you for money</li><li>No portfolio package to buy</li><li>You stay private</li><li>A portfolio you keep</li>
+<!-- HEADER — no photographs, on purpose. Showing someone else's face to
+     recruit a model borrows a likeness we were never given for this, and it
+     puts a stranger where the reader should be picturing herself. Empty,
+     lit frames do the aspiration better: the whole page is a book waiting
+     for her pictures. Everything below is drawn in CSS. -->
+<section class="ap-hero3">
+  <div class="ap-hero3-grain" aria-hidden="true"></div>
+  <div class="wrap ap-hero3-in">
+
+    <div class="ap-hero3-txt">
+      <p class="tal-kicker">Submissions — Open · Volume 01</p>
+      <h1 class="ap-hero3-h">Some faces<br /><em>get remembered.</em></h1>
+      <p class="ap-hero3-sub">Models, actors and creators across <b>India &amp; the UAE</b>. Send a few photos from your phone and walk away with a portfolio built the way agencies build them — <b>free</b>, and yours to keep whether I ever cast you or not.</p>
+      <div class="ap-hero3-cta-row">
+        <a class="ap-hero3-cta" href="#talForm">Start — free, about 3 minutes</a>
+        <a class="ap-hero3-alt" href="#is-this-real">Is this real? →</a>
+      </div>
+      <ul class="ap-hero3-chips">
+        <li>No fee, ever</li><li>Nothing to buy</li><li>Your name stays private</li><li>A portfolio you keep</li>
       </ul>
-      <div class="ap-hero2-cta-row">
-        <a class="ap-hero2-cta" href="#talForm">Start — it's free ↓</a>
-        <span class="ap-hero2-note">2-minute submission · phone photos welcome</span>
+    </div>
+
+    <!-- the comp card, drawn rather than photographed: this is the artefact
+         she walks away with, so it is the only thing worth showing -->
+    <div class="ap-hero3-art" aria-hidden="true">
+      <div class="ap-h3-plate ap-h3-plate-b"><span class="ap-h3-num">02</span></div>
+      <div class="ap-h3-plate ap-h3-plate-c"><span class="ap-h3-num">03</span></div>
+
+      <div class="ap-h3-card">
+        <div class="ap-h3-card-top"><b>YKS</b><span>Talent Portfolio</span></div>
+        <div class="ap-h3-frame">
+          <span class="ap-h3-crop ap-h3-crop-tl"></span><span class="ap-h3-crop ap-h3-crop-tr"></span>
+          <span class="ap-h3-crop ap-h3-crop-bl"></span><span class="ap-h3-crop ap-h3-crop-br"></span>
+          <span class="ap-h3-wm">YKS PRODUCTIONS</span>
+          <span class="ap-h3-here">your cover</span>
+        </div>
+        <div class="ap-h3-card-disc">FASHION · EDITORIAL · RUNWAY</div>
+        <div class="ap-h3-card-name">Your Name</div>
+        <div class="ap-h3-card-meta">
+          <span>HEIGHT<b>—</b></span><span>BUST<b>—</b></span><span>WAIST<b>—</b></span><span>HIPS<b>—</b></span>
+        </div>
+        <div class="ap-h3-card-ed">EDITION 2026 · YKS</div>
       </div>
     </div>
-    <div class="ap-hero2-mock" aria-hidden="true">
-      <div class="ap-mock-card ap-mock-back">
-        <div class="ap-mock-lbl">Profile — measurements</div>
-        <div class="ap-mock-stats"><span>HEIGHT<b>5'8"</b></span><span>BUST<b>34"</b></span><span>WAIST<b>26"</b></span><span>HIPS<b>36"</b></span></div>
-        <div class="ap-mock-rows"><i></i><i></i><i></i></div>
-      </div>
-      <div class="ap-mock-card ap-mock-front">
-        <div class="ap-mock-top"><b>YKS</b><span>Talent Portfolio</span></div>
-        <div class="ap-mock-photo"><span class="ap-mock-wm">YKS PRODUCTIONS</span></div>
-        <div class="ap-mock-disc">FASHION · EDITORIAL · RUNWAY</div>
-        <div class="ap-mock-name">Your Name</div>
-        <div class="ap-mock-ed">EDITION 2026 · EXCLUSIVE · YKS</div>
-      </div>
+
+  </div>
+</section>
+
+<!-- WHAT YOU WALK AWAY WITH — the six books, drawn, not screenshotted -->
+<section class="ap-books" aria-label="The portfolio designs you can build">
+  <div class="wrap">
+    <div class="ap-books-head">
+      <p class="tal-kicker">What you walk away with</p>
+      <h2 class="ap-books-h">Six books. Pick one, <em>or let it pick for you.</em></h2>
+      <p class="ap-books-say">Every one is print-ready, graded so your shots look like one shoot rather than a camera roll, and carries a booking QR that routes through me. Designers charge for this. You won't be asked for anything.</p>
     </div>
+    <div class="ap-books-row">
+      <article class="ap-book" style="--bk:#c8703a"><div class="ap-book-top"><span>01</span><i></i></div><div class="ap-book-plate"></div><b>Editorial</b><small>The house book — full spreads</small></article>
+      <article class="ap-book" style="--bk:#8a8f7a"><div class="ap-book-top"><span>02</span><i></i></div><div class="ap-book-plate ap-book-plate-2"></div><b>Comp card</b><small>Two pages, the industry standard</small></article>
+      <article class="ap-book" style="--bk:#7d6ea8"><div class="ap-book-top"><span>03</span><i></i></div><div class="ap-book-plate ap-book-plate-3"></div><b>Lookbook</b><small>Wide plates, for fashion</small></article>
+      <article class="ap-book" style="--bk:#4f7f8b"><div class="ap-book-top"><span>04</span><i></i></div><div class="ap-book-plate ap-book-plate-4"></div><b>Minimal</b><small>Quiet type, nothing in the way</small></article>
+      <article class="ap-book" style="--bk:#a8544c"><div class="ap-book-top"><span>05</span><i></i></div><div class="ap-book-plate ap-book-plate-5"></div><b>Classic</b><small>Centred, formal, timeless</small></article>
+      <article class="ap-book" style="--bk:#5c7f5e"><div class="ap-book-top"><span>06</span><i></i></div><div class="ap-book-plate ap-book-plate-6"></div><b>Ethereal</b><small>Soft, airy, light-led</small></article>
+    </div>
+    <p class="ap-books-fine">Plus a digitals page — natural and unretouched, the way casting directors actually ask to see you.</p>
   </div>
 </section>
 
@@ -995,6 +1031,10 @@
 
 <script src="/js/landing.js?v=11"></script>
 <script src="/js/talent-apply.js?v=68"></script>
+<script src="/js/talent-apply-flow.js?v=4"></script>
+<script src="/js/talent-apply-live.js?v=4"></script>
+<script src="/js/talent-apply-assist.js?v=1"></script>
+<script src="/js/talent-apply-reveal.js?v=1"></script>
   <script src="/js/search.js?v=10" defer></script>
 <script src="/js/source.js?v=1"></script>
 <script src="/js/preferred-source.js?v=1" defer></script>

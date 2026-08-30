@@ -1092,3 +1092,571 @@ main{overflow-x:clip}
   .pf-stick.on{transform:translateY(0)}
   .pf-stick-btn{padding:8px 12px;font-size:10px}
 }
+
+/* ── letter-spacing also widens the space character, so word gaps in uppercase buttons and
+      labels render roughly double. Pull the word spacing back by the tracking amount. ── */
+.btn,.ap-ai-btn,.pf-stick-btn,.tal-sl-btn,.tal-plan-go,.tal-plan-send,.tal-plan-show,
+.tal-hold-go,.pf-tab,.ap-crop-mode,.tal-chip,.ap-statspaste-go{word-spacing:-.14em}
+/* the italic display face overhangs to the left, so it needs a touch more room after a name */
+.l-cta h2 em,.pf-hero-txt h1 em{margin-left:.12em}
+/* keep the sticky book bar clear of the floating chat widget at every width */
+.pf-stick{max-width:min(calc(100vw - 240px),780px)}
+@media(max-width:820px){
+  .pf-stick{max-width:none;bottom:92px}          /* the chat bubble sits bottom-right on mobile */
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THE EDIT — 2026 rebuild
+   The page had one job (show faces) and was doing it for two
+   audiences at once. These sections split the lanes: everything
+   above .tal-join speaks to a brand with a shoot to cast; .tal-join
+   is a different door, lit differently, for the talent.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* the talent link in the masthead is deliberately quieter than the
+   two client CTAs beside it — clients decide in the first screen */
+.tal-hero-links a.tal-hero-alt{border-color:transparent;color:var(--mag-soft);opacity:.85}
+.tal-hero-links a.tal-hero-alt:hover{opacity:1;border-color:var(--mag-line-2)}
+
+/* ── the brief engine: value before the ask ── */
+.tal-brief-head{max-width:720px}
+.tal-brief .tal-plan{max-width:760px;margin:34px auto 0}
+.tal-brief .tal-plan-box textarea{font-size:16px;padding:16px 18px}
+.tal-plan-note{font-family:var(--mag-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--mag-soft);text-align:center;margin:14px 0 0}
+
+/* ── proof ── */
+.tal-proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin:40px 0 26px}
+.tal-proof-card{border-top:1px solid var(--mag-line-2);padding-top:22px}
+.tal-proof-n{font-family:var(--mag-display);font-weight:600;font-size:clamp(34px,4.6vw,52px);
+  line-height:1;color:var(--mag-accent);display:block;letter-spacing:-.02em}
+.tal-proof-card b{display:block;margin:10px 0 8px;font-family:var(--mag-mono);font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--mag-ink);font-weight:500}
+.tal-proof-card p{margin:0;font-size:14.5px;line-height:1.65;color:var(--mag-soft)}
+
+/* ── the five steps, with the clock on them ── */
+.tal-steps{list-style:none;margin:40px 0 34px;padding:0;counter-reset:none;
+  border-top:1px solid var(--mag-line)}
+.tal-steps li{display:flex;gap:26px;padding:26px 0;border-bottom:1px solid var(--mag-line)}
+.tal-step-n{font-family:var(--mag-display);font-size:26px;font-weight:600;color:var(--mag-accent);
+  flex:0 0 54px;line-height:1.1}
+.tal-steps li > div{flex:1;min-width:0}
+.tal-steps b{font-family:var(--mag-display);font-size:21px;font-weight:600;color:var(--mag-ink);
+  margin-right:14px}
+.tal-step-t{font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--mag-accent);white-space:nowrap}
+.tal-steps p{margin:9px 0 0;font-size:15px;line-height:1.7;color:var(--mag-ink-2);max-width:70ch}
+.tal-steps-cta{display:flex;gap:14px;flex-wrap:wrap}
+
+/* ── the agency comparison ── */
+.tal-vs{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:40px 0 22px}
+.tal-vs-col{border:1px solid var(--mag-line);border-radius:4px;padding:26px 26px 22px;
+  background:rgba(244,237,226,.02)}
+.tal-vs-col h3{font-family:var(--mag-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mag-soft);margin:0 0 18px;font-weight:500}
+.tal-vs-col ul{list-style:none;margin:0;padding:0}
+.tal-vs-col li{position:relative;padding:0 0 13px 24px;font-size:15px;line-height:1.6;color:var(--mag-soft)}
+.tal-vs-col li::before{content:"—";position:absolute;left:0;color:var(--mag-line-2)}
+.tal-vs-mine{border-color:var(--mag-accent);background:rgba(255,140,59,.05)}
+.tal-vs-mine h3{color:var(--mag-accent)}
+.tal-vs-mine li{color:var(--mag-ink-2)}
+.tal-vs-mine li::before{content:"✓";color:var(--mag-accent);font-size:12px}
+
+/* ── risk reversal ── */
+.tal-safe{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:40px;
+  background:var(--mag-line);border:1px solid var(--mag-line)}
+.tal-safe > div{background:var(--mag-paper);padding:26px 24px}
+.tal-safe b{display:block;font-family:var(--mag-display);font-size:19px;font-weight:600;
+  color:var(--mag-ink);margin-bottom:9px;line-height:1.3}
+.tal-safe p{margin:0;font-size:14.5px;line-height:1.65;color:var(--mag-soft)}
+
+/* ── usage & rights ── */
+.tal-usage{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin:40px 0 24px}
+.tal-usage h3{font-family:var(--mag-display);font-size:23px;font-weight:600;color:var(--mag-accent);
+  margin:0 0 12px;padding-top:18px;border-top:2px solid var(--mag-accent)}
+.tal-usage p{margin:0;font-size:14.5px;line-height:1.7;color:var(--mag-ink-2)}
+
+/* ══ TALENT LANE — inverted, so it reads as a different door ══ */
+.tal-join{background:var(--mag-ink);color:#14110c;padding:clamp(64px,9vw,110px) 0;
+  border-top:1px solid var(--mag-line)}
+.tal-join .tal-kicker{color:#b4540d}
+.tal-join .tal-kicker::before{background:#b4540d}
+.tal-join-head{max-width:820px;margin-bottom:44px}
+.tal-join h2{font-family:var(--mag-display);font-size:clamp(32px,5vw,54px);font-weight:500;
+  line-height:1.08;letter-spacing:-.02em;color:#14110c;margin:18px 0 20px}
+.tal-join h2 em{font-style:italic;color:#b4540d}
+.tal-join-lede{font-size:17px;line-height:1.72;color:rgba(20,17,12,.78);margin:0;max-width:68ch}
+
+.tal-join-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:26px;margin-bottom:52px}
+.tal-join-card{border:1px solid rgba(20,17,12,.16);border-radius:4px;padding:32px 30px;
+  background:rgba(255,255,255,.42)}
+.tal-join-card h3{font-family:var(--mag-display);font-size:27px;font-weight:600;color:#14110c;
+  margin:0 0 18px;line-height:1.2}
+.tal-join-tag{font-family:var(--mag-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:#b4540d;display:block;margin-bottom:12px}
+.tal-join-list{list-style:none;margin:0 0 26px;padding:0}
+.tal-join-list li{position:relative;padding:0 0 14px 26px;font-size:15px;line-height:1.62;
+  color:rgba(20,17,12,.76)}
+.tal-join-list li::before{content:"→";position:absolute;left:0;color:#b4540d}
+.tal-join-list b{color:#14110c}
+.tal-join .btn{border-color:rgba(20,17,12,.3);color:#14110c}
+.tal-join .btn:hover{background:rgba(180,84,13,.1);border-color:#b4540d;color:#b4540d}
+.tal-join .btn-fill{background:#14110c;border-color:#14110c;color:var(--mag-ink)}
+.tal-join .btn-fill:hover{background:#b4540d;border-color:#b4540d;color:#fff}
+.tal-join-fine{font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.08em;
+  color:rgba(20,17,12,.55);margin:14px 0 0;line-height:1.6}
+
+/* the four promises — the fear-killers, numbered so they read as terms */
+.tal-join-promise{background:rgba(20,17,12,.05);border-color:rgba(20,17,12,.22)}
+.tal-join-why{font-size:14.5px;line-height:1.6;color:rgba(20,17,12,.66);margin:0 0 18px}
+.tal-promise{list-style:none;margin:0;padding:0;counter-reset:promise}
+.tal-promise li{counter-increment:promise;position:relative;padding:0 0 16px 34px;
+  font-size:14.5px;line-height:1.62;color:rgba(20,17,12,.74)}
+.tal-promise li::before{content:counter(promise,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.06em;color:#b4540d}
+.tal-promise b{color:#14110c}
+
+.tal-join-next{border-top:1px solid rgba(20,17,12,.16);padding-top:40px}
+.tal-join-next h3{font-family:var(--mag-display);font-size:27px;font-weight:600;color:#14110c;margin:0 0 26px}
+.tal-join-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:30px}
+.tal-join-steps span{font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.2em;color:#b4540d;
+  display:block;margin-bottom:8px}
+.tal-join-steps b{display:block;font-family:var(--mag-display);font-size:19px;font-weight:600;
+  color:#14110c;margin-bottom:7px}
+.tal-join-steps p{margin:0;font-size:14.5px;line-height:1.62;color:rgba(20,17,12,.7)}
+.tal-join-vol{font-size:15px;line-height:1.7;color:rgba(20,17,12,.72);margin:0 0 26px;max-width:64ch;
+  border-left:2px solid #b4540d;padding-left:18px}
+.tal-join-cta{display:flex;gap:14px;flex-wrap:wrap}
+
+/* ── responsive ── */
+@media(max-width:1000px){
+  .tal-usage{grid-template-columns:1fr 1fr}
+  .tal-safe{grid-template-columns:1fr 1fr}
+  .tal-join-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .tal-proof-grid{grid-template-columns:1fr;gap:26px}
+  .tal-vs{grid-template-columns:1fr}
+  .tal-safe{grid-template-columns:1fr}
+  .tal-usage{grid-template-columns:1fr;gap:26px}
+  .tal-join-steps{grid-template-columns:1fr;gap:24px}
+  .tal-steps li{gap:16px;padding:22px 0}
+  .tal-step-n{flex-basis:34px;font-size:20px}
+  .tal-steps b{display:block;margin:0 0 4px}
+  .tal-join-card{padding:26px 22px}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   APPLY WIZARD — one thing at a time
+   Layered on top of the existing apply markup by talent-apply-flow.js.
+   Everything here is scoped under .apw-on, which only exists once the
+   script has run, so the no-JS page keeps every block open.
+   ═══════════════════════════════════════════════════════════════ */
+/* the "Start" link jumps to #talForm; without this the first line lands
+   underneath the sticky progress bar that is the form's own first child */
+.apw-on{scroll-margin-top:calc(var(--apw-top, 64px) + 6px)}
+.apw-panel{display:none}
+.apw-on .apw-panel.is-on{display:block;animation:apwIn .32s cubic-bezier(.2,.7,.2,1)}
+@keyframes apwIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.apw-on .apw-panel.is-on{animation:none}}
+
+/* progress header — sticky, because the reassurance has to stay on screen */
+.apw-bar{position:sticky;top:var(--apw-top,64px);z-index:30;margin:0 0 30px;padding:16px 0 14px;
+  background:var(--mag-paper);box-shadow:0 10px 18px -10px var(--mag-paper);
+  border-bottom:1px solid var(--mag-line)}
+/* The nav animates its height, so the measured offset is always a frame or two
+   behind and a sliver of scrolling text can show between nav and bar. Rather
+   than chase the measurement, carry the bar's own background up past it — any
+   gap is then filled with page colour whatever the nav is doing. */
+.apw-bar::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:26px;
+  background:var(--mag-paper);pointer-events:none}
+.apw-bar-top{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-bottom:11px}
+.apw-count{font-family:var(--mag-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mag-soft)}
+.apw-count b{font-family:var(--mag-display);font-size:17px;font-weight:600;color:var(--mag-accent);
+  letter-spacing:0;margin:0 2px}
+.apw-left{font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mag-accent)}
+.apw-track{height:2px;background:var(--mag-line);overflow:hidden}
+.apw-fill{display:block;height:100%;background:var(--mag-accent);width:8%;
+  transition:width .42s cubic-bezier(.2,.7,.2,1)}
+
+/* the rail: every step named and reachable, so the end is visible from step one */
+.apw-dots{display:flex;gap:6px;margin-top:12px;overflow-x:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch}
+.apw-dots::-webkit-scrollbar{display:none}
+.apw-dot{flex:0 0 auto;cursor:pointer;background:none;border:0;padding:5px 0 0;
+  font-family:var(--mag-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(244,237,226,.34);border-top:2px solid var(--mag-line);margin-right:4px;
+  transition:color .25s,border-color .25s;white-space:nowrap}
+.apw-dot span{padding:0 9px 0 0}
+.apw-dot.is-done{color:var(--mag-soft);border-top-color:var(--mag-line-2)}
+.apw-dot.is-on{color:var(--mag-ink);border-top-color:var(--mag-accent)}
+.apw-dot:hover{color:var(--mag-ink)}
+.apw-dot:focus-visible{outline:2px solid var(--mag-accent);outline-offset:2px}
+
+.apw-lead{font-size:15px;line-height:1.6;color:var(--mag-soft);margin:0 0 22px;max-width:60ch}
+
+/* step nav */
+.apw-nav{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  margin-top:34px;padding-top:22px;border-top:1px solid var(--mag-line);flex-wrap:wrap}
+.apw-fwd{display:flex;gap:10px;align-items:center;margin-left:auto}
+.apw-back,.apw-skip{cursor:pointer;background:none;border:0;padding:12px 4px;
+  font-family:var(--mag-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mag-soft);transition:color .2s}
+.apw-back:hover,.apw-skip:hover{color:var(--mag-ink)}
+.apw-next{cursor:pointer;background:var(--mag-accent);border:0;border-radius:2px;padding:14px 26px;
+  color:#0a0810;font-family:var(--mag-mono);font-size:11px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;transition:background .2s}
+.apw-next:hover{background:#ffc9a3}
+.apw-back:focus-visible,.apw-skip:focus-visible,.apw-next:focus-visible{
+  outline:2px solid var(--mag-accent);outline-offset:3px}
+
+/* the step heading is the panel's own title now — the wizard supplies the number */
+.apw-on .ap-block{margin-bottom:0}
+
+@media(max-width:760px){
+  .apw-bar{padding:13px 0 11px}
+  .apw-dots{margin-top:10px}
+  .apw-nav{margin-top:26px}
+  .apw-next{flex:1;text-align:center;padding:15px 18px}
+  .apw-fwd{width:100%}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   APPLY — the photography-led rebuild
+   The page sells a modelling career and showed no modelling. Type on
+   black, section after section, is why it read as a document rather
+   than an invitation. The work does the arguing now; the copy just
+   points at it.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── hero ────────────────────────────────────────────────────
+   Drawn, not photographed. A lit, empty frame asks the reader to put
+   herself in it; a stranger's face answers the question for her. It
+   also means no likeness is used to recruit that was never given for
+   recruiting. ─────────────────────────────────────────────────── */
+.ap-hero3{position:relative;padding:clamp(108px,10vw,138px) 0 clamp(44px,5vw,70px);overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 84% 6%,rgba(255,140,59,.15),transparent 56%),
+    radial-gradient(70% 60% at 6% 98%,rgba(255,140,59,.05),transparent 62%),
+    var(--mag-paper)}
+.ap-hero3-grain{position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(rgba(244,237,226,.05) 1px,transparent 1px);
+  background-size:3px 3px}
+.ap-hero3-in{position:relative;display:grid;grid-template-columns:1.05fr .95fr;
+  gap:clamp(30px,5vw,74px);align-items:center}
+
+.ap-hero3-h{font-family:var(--mag-display);font-optical-sizing:auto;font-weight:500;
+  font-size:clamp(44px,7.2vw,92px);line-height:.96;letter-spacing:-.035em;
+  color:var(--mag-ink);margin:20px 0 24px;text-wrap:balance}
+.ap-hero3-h em{font-style:italic;color:var(--mag-accent);display:inline-block}
+.ap-hero3-sub{font-size:clamp(15.5px,1.5vw,17.5px);line-height:1.72;color:var(--mag-ink-2);
+  margin:0 0 30px;max-width:52ch}
+.ap-hero3-sub b{color:var(--mag-ink);font-weight:600}
+
+.ap-hero3-cta-row{display:flex;align-items:center;gap:16px 34px;flex-wrap:wrap;margin-bottom:30px}
+.ap-hero3-cta{display:inline-block;background:var(--mag-accent);color:#0a0810;border-radius:2px;
+  padding:17px 32px;font-family:var(--mag-mono);font-size:11.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;transition:background .22s,transform .22s;
+  box-shadow:0 14px 34px -16px rgba(255,140,59,.8)}
+.ap-hero3-cta:hover{background:#ffc9a3;transform:translateY(-1px)}
+.ap-hero3-alt{font-family:var(--mag-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--mag-soft);border-bottom:1px solid var(--mag-line-2);padding-bottom:3px;transition:color .2s}
+.ap-hero3-alt:hover{color:var(--mag-accent);border-color:var(--mag-accent)}
+.ap-hero3-chips{list-style:none;display:flex;flex-wrap:wrap;gap:9px 10px;margin:0;padding:0}
+.ap-hero3-chips li{font-family:var(--mag-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--mag-ink-2);border:1px solid var(--mag-line);border-radius:100px;padding:7px 13px}
+
+/* the artefact — a comp card and two loose plates behind it */
+.ap-hero3-art{position:relative;min-height:clamp(400px,46vw,560px);
+  display:flex;align-items:center;justify-content:center}
+.ap-h3-plate{position:absolute;border:1px solid var(--mag-line-2);border-radius:2px;
+  background:linear-gradient(150deg,rgba(244,237,226,.07),rgba(244,237,226,.015) 55%),var(--mag-panel)}
+.ap-h3-plate-b{width:34%;aspect-ratio:2/3;top:3%;left:1%;transform:rotate(-6deg);opacity:.62}
+.ap-h3-plate-c{width:29%;aspect-ratio:2/3;bottom:5%;right:2%;transform:rotate(5deg);opacity:.45}
+.ap-h3-num{position:absolute;top:9px;left:10px;font-family:var(--mag-mono);font-size:8.5px;
+  letter-spacing:.2em;color:var(--mag-soft)}
+
+.ap-h3-card{position:relative;z-index:3;width:min(320px,74%);
+  background:linear-gradient(168deg,#15121c,#0d0b12);
+  border:1px solid var(--mag-line-2);border-radius:3px;padding:20px 20px 18px;
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.98),0 0 0 1px rgba(255,140,59,.07)}
+.ap-h3-card-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:14px}
+.ap-h3-card-top b{font-family:var(--mag-display);font-size:19px;font-weight:600;color:var(--mag-ink)}
+.ap-h3-card-top span{font-family:var(--mag-mono);font-size:8px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--mag-soft)}
+
+/* the empty frame, lit like a backdrop */
+.ap-h3-frame{position:relative;aspect-ratio:4/5;border-radius:2px;overflow:hidden;
+  background:
+    radial-gradient(75% 58% at 50% 30%,rgba(255,190,140,.16),transparent 68%),
+    radial-gradient(110% 80% at 50% 118%,rgba(255,140,59,.08),transparent 60%),
+    linear-gradient(180deg,#241d28,#100d15);
+  border:1px solid var(--mag-line);
+  display:flex;align-items:center;justify-content:center}
+.ap-h3-wm{font-family:var(--mag-display);font-size:15px;letter-spacing:.16em;
+  color:rgba(244,237,226,.13);transform:rotate(-24deg);white-space:nowrap;font-weight:600}
+.ap-h3-here{position:absolute;bottom:11px;left:0;right:0;text-align:center;
+  font-family:var(--mag-mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
+  color:rgba(255,140,59,.72)}
+.ap-h3-crop{position:absolute;width:11px;height:11px;border:0 solid rgba(244,237,226,.42)}
+.ap-h3-crop-tl{top:7px;left:7px;border-top-width:1px;border-left-width:1px}
+.ap-h3-crop-tr{top:7px;right:7px;border-top-width:1px;border-right-width:1px}
+.ap-h3-crop-bl{bottom:7px;left:7px;border-bottom-width:1px;border-left-width:1px}
+.ap-h3-crop-br{bottom:7px;right:7px;border-bottom-width:1px;border-right-width:1px}
+
+.ap-h3-card-disc{font-family:var(--mag-mono);font-size:8px;letter-spacing:.18em;color:var(--mag-accent);
+  text-transform:uppercase;margin:14px 0 5px}
+.ap-h3-card-name{font-family:var(--mag-display);font-size:30px;font-weight:600;color:var(--mag-ink);
+  line-height:1.02;letter-spacing:-.015em}
+.ap-h3-card-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0 12px;
+  padding-top:12px;border-top:1px solid var(--mag-line)}
+.ap-h3-card-meta span{display:flex;flex-direction:column;gap:3px;
+  font-family:var(--mag-mono);font-size:7px;letter-spacing:.12em;color:var(--mag-soft)}
+.ap-h3-card-meta b{font-family:var(--mag-display);font-size:14px;color:var(--mag-ink-2);letter-spacing:0}
+.ap-h3-card-ed{font-family:var(--mag-mono);font-size:7px;letter-spacing:.16em;color:var(--mag-soft);
+  text-transform:uppercase}
+
+/* ── the six books ── */
+.ap-books{padding:clamp(52px,6vw,84px) 0;border-top:1px solid var(--mag-line);
+  border-bottom:1px solid var(--mag-line);background:var(--mag-paper-2)}
+.ap-books-head{max-width:62ch;margin-bottom:38px}
+.ap-books-h{font-family:var(--mag-display);font-weight:500;font-size:clamp(28px,4vw,46px);
+  line-height:1.08;letter-spacing:-.025em;color:var(--mag-ink);margin:16px 0 14px}
+.ap-books-h em{font-style:italic;color:var(--mag-accent)}
+.ap-books-say{font-size:15.5px;line-height:1.7;color:var(--mag-ink-2);margin:0}
+.ap-books-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.ap-book{border:1px solid var(--mag-line);border-radius:3px;padding:13px 13px 15px;
+  background:var(--mag-panel);transition:border-color .28s,transform .28s}
+.ap-book:hover{border-color:var(--bk);transform:translateY(-3px)}
+.ap-book-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ap-book-top span{font-family:var(--mag-mono);font-size:8.5px;letter-spacing:.16em;color:var(--mag-soft)}
+.ap-book-top i{width:13px;height:2px;background:var(--bk);display:block;border-radius:2px}
+.ap-book-plate{aspect-ratio:3/4;border-radius:2px;margin-bottom:11px;border:1px solid var(--mag-line);
+  background:
+    linear-gradient(160deg,color-mix(in srgb,var(--bk) 26%,transparent),transparent 62%),
+    linear-gradient(180deg,#1d1826,#100d15)}
+.ap-book-plate-2{background:
+    linear-gradient(160deg,color-mix(in srgb,var(--bk) 26%,transparent),transparent 62%),
+    repeating-linear-gradient(180deg,#1d1826 0 46%,#0e0b13 46% 50%,#1d1826 50% 96%)}
+.ap-book-plate-3{background:
+    linear-gradient(200deg,color-mix(in srgb,var(--bk) 30%,transparent),transparent 58%),
+    linear-gradient(90deg,#1d1826 0 62%,#0e0b13 62%)}
+.ap-book-plate-4{background:linear-gradient(180deg,#191420,#0e0b13)}
+.ap-book-plate-5{background:
+    radial-gradient(58% 44% at 50% 42%,color-mix(in srgb,var(--bk) 34%,transparent),transparent 70%),
+    linear-gradient(180deg,#1b1623,#0e0b13)}
+.ap-book-plate-6{background:
+    radial-gradient(120% 80% at 50% 0%,color-mix(in srgb,var(--bk) 26%,transparent),transparent 66%),
+    linear-gradient(180deg,#1e1a27,#12101a)}
+.ap-book b{display:block;font-family:var(--mag-display);font-size:16px;font-weight:600;
+  color:var(--mag-ink);margin-bottom:3px}
+.ap-book small{display:block;font-size:11.5px;line-height:1.45;color:var(--mag-soft)}
+.ap-books-fine{margin:26px 0 0;font-size:14px;color:var(--mag-soft);
+  border-left:2px solid var(--mag-accent);padding-left:15px}
+
+@media(max-width:1040px){.ap-books-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){
+  .ap-hero3-in{grid-template-columns:1fr;gap:38px}
+  .ap-hero3-art{min-height:min(104vw,470px);max-width:460px;margin-inline:auto;width:100%}
+  .ap-hero3-h{font-size:clamp(40px,11vw,62px)}
+}
+@media(max-width:560px){
+  .ap-hero3-cta{width:100%;text-align:center}
+  .ap-hero3-cta-row{gap:16px}
+  .ap-h3-card{width:min(280px,84%);padding:16px 16px 15px}
+  .ap-h3-card-name{font-size:25px}
+  .ap-books-row{grid-template-columns:repeat(2,1fr)}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   APPLY — the live studio (talent-apply-live.js)
+   ═══════════════════════════════════════════════════════════════ */
+.apl{margin-top:26px;border:1px solid var(--mag-line-2);border-radius:4px;overflow:hidden;
+  background:linear-gradient(168deg,#16121d,#0c0a11);
+  opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s cubic-bezier(.2,.7,.2,1)}
+.apl.is-in{opacity:1;transform:none}
+.apl-head{padding:18px 20px 14px;border-bottom:1px solid var(--mag-line)}
+.apl-kick{font-family:var(--mag-mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--mag-accent);margin:0 0 7px}
+.apl-say{margin:0;font-size:14px;line-height:1.6;color:var(--mag-ink-2)}
+.apl-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;padding:20px}
+
+.apl-card{background:linear-gradient(168deg,#181320,#0e0b13);border:1px solid var(--mag-line-2);
+  border-radius:3px;padding:15px 15px 14px;box-shadow:0 30px 64px -28px rgba(0,0,0,.95)}
+.apl-card-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px}
+.apl-card-top b{font-family:var(--mag-display);font-size:16px;font-weight:600;color:var(--mag-ink)}
+.apl-card-top span{font-family:var(--mag-mono);font-size:7.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--mag-soft)}
+.apl-card-disc{font-family:var(--mag-mono);font-size:8px;letter-spacing:.18em;color:var(--mag-accent);
+  text-transform:uppercase;margin:13px 0 4px}
+.apl-card-name{font-family:var(--mag-display);font-size:25px;font-weight:600;color:var(--mag-ink);
+  line-height:1.04;letter-spacing:-.015em}
+.apl-card-name.is-placeholder{color:var(--mag-soft)}
+.apl-card-ed{font-family:var(--mag-mono);font-size:7px;letter-spacing:.16em;color:var(--mag-soft);
+  text-transform:uppercase;margin-top:9px}
+
+/* the wipe: same photograph, twice, one graded */
+.apl-wipe{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:2px;
+  background:var(--mag-panel);cursor:ew-resize;touch-action:none;user-select:none}
+.apl-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.apl-clip{position:absolute;inset:0;width:50%;overflow:hidden}
+.apl-clip .apl-img{width:auto;min-width:100%}
+.apl-clip{border-right:1px solid rgba(244,237,226,.85)}
+.apl-tag{position:absolute;bottom:9px;font-family:var(--mag-mono);font-size:8px;letter-spacing:.18em;
+  text-transform:uppercase;padding:4px 8px;border-radius:2px;background:rgba(10,8,14,.72);
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);pointer-events:none}
+.apl-tag-l{left:9px;color:var(--mag-soft)}
+.apl-tag-r{right:9px;color:var(--mag-accent)}
+.apl-handle{position:absolute;top:0;bottom:0;left:50%;width:34px;margin-left:-17px;cursor:ew-resize;
+  display:flex;align-items:center;justify-content:center;background:none;border:0}
+.apl-handle i{width:26px;height:26px;border-radius:50%;background:var(--mag-ink);
+  box-shadow:0 3px 14px rgba(0,0,0,.6);position:relative;display:block}
+.apl-handle i::before,.apl-handle i::after{content:"";position:absolute;top:50%;width:0;height:0;
+  border-top:4px solid transparent;border-bottom:4px solid transparent;margin-top:-4px}
+.apl-handle i::before{left:5px;border-right:5px solid #0a0810}
+.apl-handle i::after{right:5px;border-left:5px solid #0a0810}
+.apl-handle:focus-visible i{outline:2px solid var(--mag-accent);outline-offset:3px}
+
+.apl-side{display:flex;flex-direction:column;align-self:start}
+.apl-lbl{font-family:var(--mag-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mag-soft);margin:0 0 11px}
+.apl-looks{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.apl-look{cursor:pointer;background:transparent;border:1px solid var(--mag-line-2);border-radius:100px;
+  padding:8px 14px;color:var(--mag-ink-2);font-family:var(--mag-mono);font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;transition:all .2s}
+.apl-look:hover{color:var(--mag-ink);border-color:var(--mag-soft)}
+.apl-look.is-on{background:var(--mag-accent);border-color:var(--mag-accent);color:#0a0810;font-weight:600}
+.apl-look:focus-visible{outline:2px solid var(--mag-accent);outline-offset:2px}
+.apl-note{margin:0;font-size:13.5px;line-height:1.62;color:var(--mag-soft)}
+.apl-fine{margin:11px 0 0;font-family:var(--mag-mono);font-size:9.5px;letter-spacing:.06em;
+  line-height:1.6;color:rgba(244,237,226,.42)}
+
+/* story export — the card as something she can actually post. Every applicant
+   who shares one is a YKS-branded card in front of an audience of models. */
+.apl-share{margin-top:18px;padding-top:16px;border-top:1px solid var(--mag-line)}
+.apl-story{cursor:pointer;width:100%;background:transparent;border:1px solid var(--mag-accent);
+  border-radius:2px;padding:14px 18px;color:var(--mag-accent);font-family:var(--mag-mono);
+  font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  transition:background .2s,color .2s}
+.apl-story:hover{background:var(--mag-accent);color:#0a0810}
+.apl-story[disabled]{opacity:.6;cursor:default}
+.apl-story:focus-visible{outline:2px solid var(--mag-accent);outline-offset:3px}
+.apl-stage{min-width:0}
+
+@media(max-width:820px){
+  .apl-body{grid-template-columns:1fr;gap:18px;padding:16px}
+  .apl-card{max-width:340px;margin-inline:auto;width:100%}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   APPLY — tap instead of write (talent-apply-assist.js)
+   ═══════════════════════════════════════════════════════════════ */
+.apa{margin:2px 0 12px}
+.apa-lead{margin:0 0 14px;font-size:13.5px;line-height:1.6;color:var(--mag-soft);max-width:62ch}
+.apa-group{margin-bottom:14px}
+.apa-lbl{font-family:var(--mag-mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mag-soft);margin:0 0 9px}
+.apa-no .apa-lbl{color:rgba(255,140,59,.72)}
+.apa-chips{display:flex;flex-wrap:wrap;gap:7px}
+.apa-chip{cursor:pointer;background:transparent;border:1px solid var(--mag-line);border-radius:100px;
+  padding:9px 14px;color:var(--mag-ink-2);font-family:var(--mag-sans);font-size:13px;
+  line-height:1;transition:all .18s;text-align:left}
+.apa-chip:hover{border-color:var(--mag-soft);color:var(--mag-ink)}
+.apa-chip.is-on{background:rgba(255,140,59,.14);border-color:var(--mag-accent);color:var(--mag-ink)}
+.apa-no .apa-chip.is-on{background:rgba(244,237,226,.09);border-color:var(--mag-line-2);
+  color:var(--mag-soft);text-decoration:line-through;text-decoration-color:rgba(255,140,59,.6)}
+.apa-chip:focus-visible{outline:2px solid var(--mag-accent);outline-offset:2px}
+
+.apa-tools{display:flex;align-items:center;gap:16px;margin-top:12px}
+.apa-mic,.apa-clear{cursor:pointer;background:none;border:0;padding:6px 0;
+  font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--mag-soft);transition:color .2s;display:inline-flex;align-items:center;gap:8px}
+.apa-mic:hover,.apa-clear:hover{color:var(--mag-ink)}
+.apa-mic-dot{width:7px;height:7px;border-radius:50%;background:var(--mag-soft);display:block}
+.apa-mic.is-live{color:var(--mag-accent)}
+.apa-mic.is-live .apa-mic-dot{background:var(--mag-accent);animation:apaPulse 1.1s ease-in-out infinite}
+@keyframes apaPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.35)}}
+.apa-mic:focus-visible,.apa-clear:focus-visible{outline:2px solid var(--mag-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.apa-mic.is-live .apa-mic-dot{animation:none}}
+
+/* book strength — a casting desk reading her book back to her, not a score */
+.apl-strength{margin-top:18px;padding-top:16px;border-top:1px solid var(--mag-line)}
+.apl-meter{height:3px;background:var(--mag-line);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.apl-meter span{display:block;height:100%;width:5%;border-radius:3px;background:var(--mag-soft);
+  transition:width .45s cubic-bezier(.2,.7,.2,1),background .45s}
+.apl-meter span.is-mid{background:var(--mag-accent)}
+.apl-meter span.is-good{background:#5fc08a}
+.apl-verdict{margin:0;font-size:13px;line-height:1.55;color:var(--mag-ink-2);min-height:1.2em}
+
+/* the turn — a comp card has two sides, and the reverse is the one a client
+   actually gets sent, so showing it is the privacy promise made visible */
+.apl-stage{min-width:0;perspective:1400px}
+.apl-flip{position:relative;transform-style:preserve-3d;
+  transition:transform .68s cubic-bezier(.4,.05,.2,1)}
+.apl-flip.is-back{transform:rotateY(180deg)}
+.apl-face{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.apl-back{position:absolute;inset:0;transform:rotateY(180deg);display:flex;flex-direction:column}
+.apl-code{font-family:var(--mag-mono);font-size:11px!important;letter-spacing:.22em;
+  color:var(--mag-accent)!important}
+.apl-back-lbl{font-family:var(--mag-mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--mag-soft);margin:2px 0 12px;padding-top:12px;border-top:1px solid var(--mag-line)}
+.apl-stats{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin:0 0 16px;align-content:start}
+.apl-stats dt{font-family:var(--mag-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mag-soft);align-self:baseline}
+.apl-stats dd{margin:0;font-family:var(--mag-display);font-size:16px;line-height:1.1;
+  color:rgba(244,237,226,.3);text-align:right}
+.apl-stats dd.is-set{color:var(--mag-ink)}
+.apl-back-note{margin:auto 0 12px;font-size:12px;line-height:1.55;color:var(--mag-soft)}
+.apl-flipbtn{cursor:pointer;width:100%;margin-top:12px;background:none;border:1px solid var(--mag-line);
+  border-radius:2px;padding:11px 14px;color:var(--mag-soft);font-family:var(--mag-mono);
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;transition:all .2s}
+.apl-flipbtn:hover{color:var(--mag-ink);border-color:var(--mag-line-2)}
+.apl-flipbtn:focus-visible{outline:2px solid var(--mag-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.apl-flip{transition:none}}
+
+/* ═══════════════════════════════════════════════════════════════
+   APPLY — ambient studio light
+   A flat black ground is what made this page feel heavy rather than
+   deep. Two large, slow softboxes drifting behind the content give
+   it somewhere to sit. Nothing here is interactive, nothing shifts
+   layout, and it stops entirely for reduced-motion.
+   ═══════════════════════════════════════════════════════════════ */
+.ap-hero3::before,.ap-hero3::after{content:"";position:absolute;pointer-events:none;
+  border-radius:50%;filter:blur(72px);opacity:.5;z-index:0}
+.ap-hero3::before{width:58vw;height:58vw;max-width:760px;max-height:760px;top:-16%;right:-8%;
+  background:radial-gradient(circle,rgba(255,140,59,.34),rgba(255,140,59,0) 66%);
+  animation:aplLightA 26s ease-in-out infinite alternate}
+.ap-hero3::after{width:46vw;height:46vw;max-width:600px;max-height:600px;bottom:-22%;left:-12%;
+  background:radial-gradient(circle,rgba(150,120,255,.16),rgba(150,120,255,0) 68%);
+  animation:aplLightB 34s ease-in-out infinite alternate}
+.ap-hero3 > .wrap,.ap-hero3-grain{position:relative;z-index:1}
+@keyframes aplLightA{
+  0%{transform:translate3d(0,0,0) scale(1)}
+  50%{transform:translate3d(-5%,5%,0) scale(1.1)}
+  100%{transform:translate3d(4%,-4%,0) scale(.96)}}
+@keyframes aplLightB{
+  0%{transform:translate3d(0,0,0) scale(1)}
+  100%{transform:translate3d(9%,-7%,0) scale(1.14)}}
+
+/* the same light, quieter, under the books row so the section has depth too */
+.ap-books{position:relative;overflow:hidden}
+.ap-books::before{content:"";position:absolute;pointer-events:none;width:50vw;height:50vw;
+  max-width:620px;max-height:620px;top:-30%;left:8%;border-radius:50%;filter:blur(80px);opacity:.42;
+  background:radial-gradient(circle,rgba(255,140,59,.2),rgba(255,140,59,0) 68%);
+  animation:aplLightB 40s ease-in-out infinite alternate}
+.ap-books > .wrap{position:relative;z-index:1}
+
+@media(prefers-reduced-motion:reduce){
+  .ap-hero3::before,.ap-hero3::after,.ap-books::before{animation:none}
+}
+
+/* ── darkroom reveal (talent-apply-reveal.js) ──
+   dark and soft, then contrast, then resolved — the way a print comes up */
+.apr{opacity:0;transform:translateY(18px);filter:blur(7px) contrast(.72) brightness(.7);
+  transition:opacity .85s ease,transform .85s cubic-bezier(.2,.7,.2,1),filter 1.05s ease;
+  transition-delay:var(--apr-d,0ms);will-change:opacity,transform,filter}
+.apr.is-lit{opacity:1;transform:none;filter:none}
+@media(prefers-reduced-motion:reduce){.apr{opacity:1;transform:none;filter:none;transition:none}}
