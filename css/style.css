@@ -72,8 +72,18 @@ img{display:block;max-width:100%}
 .cursor.grow{width:54px;height:54px}
 @media(hover:none){.cursor{display:none}}
 
+/* Before it scrolls, the nav had no background at all, so it sat directly on
+   the hero. Over a still that is mostly one tone that reads fine; over the
+   nebula it puts white type and a status dot on whatever colour happens to be
+   behind them, and bright patches of the artwork read as stray marks in the
+   bar. A short scrim keeps the type legible without introducing a hard edge —
+   the solid .nav.scrolled background still takes over on scroll. */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
   padding:20px 30px;transition:.45s var(--ease);mix-blend-mode:normal}
+.nav::before{content:"";position:absolute;inset:-1px 0 auto 0;height:132px;pointer-events:none;z-index:-1;
+  background:linear-gradient(180deg,rgba(7,6,10,.82) 0%,rgba(7,6,10,.55) 46%,rgba(7,6,10,0) 100%);
+  transition:opacity .45s var(--ease)}
+.nav.scrolled::before{opacity:0}
 .nav.scrolled{background:rgba(9,7,12,.95);padding:13px 30px;border-bottom:1px solid var(--line)}
 .brandmark{font-family:var(--font-d);font-size:21px;font-weight:600;letter-spacing:.03em}
 .brandmark span{color:var(--amber)}

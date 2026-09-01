@@ -346,8 +346,12 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
 /* ═══ TRUST LAYER — promises + the person (injected by js/landing.js) ═══ */
 
 /* the three promises — quiet, factual, right above the form */
-.l-promise{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 30px;
-  max-width:760px;margin:0 auto 6px;padding:0}
+/* landing.js drops this above the enquiry form, where the form supplied the
+   space above it. On a page with no form — a talent profile — it lands
+   directly under the buttons instead, and a zero top margin put it flush
+   against them. Own the space rather than borrowing it from a neighbour. */
+.l-promise{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:14px 30px;
+  max-width:760px;margin:clamp(30px,4vw,44px) auto 6px;padding:0}
 .l-promise li{display:flex;align-items:flex-start;gap:9px;text-align:left;
   font-size:.93rem;line-height:1.55;color:var(--paper-dim);flex:0 1 230px;min-width:0}
 .l-promise li>span{flex:1;min-width:0}
