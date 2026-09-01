@@ -707,13 +707,19 @@
   }
 
   function attach() {
-    var links = document.querySelector('.nav .links');           // homepage shell
-    if (links && !links.querySelector('.yks-sbtn')) {
-      links.insertBefore(button(), links.querySelector('.nav-panel-cta') || null);
-    }
-    var lnav = document.querySelector('.l-nav');                 // landing-page shell
-    if (lnav && !lnav.querySelector('.yks-sbtn')) {
-      lnav.insertBefore(button(), lnav.querySelector('.l-back') || null);
+    /* The rail (js/landing.js) carries search on every page that has it, so
+       the nav copy would be a second, worse trigger — on a phone it collapsed
+       to a bare unlabelled magnifier. Only fall back to the nav where no rail
+       exists, so those pages keep a way in. */
+    if (!document.querySelector('.yks-rail')) {
+      var links = document.querySelector('.nav .links');         // homepage shell
+      if (links && !links.querySelector('.yks-sbtn')) {
+        links.insertBefore(button(), links.querySelector('.nav-panel-cta') || null);
+      }
+      var lnav = document.querySelector('.l-nav');               // landing-page shell
+      if (lnav && !lnav.querySelector('.yks-sbtn')) {
+        lnav.insertBefore(button(), lnav.querySelector('.l-back') || null);
+      }
     }
     Array.prototype.forEach.call(document.querySelectorAll('[data-search-open]'), function (el) {
       el.addEventListener('click', function (ev) { ev.preventDefault(); open(el.dataset.searchOpen); });
