@@ -26,7 +26,7 @@ html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
 body{
   font-family:var(--font-b);background:var(--black);color:var(--paper);
-  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-x:clip;
 }
 h1,h2,h3,h4{font-family:var(--font-d);font-weight:500;line-height:1.05;letter-spacing:-.015em}
 h2{font-size:clamp(38px,5.6vw,76px)}
