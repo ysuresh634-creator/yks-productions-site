@@ -150,9 +150,13 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
   .l-gallery{grid-template-columns:repeat(3,1fr)}
 }
 @media(max-width:600px){
-  .wrap{padding:0 22px}
+  /* 22px on a 375px screen is under 6% of the width, and against a 46px
+     masthead the gutter came out smaller than half the cap height — which is
+     what reads as content jammed against the edge. 28px is ~7.5% and still
+     leaves 319px of line. */
+  .wrap{padding:0 28px}
   .l-foot{padding-bottom:150px}
-  .l-nav{padding:15px 22px}
+  .l-nav{padding:15px 28px}
   .l-hero{padding:116px 0 54px}
   .l-section{padding:56px 0}
   .l-grid,.l-steps{grid-template-columns:1fr}

@@ -18,8 +18,16 @@
   var st = document.createElement('style');
   st.id = 'yks-rail-css';
   st.textContent = [
+    /* A fixed control always covers something. At the top of a page that
+       something is the hero, so the rail stays out of the way until there is
+       actually a page behind you — "/" and Cmd-K still open search up there. */
     '.yks-rail{position:fixed;left:20px;bottom:22px;z-index:310;display:flex;flex-direction:column;',
-      'align-items:flex-start;gap:9px;pointer-events:none}',
+      'align-items:flex-start;gap:9px;pointer-events:none;opacity:0;transform:translateY(10px);',
+      'transition:opacity .35s,transform .35s}',
+    '.yks-rail.on{opacity:1;transform:none}',
+    /* invisible must also mean untappable — otherwise a tap in this corner
+       near the top of a page silently opens search */
+    '.yks-rail:not(.on) .yks-rail-btn{pointer-events:none}',
     '.yks-rail-btn{pointer-events:auto;display:inline-flex;align-items:center;gap:9px;cursor:pointer;',
       'font-family:"Space Grotesk",ui-monospace,monospace;font-size:10.5px;letter-spacing:.16em;',
       'text-transform:uppercase;color:#f4ede2;min-height:44px;padding:0 18px;',
@@ -30,10 +38,17 @@
     '.yks-rail-btn svg{width:14px;height:14px;flex:none}',
     '.yks-rail-btn:hover{border-color:rgba(255,140,59,.6);color:#ff8c3b}',
     '.yks-rail-btn:focus-visible{outline:2px solid #ff8c3b;outline-offset:3px}',
-    '.yks-rail-btn.is-top{opacity:0;transform:translateY(10px);pointer-events:none}',
-    '.yks-rail-btn.is-top.on{opacity:1;transform:none;pointer-events:auto}',
-    '@media(max-width:640px){.yks-rail{left:14px;bottom:84px;gap:8px}',
-      '.yks-rail-btn{padding:0 15px;font-size:10px}}',
+
+    /* On a 375px screen a 110px labelled pill floating over the page covers
+       real content — it was sitting on top of the hero stat line. Phones get
+       44px circles instead: same tap target, a quarter of the footprint, and
+       still a proper button rather than the bare unlabelled icon this
+       replaced in the nav. aria-label carries the name for screen readers. */
+    '@media(max-width:640px){.yks-rail{left:16px;bottom:88px;gap:10px}',
+      '.yks-rail-btn{width:44px;padding:0;justify-content:center;border-radius:50%}',
+      '.yks-rail-btn span{position:absolute;width:1px;height:1px;overflow:hidden;',
+      'clip:rect(0 0 0 0);white-space:nowrap}',
+      '.yks-rail-btn svg{width:17px;height:17px}}',
     '@media(prefers-reduced-motion:reduce){.yks-rail-btn{transition:none}}'
   ].join('');
   document.head.appendChild(st);
@@ -83,8 +98,10 @@
 
   var shown = false;
   function sync() {
-    var show = window.scrollY > window.innerHeight * 0.6;
-    if (show !== shown) { shown = show; top.classList.toggle('on', show); }
+    var show = window.scrollY > window.innerHeight * 0.5;
+    if (show === shown) return;
+    shown = show;
+    rail.classList.toggle('on', show);
   }
   window.addEventListener('scroll', sync, { passive: true });
   sync();
