@@ -35,7 +35,7 @@ h2 em,h3 em{font-style:italic;background:linear-gradient(100deg,var(--amber),var
    on the parent vanishes once .char/.word get their own compositor layers */
 h2 em .word,h3 em .word{background:linear-gradient(120deg,var(--amber),var(--magenta) 60%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
 a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%}
+img{display:block;max-width:100%;height:auto}
 .wrap{max-width:1280px;margin:0 auto;padding:0 32px}
 .mono{font-family:var(--font-m);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--paper-dim)}
 .eyebrow{font-family:var(--font-m);font-size:11.5px;font-weight:500;letter-spacing:.3em;text-transform:uppercase;

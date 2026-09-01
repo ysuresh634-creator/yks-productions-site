@@ -5,6 +5,16 @@
   'use strict';
   gsap.registerPlugin(ScrollTrigger);
 
+  /* On a phone the address bar collapses as you scroll and slides back when you
+     stop. Every one of those fires a window resize, and ScrollTrigger refreshes
+     on resize by default — which recalculates the spacing for all four pinned
+     sections and nudges the scroll position with it. The result is a page that
+     visibly rocks up and down a moment after you take your finger off.
+     ignoreMobileResize tells ScrollTrigger to disregard a resize on a touch
+     device where only the height changed, i.e. exactly the browser-chrome case,
+     while a real resize (rotation, desktop window drag) still refreshes. */
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
   const $ = (s, c) => (c || document).querySelector(s);
   const $$ = (s, c) => Array.from((c || document).querySelectorAll(s));
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
