@@ -202,7 +202,7 @@ def profile(t, plate):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=22" />
-<link rel="stylesheet" href="/css/talents.css?v=87" />
+<link rel="stylesheet" href="/css/talents.css?v=88" />
 </head>
 <body data-wa="{wa}">
 
@@ -301,7 +301,8 @@ def profile(t, plate):
 
 <script src="/js/rail.js?v=6"></script>
 <script src="/js/talent-names.js?v=2"></script>
-<script src="/js/talent-profile.js?v=3"></script>
+<script src="/js/talent-profile.js?v=4"></script>
+<script src="/js/talent-book.js?v=3"></script>
 <script src="/js/landing.js?v=12"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=4"></script>

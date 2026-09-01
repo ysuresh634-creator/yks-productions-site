@@ -42,9 +42,28 @@
       '<span class="pf-stick-acts">' +
         '<button type="button" class="pf-stick-btn" data-act="card">↓ Comp card</button>' +
         '<button type="button" class="pf-stick-btn" data-act="share">Share</button>' +
-        '<a class="pf-stick-btn pf-stick-go" href="' + esc(cta.getAttribute('href')) + '" target="_blank" rel="noopener">Enquire to book →</a>' +
+        /* Points at the booking desk rather than straight out to WhatsApp.
+           The desk collects dates and usage first, so what lands on my phone
+           is a brief I can quote instead of "is she free?". It falls back to
+           the WhatsApp link if the desk is not on the page. */
+        '<a class="pf-stick-btn pf-stick-go" href="#book">Book this face →</a>' +
       '</span>';
     document.body.appendChild(bar);
+
+    var go = bar.querySelector('.pf-stick-go');
+    go.addEventListener('click', function (e) {
+      var desk = document.getElementById('book');
+      if (!desk) {                       // no desk on this page — use WhatsApp
+        go.href = cta.getAttribute('href');
+        go.target = '_blank';
+        return;
+      }
+      e.preventDefault();
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      desk.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      var f = desk.querySelector('.bk-from');
+      if (f) setTimeout(function () { try { f.focus({ preventScroll: true }); } catch (err) {} }, reduce ? 0 : 600);
+    });
     // a passive scroll check rather than IntersectionObserver: it only reads scrollY against a
     // cached offset, so there is no layout thrash, and it can't be missed if IO never fires.
     // Time-throttled, not requestAnimationFrame: rAF is paused whenever the tab is hidden or
