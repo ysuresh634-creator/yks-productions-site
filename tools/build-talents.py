@@ -77,6 +77,35 @@ def img(t, f):
 
 
 # ── profile pages ──────────────────────────────────────────────
+# ── measurements, in both systems ──────────────────────────────
+# Every serious board — Inega, IMG, Storm — quotes centimetres, and that is
+# what international casting reads. Indian brand clients still think in feet.
+# So the roster keeps whatever was typed and the page shows both, metric first.
+FT_IN = re.compile(r"^\s*(\d+)\s*(?:'|ft|feet)\s*(\d{1,2})?\s*(?:\"|''|in|inches)?\s*$")
+INCHES = re.compile(r"^\s*(\d{2,3})(?:\.(\d))?\s*(?:\"|''|in|inches)?\s*([A-Ha-h]{1,2})?\s*$")
+CM_ALREADY = re.compile(r"(\d{2,3})\s*cm", re.I)
+LINEAR = ('Height', 'Bust', 'Waist', 'High hip', 'Hips', 'Chest', 'Inseam')
+
+
+def dual(key, val):
+    """(metric, original) for a measurement; (value, '') for anything else."""
+    v = (val or '').strip()
+    if key not in LINEAR or not v:
+        return v, ''
+    if CM_ALREADY.search(v):                       # already metric, leave it alone
+        return v, ''
+    m = FT_IN.match(v)
+    if m:
+        total = int(m.group(1)) * 12 + int(m.group(2) or 0)
+        return f'{round(total * 2.54)} cm', v
+    m = INCHES.match(v)
+    if m:
+        inches = float(m.group(1)) + (float(m.group(2)) / 10 if m.group(2) else 0)
+        if 20 <= inches <= 90:                     # a plausible body measurement
+            return f'{round(inches * 2.54)} cm', v
+    return v, ''
+
+
 def profile(t, plate):
     cat = CAT_LABEL.get(t['cat'], 'Talent')
     where = f'{t["city"]}, {t["country"]}'
@@ -92,9 +121,11 @@ def profile(t, plate):
     ogdesc = f'{cat} · {where} — YKS Talents roster.'
     kw = ''
 
-    specs = '\n'.join(
-        f'          <div class="pf-row"><dt>{e(k)}</dt><dd>{e(v)}</dd></div>'
-        for k, v in (t.get('specs') or {}).items())
+    def spec_row(k, v):
+        metric, orig = dual(k, v)
+        alt = f'<span class="pf-alt">{e(orig)}</span>' if orig else ''
+        return f'          <div class="pf-row"><dt>{e(k)}</dt><dd>{e(metric)}{alt}</dd></div>'
+    specs = '\n'.join(spec_row(k, v) for k, v in (t.get('specs') or {}).items())
     cast = '\n'.join(f'            <li>{e(c)}</li>' for c in t.get('castableFor', []))
     # Galleries are grouped into sets so a client can jump straight to what they need —
     # the polished book, the plain digitals, or real client work. A talent's photos already
@@ -171,7 +202,7 @@ def profile(t, plate):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=15" />
-<link rel="stylesheet" href="/css/talents.css?v=85" />
+<link rel="stylesheet" href="/css/talents.css?v=87" />
 </head>
 <body data-wa="{wa}">
 
@@ -200,7 +231,7 @@ def profile(t, plate):
 {video_html}        <div class="pf-cta">
           <a class="btn btn-fill" data-tbook="{t['code']}" href="https://wa.me/{wa}?text={msg}" target="_blank" rel="noopener">Enquire to book <span data-tfirst="{t['code']}">this talent</span> →</a>
         </div>
-        <p class="pf-priv">Booked only through YKS — no direct contact is shared, and this profile is not published to search engines. I handle availability, rates and the shoot.</p>
+        <p class="pf-priv"><b>Every booking goes through me.</b> No client contacts talent directly — not before a shoot, not after one. Contact details are never shared, this profile is not indexed, and I handle availability, rates and the day itself.</p>
       </div>
     </div>
   </div>
@@ -236,18 +267,6 @@ def profile(t, plate):
       <span>Plates 02 – {ngal + 1:02d}</span>
     </div>
 {plates}
-  </div>
-</section>
-
-<section class="l-section pf-getssec">
-  <div class="wrap">
-    <p class="pf-block-k">What you get, booking through me</p>
-    <div class="pf-gets">
-      <div><b>One all-in number</b><p>Talent, my time and the usage you need, quoted as a single figure. Nothing added later.</p></div>
-      <div><b>Usage sorted</b><p>I handle the release and agree the usage up front — where the images run, and for how long.</p></div>
-      <div><b>Availability confirmed first</b><p>I check the dates before you commit to anything. A hold is never a booking until I say so.</p></div>
-      <div><b>One point of contact</b><p>You deal with me, not with talent directly. Briefing, changes and payment all run through one place.</p></div>
-    </div>
   </div>
 </section>
 

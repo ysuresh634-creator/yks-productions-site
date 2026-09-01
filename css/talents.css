@@ -872,3 +872,53 @@ main{overflow-x:clip}
    meaning "act here" — hand the rules back to ink */
 .tal-usage h3{color:var(--mag-ink)}
 .tal-usage > div{border-top:2px solid var(--mag-accent)}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROFILE — read like a casting board, not a magazine spread
+
+   Every serious board (Inega, IMG, Storm) is photograph-first, sets
+   the name in a hard grotesque rather than a display serif, quotes
+   centimetres, and carries no persuasion copy at all. A casting
+   director wants face, frame, measurements and more photographs —
+   and scrolls past everything else.
+
+   The ground stays dark, which is ours. What changes is the weight
+   of the type, the size of the plates and how little else there is.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* the name: a board name, not a masthead */
+.pf-name{font-family:var(--mag-sans);font-weight:700;text-transform:uppercase;
+  font-size:clamp(38px,5.4vw,74px);line-height:.88;letter-spacing:-.025em;
+  color:var(--mag-ink);margin:0 0 18px}
+.pf-name em{font-style:normal}
+.pf-disc{color:var(--mag-soft);letter-spacing:.16em;margin-bottom:26px}
+
+/* measurements: metric first, what was typed beside it */
+.pf-row{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:16px;
+  padding:13px 0;border-bottom:1px solid var(--mag-line)}
+.pf-row dt{font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--mag-soft)}
+.pf-row dd{margin:0;font-family:var(--mag-sans);font-size:17px;font-weight:600;
+  color:var(--mag-ink);display:flex;align-items:baseline;gap:10px}
+.pf-alt{font-family:var(--mag-mono);font-size:11px;font-weight:400;letter-spacing:.06em;
+  color:var(--mag-soft)}
+
+/* the plates are the page — one wide column, big, the way a book is looked at */
+.pf-gallery{column-count:1;column-gap:0;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr));gap:20px}
+.pf-plate{margin:0;break-inside:auto}
+.pf-plate img{width:100%;display:block;border:1px solid var(--mag-line);border-radius:2px}
+.pf-plate figcaption{padding:11px 2px 0}
+
+/* The one rule this whole roster runs on. It is not fine print — a client
+   reading this page needs to know the route, and a talent needs to know the
+   route is protected. Trimming copy is not licence to whisper the promise. */
+.pf-priv{font-family:var(--mag-sans);font-size:13.5px;line-height:1.65;
+  color:var(--mag-ink-2);margin-top:24px;padding:16px 18px;max-width:56ch;
+  border-left:2px solid var(--mag-accent);background:rgba(255,148,72,.06);
+  border-radius:0 3px 3px 0;text-transform:none;letter-spacing:0}
+.pf-priv b{color:var(--mag-ink);font-weight:600}
+
+@media(max-width:760px){
+  .pf-gallery{grid-template-columns:1fr;gap:14px}
+}
