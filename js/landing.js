@@ -287,7 +287,7 @@
   sec.className = 'l-section l-who-sec';
   sec.innerHTML =
       '<div class="wrap"><div class="l-who">'
-    + '<figure class="l-who-photo"><img src="/assets/yedu-portrait-2.jpg" alt="Yedukrishna Suresh, founder of YKS Productions" loading="lazy" decoding="async" /></figure>'
+    + '<figure class="l-who-photo"><img width="1067" height="1600" src="/assets/yedu-portrait-2.jpg" alt="Yedukrishna Suresh, founder of YKS Productions" loading="lazy" decoding="async" /></figure>'
     + '<div class="l-who-copy">'
     + '<p class="l-eyebrow">The eye behind the lens</p>'
     + '<h2>Why a frame is worth <em>slowing down for</em></h2>'

@@ -26,7 +26,7 @@ Guard rails enforced here rather than trusted to memory:
   · No prices. The build ABORTS if it finds a currency figure.
   · India talent → +91 booking number, UAE talent → +971.
 """
-import io, os, re, json, sys, html
+import io, os, re, json, sys, html, subprocess
 from urllib.parse import quote
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -70,6 +70,21 @@ if errs:
     sys.exit(1)
 
 e = html.escape
+
+
+def dims(t, f):
+    """Intrinsic size, so a lazy plate reserves its box before it decodes."""
+    path = P('assets', 'talents', t['dir'], f)
+    try:
+        r = subprocess.run(['sips', '-g', 'pixelWidth', '-g', 'pixelHeight', path],
+                           capture_output=True, text=True, timeout=15)
+        w = re.search(r'pixelWidth:\s*(\d+)', r.stdout)
+        h = re.search(r'pixelHeight:\s*(\d+)', r.stdout)
+        if w and h:
+            return ' width="%s" height="%s"' % (w.group(1), h.group(1))
+    except Exception:
+        pass
+    return ''
 
 
 def img(t, f):
@@ -149,9 +164,9 @@ def profile(t, plate):
     ngal = len(t.get('gallery', []))
 
     def plate_html(i, g):
-        return ('        <figure class="pf-plate"><img src="%s" alt="%s · %s — %s" loading="lazy" decoding="async" />'
+        return ('        <figure class="pf-plate"><img%s src="%s" alt="%s · %s — %s" loading="lazy" decoding="async" />'
                 '<figcaption><b>Plate %02d</b><span>%s</span></figcaption></figure>'
-                % (img(t, g['file']), cat, e(t['city']), e(g['alt']), i + 2, e(g['label'])))
+                % (dims(t, g['file']), img(t, g['file']), cat, e(t['city']), e(g['alt']), i + 2, e(g['label'])))
 
     tabs = ''
     if len(sets) > 1:
@@ -222,7 +237,7 @@ def profile(t, plate):
     </div>
     <div class="pf-hero-grid">
       <div class="pf-hero-img">
-        <img src="{img(t, t['cover'])}" alt="{cat} · {e(t['city'])} — YKS Talents roster {code}" />
+        <img{dims(t, t["cover"])} src="{img(t, t['cover'])}" alt="{cat} · {e(t['city'])} — YKS Talents roster {code}" />
       </div>
       <div class="pf-hero-txt">
         <p class="tal-kicker">{cat} · {e(where)}</p>
@@ -304,7 +319,7 @@ def profile(t, plate):
 <script src="/js/talent-profile.js?v=4"></script>
 <script src="/js/talent-book.js?v=3"></script>
 <script src="/js/keep.js?v=1"></script>
-<script src="/js/landing.js?v=12"></script>
+<script src="/js/landing.js?v=13"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=4"></script>
 </body>
@@ -327,7 +342,7 @@ def card(t):
         f'        data-bio="{e(t.get("shortBio") or t.get("bio", ""))}"\n'
         f'        data-gallery="{img(t, t["cover"])}|{gal}">\n'
         f'        <a class="tal-open" href="{href}" rel="nofollow">\n'
-        f'          <span class="tal-media"><img src="{img(t, t["cover"])}" '
+        f'          <span class="tal-media"><img{dims(t, t["cover"])} src="{img(t, t["cover"])}" '
         f'alt="{cat} · {e(t["city"])} — YKS Talents roster" loading="lazy" /></span>\n'
         f'          <span class="tal-grad"></span><span class="tal-cat">{cat}</span>\n'
         f'          <span class="tal-body"><b data-tname="{t["code"]}" data-nosnippet>'
