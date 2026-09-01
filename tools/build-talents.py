@@ -303,6 +303,7 @@ def profile(t, plate):
 <script src="/js/talent-names.js?v=2"></script>
 <script src="/js/talent-profile.js?v=4"></script>
 <script src="/js/talent-book.js?v=3"></script>
+<script src="/js/keep.js?v=1"></script>
 <script src="/js/landing.js?v=12"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=4"></script>
