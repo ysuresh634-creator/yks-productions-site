@@ -79,12 +79,12 @@ img{display:block;max-width:100%}
    bar. A short scrim keeps the type legible without introducing a hard edge —
    the solid .nav.scrolled background still takes over on scroll. */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
-  padding:20px 30px;transition:.45s var(--ease);mix-blend-mode:normal}
+  padding:20px 32px;transition:.45s var(--ease);mix-blend-mode:normal}
 .nav::before{content:"";position:absolute;inset:-1px 0 auto 0;height:132px;pointer-events:none;z-index:-1;
   background:linear-gradient(180deg,rgba(7,6,10,.82) 0%,rgba(7,6,10,.55) 46%,rgba(7,6,10,0) 100%);
   transition:opacity .45s var(--ease)}
 .nav.scrolled::before{opacity:0}
-.nav.scrolled{background:rgba(9,7,12,.95);padding:13px 30px;border-bottom:1px solid var(--line)}
+.nav.scrolled{background:rgba(9,7,12,.95);padding:13px 32px;border-bottom:1px solid var(--line)}
 .brandmark{font-family:var(--font-d);font-size:21px;font-weight:600;letter-spacing:.03em}
 .brandmark span{color:var(--amber)}
 .brandmark em{font-style:normal;font-size:13px;opacity:.65;margin-left:2px;letter-spacing:.08em}
@@ -924,8 +924,17 @@ img{display:block;max-width:100%}
    burger and crowd it — the old REC light was hidden here for the same
    reason. Hidden, and the burger panel gets its own entry instead. */
 .nav-panel-cta{display:none}
-@media(max-width:1020px){
+/* The burger takes over at 1200px and the links become a side drawer, but the
+   status chip was only hidden at 1020px. Between those two widths the links
+   have left the bar while "Available 2026" is still in it — so the only flex
+   children left are the brandmark and the chip, and space-between pushes the
+   chip into the middle of the nav. That is the "why is it centred" case, and
+   it is a breakpoint that was never lined up rather than a placement choice.
+   The chip now leaves at the same moment the links do. */
+@media(max-width:1200px){
   .nav-status{display:none}
+}
+@media(max-width:1020px){
   .nav .links .nav-panel-cta{display:flex;align-items:flex-start;gap:10px;width:100%;
     margin-top:18px;padding-top:18px;border-top:1px solid rgba(244,237,226,.14);
     font-size:12.5px;letter-spacing:.1em;color:var(--paper);
@@ -1012,7 +1021,7 @@ img{display:block;max-width:100%}
   .pv-photo{aspect-ratio:4/5}
   .pv-wide{height:auto;aspect-ratio:16/10}
 }
-@media(prefers-reduced-motion:reduce){.pv-live::after{animation:none}}}
+@media(prefers-reduced-motion:reduce){.pv-live::after{animation:none}}
 
 /* ───────────────────────── INSTANT QUOTE ESTIMATOR ───────────────────────── */
 .act-quote{padding:120px 0;background:
