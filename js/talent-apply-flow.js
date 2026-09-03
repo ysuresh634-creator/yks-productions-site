@@ -221,6 +221,47 @@
     go(at + 1);
   });
 
+  /* ── photographs are the application ────────────────────────
+     They live in a JS array rather than a form control, so checkValidity()
+     never sees them and an application could be sent with none at all — which
+     is most of what arrives from someone not really applying. Three is the
+     floor: the page asks for six to ten, and the three a casting director
+     wants first are a headshot, a full-length and digitals. */
+  var MIN_PHOTOS = 3;
+  function photoCount() {
+    return document.querySelectorAll('#apThumbs .ap-thumb').length;
+  }
+  function photoNotice(n) {
+    var host = document.getElementById('apThumbs');
+    if (!host) return;
+    var el = document.getElementById('apwPhotoWarn');
+    if (!el) {
+      el = document.createElement('p');
+      el.id = 'apwPhotoWarn';
+      el.className = 'apw-warn';
+      el.setAttribute('role', 'alert');
+      host.parentNode.insertBefore(el, host.nextSibling);
+    }
+    el.textContent = n === 0
+      ? 'An application needs photographs — add at least ' + MIN_PHOTOS + ' before sending.'
+      : 'That is ' + n + '. Add ' + (MIN_PHOTOS - n) + ' more — a headshot, a full-length and a set of digitals is the minimum anyone can cast from.';
+    el.hidden = false;
+  }
+
+  form.addEventListener('submit', function (e) {
+    if (photoCount() < MIN_PHOTOS) {
+      e.preventDefault();
+      e.stopImmediatePropagation();          // do not let the sender run
+      photoNotice(photoCount());
+      go(0);                                  // the photos step
+      var w = document.getElementById('apwPhotoWarn');
+      if (w) w.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
+      return;
+    }
+    var w = document.getElementById('apwPhotoWarn');
+    if (w) w.hidden = true;
+  }, true);
+
   /* A required field sitting in a hidden panel cannot be focused, so the
      browser refuses to report it and the submit dies silently. Capture the
      event before talent-apply.js sees it and surface the panel first. */

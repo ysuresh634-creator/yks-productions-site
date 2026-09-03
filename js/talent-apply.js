@@ -1698,6 +1698,32 @@
   // This IS a submission: the talent lands in YKS's inbox with their book, opening a direct conversation.
   var waMsgEl = $('#apDlWaMsg');
   function waStatus(html, html_ok) { if (!waMsgEl) return; waMsgEl.hidden = false; if (html_ok) waMsgEl.innerHTML = html; else waMsgEl.textContent = String(html).replace(/<[^>]+>/g, ''); }
+  /* The finished book as a Blob, rather than straight to the device. This was
+     inline in the WhatsApp button; the submit path needs the same thing, so it
+     lives once. Same eight photographs, same grade, same template the studio
+     is currently showing. */
+  function portfolioBlob(name) {
+    return Promise.all([ensureJsPDF(), ensureQR()]).then(function (rr) {
+      var JsPDF = rr[0];
+      return Promise.all(photos.slice(0, 8).map(function (p) {
+        var pr = p.edited ? gradeDataURL(p.edited).then(function (d) { return { data: d, w: 900, h: 1125 }; })
+                          : prepImg(p.preview || p.file, 0.8, 1000);
+        return pr.then(function (im) { im.cat = p.cat || ''; im.fit = !!p.fit; return im; });
+      })).then(function (imgs) {
+        var th = THEMES[CFG.theme];
+        return new Promise(function (resolve, reject) {
+          try {
+            buildPortfolio(JsPDF, imgs, name, {
+              bg: hexRgb(th.bg), text: hexRgb(th.text), sub: hexRgb(th.sub),
+              accent: hexRgb(CFG.accent), font: FONTS[CFG.font].pdf, template: CFG.layout,
+              onDoc: function (doc) { resolve(doc.output('blob')); }
+            });
+          } catch (er) { reject(er); }
+        });
+      });
+    });
+  }
+
   var waBtn = $('#apDlWa');
   if (waBtn) waBtn.addEventListener('click', function () {
     if (!photos.length) { alert('Add at least one photo first — your portfolio is built from your photos.'); return; }
@@ -1708,22 +1734,7 @@
     var waWin = null; try { waWin = window.open('', '_blank'); } catch (e) {}
     if (waWin) { try { waWin.document.write('<title>Opening WhatsApp…</title><body style="background:#0c0a10;color:#f4f0e8;font:15px system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">Preparing your portfolio…</body>'); } catch (e) {} }
     waStatus('Building your portfolio — this takes a few seconds.');
-    Promise.all([ensureJsPDF(), ensureQR()])
-      .then(function (rr) {
-        var JsPDF = rr[0];
-        return Promise.all(photos.slice(0, 8).map(function (p) {
-          var pr = p.edited ? gradeDataURL(p.edited).then(function (d) { return { data: d, w: 900, h: 1125 }; }) : prepImg(p.preview || p.file, 0.8, 1000);
-          return pr.then(function (im) { im.cat = p.cat || ''; im.fit = !!p.fit; return im; });
-        })).then(function (imgs) {
-          var th = THEMES[CFG.theme];
-          return new Promise(function (resolve, reject) {
-            try {
-              buildPortfolio(JsPDF, imgs, name, { bg: hexRgb(th.bg), text: hexRgb(th.text), sub: hexRgb(th.sub), accent: hexRgb(CFG.accent), font: FONTS[CFG.font].pdf, template: CFG.layout,
-                onDoc: function (doc) { resolve(doc.output('blob')); } });
-            } catch (er) { reject(er); }
-          });
-        });
-      })
+    portfolioBlob(name)
       .then(function (blob) {
         waBtn.textContent = 'Sending to YKS…'; waStatus('Uploading your PDF to YKS…');
         var file = new File([blob], name.replace(/\s+/g, '-') + '-YKS-portfolio.pdf', { type: 'application/pdf' });
@@ -2069,6 +2080,23 @@
       }).then(function () { return out; });
     }
 
+    /* The book the studio just built, sent with the application. It is derived
+       from photos that are already on their way, so a failure here must never
+       cost the applicant their submission — it degrades to a note. */
+    if (configured && photos.length) {
+      chain = chain.then(function (o) {
+        say('Building your portfolio…');
+        var nm = (form.name.value || 'Applicant').trim();
+        return portfolioBlob(nm)
+          .then(function (blob) {
+            var file = new File([blob], nm.replace(/\s+/g, '-') + '-YKS-portfolio.pdf', { type: 'application/pdf' });
+            return upload(file, null, folderName);
+          })
+          .then(function (u) { o.built = u || ''; return o; })
+          .catch(function () { o.built = ''; return o; });
+      });
+    }
+
     chain.then(function (up) {
       say('Sending your application…');
       var payload = {
@@ -2101,6 +2129,7 @@
         photos: configured
           ? (up.photos.filter(Boolean).join('\n') || (photos.length ? photos.length + ' photo(s) uploaded' : '(none)'))
           : (photos.length ? '(' + photos.length + ' photos — applicant will send on WhatsApp)' : '(none)'),
+        built_portfolio: (up.built || '(not built — no photos, or the build failed)'),
         portfolio_pdf: configured
           ? (up.pdf || (pdf ? 'PDF uploaded' : '(none)'))
           : (pdf ? '(PDF — applicant will send on WhatsApp)' : '(none)'),
