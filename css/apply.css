@@ -1006,3 +1006,12 @@
   text-transform:uppercase;color:#0a0810;background:var(--mag-accent);border-radius:2px;
   padding:14px 20px;text-align:center}
 @media(max-width:880px){.ap-follow-in{grid-template-columns:1fr}}
+
+/* the follow confirmation, beside the send button */
+.ap-followcheck{display:flex;align-items:flex-start;gap:12px;margin:0 0 16px;padding:14px 16px;
+  border-radius:3px;border:1px solid rgba(255,148,72,.34);background:rgba(255,148,72,.06);
+  cursor:pointer;font-size:14px;line-height:1.6;color:var(--mag-ink-2);text-align:left}
+.ap-followcheck input{flex:none;width:20px;height:20px;margin-top:1px;accent-color:var(--mag-accent);cursor:pointer}
+.ap-followcheck b{color:var(--mag-ink);font-weight:600}
+.ap-followcheck:hover{border-color:var(--mag-accent)}
+.ap-followcheck:focus-within{outline:2px solid var(--mag-accent);outline-offset:2px}

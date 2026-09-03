@@ -41,7 +41,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=23" />
 <link rel="stylesheet" href="/css/talents.css?v=90" />
-<link rel="stylesheet" href="/css/apply.css?v=3" />
+<link rel="stylesheet" href="/css/apply.css?v=4" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -724,7 +724,7 @@
           </div>
           <div class="row2">
             <label>City<input type="text" name="city" placeholder="Delhi, Dubai …" required /></label>
-            <label>Instagram <span class="tal-priv">required · private</span><input type="text" name="socials" placeholder="@yourhandle — only I see this" required /></label>
+            <label>Instagram <span class="tal-priv">required · private</span><input type="text" name="socials" placeholder="@yourhandle — only I see this" required pattern="(?!\s*(n/?a|none|nil|-|na)\s*$).*(@[A-Za-z0-9._]{2,}|instagram\.com/[A-Za-z0-9._]{2,}|[A-Za-z0-9._]{3,})" title="Your Instagram handle, e.g. @yourname — or paste the profile link" /></label>
           </div>
           <label class="ap-full">Signature line <span class="ap-opt">optional · shows on your cover</span>
             <span class="ap-tagrow">
@@ -929,7 +929,8 @@
         <p class="ap-tail-lead">Happy with it? This is the one that matters — <b>send it to me</b> and you're in front of me for casting.</p>
         <button type="submit" form="talForm" class="btn btn-fill ap-submit">Submit my portfolio to YKS →</button>
         <p class="ap-progress" id="apProgress" hidden></p>
-        <p class="tal-form-note">🔒 Your number, email and socials are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
+        <label class="ap-followcheck"><input type="checkbox" name="follows_ig" value="yes" form="talForm" required /><span>I follow <b>@yks_photoworks</b> &mdash; that is where briefs and casting calls go out first.</span></label>
+        <p class="tal-form-note">🔒 Your number, email and Instagram are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
         <p class="l-form-ok" id="talOk">✓ Application received — thank you. If it's a fit, I'll be in touch personally.
           <span id="apOkWa" hidden><br />One quick step: <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%20just%20applied%20to%20YKS%20Talents%20and%20I%27d%20like%20to%20send%20my%20photos%2Fvideos." target="_blank" rel="noopener">send your photos &amp; videos on WhatsApp →</a></span>
         </p>
