@@ -41,7 +41,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=23" />
 <link rel="stylesheet" href="/css/talents.css?v=90" />
-<link rel="stylesheet" href="/css/apply.css?v=7" />
+<link rel="stylesheet" href="/css/apply.css?v=8" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -370,7 +370,7 @@
     <div class="ap-hero3-txt">
       <p class="tal-kicker">Women's board — open · Volume 01</p>
       <h1 class="ap-hero3-h">Some faces<br /><em>get remembered.</em></h1>
-      <p class="ap-hero3-sub">The women&rsquo;s board — models, actors and creators across <b>India &amp; the UAE</b>, cast for brand and editorial work. Every brief that comes through here is <b>paid work for a real client</b>. I read every submission myself, and I&rsquo;d rather have thirty faces I can actually put forward than three hundred I can&rsquo;t.</p>
+      <p class="ap-hero3-sub">The women&rsquo;s board — models, actors and creators across <b>India &amp; the UAE</b>, cast for brand and editorial work — and open to anyone who can work here, wherever you are based. Every brief that comes through here is <b>paid work for a real client</b>. I read every submission myself, and I&rsquo;d rather have thirty faces I can actually put forward than three hundred I can&rsquo;t.</p>
       <div class="ap-hero3-cta-row">
         <a class="ap-hero3-cta" href="#talForm">Apply to the board — about 3 minutes</a>
         <a class="ap-hero3-alt" href="#is-this-real">Is this real? →</a>
@@ -744,14 +744,44 @@
               </select>
             </label>
             <label>Based in
-              <select name="region" required>
+              <select name="region" id="apRegion" required>
                 <option value="" disabled selected>Choose one</option>
-                <option>India</option><option>UAE</option>
+                <optgroup label="Where most of my work is">
+                  <option>India</option><option>UAE</option>
+                </optgroup>
+                <optgroup label="Rest of the Gulf">
+                  <option>Saudi Arabia</option><option>Qatar</option><option>Oman</option>
+                  <option>Kuwait</option><option>Bahrain</option>
+                </optgroup>
+                <optgroup label="Asia &amp; Pacific">
+                  <option>Sri Lanka</option><option>Nepal</option><option>Singapore</option>
+                  <option>Malaysia</option><option>Thailand</option><option>Indonesia</option>
+                  <option>Philippines</option><option>Japan</option><option>South Korea</option>
+                  <option>Australia</option><option>New Zealand</option>
+                </optgroup>
+                <optgroup label="Europe">
+                  <option>United Kingdom</option><option>Ireland</option><option>France</option>
+                  <option>Italy</option><option>Spain</option><option>Portugal</option>
+                  <option>Germany</option><option>Netherlands</option><option>Poland</option>
+                  <option>Ukraine</option><option>Russia</option><option>Türkiye</option>
+                </optgroup>
+                <optgroup label="Africa">
+                  <option>South Africa</option><option>Kenya</option><option>Nigeria</option>
+                  <option>Egypt</option><option>Morocco</option>
+                </optgroup>
+                <optgroup label="Americas">
+                  <option>United States</option><option>Canada</option><option>Mexico</option>
+                  <option>Brazil</option><option>Argentina</option><option>Colombia</option>
+                </optgroup>
+                <option value="Somewhere else">Somewhere else →</option>
               </select>
             </label>
           </div>
+          <label class="ap-full ap-elsewhere" id="apElsewhere">Which country?
+            <input type="text" name="country_other" placeholder="Type your country" />
+          </label>
           <div class="row2">
-            <label>City<input type="text" name="city" placeholder="Delhi, Dubai …" required /></label>
+            <label>City<input type="text" name="city" placeholder="Delhi, Dubai, Lisbon …" required /></label>
             <label>Instagram <span class="tal-priv">required · private</span><input type="text" name="socials" placeholder="@yourhandle — only I see this" required pattern="(?!\s*(n/?a|none|nil|-|na)\s*$).*(@[A-Za-z0-9._]{2,}|instagram\.com/[A-Za-z0-9._]{2,}|[A-Za-z0-9._]{3,})" title="Your Instagram handle, e.g. @yourname — or paste the profile link" /></label>
           </div>
           <label class="ap-full">Signature line <span class="ap-opt">optional · shows on your cover</span>
@@ -1185,10 +1215,11 @@
 </footer>
 
 <script src="/js/landing.js?v=13"></script>
-<script src="/js/talent-apply.js?v=70"></script>
+<script src="/js/talent-apply.js?v=71"></script>
 <script src="/js/talent-apply-flow.js?v=6"></script>
 <script src="/js/talent-apply-live.js?v=4"></script>
 <script src="/js/talent-apply-taste.js?v=1"></script>
+<script src="/js/talent-apply-world.js?v=1"></script>
 <script src="/js/talent-apply-assist.js?v=1"></script>
 <script src="/js/keep.js?v=1"></script>
 <script src="/js/talent-apply-reveal.js?v=2"></script>

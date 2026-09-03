@@ -1043,3 +1043,12 @@
 .ap-taste-no-lbl{color:var(--mag-accent)}
 .ap-taste-chips.is-no button.on{border-color:rgba(255,148,72,.6);
   background:rgba(255,148,72,.14);color:var(--mag-ink)}
+
+/* ── elsewhere ──
+   Shown only when someone picks a country outside the two the board was
+   built around. The note under it is not decoration: it is the thing they
+   would otherwise find out after applying. */
+.ap-elsewhere[hidden]{display:none}
+.ap-world-note{margin:12px 0 0;font-size:14px;line-height:1.7;color:var(--mag-ink-2);
+  max-width:64ch;border-left:2px solid var(--mag-accent);padding-left:15px}
+.ap-world-note[hidden]{display:none}

@@ -1178,7 +1178,7 @@
   }
 
   /* ══ autosave draft (text + video links; uploaded files can't persist across reloads) ══ */
-  var textNames = ['name', 'contact', 'category', 'region', 'city', 'socials', 'about', 'tagline',
+  var textNames = ['name', 'contact', 'category', 'region', 'country_other', 'city', 'socials', 'about', 'tagline',
     'dob', 'gender', 'marital', 'education', 'languages', 'occupation', 'availability', 'travel', 'comfort', 'extra', 'preferences',
     'taste_drawn', 'taste_worlds', 'taste_onset', 'taste_rather_not',
     'age_group', 'guardian_name', 'guardian_contact'];
@@ -2105,7 +2105,10 @@
         subject: 'New talent application — ' + (form.name.value || 'YKS Talents'),
         from_name: 'YKS Talents application',
         name: form.name.value, phone_whatsapp: form.contact.value,
-        category: form.category.value, based_in: form.region.value,
+        category: form.category.value,
+        based_in: form.region.value === 'Somewhere else'
+          ? ((form.country_other && form.country_other.value.trim()) || 'Somewhere else')
+          : form.region.value,
         city: form.city.value, instagram_social: form.socials.value,
         signature_line: (form.tagline && form.tagline.value) || '(none)',
         about: form.about.value,
