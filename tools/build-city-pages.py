@@ -234,8 +234,8 @@ def page(c):
   gtag('js', new Date());
   gtag('config', 'G-C57X89TN45');
 </script>
-<title>Models in {e(c['city'])} — Cast for a Shoot or Join the Roster | YKS Talents</title>
-<meta name="description" content="Cast models, actors and creators in {e(c['city'])}, or join the YKS Talents roster from {e(c['city'])}. Free to join, no portfolio fee, bookings arranged through YKS Productions." />
+<title>Female Models in {e(c['city'])} — Casting Board &amp; Submissions | YKS Talents</title>
+<meta name="description" content="Women's casting board for {e(c['city'])} — models, actors and creators put forward for brand and editorial work. Read personally; booked through YKS." />
 <link rel="canonical" href="{url}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="geo.region" content="{e(c['geo'])}" />
@@ -267,11 +267,11 @@ def page(c):
 <section class="l-hero">
   <div class="wrap">
     <p class="l-eyebrow">Talent · {e(c['city'])} · {e(c['state'])}</p>
-    <h1>Models in {e(c['city'])}</h1>
+    <h1>Female models in {e(c['city'])}</h1>
     <p class="tal-h1sub">Modelling, acting and creator work in {e(c['city'])} — for the people doing it, and the brands casting it.</p>
     <p class="l-lede">{e(c['market'])}</p>
     <div class="l-cta-row">
-      <a class="btn btn-fill" href="/talents/apply.html">I'm talent — join the roster</a>
+      <a class="btn btn-fill" href="/talents/apply.html">Apply to the women&rsquo;s board →</a>
       <a class="btn btn-ghost" href="/casting-india.html#brief">I'm casting — send a brief</a>
     </div>
   </div>
@@ -283,7 +283,7 @@ def page(c):
 
       <div class="l-svcside">
         <p class="l-eyebrow">For talent in {e(c['city'])}</p>
-        <h2>Get on a roster brands <em>actually cast from</em></h2>
+        <h2>The women&rsquo;s board is <em>open in {e(c['city'])}</em></h2>
         <p class="l-prose">{e(c['talent'])}</p>
         <p class="l-prose">Joining is free and stays free. There is no registration fee, no
         portfolio package to buy and no compulsory shoot — if anyone in this industry asks you
