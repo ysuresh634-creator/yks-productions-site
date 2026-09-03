@@ -29,11 +29,37 @@
         .map(function (b) { return b.dataset.v; }).join(', ');
     }
 
+    function off(el) {
+      el.classList.remove('on');
+      el.setAttribute('aria-pressed', 'false');
+    }
+    /* Some answers cannot both be true. "Passport in hand" and "No passport
+       yet" arriving together is worse than neither arriving at all — it is
+       the one thing a producer rings me about. So picking one drops the
+       others rather than quietly recording a contradiction. */
+    function clash(b) {
+      var x = b.getAttribute('data-x');
+      if (x) {
+        [].forEach.call(group.querySelectorAll('[data-x="' + x + '"]'), function (o) {
+          if (o !== b) off(o);
+        });
+      }
+      var clear = b.getAttribute('data-xclear');
+      if (clear) {
+        [].forEach.call(group.querySelectorAll('[data-xmember="' + clear + '"]'), off);
+      }
+      var member = b.getAttribute('data-xmember');
+      if (member) {
+        [].forEach.call(group.querySelectorAll('[data-xclear="' + member + '"]'), off);
+      }
+    }
+
     [].forEach.call(group.querySelectorAll('button'), function (b) {
       b.setAttribute('aria-pressed', 'false');
       b.addEventListener('click', function () {
         var on = b.classList.toggle('on');
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (on) clash(b);
         sync();
         /* keep.js listens for this so a half-tapped set survives a
            phone call, the same as every typed field on the form */

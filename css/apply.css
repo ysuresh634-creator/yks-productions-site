@@ -1052,3 +1052,31 @@
 .ap-world-note{margin:12px 0 0;font-size:14px;line-height:1.7;color:var(--mag-ink-2);
   max-width:64ch;border-left:2px solid var(--mag-accent);padding-left:15px}
 .ap-world-note[hidden]{display:none}
+
+/* ── your kit + profile strength ──
+   The kit is deliberately long. The meter is what makes a long thing get
+   filled: it names what is missing and says what the free book costs. */
+.ap-kit{margin-top:26px;padding-top:24px;border-top:1px solid var(--mag-line)}
+.ap-kit-sizes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0 4px}
+.ap-kit-credits{margin-top:18px}
+.ap-kit-notice{margin:18px 0 0;font-size:13.5px;line-height:1.72;color:var(--mag-soft);
+  max-width:70ch;border-left:2px solid var(--mag-line-2);padding-left:15px}
+
+.ap-str{margin:16px 0 22px;padding:20px 20px 18px;border-radius:4px;
+  border:1px solid var(--mag-line);background:var(--mag-panel)}
+.ap-str.is-strong{border-color:rgba(255,148,72,.42)}
+.ap-str.is-full{border-color:rgba(99,199,147,.45)}
+.ap-str-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.ap-str-lbl{font-family:var(--mag-mono);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--mag-soft)}
+.ap-str-pct{font-family:var(--mag-display);font-size:26px;font-weight:600;color:var(--mag-ink)}
+.ap-str-track{height:4px;border-radius:100px;background:rgba(246,241,233,.09);margin:12px 0 14px;overflow:hidden}
+.ap-str-fill{display:block;height:100%;width:0;border-radius:100px;background:var(--mag-accent);
+  transition:width .35s ease,background .35s ease}
+.ap-str.is-full .ap-str-fill{background:var(--mag-good,#63C793)}
+.ap-str-say{margin:0 0 6px;font-size:15px;line-height:1.6;color:var(--mag-ink)}
+.ap-str-next{margin:0 0 14px;font-size:13.5px;line-height:1.65;color:var(--mag-soft)}
+.ap-str-deal{margin:0;padding-top:13px;border-top:1px solid var(--mag-line);
+  font-size:13.5px;line-height:1.75;color:var(--mag-ink-2);max-width:70ch}
+@media(prefers-reduced-motion:reduce){.ap-str-fill{transition:none}}
+@media(max-width:620px){.ap-kit-sizes{grid-template-columns:repeat(2,1fr)}}

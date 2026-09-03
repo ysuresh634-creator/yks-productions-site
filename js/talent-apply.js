@@ -915,6 +915,8 @@
   });
   $$('.ap-chips').forEach(function (group) {
     if (group.id === 'apPrefs') return;   // work-preference chips have their own handler (below)
+    if (group.dataset.taste) return;      // taste + kit rows are multi-select and owned by talent-apply-taste.js;
+                                          // this generic wiring is single-select and would fight it on every tap
     var key = group.dataset.k, multi = group.classList.contains('ap-multi');
     group.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
@@ -1181,6 +1183,8 @@
   var textNames = ['name', 'contact', 'category', 'region', 'country_other', 'city', 'socials', 'about', 'tagline',
     'dob', 'gender', 'marital', 'education', 'languages', 'occupation', 'availability', 'travel', 'comfort', 'extra', 'preferences',
     'taste_drawn', 'taste_worlds', 'taste_onset', 'taste_rather_not',
+    'kit_dress', 'kit_top', 'kit_jeans', 'kit_years', 'kit_reach', 'kit_notice',
+    'kit_skills', 'kit_perform', 'kit_look', 'kit_travel', 'kit_logistics', 'kit_credits',
     'age_group', 'guardian_name', 'guardian_contact'];
   function persistDraft() {
     try {
@@ -2145,6 +2149,14 @@
           (waVideos.length ? '(' + waVideos.length + ' clip(s) — applicant will send on WhatsApp)' : '(none)'),
         video_links: vidLinks.length ? vidLinks.join('\n') : '(none)'
       };
+
+      /* Everything in "your kit" — sizes, skills, languages, look, visas,
+         logistics, credits. Swept by name rather than listed one by one, so a
+         chip group added to the page later arrives in the email on its own. */
+      [].forEach.call(form.elements, function (el) {
+        if (!el.name || el.name.indexOf('kit_') !== 0) return;
+        payload[el.name.slice(4)] = el.value || '(not answered)';
+      });
       // also feed the structured submission to the YKS Talents Engine (roster pipeline) — non-blocking; never breaks the apply flow
       if (ENGINE_URL && up.photos && up.photos.filter(Boolean).length) {
         try {

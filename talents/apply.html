@@ -41,7 +41,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=23" />
 <link rel="stylesheet" href="/css/talents.css?v=90" />
-<link rel="stylesheet" href="/css/apply.css?v=8" />
+<link rel="stylesheet" href="/css/apply.css?v=9" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -979,6 +979,174 @@
             <input type="hidden" name="taste_onset" />
             <input type="hidden" name="taste_rather_not" />
           </div>
+
+          <!-- YOUR KIT — the depth of the profile.
+               None of it is required. All of it is the difference between
+               being on a list and being the person I can answer a brief with
+               at nine at night without having to ring anyone. -->
+          <div class="ap-full ap-kit">
+            <span class="ap-sub-lbl">Your kit <span class="ap-opt">none of this is required — every line of it is a brief you could be sent for</span></span>
+            <div class="ap-kit-sizes">
+            <label>Dress size
+              <select name="kit_dress">
+                <option value="" disabled selected>Choose one</option>
+                <option>XS</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+                <option>Not sure</option>
+              </select>
+            </label>
+            <label>Top / blouse
+              <select name="kit_top">
+                <option value="" disabled selected>Choose one</option>
+                <option>XS</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+                <option>Not sure</option>
+              </select>
+            </label>
+            <label>Jeans / waist
+              <select name="kit_jeans">
+                <option value="" disabled selected>Choose one</option>
+                <option>24</option>
+                <option>26</option>
+                <option>28</option>
+                <option>30</option>
+                <option>32</option>
+                <option>34</option>
+                <option>36</option>
+                <option>38</option>
+                <option>Not sure</option>
+              </select>
+            </label>
+            <label>Years doing this
+              <select name="kit_years">
+                <option value="" disabled selected>Choose one</option>
+                <option>This is my first year</option>
+                <option>1–2 years</option>
+                <option>3–5 years</option>
+                <option>5–10 years</option>
+                <option>More than 10 years</option>
+              </select>
+            </label>
+            <label>Instagram following
+              <select name="kit_reach">
+                <option value="" disabled selected>Choose one</option>
+                <option>Under 1,000</option>
+                <option>1,000 – 5,000</option>
+                <option>5,000 – 25,000</option>
+                <option>25,000 – 100,000</option>
+                <option>Over 100,000</option>
+              </select>
+            </label>
+            <label>Notice you need
+              <select name="kit_notice">
+                <option value="" disabled selected>Choose one</option>
+                <option>Same day</option>
+                <option>A day</option>
+                <option>Two or three days</option>
+                <option>About a week</option>
+                <option>Two weeks or more</option>
+              </select>
+            </label>
+            </div>
+            <p class="ap-taste-row-lbl">Things you can actually do <span class="ap-opt">a brief asks for these by name — every one you tick is a job you could be sent for</span></p>
+            <div class="ap-chips ap-taste-chips" data-taste="kit_skills">
+              <button type="button" data-v="Classical dance">Classical dance</button>
+              <button type="button" data-v="Hip-hop">Hip-hop</button>
+              <button type="button" data-v="Contemporary dance">Contemporary dance</button>
+              <button type="button" data-v="Salsa">Salsa</button>
+              <button type="button" data-v="Swimming">Swimming</button>
+              <button type="button" data-v="Rides a two-wheeler">Rides a two-wheeler</button>
+              <button type="button" data-v="Drives a car">Drives a car</button>
+              <button type="button" data-v="Horse riding">Horse riding</button>
+              <button type="button" data-v="Martial arts">Martial arts</button>
+              <button type="button" data-v="Yoga">Yoga</button>
+              <button type="button" data-v="Athletics / gym">Athletics / gym</button>
+              <button type="button" data-v="Singing">Singing</button>
+              <button type="button" data-v="Plays an instrument">Plays an instrument</button>
+              <button type="button" data-v="Trained actor">Trained actor</button>
+              <button type="button" data-v="Runway trained">Runway trained</button>
+              <button type="button" data-v="Skating">Skating</button>
+              <button type="button" data-v="Cycling">Cycling</button>
+              <button type="button" data-v="Cooking on camera">Cooking on camera</button>
+            </div>
+            <input type="hidden" name="kit_skills" />
+            <p class="ap-taste-row-lbl">Languages you can perform in <span class="ap-opt">not just speak — deliver a line in</span></p>
+            <div class="ap-chips ap-taste-chips" data-taste="kit_perform">
+              <button type="button" data-v="Hindi">Hindi</button>
+              <button type="button" data-v="English">English</button>
+              <button type="button" data-v="Tamil">Tamil</button>
+              <button type="button" data-v="Telugu">Telugu</button>
+              <button type="button" data-v="Kannada">Kannada</button>
+              <button type="button" data-v="Malayalam">Malayalam</button>
+              <button type="button" data-v="Marathi">Marathi</button>
+              <button type="button" data-v="Bengali">Bengali</button>
+              <button type="button" data-v="Punjabi">Punjabi</button>
+              <button type="button" data-v="Gujarati">Gujarati</button>
+              <button type="button" data-v="Odia">Odia</button>
+              <button type="button" data-v="Assamese">Assamese</button>
+              <button type="button" data-v="Urdu">Urdu</button>
+              <button type="button" data-v="Arabic">Arabic</button>
+              <button type="button" data-v="French">French</button>
+              <button type="button" data-v="Spanish">Spanish</button>
+            </div>
+            <input type="hidden" name="kit_perform" />
+            <p class="ap-taste-row-lbl">How much your look can change <span class="ap-opt">this decides half the campaigns you can be sent for</span></p>
+            <div class="ap-chips ap-taste-chips" data-taste="kit_look">
+              <button type="button" data-xmember="hair" data-v="Open to a haircut">Open to a haircut</button>
+              <button type="button" data-xmember="hair" data-v="Open to colour">Open to colour</button>
+              <button type="button" data-xmember="hair" data-v="Open to a fringe">Open to a fringe</button>
+              <button type="button" data-xclear="hair" data-v="Prefer no hair changes">Prefer no hair changes</button>
+              <button type="button" data-x="tat" data-v="Visible tattoos">Visible tattoos</button>
+              <button type="button" data-x="tat" data-v="Tattoos can be covered">Tattoos can be covered</button>
+              <button type="button" data-x="tat" data-v="No tattoos">No tattoos</button>
+              <button type="button" data-v="Piercings, removable">Piercings, removable</button>
+              <button type="button" data-v="Braces right now">Braces right now</button>
+              <button type="button" data-v="Glasses or lenses">Glasses or lenses</button>
+              <button type="button" data-v="Happy to go make-up free">Happy to go make-up free</button>
+            </div>
+            <input type="hidden" name="kit_look" />
+            <p class="ap-taste-row-lbl">Passport and visas <span class="ap-opt">the single thing that decides if you can be put up for an overseas job</span></p>
+            <div class="ap-chips ap-taste-chips" data-taste="kit_travel">
+              <button type="button" data-x="pp" data-v="Passport in hand">Passport in hand</button>
+              <button type="button" data-x="pp" data-v="No passport yet">No passport yet</button>
+              <button type="button" data-x="pp" data-v="Applied for one">Applied for one</button>
+              <button type="button" data-v="UAE visa / residency">UAE visa / residency</button>
+              <button type="button" data-v="Schengen">Schengen</button>
+              <button type="button" data-v="United Kingdom">United Kingdom</button>
+              <button type="button" data-v="United States">United States</button>
+              <button type="button" data-v="Singapore">Singapore</button>
+              <button type="button" data-v="Canada">Canada</button>
+              <button type="button" data-v="Australia">Australia</button>
+              <button type="button" data-v="None of these yet">None of these yet</button>
+            </div>
+            <input type="hidden" name="kit_travel" />
+            <p class="ap-taste-row-lbl">How you work <span class="ap-opt">the boring questions a producer asks me before they book anyone</span></p>
+            <div class="ap-chips ap-taste-chips" data-taste="kit_logistics">
+              <button type="button" data-v="Own transport">Own transport</button>
+              <button type="button" data-x="chap" data-v="Can travel alone">Can travel alone</button>
+              <button type="button" data-x="chap" data-v="Prefer a chaperone">Prefer a chaperone</button>
+              <button type="button" data-v="Early calls are fine">Early calls are fine</button>
+              <button type="button" data-v="Overnight schedules fine">Overnight schedules fine</button>
+              <button type="button" data-x="days" data-v="Weekdays only">Weekdays only</button>
+              <button type="button" data-x="days" data-v="Weekends only">Weekends only</button>
+              <button type="button" data-x="note" data-v="Need a day of notice">Need a day of notice</button>
+              <button type="button" data-x="note" data-v="Can do same-day">Can do same-day</button>
+            </div>
+            <input type="hidden" name="kit_logistics" />
+            <label class="ap-full ap-kit-credits">Who you&rsquo;ve worked with <span class="ap-opt">brands, agencies, publications — names I can check</span>
+              <input type="text" name="kit_credits" placeholder="e.g. Nykaa, Tanishq, a Lakmé show, an agency you are signed with" />
+            </label>
+          </div>
+          <p class="ap-kit-notice">Where all this goes: to me, and it stays with me. It is stored so I can match you against briefs — it is never sold, never shared with another agency, and never published. Your number, email and Instagram do not appear anywhere on this site, now or later. Want it deleted? Message the same WhatsApp and it is gone, no reason needed and no hard feelings.</p>
+
           <label class="ap-full">Your comfort zone &amp; boundaries <span class="ap-opt">this protects you</span>
             <textarea name="comfort" required rows="2" placeholder="What are you happy to shoot — and anything that's a firm no? (e.g. swimwear yes; no smoking scenes.) I'll never put you forward for something you're not comfortable with."></textarea>
             <span class="ap-polish-row">
@@ -1215,11 +1383,12 @@
 </footer>
 
 <script src="/js/landing.js?v=13"></script>
-<script src="/js/talent-apply.js?v=71"></script>
+<script src="/js/talent-apply.js?v=73"></script>
 <script src="/js/talent-apply-flow.js?v=6"></script>
 <script src="/js/talent-apply-live.js?v=4"></script>
-<script src="/js/talent-apply-taste.js?v=1"></script>
+<script src="/js/talent-apply-taste.js?v=2"></script>
 <script src="/js/talent-apply-world.js?v=1"></script>
+<script src="/js/talent-apply-strength.js?v=1"></script>
 <script src="/js/talent-apply-assist.js?v=1"></script>
 <script src="/js/keep.js?v=1"></script>
 <script src="/js/talent-apply-reveal.js?v=2"></script>
