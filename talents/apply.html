@@ -41,7 +41,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&family=Playfair+Display:wght@500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=23" />
 <link rel="stylesheet" href="/css/talents.css?v=90" />
-<link rel="stylesheet" href="/css/apply.css?v=5" />
+<link rel="stylesheet" href="/css/apply.css?v=7" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -370,13 +370,13 @@
     <div class="ap-hero3-txt">
       <p class="tal-kicker">Women's board — open · Volume 01</p>
       <h1 class="ap-hero3-h">Some faces<br /><em>get remembered.</em></h1>
-      <p class="ap-hero3-sub">The women&rsquo;s board — models, actors and creators across <b>India &amp; the UAE</b>, cast for brand and editorial work. I read every submission myself, and I&rsquo;d rather have thirty faces I can actually put forward than three hundred I can&rsquo;t. Send six to ten photographs and the site builds you a proper portfolio while you&rsquo;re here.</p>
+      <p class="ap-hero3-sub">The women&rsquo;s board — models, actors and creators across <b>India &amp; the UAE</b>, cast for brand and editorial work. Every brief that comes through here is <b>paid work for a real client</b>. I read every submission myself, and I&rsquo;d rather have thirty faces I can actually put forward than three hundred I can&rsquo;t.</p>
       <div class="ap-hero3-cta-row">
-        <a class="ap-hero3-cta" href="#talForm">Start — free, about 3 minutes</a>
+        <a class="ap-hero3-cta" href="#talForm">Apply to the board — about 3 minutes</a>
         <a class="ap-hero3-alt" href="#is-this-real">Is this real? →</a>
       </div>
       <ul class="ap-hero3-chips">
-        <li>18+ · women&rsquo;s board</li><li>No fee, ever</li><li>Your name stays private</li><li>Read personally, not by a bot</li>
+        <li>18+ · women&rsquo;s board</li><li>Every brief is paid</li><li>Your name stays private</li><li>Read personally, not by a bot</li>
       </ul>
     </div>
 
@@ -488,7 +488,7 @@
         <span class="ap-flow-node">01</span>
         <span class="ap-flow-body">
           <span class="ap-flow-title">You send a few photos</span>
-          <span class="ap-flow-detail">Straight from your phone — any size, any format. Then build your own portfolio right here as you go. Free, and yours to keep.</span>
+          <span class="ap-flow-detail">Straight from your phone — any size, any format. Shot plainly: daylight, no filter, hair off your face. That tells me more than a retouched one ever could.</span>
         </span>
       </button>
       <button class="ap-flow-step" type="button" data-i="1">
@@ -506,6 +506,34 @@
         </span>
       </button>
     </div>
+  </div>
+</section>
+
+<!-- THE BAR — the actual filter.
+     The page used to lead with a free portfolio, so it drew people who wanted a
+     free portfolio. Nothing here charges anyone; it just states the standard
+     plainly, which is what established talent recognises and what the
+     free-PDF crowd reads and skips. -->
+<section class="l-section ap-bar" id="the-bar">
+  <div class="wrap">
+    <p class="tal-kicker" style="margin-bottom:14px">The bar</p>
+    <h2 class="ap-bar-h">What actually gets you on the board</h2>
+    <p class="ap-bar-intro">I&rsquo;m not looking for a particular look — that changes with every brief. I&rsquo;m looking for someone a client can book on a Tuesday and not think about again. It&rsquo;s a shorter list than people expect, and almost none of it is about your best photograph.</p>
+    <div class="ap-board-grid ap-bar-grid">
+      <div class="ap-board">
+        <b>Photographs, not glamour shots</b>
+        <p>Daylight, plain wall, hair off your face, clothes that show your actual shape. One full-length, one head and shoulders, one that looks like you on a normal day. No filters, no heavy retouching, no salon hair and makeup — a client is booking the person, and a retouched picture tells me nothing about her.</p>
+      </div>
+      <div class="ap-board">
+        <b>You answer, and you turn up</b>
+        <p>Most people don&rsquo;t lose the job at the casting. They lose it by going quiet for four days, or arriving at eleven for a nine o&rsquo;clock call. If you pick up your phone and you&rsquo;re on time, you are already ahead of most of this industry — I&rsquo;m not exaggerating.</p>
+      </div>
+      <div class="ap-board">
+        <b>You know what you won&rsquo;t do</b>
+        <p>Tell me your lines before a client ever asks. Nobody minds a clear no; it&rsquo;s the yes-to-everything that becomes a no on the morning of the shoot, and that&rsquo;s what costs people work. Written down here, I can make sure you&rsquo;re never put in a room you didn&rsquo;t want to be in.</p>
+      </div>
+    </div>
+    <p class="ap-bar-note">And what this isn&rsquo;t: a free portfolio service. The board exists to put people in front of paying clients — the builder further down is a by-product, made so I&rsquo;d have something decent to read. If the PDF is what you came for, take it and go, genuinely no hard feelings. If you want to be sent for jobs, fill the form in properly. Half-finished ones don&rsquo;t get put forward, and that is the only filter here.</p>
   </div>
 </section>
 
@@ -689,7 +717,7 @@
               <button type="button" class="ap-ai-regen" id="apAiRegen" hidden>↻ Another version</button>
             </div>
           </div>
-          <textarea name="about" id="apAbout" rows="5" placeholder="e.g. Fashion &amp; editorial model based in Delhi. I love campaign and lookbook work, take direction well, and I'm just as comfortable on location as in studio."></textarea>
+          <textarea name="about" required id="apAbout" rows="5" placeholder="e.g. Fashion &amp; editorial model based in Delhi. I love campaign and lookbook work, take direction well, and I'm just as comfortable on location as in studio."></textarea>
         </div>
 
         <!-- The basics -->
@@ -735,9 +763,10 @@
           </label>
         </div>
 
-        <!-- Stats & details (optional, mostly models) -->
+        <!-- Stats & details. Required now, apart from skin tone: a half-filled
+             entry cannot be put in front of a client, which was the whole problem. -->
         <div class="ap-block">
-          <p class="ap-step">Your stats <span class="ap-opt">optional · for your portfolio</span></p>
+          <p class="ap-step">Your stats <span class="ap-opt">this is the page clients check first</span></p>
           <p class="ap-hint">Add whatever applies — these become a measurements page in your portfolio, just like a proper comp card. Leave blank if you'd rather not.</p>
           <button type="button" class="ap-ai-btn" id="apStatsAiOpen">✨ Paste your stats — I'll sort them</button>
           <div class="ap-statspaste" id="apStatsPaste" hidden>
@@ -748,20 +777,20 @@
             </div>
           </div>
           <div class="ap-stats">
-            <label>Height<input type="text" name="stat_height" placeholder="5&#39;6&quot;" /></label>
-            <label>Bust / Chest<input type="text" name="stat_bust" placeholder="34" /></label>
-            <label>Waist<input type="text" name="stat_waist" placeholder="26" /></label>
-            <label>Hips<input type="text" name="stat_hips" placeholder="36" /></label>
-            <label>Shoe<input type="text" name="stat_shoe" placeholder="38 EU" /></label>
-            <label>Hair<input type="text" name="stat_hair" placeholder="Black" /></label>
-            <label>Eyes<input type="text" name="stat_eyes" placeholder="Brown" /></label>
+            <label>Height<input type="text" name="stat_height" required placeholder="5&#39;6&quot;" /></label>
+            <label>Bust / Chest<input type="text" name="stat_bust" required placeholder="34" /></label>
+            <label>Waist<input type="text" name="stat_waist" required placeholder="26" /></label>
+            <label>Hips<input type="text" name="stat_hips" required placeholder="36" /></label>
+            <label>Shoe<input type="text" name="stat_shoe" required placeholder="38 EU" /></label>
+            <label>Hair<input type="text" name="stat_hair" required placeholder="Black" /></label>
+            <label>Eyes<input type="text" name="stat_eyes" required placeholder="Brown" /></label>
             <label>Skin<input type="text" name="stat_skin" placeholder="Medium" /></label>
           </div>
         </div>
 
         <!-- More about you — private, only YKS sees this -->
         <div class="ap-block">
-          <p class="ap-step">More about you <span class="ap-opt">optional · 100% private</span></p>
+          <p class="ap-step">More about you <span class="ap-opt">100% private — never shown publicly</span></p>
           <p class="ap-hint">The more I know, the better I can put you forward for the right jobs. <b class="tal-priv">Only YKS ever sees this — none of it is shown publicly.</b> Fill what you're comfortable with; skip anything you'd rather not.</p>
           <button type="button" class="ap-ai-btn" id="apMoreAiOpen">✨ Paste it instead — I'll fill this section</button>
           <div class="ap-statspaste" id="apMorePaste" hidden>
@@ -772,9 +801,9 @@
             </div>
           </div>
           <div class="row2">
-            <label>Date of birth <span class="tal-priv">private</span><input type="date" name="dob" /></label>
+            <label>Date of birth <span class="tal-priv">private</span><input type="date" name="dob" required /></label>
             <label>Gender
-              <select name="gender">
+              <select name="gender" required>
                 <option value="" disabled selected>Choose one</option>
                 <option>Woman</option><option>Man</option><option>Non-binary</option><option>Prefer to self-describe</option><option>Prefer not to say</option>
               </select>
@@ -817,18 +846,18 @@
             </label>
           </div>
           <div class="row2">
-            <label>Languages you speak<input type="text" name="languages" placeholder="English, Hindi, Tamil…" /></label>
-            <label>Current work or studies<input type="text" name="occupation" placeholder="Student, full-time model, engineer…" /></label>
+            <label>Languages you speak<input type="text" name="languages" required placeholder="English, Hindi, Tamil…" /></label>
+            <label>Current work or studies<input type="text" name="occupation" required placeholder="Student, full-time model, engineer…" /></label>
           </div>
           <div class="row2">
             <label>Availability
-              <select name="availability">
+              <select name="availability" required>
                 <option value="" disabled selected>Choose one</option>
                 <option>Full-time</option><option>Part-time</option><option>Weekends &amp; evenings</option><option>Project by project</option>
               </select>
             </label>
             <label>Open to travel for work?
-              <select name="travel">
+              <select name="travel" required>
                 <option value="" disabled selected>Choose one</option>
                 <option>Yes — anywhere</option><option>Within my country</option><option>Within my city only</option><option>Not right now</option>
               </select>
@@ -850,8 +879,78 @@
             </div>
             <input type="hidden" name="preferences" />
           </div>
-          <label class="ap-full">Your comfort zone &amp; boundaries <span class="ap-opt">optional · this protects you</span>
-            <textarea name="comfort" rows="2" placeholder="What are you happy to shoot — and anything that's a firm no? (e.g. swimwear yes; no smoking scenes.) I'll never put you forward for something you're not comfortable with."></textarea>
+
+          <!-- TASTE — what she's drawn to, and what she'd rather not do.
+               Every one of these is a tap. A brief almost never says "find me a
+               model"; it says warm, minimal, movement, no swimwear. This is the
+               half of the match that measurements can't carry. -->
+          <div class="ap-full ap-taste">
+            <span class="ap-sub-lbl">What you&rsquo;re drawn to <span class="ap-opt">all tapping, no typing — skip any row</span></span>
+
+            <p class="ap-taste-row-lbl">Looks you love</p>
+            <div class="ap-chips ap-taste-chips" data-taste="taste_drawn">
+              <button type="button" data-v="Editorial &amp; sharp">Editorial &amp; sharp</button>
+              <button type="button" data-v="Soft &amp; natural">Soft &amp; natural</button>
+              <button type="button" data-v="Bold colour">Bold colour</button>
+              <button type="button" data-v="Minimal">Minimal</button>
+              <button type="button" data-v="Vintage">Vintage</button>
+              <button type="button" data-v="Street">Street</button>
+              <button type="button" data-v="Luxury">Luxury</button>
+              <button type="button" data-v="High glam">High glam</button>
+              <button type="button" data-v="Athletic">Athletic</button>
+              <button type="button" data-v="Ethereal">Ethereal</button>
+            </div>
+
+            <p class="ap-taste-row-lbl">Worlds you want to work in</p>
+            <div class="ap-chips ap-taste-chips" data-taste="taste_worlds">
+              <button type="button" data-v="Beauty">Beauty</button>
+              <button type="button" data-v="Jewellery">Jewellery</button>
+              <button type="button" data-v="Skincare">Skincare</button>
+              <button type="button" data-v="Apparel">Apparel</button>
+              <button type="button" data-v="Streetwear">Streetwear</button>
+              <button type="button" data-v="Bridal">Bridal</button>
+              <button type="button" data-v="Travel">Travel</button>
+              <button type="button" data-v="Food">Food</button>
+              <button type="button" data-v="Tech">Tech</button>
+              <button type="button" data-v="Automotive">Automotive</button>
+              <button type="button" data-v="Fitness">Fitness</button>
+              <button type="button" data-v="Home &amp; interiors">Home &amp; interiors</button>
+            </div>
+
+            <p class="ap-taste-row-lbl">How you like a set to run</p>
+            <div class="ap-chips ap-taste-chips" data-taste="taste_onset">
+              <button type="button" data-v="Studio">Studio</button>
+              <button type="button" data-v="Outdoors / location">Outdoors / location</button>
+              <button type="button" data-v="Small crew">Small crew</button>
+              <button type="button" data-v="Big production">Big production</button>
+              <button type="button" data-v="Movement &amp; dance">Movement &amp; dance</button>
+              <button type="button" data-v="Stills only">Stills only</button>
+              <button type="button" data-v="Speaking on camera">Speaking on camera</button>
+              <button type="button" data-v="Directed closely">Directed closely</button>
+              <button type="button" data-v="Room to improvise">Room to improvise</button>
+              <button type="button" data-v="Early calls are fine">Early calls are fine</button>
+            </div>
+
+            <p class="ap-taste-row-lbl ap-taste-no-lbl">Things you&rsquo;d rather not do <span class="ap-opt">a clear no here is worth more to me than a maybe</span></p>
+            <div class="ap-chips ap-taste-chips is-no" data-taste="taste_rather_not">
+              <button type="button" data-v="Swimwear">Swimwear</button>
+              <button type="button" data-v="Lingerie">Lingerie</button>
+              <button type="button" data-v="Smoking or alcohol on camera">Smoking / alcohol on camera</button>
+              <button type="button" data-v="Cutting or colouring my hair">Cutting or colouring my hair</button>
+              <button type="button" data-v="Heavy prosthetics or body paint">Heavy prosthetics / body paint</button>
+              <button type="button" data-v="Night shoots">Night shoots</button>
+              <button type="button" data-v="Long travel">Long travel</button>
+              <button type="button" data-v="Speaking on camera">Speaking on camera</button>
+              <button type="button" data-v="Crowd scenes">Crowd scenes</button>
+            </div>
+
+            <input type="hidden" name="taste_drawn" />
+            <input type="hidden" name="taste_worlds" />
+            <input type="hidden" name="taste_onset" />
+            <input type="hidden" name="taste_rather_not" />
+          </div>
+          <label class="ap-full">Your comfort zone &amp; boundaries <span class="ap-opt">this protects you</span>
+            <textarea name="comfort" required rows="2" placeholder="What are you happy to shoot — and anything that's a firm no? (e.g. swimwear yes; no smoking scenes.) I'll never put you forward for something you're not comfortable with."></textarea>
             <span class="ap-polish-row">
               <button type="button" class="ap-tag-ai" id="apComfortAi" data-field="What are you happy to shoot — and anything that is a firm no?">✨ Say it clearly</button>
               <small class="ap-mini">Tidies your own words — it never changes what you said yes or no to.</small>
@@ -1086,9 +1185,10 @@
 </footer>
 
 <script src="/js/landing.js?v=13"></script>
-<script src="/js/talent-apply.js?v=69"></script>
-<script src="/js/talent-apply-flow.js?v=5"></script>
+<script src="/js/talent-apply.js?v=70"></script>
+<script src="/js/talent-apply-flow.js?v=6"></script>
 <script src="/js/talent-apply-live.js?v=4"></script>
+<script src="/js/talent-apply-taste.js?v=1"></script>
 <script src="/js/talent-apply-assist.js?v=1"></script>
 <script src="/js/keep.js?v=1"></script>
 <script src="/js/talent-apply-reveal.js?v=2"></script>

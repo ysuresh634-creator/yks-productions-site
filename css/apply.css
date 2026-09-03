@@ -1020,3 +1020,26 @@
 .apw-warn{margin:14px 0 0;padding:13px 16px;border-radius:3px;
   border:1px solid rgba(201,86,76,.45);background:rgba(201,86,76,.1);
   font-size:14px;line-height:1.6;color:var(--mag-ink)}
+
+/* ── the bar ──
+   Reuses the board cards so this adds almost no new surface. The section
+   states a standard rather than a fee: established talent reads it as a
+   professional board, and people after a free PDF read it and move on. */
+.ap-bar{border-top:1px solid var(--mag-line)}
+.ap-bar-h{font-family:var(--mag-display);font-weight:500;font-size:clamp(26px,3.4vw,40px);
+  line-height:1.12;letter-spacing:-.02em;color:var(--mag-ink);margin:16px 0 16px}
+.ap-bar-intro{font-size:15.5px;line-height:1.72;color:var(--mag-ink-2);margin:0 0 30px;max-width:62ch}
+.ap-bar-note{margin:30px 0 0;font-size:14.5px;line-height:1.75;color:var(--mag-soft);
+  max-width:68ch;border-left:2px solid var(--mag-accent);padding-left:16px}
+
+/* ── taste ──
+   Same chips as everywhere else on the form, in labelled rows. The "rather
+   not" row is deliberately a different colour: it is the one row I most want
+   answered, and it should not read like another list of things to want. */
+.ap-taste{margin-top:26px;padding-top:24px;border-top:1px solid var(--mag-line)}
+.ap-taste-row-lbl{margin:20px 0 10px;font-family:var(--mag-mono);font-size:10px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--mag-soft)}
+.ap-taste-row-lbl:first-of-type{margin-top:14px}
+.ap-taste-no-lbl{color:var(--mag-accent)}
+.ap-taste-chips.is-no button.on{border-color:rgba(255,148,72,.6);
+  background:rgba(255,148,72,.14);color:var(--mag-ink)}

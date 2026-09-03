@@ -1180,6 +1180,7 @@
   /* ══ autosave draft (text + video links; uploaded files can't persist across reloads) ══ */
   var textNames = ['name', 'contact', 'category', 'region', 'city', 'socials', 'about', 'tagline',
     'dob', 'gender', 'marital', 'education', 'languages', 'occupation', 'availability', 'travel', 'comfort', 'extra', 'preferences',
+    'taste_drawn', 'taste_worlds', 'taste_onset', 'taste_rather_not',
     'age_group', 'guardian_name', 'guardian_contact'];
   function persistDraft() {
     try {
@@ -2118,6 +2119,10 @@
         availability: (form.availability && form.availability.value) || '(none)',
         open_to_travel: (form.travel && form.travel.value) || '(none)',
         work_preferences: (form.preferences && form.preferences.value) || '(none)',
+        drawn_to:      (form.taste_drawn && form.taste_drawn.value) || '(not answered)',
+        worlds:        (form.taste_worlds && form.taste_worlds.value) || '(not answered)',
+        on_set:        (form.taste_onset && form.taste_onset.value) || '(not answered)',
+        rather_not_do: (form.taste_rather_not && form.taste_rather_not.value) || '(not answered)',
         comfort_boundaries: (form.comfort && form.comfort.value) || '(none)',
         anything_else: (form.extra && form.extra.value) || '(none)',
         age_group: (form.age_group && form.age_group.value) || '(none)',
