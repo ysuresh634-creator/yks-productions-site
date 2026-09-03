@@ -234,8 +234,8 @@ def page(c):
   gtag('js', new Date());
   gtag('config', 'G-C57X89TN45');
 </script>
-<title>Female Models in {e(c['city'])} — Casting Board &amp; Submissions | YKS Talents</title>
-<meta name="description" content="Women's casting board for {e(c['city'])} — models, actors and creators put forward for brand and editorial work. Read personally; booked through YKS." />
+<title>Models in {e(c['city'])} — Book a Face, or Join the Women&rsquo;s Board | YKS Talents</title>
+<meta name="description" content="Cast models, actors and creators in {e(c['city'])} — send a brief, get a shortlist in 24 hours. Applications open on the women&#39;s board." />
 <link rel="canonical" href="{url}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="geo.region" content="{e(c['geo'])}" />
@@ -267,7 +267,7 @@ def page(c):
 <section class="l-hero">
   <div class="wrap">
     <p class="l-eyebrow">Talent · {e(c['city'])} · {e(c['state'])}</p>
-    <h1>Female models in {e(c['city'])}</h1>
+    <h1>Models in {e(c['city'])}</h1>
     <p class="tal-h1sub">Modelling, acting and creator work in {e(c['city'])} — for the people doing it, and the brands casting it.</p>
     <p class="l-lede">{e(c['market'])}</p>
     <div class="l-cta-row">
@@ -285,13 +285,11 @@ def page(c):
         <p class="l-eyebrow">For talent in {e(c['city'])}</p>
         <h2>The women&rsquo;s board is <em>open in {e(c['city'])}</em></h2>
         <p class="l-prose">{e(c['talent'])}</p>
-        <p class="l-prose">Joining is free and stays free. There is no registration fee, no
-        portfolio package to buy and no compulsory shoot — if anyone in this industry asks you
-        to pay to be represented, that is the moment to walk away. You need to be over 18, and
-        you need photographs clear enough to see you properly. That is the whole barrier.</p>
-        <p class="l-prose">What we will not do is promise you work. Nobody honest can. What we
-        can do is put you in front of the briefs that come in, and handle the booking, the
-        schedule and the payment when one fits you.</p>
+        <p class="l-prose">Over 18, photographs clear enough to see you properly, no fee at any
+        point. Nobody honest promises work — what I can promise is that briefs from
+        {e(c['city'])} get put in front of the right faces, and that the booking, the schedule
+        and the payment run through me. <a href="/talents/apply.html">The full terms are on the
+        board &rarr;</a></p>
         <div class="l-cta-row">
           <a class="btn btn-fill" href="/talents/apply.html">Apply from {e(c['city'])} →</a>
         </div>
@@ -301,13 +299,10 @@ def page(c):
         <p class="l-eyebrow">For brands casting in {e(c['city'])}</p>
         <h2>Send a brief, get a <em>shortlist</em></h2>
         <p class="l-prose">{e(c['client'])}</p>
-        <p class="l-prose">Tell us the dates, the city, the look and how you intend to use the
-        images. You get back a shortlist built against that brief and one all-in number covering
-        the talent and the arrangement — not a directory to sift through and negotiate with
-        one profile at a time.</p>
-        <p class="l-prose">Talent contact details are never shared, in either direction. Everything
-        runs through us, which is what makes the shoot day predictable and keeps the people in
-        front of the camera protected.</p>
+        <p class="l-prose">Dates, the look and how you intend to use the images — that is the
+        whole brief. Back comes a shortlist built against it and one all-in number, rather than a
+        directory to sift through. Contact details are never shared in either direction.
+        <a href="/casting-india.html">How a casting runs &rarr;</a></p>
         <div class="l-cta-row">
           <a class="btn btn-fill" href="/casting-india.html#brief">Send a {e(c['city'])} brief →</a>
         </div>
