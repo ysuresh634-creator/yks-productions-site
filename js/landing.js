@@ -45,7 +45,19 @@
   if (document.querySelector('.l-fab')) return;
   var waLink = document.querySelector('a[href*="wa.me/"]');
   var num = (document.body && document.body.getAttribute('data-wa')) || (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1]) || '971501955122';
-  var msg = encodeURIComponent("Hi Yedukrishna, I'd like to enquire about a shoot.");
+  /* The opening line depends on which page you are standing on. This button
+     said "I'd like to enquire about a shoot" on every page of the site —
+     including the women's casting board, where it handed people applying for
+     work a client's script. They then sent it, because it is what the button
+     gave them, and arrived looking like an enquiry that was not one.
+     The apply page speaks as an applicant, the roster speaks as a client. */
+  var path = location.pathname;
+  var line = /\/talents\/apply/.test(path)
+    ? "Hi Yedukrishna \u2014 I'd like to apply to the women's casting board. I'm 18 or over, and I know the application itself is the form on your site."
+    : /\/talents/.test(path)
+      ? "Hi Yedukrishna, I'm looking to cast talent from your roster."
+      : "Hi Yedukrishna, I'd like to enquire about a shoot.";
+  var msg = encodeURIComponent(line);
   var css = '.l-fab{position:fixed;right:18px;bottom:18px;z-index:300;display:flex;flex-direction:column;gap:12px}'
     + '.l-fab a{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(0,0,0,.42);transition:transform .25s cubic-bezier(.22,.61,.36,1)}'
     + '.l-fab a:hover{transform:scale(1.09)}'

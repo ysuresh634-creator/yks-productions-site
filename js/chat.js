@@ -35,8 +35,16 @@
     return (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1]) || WA_AE;
   }
   var NUM = (document.body && document.body.getAttribute('data-wa')) || localNum();
-  var WA_URL = 'https://wa.me/' + NUM + '?text='
-             + encodeURIComponent("Hi Yedukrishna, I'd like to enquire about a shoot.");
+  /* Same page-awareness as the floating button: on the roster the visitor is
+     almost always casting, not booking a shoot for themselves, and on the
+     apply page they are neither. Handing everyone the same opening line is
+     how applicants ended up arriving worded as client enquiries. */
+  var WA_URL = 'https://wa.me/' + NUM + '?text=' + encodeURIComponent(
+    /\/talents\/apply/.test(location.pathname)
+      ? "Hi Yedukrishna \u2014 I'd like to apply to the women's casting board. I'm 18 or over, and I know the application itself is the form on your site."
+      : /\/talents|\/models-in-/.test(location.pathname)
+        ? "Hi Yedukrishna, I'm looking to cast talent from your roster."
+        : "Hi Yedukrishna, I'd like to enquire about a shoot.");
 
   /* ── languages ─────────────────────────────────────────────────
      Iris answers in whatever the visitor writes. These just decide
