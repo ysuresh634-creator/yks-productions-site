@@ -63,13 +63,24 @@ brand campaigns and portraits across India and the UAE.
 
 ---
 
-## Vimeo — vimeo.com/yksproductions
+## Vimeo — dropped (4 Sep 2026)
 
-**Name:** `Yedukrishna Suresh`
-**Bio:** same About paragraph as Behance
-**Link:** `https://yksproductions.com`
+`vimeo.com/yksproductions` never existed; the vanity URL was never claimed.
+The real account, `vimeo.com/user246729937`, is set to **private**. So there
+was no working URL to point at, while 66 pages declared one in schema and
+the homepage and `/links` carried clickable links straight to a 404.
 
----
+All of it has been removed — schema `sameAs`, the social row and the
+link-in-bio page. A `sameAs` to a dead or private profile is a broken claim
+about who you are, which is worse than making no claim at all.
+
+**To bring it back**, two things have to be true: the profile made public,
+and the vanity URL `yksproductions` claimed. Then re-add it to `sameAs`,
+the social row and `/links`. Until both hold, leave it out.
+
+The Real Estate Showreel embed (`vimeo.com/1117232167`) is untouched and
+still works — a public video on a private profile. That is a separate thing
+from the profile link and should not be removed.
 
 ## Why the exact wording matters
 
@@ -93,7 +104,7 @@ that has nothing your site doesn't.
                           ▲
         ┌─────────┬───────┴───────┬─────────┐
         │         │               │         │
-   Instagram   Behance A      Behance B   Vimeo
+   Instagram   Behance A      Behance B
                                             
                      Linktree ──────────────┘
                 (a spoke, not a hub — point it
@@ -107,14 +118,13 @@ that has nothing your site doesn't.
 | Instagram bio | `yksproductions.com/links` |
 | Behance A (yedusuresha14c) | `https://yksproductions.com` |
 | Behance B (ysuresh634f0a1) | `https://yksproductions.com` |
-| Vimeo | `https://yksproductions.com` |
 | Linktree — top link | `https://yksproductions.com/links` |
 
 **Already done on the site:** it no longer links out to Linktree from the
 social row or the footer — those were sending visitors away to a page
 that only sends them back. Linktree stays in the schema `sameAs`, which
 is correct: that declares the profile as yours without feeding it traffic.
-Vimeo took its place in the social row.
+The social row no longer carries Vimeo (see above).
 
 **Keep Linktree or not?** Keep it — it costs nothing and it's another
 profile carrying your name. Just make its first link the website, so
