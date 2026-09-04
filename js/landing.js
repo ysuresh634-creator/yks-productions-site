@@ -47,13 +47,13 @@
   var num = (document.body && document.body.getAttribute('data-wa')) || (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1]) || '971501955122';
   /* The opening line depends on which page you are standing on. This button
      said "I'd like to enquire about a shoot" on every page of the site —
-     including the women's casting board, where it handed people applying for
+     including the casting board, where it handed people applying for
      work a client's script. They then sent it, because it is what the button
      gave them, and arrived looking like an enquiry that was not one.
      The apply page speaks as an applicant, the roster speaks as a client. */
   var path = location.pathname;
   var line = /\/talents\/apply/.test(path)
-    ? "Hi Yedukrishna \u2014 I'd like to apply to the women's casting board. I'm 18 or over, and I know the application itself is the form on your site."
+    ? "Hi Yedukrishna \u2014 I'd like to apply to the board. I'm 18 or over, and I know the application itself is the form on your site."
     : /\/talents/.test(path)
       ? "Hi Yedukrishna, I'm looking to cast talent from your roster."
       : "Hi Yedukrishna, I'd like to enquire about a shoot.";

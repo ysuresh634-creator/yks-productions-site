@@ -41,7 +41,7 @@
      how applicants ended up arriving worded as client enquiries. */
   var WA_URL = 'https://wa.me/' + NUM + '?text=' + encodeURIComponent(
     /\/talents\/apply/.test(location.pathname)
-      ? "Hi Yedukrishna \u2014 I'd like to apply to the women's casting board. I'm 18 or over, and I know the application itself is the form on your site."
+      ? "Hi Yedukrishna \u2014 I'd like to apply to the board. I'm 18 or over, and I know the application itself is the form on your site."
       : /\/talents|\/models-in-/.test(location.pathname)
         ? "Hi Yedukrishna, I'm looking to cast talent from your roster."
         : "Hi Yedukrishna, I'd like to enquire about a shoot.");
