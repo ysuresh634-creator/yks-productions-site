@@ -510,3 +510,18 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
 .l-ptable caption{caption-side:bottom;text-align:left;font-family:var(--mono);font-size:10.5px;
   letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim);opacity:.7;
   padding-top:10px;line-height:1.6}
+
+
+/* ── Data tables ─────────────────────────────────────────────
+   Answer engines lift tables intact, so several landing pages
+   carry one. Always inside .l-tablewrap: the wrapper scrolls on
+   a phone so a wide table never makes the whole page scroll
+   sideways. */
+.l-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:6px}
+.l-table{width:100%;border-collapse:collapse;min-width:640px;font-size:15px}
+.l-table caption{text-align:left;color:var(--muted);font-size:13px;letter-spacing:.04em;padding-bottom:12px}
+.l-table th,.l-table td{border:1px solid var(--line);padding:14px 16px;text-align:left;vertical-align:top}
+.l-table thead th{color:var(--ink);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.l-table td:first-child{color:var(--ink);font-weight:500}
+.l-table td{color:var(--muted)}
+@media(max-width:760px){.l-table{font-size:14px}.l-table th,.l-table td{padding:11px 12px}}
