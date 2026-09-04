@@ -1030,3 +1030,10 @@ img{display:block;max-width:100%;height:auto}
 .act-quote .sec-head{margin-bottom:52px;max-width:720px}
 .quote-intro{color:var(--paper-dim);font-size:1.02rem;line-height:1.75;margin-top:18px;max-width:60ch}
 @media(max-width:640px){.act-quote{padding:70px 0}.act-quote .sec-head{margin-bottom:34px}}
+
+/* A model landing on the booking block had an email address and nothing else,
+   so that is what she used. One line, at the point the choice gets made. */
+.quick-talent{margin:18px 0 0;font-size:14px;line-height:1.7;color:rgba(246,241,233,.62);
+  border-left:2px solid #ff8c3b;padding-left:15px;max-width:64ch}
+.quick-talent a{color:#ff8c3b;text-decoration:none;border-bottom:1px solid rgba(255,140,59,.4)}
+.quick-talent a:hover{border-bottom-color:#ff8c3b}
