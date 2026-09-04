@@ -43,6 +43,14 @@
 /* Floating WhatsApp + call — one-tap contact from anywhere on the page */
 (function () {
   if (document.querySelector('.l-fab')) return;
+  /* Not on the application page. That page's whole job is the form, and a
+     floating "message me" bubble sitting beside it is simply a way around
+     it — every stray application so far arrived through this button rather
+     than the form, carrying none of the checks the form makes, and one
+     person said so outright: he could not tell who the call was for, so he
+     used the pop-up instead. The page keeps its own labelled WhatsApp links
+     under the submit button and for sending files after applying. */
+  if (/\/talents\/apply/.test(location.pathname)) return;
   var waLink = document.querySelector('a[href*="wa.me/"]');
   var num = (document.body && document.body.getAttribute('data-wa')) || (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1]) || '971501955122';
   /* The opening line depends on which page you are standing on. This button

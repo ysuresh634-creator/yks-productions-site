@@ -277,3 +277,20 @@
 
   go(0, true);
 })();
+
+/* "Not sure this call is for you?" — the honest answer lives in the FAQ
+   rather than on a sign over the door. Anyone who wonders clicks and is told;
+   nobody merely browsing gets a billboard about who is excluded. Someone
+   messaged to ask exactly this, so the question needed an answer on the page
+   rather than in his inbox. */
+document.addEventListener('click', function (e) {
+  var a = e.target && e.target.closest ? e.target.closest('a[href="#faq-who"]') : null;
+  if (!a) return;
+  var d = document.getElementById('faq-who');
+  if (!d) return;
+  e.preventDefault();
+  d.open = true;
+  d.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  var sum = d.querySelector('summary');
+  if (sum) sum.focus({ preventScroll: true });
+});

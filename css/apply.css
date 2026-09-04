@@ -1080,3 +1080,10 @@
   font-size:13.5px;line-height:1.75;color:var(--mag-ink-2);max-width:70ch}
 @media(prefers-reduced-motion:reduce){.ap-str-fill{transition:none}}
 @media(max-width:620px){.ap-kit-sizes{grid-template-columns:repeat(2,1fr)}}
+
+/* the quiet way to ask who the call is for — a link, not a billboard */
+.ap-board-ask{margin:12px 0 0}
+.ap-board-ask a{font-family:var(--mag-mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--mag-accent);text-decoration:none;
+  border-bottom:1px solid rgba(255,148,72,.35);padding-bottom:2px}
+.ap-board-ask a:hover{border-bottom-color:var(--mag-accent)}
