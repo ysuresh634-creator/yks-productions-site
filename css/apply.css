@@ -608,7 +608,7 @@
 
 /* the rail: every step named and reachable, so the end is visible from step one */
 .apw-dots{display:flex;gap:6px;margin-top:12px;overflow-x:auto;scrollbar-width:none;
-  -webkit-overflow-scrolling:touch}
+  }
 .apw-dots::-webkit-scrollbar{display:none}
 .apw-dot{flex:0 0 auto;cursor:pointer;background:none;border:0;padding:5px 0 0;
   font-family:var(--mag-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;

@@ -6,7 +6,7 @@
   --line:rgba(244,237,226,.12);--ease:cubic-bezier(.22,.61,.36,1);
   --serif:'Playfair Display',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--mono:'Space Grotesk',monospace
 }
-body{font-family:var(--sans);background:var(--black);color:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-x:clip;line-height:1.65}
+body{font-family:var(--sans);background:var(--black);color:var(--paper);-webkit-font-smoothing:antialiased;line-height:1.65}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%;height:auto}
 .wrap{max-width:1160px;margin:0 auto;padding:0 36px}
@@ -404,7 +404,7 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
 /* one strip of film */
 .cs-strip{position:relative;background:#100d0b;border-radius:3px;padding:22px 0;
   box-shadow:0 24px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(244,237,226,.05);
-  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;}
 .cs-strip::-webkit-scrollbar{display:none}
 /* sprocket rows — rounded holes, top and bottom rebate */
 .cs-strip::before,.cs-strip::after{content:"";position:absolute;left:0;right:0;height:13px;
@@ -517,7 +517,7 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
    carry one. Always inside .l-tablewrap: the wrapper scrolls on
    a phone so a wide table never makes the whole page scroll
    sideways. */
-.l-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:6px}
+.l-tablewrap{overflow-x:auto;margin-top:6px}
 .l-table{width:100%;border-collapse:collapse;min-width:640px;font-size:15px}
 .l-table caption{text-align:left;color:var(--muted);font-size:13px;letter-spacing:.04em;padding-bottom:12px}
 .l-table th,.l-table td{border:1px solid var(--line);padding:14px 16px;text-align:left;vertical-align:top}
