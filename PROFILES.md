@@ -14,12 +14,14 @@ Name is always **Yedukrishna Suresh** — never "YK S", never initials.
 Yedukrishna Suresh
 ```
 
-**Bio:**
+**Bio** (Instagram's limit is 150 characters and it counts emoji generously —
+this is 146. Measure before editing; the previous version shipped at 161 and
+would have been truncated):
 ```
 Photographer · Videographer · Cinematographer
-Film stills — Soothravakyam, Baby Girl · FEFKA
-Dubai 🇦🇪 · Bangalore 🇮🇳
-Property films · Weddings · Fashion · Brands
+Film stills: Soothravakyam · Baby Girl · FEFKA
+Dubai · Bangalore
+Property films · Fashion · Weddings
 ```
 
 **Link:**

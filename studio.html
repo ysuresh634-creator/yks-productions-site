@@ -681,6 +681,89 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 </div>
 </div>
 
+<!-- ══ CREATOR CONTRACT ══ -->
+<div id="screen-contract" class="screen">
+  <div class="hdr"><div class="hdr-inner">
+    <div><div class="brand">CREATOR CONTRACT</div><div class="hdr-sub">NON-EXCLUSIVE &middot; ZERO FEE TO THE TALENT</div></div>
+  </div></div>
+  <div class="form-wrap">
+
+    <div class="form-section">
+      <p class="field-note" style="margin:0 0 4px">
+        Builds the Influencer Representation &amp; Management Agreement for one creator, model or actor.
+        Everything you fill here is pre-filled on their page; they add the rest, sign on their phone and
+        save the PDF. They are never charged anything &mdash; the agreement says so in three places.
+      </p>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Who you are signing</label>
+      <div class="form-field"><input class="form-input" id="cr-name" type="text" placeholder="Full name" autocomplete="off"></div>
+      <div class="form-row">
+        <div><label class="form-label">Instagram</label><input class="form-input" id="cr-ig" type="text" placeholder="@handle" autocomplete="off"></div>
+        <div><label class="form-label">Followers</label><input class="form-input" id="cr-igf" type="text" placeholder="48,200" autocomplete="off"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Category</label><input class="form-input" id="cr-cat" type="text" placeholder="Fashion &amp; lifestyle"></div>
+        <div><label class="form-label">City / State</label><input class="form-input" id="cr-city" type="text" placeholder="Bengaluru, Karnataka"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">WhatsApp</label><input class="form-input" id="cr-wa" type="tel" placeholder="+91 XXXXX XXXXX"></div>
+        <div><label class="form-label">Email</label><input class="form-input" id="cr-email" type="email" placeholder="optional"></div>
+      </div>
+      <p class="field-note">The city fixes the stamp law and the jurisdiction, so it is worth getting right.</p>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Their terms</label>
+      <div class="form-field">
+        <label class="form-label">Minimum in-hand fee (&#8377;)</label>
+        <input class="form-input" id="cr-min" type="text" placeholder="25,000" autocomplete="off">
+        <p class="field-note">The floor you will not quote below without asking them. Goes into Schedule A as
+        both their rate floor and their minimum in-hand figure.</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Categories they will NOT take</label>
+        <input class="form-input" id="cr-excl" type="text" placeholder="Betting apps, weight-loss, tobacco">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Brands they already work with</label>
+        <input class="form-input" id="cr-pre" type="text" placeholder="Nykaa, Bewakoof">
+        <p class="field-note">Pre-existing brands. You never take anything on these, and listing them now is
+        what stops an argument later.</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">How the brand pays</label>
+        <select class="form-input" id="cr-route">
+          <option value="">Decide later &mdash; leave both unticked</option>
+          <option value="2">Route 2 &mdash; brand pays them, brand pays you separately</option>
+          <option value="1">Route 1 &mdash; brand pays you, you remit in 7 days</option>
+        </select>
+        <p class="field-note">Route 2 keeps their fee off your turnover. Route 1 puts the whole brand fee
+        through your account, which can pull you over the &#8377;20 lakh GST threshold &mdash; check with your
+        CA before you make it the default.</p>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Send it</label>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="crOpen()">&#128065; Preview</button>
+        <button class="quick-btn" onclick="crCopy()">&#128279; Copy link</button>
+        <button class="quick-btn" onclick="crWhatsApp()">&#128172; WhatsApp</button>
+        <button class="quick-btn" onclick="crEmail()">&#9993; Email</button>
+      </div>
+      <p class="field-note" id="cr-note" style="margin-top:10px"></p>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Sent</label>
+      <div id="cr-list"></div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ══ SETTINGS ══ -->
 <div id="screen-settings" class="screen">
   <div class="hdr"><div class="hdr-inner"><div class="brand">Settings</div></div></div>
@@ -1067,6 +1150,10 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
     Website
   </button>
+  <button class="nav-btn" id="nav-contract" onclick="showScreen('contract')">
+    <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/><path d="M8.5 16.5c1.2-1.6 2-2.4 2.6-2.4.9 0 .5 2 1.4 2 .7 0 1.1-1.1 2-1.1.6 0 1 .4 1.5 1"/></svg>
+    Contract
+  </button>
   <button class="nav-btn" id="nav-settings" onclick="showScreen('settings')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     Settings
@@ -1340,7 +1427,7 @@ function exportBackup(){
   const docs=getDocs();
   if(!docs.length){ toast('Nothing to back up'); return; }
   const payload={format:'yks-studio-backup',version:1,exportedAt:new Date().toISOString(),
-    settings:getSettings(),counters:getCounters(),docs};
+    settings:getSettings(),counters:getCounters(),docs,contracts:getContracts()};
   if(dlFile('yks-studio-backup-'+stamp()+'.json',JSON.stringify(payload,null,2))){
     localStorage.setItem(BK_KEY,String(Date.now()));
     toast('Backup saved \u2014 keep it somewhere safe');
@@ -1390,6 +1477,16 @@ function restoreBackup(input){
       if(n>(c[k]||1)) c[k]=n;
     });
     try{ localStorage.setItem('yks_ctrs',JSON.stringify(c)); }catch(e){}
+    if(Array.isArray(data && data.contracts)){
+      const seen={}; getContracts().forEach(c=>seen[c.ref]=c);
+      data.contracts.forEach(c=>{ if(c && c.ref && !seen[c.ref]) seen[c.ref]=c; });
+      const all=Object.keys(seen).map(k=>seen[k]).sort((a,b)=>(b.sentAt||0)-(a.sentAt||0));
+      writeContracts(all);
+      const c2=getCounters();
+      all.forEach(c=>{ const m=/^CRA-(\d+)-(\d+)$/.exec(c.ref||''); if(!m||m[1]!==DOC_SERIES) return;
+        const n=parseInt(m[2],10)+1; if(n>(c2.cra||1)) c2.cra=n; });
+      try{ localStorage.setItem('yks_ctrs',JSON.stringify(c2)); }catch(e){}
+    }
     if(data && data.settings && !localStorage.getItem('yks_settings')){
       try{ localStorage.setItem('yks_settings',JSON.stringify(data.settings)); }catch(e){}
     }
@@ -1450,6 +1547,7 @@ function showScreen(name){
   curScreen=name;
   if(name==='history') renderHistory();
   if(name==='settings') loadSettingsForm();
+  if(name==='contract') renderContracts();
   if(name!=='new') closeAI();
   if(name!=='website' && !publishing) closeSheets();
   document.getElementById('ai-float').classList.toggle('visible', name==='new');
@@ -1711,6 +1809,105 @@ function ag2Email(){
 }
 
 // ── Generate ───────────────────────────────────────────────────────────────
+
+// ── CREATOR REPRESENTATION AGREEMENT ───────────────────────────────────────
+// Same fragment trick as the client Terms above: the creator's details ride in
+// the URL hash, which is never sent to the server, so nothing personal lands in
+// GitHub Pages' logs or a referrer header. The page itself is built from the
+// canonical legal source by tools/build_creator_agreement.py — edit the contract
+// there, not here.
+const CREATOR_AGREEMENT_URL = 'https://yksproductions.com/creator-agreement.html';
+
+function getContracts(){ try{ return JSON.parse(localStorage.getItem('yks_contracts')||'[]'); }catch(e){ return []; } }
+function writeContracts(list){
+  try{ localStorage.setItem('yks_contracts',JSON.stringify(list)); return true; }
+  catch(e){ alert('That contract could NOT be added to the list.\n\nThe link itself still works — send it now and note the name down.'); return false; }
+}
+function crNextRef(){
+  const c=getCounters();
+  return 'CRA-'+DOC_SERIES+'-'+String(c.cra||1).padStart(3,'0');
+}
+function crBuild(){
+  const name=v('cr-name').trim();
+  if(!name){ toast('Add their name first'); return null; }
+  const cfg={ name, ref: crNextRef() };
+  [['ig','cr-ig'],['igf','cr-igf'],['cat','cr-cat'],['city','cr-city'],
+   ['wa','cr-wa'],['email','cr-email'],['min','cr-min'],['excl','cr-excl'],
+   ['pre','cr-pre'],['route','cr-route']].forEach(([k,id])=>{
+     const val=v(id).trim(); if(val) cfg[k]=val;
+   });
+  const json=JSON.stringify(cfg);
+  const b64=btoa(String.fromCharCode(...new TextEncoder().encode(json)));
+  return { url: CREATOR_AGREEMENT_URL+'#'+encodeURIComponent(b64), cfg };
+}
+// Only a link that actually went out gets a number and a place in the list —
+// previewing one on screen must not burn a reference.
+function crRecord(cfg){
+  const list=getContracts();
+  if(list.some(x=>x.ref===cfg.ref)) return;
+  list.unshift({ ref:cfg.ref, name:cfg.name, ig:cfg.ig||'', cat:cfg.cat||'', sentAt:Date.now() });
+  if(!writeContracts(list)) return;
+  const c=getCounters(); c.cra=(c.cra||1)+1;
+  try{ localStorage.setItem('yks_ctrs',JSON.stringify(c)); }catch(e){}
+  renderContracts();
+}
+function crOpen(){ const b=crBuild(); if(b) window.open(b.url,'_blank'); }
+function crCopy(){
+  const b=crBuild(); if(!b) return;
+  const done=()=>{ $('cr-note').textContent='Link copied — send it to '+b.cfg.name.split(' ')[0]+'.'; toast('Link copied'); crRecord(b.cfg); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(b.url).then(done).catch(()=>{ agFallback(b.url); crRecord(b.cfg); });
+  } else { agFallback(b.url); crRecord(b.cfg); }
+}
+function crMsg(cfg,url){
+  const first=cfg.name.trim().split(' ')[0];
+  return 'Hey '+first+' — here\u2019s the agreement, exactly how I explained it.\n\n'
+    +'First page is the plain-English version, and every section after it has a note in normal words '
+    +'so you\u2019re not decoding legal language on your own.\n\n'
+    +'Two things worth saying up front: it\u2019s non-exclusive, so you keep working with whoever you want. '
+    +'And you pay me nothing — no joining fee, no monthly fee, no commission, nothing cut from what you earn. '
+    +'I get paid by the brand, above your number.\n\n'
+    +'Fill in what applies, sign it on your phone, save the PDF and send it back. Anything you want changed, '
+    +'just tell me before you sign.\n\n'+url;
+}
+function crWhatsApp(){
+  const b=crBuild(); if(!b) return;
+  crRecord(b.cfg);
+  window.open('https://wa.me/?text='+encodeURIComponent(crMsg(b.cfg,b.url)),'_blank');
+}
+function crEmail(){
+  const b=crBuild(); if(!b) return;
+  crRecord(b.cfg);
+  const body=crMsg(b.cfg,b.url)+'\n\nYedukrishna\n\uD83D\uDCF8 @yks_photoworks \u00B7 yksproductions.com';
+  window.open('mailto:'+encodeURIComponent(b.cfg.email||'')
+    +'?subject='+encodeURIComponent('Working together — the agreement')
+    +'&body='+encodeURIComponent(body),'_blank');
+}
+function crDelete(ref){
+  if(!confirm('Remove this from the sent list?\n\nIt does not cancel anything — it only tidies the list.')) return;
+  writeContracts(getContracts().filter(x=>x.ref!==ref));
+  renderContracts();
+}
+function renderContracts(){
+  const el=$('cr-list'); if(!el) return;
+  const list=getContracts();
+  if(!list.length){
+    el.innerHTML='<p class="field-note" style="margin:0">Nothing sent yet. The next one will be '+crNextRef()+'.</p>';
+    return;
+  }
+  el.innerHTML=list.map(c=>{
+    const d=new Date(c.sentAt||0).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    const sub=[c.ig,c.cat].filter(Boolean).join(' \u00B7 ');
+    return '<div class="doc-card" style="margin:0 0 10px;cursor:default">'
+      +'<div class="doc-card-top">'
+      +'<div><div class="doc-num">'+c.ref+'</div>'
+      +'<div class="doc-client">'+esc(c.name)+'</div>'
+      +'<div class="doc-meta">'+(sub?esc(sub)+' \u00B7 ':'')+'sent '+d+'</div></div>'
+      +'<button class="btn-sm btn-del" onclick="crDelete(\''+c.ref+'\')">Remove</button>'
+      +'</div></div>';
+  }).join('');
+}
+
 function generateDoc(){
   const items=getItems();
   if(!v('f-client').trim()){alert('Please enter client name');return;}
