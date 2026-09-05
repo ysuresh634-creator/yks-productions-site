@@ -1,0 +1,72 @@
+# Rebuild the talent roster whenever its source changes.
+#
+# The bulk desk on /talents pushes through the YKS Talents Engine, which commits
+# two things and nothing else: the plates under assets/talents/<code>/ and the
+# entry in _data/roster.json. Everything published — the code-named cards, the
+# unguessable /talents/id/<pid>.html profiles, names.json, the schema and the
+# sitemap — is generated here by the same build he runs on his laptop, so a
+# roster added from a phone is byte-for-byte a roster added from the desk, and
+# the privacy guards (no name in markup, no contact, no price, 18+ only) run on
+# every path in.
+#
+# The build's own commit touches only generated files, which are not in the
+# paths filter below, so this cannot retrigger itself.
+
+name: Talents build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '_data/roster.json'
+      - 'assets/talents/**'
+      - 'tools/build-talents.py'
+      - 'tools/build-talent-schema.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: talents-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build the roster
+        run: |
+          python3 tools/build-talents.py
+          python3 tools/build-talent-schema.py
+
+      - name: Commit what changed
+        id: commit
+        run: |
+          git config user.name  'yks-talents-engine'
+          git config user.email 'noreply@yksproductions.com'
+          git add -A talents talents.html sitemap.xml _data
+          if git diff --cached --quiet; then
+            echo 'Nothing to rebuild.'
+            exit 0
+          fi
+          git commit -m 'Talents: rebuild the roster'
+          git push
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      # A push made with GITHUB_TOKEN does not reliably wake the Pages build, and
+      # a roster that is committed but never served is the one failure mode he
+      # would not spot — so ask for the build explicitly.
+      - name: Ask Pages to rebuild
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages/builds"

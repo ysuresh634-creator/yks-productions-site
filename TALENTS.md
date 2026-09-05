@@ -1,5 +1,42 @@
 # Adding talent to the roster
 
+There are two ways in. Both end in the same place — an entry in
+`_data/roster.json` — because that file is the only source of truth and the
+build is the only thing that writes a published page.
+
+## The bulk desk (phone, many at once)
+
+On the live site: **yksproductions.com/talents#owner** — or tap the roster
+kicker ("The Edit · Volume 01") five times. It asks for the Talents Engine
+passcode, then opens a private console that is not in the page's HTML at all.
+
+Three ways to feed it:
+
+- **Paste rows** — copy straight out of Sheets, Excel or Numbers, headings and
+  all. It works out which column is which and shows you the mapping to correct.
+  A block of `Name: …` lines per person, blank line between, works too — that
+  is how they arrive on WhatsApp.
+- **Photos** — drop everyone's pictures in one go. `priya-01.jpg`,
+  `priya-02.jpg` group themselves; anything else you re-group with the dropdown
+  under each thumbnail. First photo of a group is the cover.
+- **Applications** — everyone already waiting in the engine, ticked off in one
+  pass instead of one at a time.
+
+Everything lands in one editable list. Each row is checked against the same
+rules the build enforces (name, city, 18+ confirmed, at least one photo, and no
+email / phone / Instagram / price anywhere in the copy) before **Push** lights
+up. Push then: photos → Cloudinary, entry → the engine, and the engine commits
+the plates plus the roster entry to this repo. The **Talents build** workflow
+runs `tools/build-talents.py` on that commit, so the cards, profiles,
+`names.json`, schema and sitemap are generated exactly as they are below — the
+console never writes a page itself.
+
+Needs, once: the engine deployed (`yks-talents-engine/`, `npm run deploy`) with
+its `ADMIN_KEY` and `GITHUB_TOKEN` secrets, and Actions set to
+**Read and write permissions** in the repo settings.
+
+## By hand (laptop, one talent)
+
 Everything is generated from one file. Never hand-edit the profile pages.
 
 ## 1. Drop the images in

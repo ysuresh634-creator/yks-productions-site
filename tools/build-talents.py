@@ -72,19 +72,59 @@ if errs:
 e = html.escape
 
 
-def dims(t, f):
-    """Intrinsic size, so a lazy plate reserves its box before it decodes."""
-    path = P('assets', 'talents', t['dir'], f)
+def read_dims(path):
+    """(w, h) from the file header — JPEG SOF or PNG IHDR.
+
+    `sips` only exists on a Mac, and this build also runs on the GitHub
+    runner when the Talents Engine commits a new roster entry. Losing the
+    intrinsic size there would silently drop width/height off every plate
+    and hand the whole roster back its layout shift, so the header is parsed
+    directly and `sips` is only the fallback.
+    """
+    try:
+        with io.open(path, 'rb') as fh:
+            head = fh.read(2)
+            if head == b'\x89P':                     # PNG
+                fh.seek(16)
+                b = fh.read(8)
+                return int.from_bytes(b[:4], 'big'), int.from_bytes(b[4:], 'big')
+            if head == b'\xff\xd8':                  # JPEG — walk the segments
+                while True:
+                    b = fh.read(1)
+                    while b and b != b'\xff':
+                        b = fh.read(1)
+                    while b == b'\xff':
+                        b = fh.read(1)
+                    if not b:
+                        break
+                    m = b[0]
+                    if m in (0xd8, 0x01) or 0xd0 <= m <= 0xd7:
+                        continue
+                    ln = int.from_bytes(fh.read(2), 'big')
+                    if 0xc0 <= m <= 0xcf and m not in (0xc4, 0xc8, 0xcc):
+                        fh.read(1)
+                        h = int.from_bytes(fh.read(2), 'big')
+                        w = int.from_bytes(fh.read(2), 'big')
+                        return w, h
+                    fh.seek(ln - 2, 1)
+    except Exception:
+        pass
     try:
         r = subprocess.run(['sips', '-g', 'pixelWidth', '-g', 'pixelHeight', path],
                            capture_output=True, text=True, timeout=15)
         w = re.search(r'pixelWidth:\s*(\d+)', r.stdout)
         h = re.search(r'pixelHeight:\s*(\d+)', r.stdout)
         if w and h:
-            return ' width="%s" height="%s"' % (w.group(1), h.group(1))
+            return int(w.group(1)), int(h.group(1))
     except Exception:
         pass
-    return ''
+    return None, None
+
+
+def dims(t, f):
+    """Intrinsic size, so a lazy plate reserves its box before it decodes."""
+    w, h = read_dims(P('assets', 'talents', t['dir'], f))
+    return ' width="%s" height="%s"' % (w, h) if w and h else ''
 
 
 def img(t, f):
