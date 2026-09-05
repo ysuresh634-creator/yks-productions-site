@@ -50,6 +50,7 @@
     { k: 'category', label: 'Category', chips: ['model', 'influencer', 'actor'] },
     { k: 'based_in', label: 'Based in', chips: ['india', 'uae'] },
     { k: 'city', label: 'City', req: true },
+    { k: 'socials', label: 'Instagram', hint: 'private — how you check them; never published', priv: true },
     { k: 'work_preferences', label: 'Works in', hint: 'Fashion, Editorial, Commercial' },
     { k: 'stat_height', label: 'Height' },
     { k: 'stat_bust', label: 'Bust' },
@@ -72,6 +73,7 @@
     category: ['category', 'cat', 'type', 'kind'],
     based_in: ['region', 'based in', 'country', 'based'],
     city: ['city', 'location', 'base', 'town'],
+    socials: ['instagram', 'ig', 'insta', 'handle', 'socials', 'social', 'profile', 'profile link'],
     work_preferences: ['tags', 'works in', 'work', 'disciplines', 'categories', 'genres', 'skills'],
     about: ['bio', 'about', 'notes', 'description', 'profile'],
     tagline: ['tagline', 'one line', 'short', 'shortbio', 'short bio', 'line'],
@@ -481,6 +483,22 @@
   // A camera or a screenshot names a file after itself, not after the person
   // in it — those stems are worse than nothing in the name field.
   var JUNK_STEM = /^(img|image|photo|picture|pic|screenshot|screen shot|dsc|dscn|p|whatsapp image|whatsapp|untitled|final|edit|copy|download|unnamed|fullsizerender|render)\b/;
+  /* They type @name, instagram.com/name, a full URL, or just the name. All of
+     those are the same profile; this is the one place that decides. */
+  function igHandle(v) {
+    var t = String(v || '').trim();
+    // a full URL first — otherwise "https" reads as the handle; a typed name
+    // with a space in it matches nothing and is shown raw instead
+    var m = /instagram\.com\/([A-Za-z0-9._]{2,30})/i.exec(t)
+      || /@([A-Za-z0-9._]{2,30})/.exec(t)
+      || /^([A-Za-z0-9._]{2,30})$/.exec(t);
+    return m ? m[1].replace(/\.+$/, '') : '';
+  }
+  function igUrl(v) {
+    var h = igHandle(v);
+    return h ? 'https://www.instagram.com/' + h + '/' : '';
+  }
+
   var stemOf = function (name) {
     var stem = String(name || '').replace(/\.[^.]+$/, '').replace(/[-_ ]?\d+$/, '')
       .replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -680,7 +698,15 @@
           '<div class="ow-meta">' + esc([t.category, t.city].filter(Boolean).join(' · ')) +
           ' · ' + (t.photos || 0) + ' photo' + (t.photos === 1 ? '' : 's') +
           (t.status === 'live' ? ' · <span style="color:#C9A96E">' + esc(String(t.slug || '').toUpperCase()) + ' live</span>' : '') +
-          '</div>';
+          '</div>' +
+          (igUrl(t.socials)
+            ? '<div class="ow-meta"><a href="' + esc(igUrl(t.socials)) + '" target="_blank" rel="noopener noreferrer" ' +
+              'style="color:#C9A96E">@' + esc(igHandle(t.socials)) + ' ↗</a></div>'
+            : t.socials
+              // something was typed that is not a handle — show it as it came,
+              // rather than claiming they never gave one
+              ? '<div class="ow-meta">IG: ' + esc(String(t.socials).slice(0, 40)) + '</div>'
+              : '<div class="ow-meta" style="color:#e5533d">no Instagram on the application</div>');
         var acts = el('div', 'ow-row');
         acts.style.marginTop = '9px';
         var open = el('button', 'ow-btn', 'Open');
@@ -785,6 +811,7 @@
         stat_high_hip: d.stat_high_hip || '', stat_hips: d.stat_hips || '', stat_shoe: d.stat_shoe || '',
         stat_hair: d.stat_hair || '', stat_eyes: d.stat_eyes || '', stat_skin: d.stat_skin || '',
         gender: d.gender || '', nationality: d.nationality || '',
+        socials: d.socials || d.instagram || '',
         tagline: d.tagline || '', about: d.about || '',
         over18: j.talent.status === 'live', photos: ordered
       }]);
@@ -812,7 +839,7 @@
         stat_hips: d.stat_hips || '', stat_shoe: d.stat_shoe || '', stat_hair: d.stat_hair || '',
         stat_eyes: d.stat_eyes || '', stat_skin: d.stat_skin || '', gender: d.gender || '',
         tagline: d.tagline || '', about: d.about || '',
-        nationality: d.nationality || '', notes: d.notes || '',
+        nationality: d.nationality || '', notes: d.notes || '', socials: d.socials || '',
         over18: d.over18 === true, shots: shots, cover: 0,
         engineId: d.engineId || '', status: d.status || '', code: d.code || ''
       });
@@ -875,6 +902,14 @@
           input.oninput = function () { d[f.k] = input.value; d._err = ''; };
           input.onblur = function () { renderDrafts(); };
           box.appendChild(input);
+          if (f.k === 'socials' && igUrl(d.socials)) {
+            var go = el('a', '', 'Open their Instagram ↗');
+            go.href = igUrl(d.socials);
+            go.target = '_blank';
+            go.rel = 'noopener noreferrer';
+            go.style.cssText = 'display:inline-block;margin-top:7px;font-size:12.5px;color:#C9A96E';
+            box.appendChild(go);
+          }
         }
         grid.appendChild(box);
       });
@@ -1008,6 +1043,11 @@
         name: d.name, category: d.category, based_in: d.based_in, city: d.city,
         work_preferences: d.work_preferences, about: d.about, tagline: d.tagline,
         gender: d.gender, nationality: d.nationality, over18: true, source: d.engineId ? undefined : 'bulk',
+        // Private, and the roster build refuses any entry containing it — it
+        // exists so he can check who he is putting forward, nothing else. An
+        // empty one is left out rather than sent: a save must never be the
+        // thing that quietly erases the handle they applied with.
+        socials: d.socials || undefined,
         stat_height: d.stat_height, stat_bust: d.stat_bust, stat_waist: d.stat_waist,
         stat_high_hip: d.stat_high_hip, stat_hips: d.stat_hips, stat_shoe: d.stat_shoe,
         stat_hair: d.stat_hair, stat_eyes: d.stat_eyes, stat_skin: d.stat_skin,

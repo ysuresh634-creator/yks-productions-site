@@ -21,6 +21,29 @@
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
   var form = $('#talForm');
+
+  /* ── Instagram: required, and stored in one shape ────────────────────
+     Every application is checked against the handle before anyone is put
+     forward, so it has to be a handle rather than "yes" or a screenshot of
+     one. People type it four ways — @name, the app's share link with its
+     ?igsh= tail, the full https URL, or just the name — and all four mean the
+     same profile, so it is normalised to @name on the way out. It never
+     leaves the database: the roster build refuses any entry containing an
+     instagram.com link, and always will. */
+  if (form && form.socials) {
+    form.socials.addEventListener('blur', function () {
+      var raw = String(form.socials.value || '').trim();
+      if (!raw) return;
+      // Order matters: a pasted https://www.instagram.com/name would otherwise
+      // read "https" as the handle. And someone who types their NAME here gets
+      // left alone rather than turned into a handle that isn't theirs — better
+      // a value he has to look at than a wrong link he trusts.
+      var m = /instagram\.com\/([A-Za-z0-9._]{2,30})/i.exec(raw)
+        || /@([A-Za-z0-9._]{2,30})/.exec(raw)
+        || /^([A-Za-z0-9._]{2,30})$/.exec(raw);
+      if (m) form.socials.value = '@' + m[1].replace(/\.+$/, '');
+    });
+  }
   if (!form) return;
 
   var photos = [];   // { file, id, url }
