@@ -1087,3 +1087,6 @@
   text-transform:uppercase;color:var(--mag-accent);text-decoration:none;
   border-bottom:1px solid rgba(255,148,72,.35);padding-bottom:2px}
 .ap-board-ask a:hover{border-bottom-color:var(--mag-accent)}
+
+/* what you get — same cards as the bar, one lit because it is the trust line */
+.ap-get{border-top:1px solid var(--mag-line);background:var(--mag-paper-2)}

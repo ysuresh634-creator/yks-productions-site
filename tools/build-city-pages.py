@@ -286,11 +286,13 @@ def page(c):
         <h2>The board is <em>open in {e(c['city'])}</em></h2>
         <p class="l-prose">{e(c['talent'])}</p>
         <p class="l-prose">Over 18, photographs plain enough to see you properly, and no fee at
-        any point — not to join, not to stay on it. Every brief that comes through is paid work
-        for a real client. Nobody honest promises work; what I can promise is that briefs from
-        {e(c['city'])} go in front of the right faces, and that the booking, the schedule and the
-        payment all run through me. <a href="/talents/apply.html">The full terms are on the
-        board &rarr;</a></p>
+        any point — not to join, not to stay on it, and not for the portfolio you build here on
+        the way through. You keep that PDF either way. If your pictures aren&rsquo;t working I
+        will tell you why and what to shoot instead, which is the conversation most new faces
+        never get. Every brief that comes through is paid work for a real client. Nobody honest
+        promises work; what I can promise is that briefs from {e(c['city'])} go in front of the
+        right faces, and that the booking, the schedule and the payment all run through me.
+        <a href="/talents/apply.html">The full terms are on the board &rarr;</a></p>
         <div class="l-cta-row">
           <a class="btn btn-fill" href="/talents/apply.html">Apply from {e(c['city'])} →</a>
         </div>

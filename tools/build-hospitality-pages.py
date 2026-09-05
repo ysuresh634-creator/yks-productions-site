@@ -221,6 +221,12 @@ def build(src, p):
 <script type="application/ld+json">
 {{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{faq_ld}]}}
 </script>
+<script type="application/ld+json">
+{{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {{"@type":"ListItem","position":1,"name":"Home","item":"https://yksproductions.com/"}},
+  {{"@type":"ListItem","position":2,"name":"Hotel &amp; Resort Photography in {p['city']}","item":"{url}"}}
+]}}
+</script>
 </head>
 <body>
 {nav.group(0)}
