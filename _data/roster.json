@@ -86,6 +86,81 @@
       ],
       "code": "m01",
       "pid": "m01-pDR8Vxnr5E"
+    },
+    {
+      "slug": "siddhi-patel",
+      "code": "i01",
+      "pid": "i01-fQVgdZYEG3",
+      "name": "Siddhi Patel",
+      "cat": "influencer",
+      "region": "india",
+      "city": "Ahmedabad",
+      "country": "India",
+      "countryCode": "IN",
+      "gender": "Woman",
+      "nationality": "Indian",
+      "over18": true,
+      "plate": 1,
+      "tags": [
+        "Fashion",
+        "Commercial",
+        "Print / Catalogue",
+        "Ad films",
+        "Product / E-com"
+      ],
+      "specs": {
+        "Height": "5’3",
+        "Bust": "34",
+        "Waist": "27",
+        "Hips": "36",
+        "Shoe": "7 ind",
+        "Hair": "Black",
+        "Eyes": "Black",
+        "Skin": "Normal"
+      },
+      "bio": "I'm a model based in Ahmedabad. I'm cast for fashion, beauty, and commercial projects. I learn quickly on set, whether in a studio or on location, and respond well to direction, allowing me to work at a pace that suits the shoot.",
+      "shortBio": "Influencer | model · Ahmedabad",
+      "castableFor": [
+        "Fashion",
+        "Commercial",
+        "Print / Catalogue",
+        "Ad films",
+        "Product / E-com"
+      ],
+      "dir": "i01",
+      "cover": "01.jpg",
+      "gallery": [
+        {
+          "file": "02.jpg",
+          "alt": "portfolio plate",
+          "label": "Portfolio"
+        },
+        {
+          "file": "03.jpg",
+          "alt": "portfolio plate",
+          "label": "Portfolio"
+        },
+        {
+          "file": "04.jpg",
+          "alt": "portfolio plate",
+          "label": "Portfolio"
+        },
+        {
+          "file": "05.jpg",
+          "alt": "portfolio plate",
+          "label": "Portfolio"
+        },
+        {
+          "file": "06.jpg",
+          "alt": "portfolio plate",
+          "label": "Portfolio"
+        },
+        {
+          "file": "07.jpg",
+          "alt": "portfolio plate",
+          "label": "Portfolio"
+        }
+      ]
     }
   ]
 }
