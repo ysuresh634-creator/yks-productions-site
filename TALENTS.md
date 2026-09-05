@@ -26,8 +26,15 @@ Three ways to feed it:
   camera roll instead. Pictures dragged off a web page arrive as a URL, not
   bytes — those are pulled into our own Cloudinary on push, so a roster plate is
   never a hotlink to something that can vanish.
-- **Applications** — everyone already waiting in the engine, ticked off in one
-  pass instead of one at a time.
+- **Applications** — everyone in the pipeline, filtered by *Waiting* / *On the
+  roster* / *Everyone*. Tick several and **Publish**, **Turn down** (out of the
+  pipeline, record kept) or **Delete forever** (record destroyed, roster entry
+  removed, their photographs deleted from the repo). **Open** puts one of them
+  on the desk as an editable card — every field, their photos, and a private
+  note that is never published — so you can correct what they typed before
+  anyone sees it. Opening someone already live and saving updates their profile
+  **in place**: same roster code, same URL, so a link already sent to a client
+  keeps working, and any photo you removed is deleted from the site.
 
 Everything lands in one editable list. Each row is checked against the same
 rules the build enforces (name, city, 18+ confirmed, at least one photo, and no

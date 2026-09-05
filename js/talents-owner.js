@@ -54,12 +54,14 @@
     { k: 'stat_height', label: 'Height' },
     { k: 'stat_bust', label: 'Bust' },
     { k: 'stat_waist', label: 'Waist' },
+    { k: 'stat_high_hip', label: 'High hip' },
     { k: 'stat_hips', label: 'Hips' },
     { k: 'stat_shoe', label: 'Shoe' },
     { k: 'stat_hair', label: 'Hair' },
     { k: 'stat_eyes', label: 'Eyes' },
     { k: 'stat_skin', label: 'Skin' },
     { k: 'gender', label: 'Gender' },
+    { k: 'nationality', label: 'Nationality' },
     { k: 'tagline', label: 'One line', hint: 'the roster card line' },
     { k: 'about', label: 'Bio', big: true }
   ];
@@ -615,49 +617,180 @@
     renderDrafts();
   }
 
-  /* ── 3. the applications already in the engine ─────────────────────── */
+  /* ── 3. the pipeline: applications, and everyone already on the roster ──
+     Ticking a box and publishing is the easy half. The rest of the job is
+     opening someone up and correcting what they typed, dropping a picture they
+     should not have sent, turning someone down, and — when they ask — erasing
+     them and their photographs from the site altogether. All of that lives
+     here, because a roster you cannot take someone off is not a roster, it is
+     a publication. ── */
+
+  var pendFilter = 'pending';
+
+  function thumb(url, w, h) {
+    var img = el('img');
+    img.style.width = w + 'px';
+    img.style.height = h + 'px';
+    // a submission whose upload never completed has a dead URL; show a quiet
+    // placeholder rather than a browser's broken-image glyph
+    img.onerror = function () { img.style.visibility = 'hidden'; };
+    if (url) img.src = url; else img.style.visibility = 'hidden';
+    return img;
+  }
+
   function applications(view) {
-    var c = el('div', 'ow-card', '<p class="ow-p">Loading the pipeline…</p>');
-    view.appendChild(c);
-    api('/admin/api/talents?status=pending').then(function (j) {
-      if (!j || !j.ok) { c.innerHTML = '<p class="ow-err">' + esc((j && j.error) || 'Could not reach the engine.') + '</p>'; return; }
+    var head = el('div', 'ow-card');
+    var chips = el('div', 'ow-chips');
+    [['pending', 'Waiting'], ['live', 'On the roster'], ['all', 'Everyone']].forEach(function (f) {
+      var b = el('button', 'ow-chip' + (pendFilter === f[0] ? ' on' : ''), f[1]);
+      b.onclick = function () { pendFilter = f[0]; desk(); };
+      chips.appendChild(b);
+    });
+    head.appendChild(chips);
+    var note = el('p', 'ow-p');
+    note.style.margin = '12px 0 0';
+    note.textContent = 'Loading…';
+    head.appendChild(note);
+    view.appendChild(head);
+
+    var list = el('div');
+    view.appendChild(list);
+
+    api('/admin/api/talents?status=' + pendFilter).then(function (j) {
+      if (!j || !j.ok) { note.innerHTML = '<span class="ow-err">' + esc((j && j.error) || 'Could not reach the engine.') + '</span>'; return; }
       pending = j.talents || [];
-      c.innerHTML = pending.length
-        ? '<p class="ow-p">' + pending.length + ' waiting. Tick the ones going on the roster.</p>'
-        : '<p class="ow-p">Nothing pending — every application has been dealt with.</p>';
+      if (!pending.length) {
+        note.textContent = pendFilter === 'live'
+          ? 'Nobody on the roster yet.'
+          : pendFilter === 'pending' ? 'Nothing waiting — every application has been dealt with.' : 'Nobody here yet.';
+        return;
+      }
+      note.innerHTML = pending.length + (pendFilter === 'live' ? ' on the roster.' : ' waiting.') +
+        ' Tap <b>Open</b> to edit someone, or tick them for the buttons at the bottom.';
+
       pending.forEach(function (t) {
         var row = el('div', 'ow-card');
         var wrap = el('div', 'ow-pend');
         var box = el('input'); box.type = 'checkbox'; box.value = t.id;
         wrap.appendChild(box);
-        var img = el('img');
-        if (t.cover) img.src = t.cover;
-        wrap.appendChild(img);
-        wrap.appendChild(el('div', '',
-          '<b>' + esc(t.name || 'Unnamed') + '</b>' +
+        wrap.appendChild(thumb(t.cover, 54, 68));
+        var meta = el('div');
+        meta.style.flex = '1';
+        meta.innerHTML = '<b>' + esc(t.name || 'Unnamed') + '</b>' +
           '<div class="ow-meta">' + esc([t.category, t.city].filter(Boolean).join(' · ')) +
-          ' · ' + (t.photos || 0) + ' photo' + (t.photos === 1 ? '' : 's') + '</div>'));
+          ' · ' + (t.photos || 0) + ' photo' + (t.photos === 1 ? '' : 's') +
+          (t.status === 'live' ? ' · <span style="color:#C9A96E">' + esc(String(t.slug || '').toUpperCase()) + ' live</span>' : '') +
+          '</div>';
+        var acts = el('div', 'ow-row');
+        acts.style.marginTop = '9px';
+        var open = el('button', 'ow-btn', 'Open');
+        open.onclick = function () { openTalent(t, open); };
+        acts.appendChild(open);
+        if (t.status === 'live') {
+          var pull = el('button', 'ow-btn no', 'Take off the roster');
+          pull.onclick = function () {
+            if (!confirm('Take ' + (t.name || 'this talent') + ' off the roster? The card, the profile and their photographs all come down.')) return;
+            pull.disabled = true;
+            api('/admin/api/remove', { method: 'POST', body: { id: t.id } }).then(function (r) {
+              if (r && r.ok) { say(esc(t.name || 'They') + ' is off the roster — the build takes a minute.', 'good'); desk(); }
+              else { pull.disabled = false; say('Could not remove: ' + esc((r && r.error) || 'unknown'), 'bad'); }
+            });
+          };
+          acts.appendChild(pull);
+        }
+        meta.appendChild(acts);
+        wrap.appendChild(meta);
         row.appendChild(wrap);
-        c.appendChild(row);
+        list.appendChild(row);
       });
-      if (!pending.length) return;
+
       var conf = el('label', '', '<input type="checkbox" id="owC18" /> I confirm every ticked talent is 18 or over');
-      conf.style.cssText = 'display:flex;gap:8px;align-items:center;font-size:13px;color:#9a9088;margin-top:12px';
-      c.appendChild(conf);
-      var row = el('div', 'ow-row');
-      var go = el('button', 'ow-btn go', 'Publish selected');
-      go.onclick = function () {
-        // only the rows — the 18+ confirmation is a checkbox too, and its
-        // default value ("on") would otherwise be sent as a talent id
-        var ids = $$('.ow-pend input[type=checkbox]', c).filter(function (b) { return b.checked && b.value; })
+      conf.style.cssText = 'display:flex;gap:8px;align-items:center;font-size:13px;color:#9a9088;margin-top:6px';
+      var foot = el('div', 'ow-card');
+      foot.appendChild(conf);
+      var row2 = el('div', 'ow-row');
+
+      var ticked = function () {
+        return $$('.ow-pend input[type=checkbox]', list).filter(function (b) { return b.checked; })
           .map(function (b) { return b.value; });
+      };
+
+      var pub = el('button', 'ow-btn go', 'Publish selected');
+      pub.onclick = function () {
+        var ids = ticked();
         if (!ids.length) return say('Nothing ticked.', 'bad');
         if (!$('#owC18').checked) return say('Confirm they are 18+ first — the roster is adults only.', 'bad');
-        go.disabled = true; go.textContent = 'Publishing…';
-        publish(ids, true).then(function () { go.disabled = false; go.textContent = 'Publish selected'; desk(); });
+        pub.disabled = true;
+        publish(ids, true).then(function () { pub.disabled = false; desk(); });
       };
-      row.appendChild(go);
-      c.appendChild(row);
+      row2.appendChild(pub);
+
+      var rej = el('button', 'ow-btn', 'Turn down');
+      rej.onclick = function () {
+        var ids = ticked();
+        if (!ids.length) return say('Nothing ticked.', 'bad');
+        if (!confirm('Turn down ' + ids.length + '? They come out of the pipeline but stay in the database.')) return;
+        rej.disabled = true;
+        api('/admin/api/reject', { method: 'POST', body: { ids: ids } }).then(function (r) {
+          rej.disabled = false;
+          say(r && r.ok ? ids.length + ' turned down.' : 'Failed: ' + esc((r && r.error) || ''), r && r.ok ? 'good' : 'bad');
+          desk();
+        });
+      };
+      row2.appendChild(rej);
+
+      var del = el('button', 'ow-btn no', 'Delete forever');
+      del.onclick = function () {
+        var ids = ticked();
+        if (!ids.length) return say('Nothing ticked.', 'bad');
+        if (!confirm('Erase ' + ids.length + ' completely?\n\nAnyone live comes off the roster, their photographs are deleted from the site, and the record here is destroyed. This cannot be undone.')) return;
+        del.disabled = true;
+        api('/admin/api/delete', { method: 'POST', body: { ids: ids } }).then(function (r) {
+          del.disabled = false;
+          if (!r || !r.ok) return say('Failed: ' + esc((r && r.error) || 'unknown'), 'bad');
+          var okn = (r.results || []).filter(function (x) { return x.ok; }).length;
+          say(okn + ' erased — record, roster entry and photographs.', 'good');
+          desk();
+        });
+      };
+      row2.appendChild(del);
+
+      foot.appendChild(row2);
+      view.appendChild(foot);
+    });
+  }
+
+  /* Open one of them on the desk: their whole submission becomes an editable
+     card, exactly the same one a dropped photo makes, so there is one way to
+     edit a talent rather than two. */
+  function openTalent(t, btn) {
+    var already = drafts.filter(function (d) { return d.engineId === t.id; })[0];
+    if (already) { say('Already open below.', 'good'); renderDrafts(); return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Opening…'; }
+    api('/admin/api/t/' + encodeURIComponent(t.id)).then(function (j) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Open'; }
+      if (!j || !j.ok) return say('Could not open: ' + esc((j && j.error) || 'unknown'), 'bad');
+      var d = j.talent.data || {};
+      var photos = (d.photos || []).map(function (p) { return (typeof p === 'string' ? p : p && p.url); }).filter(Boolean);
+      var cover = d.cover_url || photos[0] || '';
+      var ordered = cover ? [cover].concat(photos.filter(function (u) { return u !== cover; })) : photos;
+      addDrafts([{
+        engineId: j.talent.id, status: j.talent.status, code: j.talent.code || '',
+        notes: j.talent.notes || '',
+        name: d.name || j.talent.name || '', category: (d.category || '').toLowerCase().indexOf('influen') >= 0 ? 'influencer'
+          : (d.category || '').toLowerCase().indexOf('act') >= 0 ? 'actor' : 'model',
+        based_in: (d.based_in || '').toLowerCase() === 'uae' ? 'uae' : 'india',
+        city: d.city || '', work_preferences: d.work_preferences || '',
+        stat_height: d.stat_height || '', stat_bust: d.stat_bust || '', stat_waist: d.stat_waist || '',
+        stat_high_hip: d.stat_high_hip || '', stat_hips: d.stat_hips || '', stat_shoe: d.stat_shoe || '',
+        stat_hair: d.stat_hair || '', stat_eyes: d.stat_eyes || '', stat_skin: d.stat_skin || '',
+        gender: d.gender || '', nationality: d.nationality || '',
+        tagline: d.tagline || '', about: d.about || '',
+        over18: j.talent.status === 'live', photos: ordered
+      }]);
+      renderDrafts();
+      say('<b>' + esc(t.name || 'Opened') + '</b> is open below' +
+        (j.talent.status === 'live' ? ' — saving updates the live profile in place.' : ' — edit, then push.'), 'good');
     });
   }
 
@@ -679,7 +812,9 @@
         stat_hips: d.stat_hips || '', stat_shoe: d.stat_shoe || '', stat_hair: d.stat_hair || '',
         stat_eyes: d.stat_eyes || '', stat_skin: d.stat_skin || '', gender: d.gender || '',
         tagline: d.tagline || '', about: d.about || '',
-        over18: false, shots: shots, cover: 0
+        nationality: d.nationality || '', notes: d.notes || '',
+        over18: d.over18 === true, shots: shots, cover: 0,
+        engineId: d.engineId || '', status: d.status || '', code: d.code || ''
       });
     });
   }
@@ -711,8 +846,11 @@
       c.setAttribute('data-draft', i);
       var head = el('div', 'ow-row');
       head.style.marginTop = '0';
-      head.innerHTML = '<b style="font-size:15px">' + esc(d.name || 'Talent ' + (i + 1)) + '</b>';
-      var drop = el('button', 'ow-btn no', 'Remove');
+      head.innerHTML = '<b style="font-size:15px">' + esc(d.name || 'Talent ' + (i + 1)) + '</b>' +
+        (d.status === 'live' ? '<span class="ow-meta" style="color:#C9A96E">' + esc((d.code || '').toUpperCase()) + ' · live</span>'
+          : d.engineId ? '<span class="ow-meta">from the pipeline</span>' : '');
+      var drop = el('button', 'ow-btn no', d.engineId ? 'Close' : 'Remove');
+      drop.title = d.engineId ? 'Close without saving' : 'Take this one off the desk';
       drop.style.marginLeft = 'auto';
       drop.onclick = function () { drafts.splice(i, 1); renderDrafts(); };
       head.appendChild(drop);
@@ -778,15 +916,29 @@
       age.querySelector('input').onchange = function (e) { d.over18 = e.target.checked; renderDrafts(); };
       c.appendChild(age);
 
+      var nb = el('div');
+      nb.appendChild(el('label', 'ow-lab', 'Private note <span style="text-transform:none;letter-spacing:0">· yours only, never published</span>'));
+      var nta = el('textarea', 'ow-ta');
+      nta.style.minHeight = '54px';
+      nta.value = d.notes || '';
+      nta.oninput = function () { d.notes = nta.value; };
+      nb.appendChild(nta);
+      c.appendChild(nb);
+
       if (errs.length) c.appendChild(el('p', 'ow-err', esc(errs.join(' · '))));
       wrap.appendChild(c);
     });
     body.appendChild(wrap);
 
-    var ready = drafts.filter(function (d) { return !problems(d).length; }).length;
+    var readyList = drafts.filter(function (d) { return !problems(d).length; });
+    var ready = readyList.length;
+    var live = readyList.filter(function (d) { return d.status === 'live'; }).length;
     var bar = el('div', 'ow-bar'); bar.id = 'owBar';
     bar.appendChild(el('span', '', ready + ' of ' + drafts.length + ' ready'));
-    var push = el('button', 'ow-btn go', 'Push ' + ready + ' to the roster');
+    var push = el('button', 'ow-btn go',
+      live === ready && ready ? 'Save ' + ready + ' live profile' + (ready === 1 ? '' : 's')
+        : live ? 'Save & publish ' + ready
+        : 'Push ' + ready + ' to the roster');
     push.disabled = !ready;
     push.onclick = function () { pushAll(push); };
     bar.appendChild(push);
@@ -850,41 +1002,72 @@
       });
     });
 
+    /* One shape for a talent, whichever way they arrived. */
+    function payloadOf(d) {
+      return {
+        name: d.name, category: d.category, based_in: d.based_in, city: d.city,
+        work_preferences: d.work_preferences, about: d.about, tagline: d.tagline,
+        gender: d.gender, nationality: d.nationality, over18: true, source: d.engineId ? undefined : 'bulk',
+        stat_height: d.stat_height, stat_bust: d.stat_bust, stat_waist: d.stat_waist,
+        stat_high_hip: d.stat_high_hip, stat_hips: d.stat_hips, stat_shoe: d.stat_shoe,
+        stat_hair: d.stat_hair, stat_eyes: d.stat_eyes, stat_skin: d.stat_skin,
+        photos: (d._urls || []).map(function (u) { return { url: u }; }),
+        cover_url: (d._urls || [])[0] || ''
+      };
+    }
+
+    var toPublish = [], updated = 0;
+
     chain.then(function () {
-      say('Sending ' + ready.length + ' to the engine…');
-      var payload = ready.map(function (d) {
-        return {
-          name: d.name, category: d.category, based_in: d.based_in, city: d.city,
-          work_preferences: d.work_preferences, about: d.about, tagline: d.tagline,
-          gender: d.gender, over18: true, source: 'bulk',
-          stat_height: d.stat_height, stat_bust: d.stat_bust, stat_waist: d.stat_waist,
-          stat_hips: d.stat_hips, stat_shoe: d.stat_shoe, stat_hair: d.stat_hair,
-          stat_eyes: d.stat_eyes, stat_skin: d.stat_skin,
-          photos: (d._urls || []).map(function (u) { return { url: u }; }),
-          cover_url: (d._urls || [])[0] || ''
-        };
+      // 1) anyone who already exists in the engine — an application he opened,
+      //    or someone live he is correcting — is an edit, not a new record.
+      //    A live one updates in place: same code, same pid, same profile URL,
+      //    because that link may already be sitting in a client's inbox.
+      var known = ready.filter(function (d) { return d.engineId; });
+      var seq = Promise.resolve();
+      known.forEach(function (d) {
+        seq = seq.then(function () {
+          say('Saving ' + esc(d.name || 'talent') + '…');
+          return api('/admin/api/t/' + encodeURIComponent(d.engineId), {
+            method: 'POST', body: { data: payloadOf(d), notes: d.notes || '' }
+          }).then(function (j) {
+            if (!j || !j.ok) { d._err = (j && j.error) || 'save failed'; return; }
+            d._sent = true;
+            if (d.status === 'live') updated++; else toPublish.push(d.engineId);
+          });
+        });
       });
-      return api('/admin/api/bulk', { method: 'POST', body: { talents: payload } });
-    }).then(function (j) {
-      if (!j || !j.ok) throw new Error((j && j.error) || 'the engine refused the batch');
-      // Clear only what the engine actually took. A refused row stays on the
-      // desk with its reason on it — losing a paste to a silent wipe is worse
-      // than any error message.
-      var ids = [];
-      (j.added || []).forEach(function (a, i) {
-        var d = ready[i];
-        if (!d) return;
-        if (a.ok) { ids.push(a.id); d._sent = true; }
-        else d._err = a.error;
-      });
+      return seq;
+    }).then(function () {
+      // 2) everyone new goes in as one batch
+      var fresh = ready.filter(function (d) { return !d.engineId; });
+      if (!fresh.length) return null;
+      say('Sending ' + fresh.length + ' to the engine…');
+      return api('/admin/api/bulk', { method: 'POST', body: { talents: fresh.map(payloadOf) } })
+        .then(function (j) {
+          if (!j || !j.ok) throw new Error((j && j.error) || 'the engine refused the batch');
+          // Clear only what the engine actually took. A refused row stays on the
+          // desk with its reason on it — losing a paste to a silent wipe is worse
+          // than any error message.
+          (j.added || []).forEach(function (a, i) {
+            var d = fresh[i];
+            if (!d) return;
+            if (a.ok) { toPublish.push(a.id); d._sent = true; }
+            else d._err = a.error;
+          });
+          var refused = (j.added || []).filter(function (a) { return !a.ok; });
+          if (refused.length) {
+            say(refused.map(function (a) { return esc(a.name) + ' — ' + esc(a.error); }).join('<br>'), 'bad');
+          }
+          return null;
+        });
+    }).then(function () {
       drafts = drafts.filter(function (d) { return !d._sent; });
       renderDrafts();
-      var refused = (j.added || []).filter(function (a) { return !a.ok; });
-      if (refused.length) {
-        say(refused.map(function (a) { return esc(a.name) + ' — ' + esc(a.error); }).join('<br>'), 'bad');
-      }
-      if (!ids.length) { btn.disabled = false; return null; }
-      return publish(ids, true);
+      if (toPublish.length) return publish(toPublish, true);
+      if (updated) say(updated + ' live profile' + (updated === 1 ? '' : 's') +
+        ' updated — the build republishes them in a minute.', 'good');
+      return null;
     }).then(function () {
       btn.disabled = false;
     }).catch(function (e) {
