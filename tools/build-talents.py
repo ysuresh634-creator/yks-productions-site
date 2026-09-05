@@ -170,6 +170,9 @@ def profile(t, plate):
     # the name for a human who has the page open; a crawler only ever sees the code.
     msg = quote(f'Hi Yedukrishna, I\'d like to book {code} ({cat}, {t["city"]}) '
                 f'from your talent pool. Is this talent available?')
+    # the cover's alt text: his words when he wrote them, a plain description
+    # of the roster card when he did not
+    cover_alt = t.get('coverAlt') or f'{cat} · {t["city"]} — YKS Talents roster {code}'
     tagline = ', '.join(x.lower() for x in t.get('tags', [])[:3])
     desc = (f'Roster profile {code} — {tagline} {cat.lower()} based in {where}, '
             f'available for shoots across India. Booked through YKS Productions.')
@@ -277,7 +280,7 @@ def profile(t, plate):
     </div>
     <div class="pf-hero-grid">
       <div class="pf-hero-img">
-        <img{dims(t, t["cover"])} src="{img(t, t['cover'])}" alt="{cat} · {e(t['city'])} — YKS Talents roster {code}" />
+        <img{dims(t, t["cover"])} src="{img(t, t['cover'])}" alt="{e(cover_alt)}" />
       </div>
       <div class="pf-hero-txt">
         <p class="tal-kicker">{cat} · {e(where)}</p>
@@ -432,12 +435,25 @@ if removed:
 # byte. If one does, the roster has leaked and this build is not shippable.
 bad = []
 names = [t['name'] for t in roster] + [t['name'].split()[0] for t in roster]
+
+
+def leaks(name, text):
+    """Is this name actually in the page, as a name?
+
+    A plain substring test reads "frame" as the talent Ram and aborts a
+    perfectly good build — and the names most likely to hit it (Ram, Ana, Ali,
+    Mia, Isa) are common ones. So the match is on word boundaries, and
+    case-insensitive, which also catches the shape a leak really takes: a
+    lowercase slug like priya-menon.html that the old test walked straight
+    past.
+    """
+    return re.search(r'(?<![A-Za-z])' + re.escape(name) + r'(?![A-Za-z])', text, re.I)
 published = [P('talents', 'id', c + '.html') for c in written] + [P('talents.html')]
 for f in published:
     s_ = io.open(f, encoding='utf-8').read()
     rel = os.path.relpath(f, ROOT)
     for n in names:
-        if n in s_:
+        if leaks(n, s_):
             bad.append(f'{rel}: LEAK — talent name "{n}" is in the published HTML')
     for m in re.finditer(r'<script type="application/ld\+json">(.*?)</script>', s_, re.S):
         try:
@@ -446,7 +462,7 @@ for f in published:
             bad.append(f'{rel}: invalid schema — {ex}')
             continue
         for n in names:
-            if n in json.dumps(blob_, ensure_ascii=False):
+            if leaks(n, json.dumps(blob_, ensure_ascii=False)):
                 bad.append(f'{rel}: LEAK — talent name "{n}" is in the schema')
     for i_ in re.findall(r'<img\b[^>]*>', s_):
         if not re.search(r'alt="[^"]+"', i_):

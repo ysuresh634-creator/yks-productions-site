@@ -63,6 +63,11 @@
     { k: 'stat_skin', label: 'Skin' },
     { k: 'gender', label: 'Gender' },
     { k: 'nationality', label: 'Nationality' },
+    { k: 'country', label: 'Country', hint: 'overrides the one the region implies' },
+    { k: 'country_code', label: 'Country code', hint: 'IN · AE · PT' },
+    { k: 'geo_region', label: 'Region code', hint: 'optional · IN-MH' },
+    { k: 'castable_for', label: 'Castable for', hint: 'comma separated · defaults to what they work in' },
+    { k: 'knows_about', label: 'Known for', hint: 'optional · what they are expert in' },
     { k: 'tagline', label: 'One line', hint: 'the roster card line' },
     { k: 'about', label: 'Bio', big: true }
   ];
@@ -170,6 +175,12 @@
       '.ow-th img{cursor:grab}',
       '.ow-th i{position:absolute;right:2px;top:2px;width:18px;height:18px;border-radius:50%;background:rgba(7,6,10,.82);',
       '  color:#f4ede2;font:600 11px/18px sans-serif;font-style:normal;text-align:center;cursor:pointer}',
+      '.ow-lb{position:fixed;inset:0;z-index:20;background:rgba(5,4,8,.96);display:flex;flex-direction:column;',
+      '  align-items:center;justify-content:center;padding:14px;gap:12px;overflow-y:auto}',
+      '.ow-lb img{max-width:100%;max-height:58vh;object-fit:contain;border-radius:10px;background:#141018}',
+      '.ow-lb-bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:560px;width:100%}',
+      '.ow-lb-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:560px;width:100%}',
+      '.ow-lb-count{color:#7d746d;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}',
       '.ow-veil{position:fixed;inset:0;z-index:10;background:rgba(7,6,10,.82);border:2px dashed #C9A96E;',
       '  display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;',
       '  font:600 17px/1.5 sans-serif;color:#C9A96E;pointer-events:none}',
@@ -929,9 +940,19 @@
       if (btn) { btn.disabled = false; btn.textContent = 'Open'; }
       if (!j || !j.ok) return say('Could not open: ' + esc((j && j.error) || 'unknown'), 'bad');
       var d = j.talent.data || {};
-      var photos = (d.photos || []).map(function (p) { return (typeof p === 'string' ? p : p && p.url); }).filter(Boolean);
-      var cover = d.cover_url || photos[0] || '';
-      var ordered = cover ? [cover].concat(photos.filter(function (u) { return u !== cover; })) : photos;
+      // prefer the ordered plates with their captions; fall back to the plain
+      // photo list for anyone who applied before captions existed
+      var src = (Array.isArray(d.plates) && d.plates.length) ? d.plates : (d.photos || []);
+      var shots = src
+        .map(function (p) { return typeof p === 'string' ? { url: p } : p; })
+        .filter(function (p) { return p && p.url; })
+        .map(function (p) { return { url: p.url, label: p.label || '', alt: p.alt || '' }; });
+      var cover = d.cover_url || '';
+      if (cover) {
+        var at = -1;
+        shots.forEach(function (p, i) { if (p.url === cover) at = i; });
+        if (at > 0) shots.unshift(shots.splice(at, 1)[0]);
+      }
       addDrafts([{
         engineId: j.talent.id, status: j.talent.status, code: j.talent.code || '',
         notes: j.talent.notes || '',
@@ -944,13 +965,117 @@
         stat_hair: d.stat_hair || '', stat_eyes: d.stat_eyes || '', stat_skin: d.stat_skin || '',
         gender: d.gender || '', nationality: d.nationality || '',
         socials: d.socials || d.instagram || '',
+        country: d.country || '', country_code: d.country_code || '', geo_region: d.geo_region || '',
+        castable_for: d.castable_for || '', knows_about: d.knows_about || '',
+        specs_extra: d.specs_extra || {},
         tagline: d.tagline || '', about: d.about || '',
-        over18: j.talent.status === 'live', photos: ordered
+        over18: j.talent.status === 'live', shots: shots
       }]);
       renderDrafts();
       say('<b>' + esc(t.name || 'Opened') + '</b> is open below' +
         (j.talent.status === 'live' ? ' — saving updates the live profile in place.' : ' — edit, then push.'), 'good');
     });
+  }
+
+  /* ── the photo, actually looked at ─────────────────────────────────
+     A 64px thumbnail is enough to tell one picture from another and nothing
+     else. Whether a plate is sharp, whether the crop works, whether it is the
+     one that should lead — none of that is visible until it is big. So a tap
+     opens it properly, and everything you would want to do having seen it is
+     there: make it the cover, move it in the order, caption it, or take it
+     off. ── */
+  function viewShot(d, at) {
+    var box = el('div', 'ow-lb');
+    var img = el('img');
+    var count = el('p', 'ow-lb-count');
+    var bar = el('div', 'ow-lb-bar');
+    var meta = el('div', 'ow-lb-meta');
+
+    function srcOf(sh) { return sh.file ? URL.createObjectURL(sh.file) : sh.url; }
+    function close() {
+      if (box.parentNode) box.parentNode.removeChild(box);
+      document.removeEventListener('keydown', onKey);
+      renderDrafts();
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowRight') step(1);
+      if (e.key === 'ArrowLeft') step(-1);
+    }
+    function step(n) {
+      if (!d.shots.length) return close();
+      at = (at + n + d.shots.length) % d.shots.length;
+      draw();
+    }
+    function draw() {
+      var sh = d.shots[at];
+      if (!sh) return close();
+      img.src = srcOf(sh);
+      count.textContent = (at + 1) + ' of ' + d.shots.length + (d.cover === at ? ' · cover' : '');
+      bar.innerHTML = '';
+      meta.innerHTML = '';
+
+      var mk = function (label, cls, fn, title) {
+        var b = el('button', 'ow-btn' + (cls ? ' ' + cls : ''), label);
+        if (title) b.title = title;
+        b.onclick = fn;
+        bar.appendChild(b);
+        return b;
+      };
+      mk('‹ Prev', '', function () { step(-1); });
+      mk('Next ›', '', function () { step(1); });
+      if (d.cover !== at) mk('Make cover', 'go', function () { d.cover = at; draw(); }, 'This becomes 01.jpg — the roster card');
+      mk('◀ Move', '', function () {
+        if (at === 0) return;
+        var sh2 = d.shots.splice(at, 1)[0];
+        d.shots.splice(at - 1, 0, sh2);
+        if (d.cover === at) d.cover = at - 1; else if (d.cover === at - 1) d.cover = at;
+        at--; draw();
+      }, 'Earlier in the book');
+      mk('Move ▶', '', function () {
+        if (at >= d.shots.length - 1) return;
+        var sh2 = d.shots.splice(at, 1)[0];
+        d.shots.splice(at + 1, 0, sh2);
+        if (d.cover === at) d.cover = at + 1; else if (d.cover === at + 1) d.cover = at;
+        at++; draw();
+      }, 'Later in the book');
+      if (!sh.file && sh.url) {
+        var open = el('a', 'ow-btn', 'Full size ↗');
+        open.href = sh.url; open.target = '_blank'; open.rel = 'noopener noreferrer';
+        bar.appendChild(open);
+      }
+      mk('Remove', 'no', function () {
+        d.shots.splice(at, 1);
+        if (d.cover >= d.shots.length) d.cover = Math.max(0, d.shots.length - 1);
+        if (!d.shots.length) return close();
+        if (at >= d.shots.length) at = d.shots.length - 1;
+        draw();
+      }, 'Take this picture off');
+      mk('Done', '', close);
+
+      // caption and alt text are what a client and a search engine read off
+      // the plate, so they are his words, not a template's
+      [['label', 'Caption', 'Studio / Editorial'], ['alt', 'Alt text', 'what is in the frame']].forEach(function (f) {
+        var wrap = el('div');
+        wrap.appendChild(el('label', 'ow-lab', f[1]));
+        var inp = el('input', 'ow-in-f');
+        inp.placeholder = f[2];
+        inp.value = sh[f[0]] || '';
+        inp.oninput = function () { sh[f[0]] = inp.value; };
+        wrap.appendChild(inp);
+        meta.appendChild(wrap);
+      });
+    }
+
+    img.onclick = function () { step(1); };
+    box.appendChild(count);
+    box.appendChild(img);
+    box.appendChild(bar);
+    box.appendChild(meta);
+    box.addEventListener('click', function (e) { if (e.target === box) close(); });
+    document.addEventListener('keydown', onKey);
+    panel.appendChild(box);
+    draw();
   }
 
   /* ── staged drafts: the shared review list ─────────────────────────── */
@@ -972,6 +1097,9 @@
         stat_eyes: d.stat_eyes || '', stat_skin: d.stat_skin || '', gender: d.gender || '',
         tagline: d.tagline || '', about: d.about || '',
         nationality: d.nationality || '', notes: d.notes || '', socials: d.socials || '',
+        country: d.country || '', country_code: d.country_code || '', geo_region: d.geo_region || '',
+        castable_for: d.castable_for || '', knows_about: d.knows_about || '',
+        specs_extra: d.specs_extra || {},
         over18: d.over18 === true, shots: shots, cover: 0,
         engineId: d.engineId || '', status: d.status || '', code: d.code || ''
       });
@@ -1084,6 +1212,41 @@
       });
       c.appendChild(grid);
 
+      // Nine measurements cover most calls; the tenth is always the one a
+      // client asks for. His own rows go on the profile beside the others.
+      var extras = el('div');
+      extras.appendChild(el('label', 'ow-lab', 'Your own measurements'));
+      var keys = Object.keys(d.specs_extra || {});
+      keys.forEach(function (k) {
+        var row = el('div', 'ow-row');
+        row.style.marginTop = '6px';
+        var kIn = el('input', 'ow-in-f');
+        kIn.value = k; kIn.style.maxWidth = '40%';
+        var vIn = el('input', 'ow-in-f');
+        vIn.value = d.specs_extra[k]; vIn.style.maxWidth = '40%';
+        var rm = el('button', 'ow-btn no', '×');
+        var commit = function (newK, newV) {
+          var next = {};
+          Object.keys(d.specs_extra).forEach(function (kk) { if (kk !== k) next[kk] = d.specs_extra[kk]; });
+          if (newK) next[newK] = newV;
+          d.specs_extra = next;
+        };
+        kIn.onblur = function () { commit(kIn.value.trim(), vIn.value.trim()); renderDrafts(); };
+        vIn.oninput = function () { d.specs_extra[k] = vIn.value; };
+        rm.onclick = function () { commit('', ''); renderDrafts(); };
+        row.appendChild(kIn); row.appendChild(vIn); row.appendChild(rm);
+        extras.appendChild(row);
+      });
+      var addRow = el('button', 'ow-btn', '+ Add a measurement');
+      addRow.style.marginTop = '8px';
+      addRow.onclick = function () {
+        d.specs_extra = d.specs_extra || {};
+        d.specs_extra['New row ' + (Object.keys(d.specs_extra).length + 1)] = '';
+        renderDrafts();
+      };
+      extras.appendChild(addRow);
+      c.appendChild(extras);
+
       // the plates: dropped, pasted, picked or linked — all the same here.
       // Tap one to make it the cover, drag it onto another card to move it.
       var strip = el('div', 'ow-thumbs');
@@ -1092,8 +1255,8 @@
         var img = el('img');
         img.src = sh.file ? URL.createObjectURL(sh.file) : sh.url;
         img.draggable = true;
-        img.title = 'Tap to make this the cover · drag to another card to move it';
-        img.onclick = function () { d.cover = n; renderDrafts(); };
+        img.title = 'Tap to see it properly · drag to another card to move it';
+        img.onclick = function () { viewShot(d, n); };
         img.addEventListener('dragstart', function (e) {
           e.dataTransfer.setData(SHOT_TYPE, i + ':' + n);
           e.dataTransfer.effectAllowed = 'move';
@@ -1112,7 +1275,7 @@
       });
       c.appendChild(strip);
       c.appendChild(el('p', 'ow-meta', d.shots.length
-        ? 'Drop more onto this card to add them.'
+        ? 'Tap a photo to see it full size, caption it, reorder it or take it off. Drop more onto this card to add them.'
         : 'No photos yet — drop some onto this card.'));
 
       var age = el('label', '', '<input type="checkbox"' + (d.over18 ? ' checked' : '') + ' /> 18 or over');
@@ -1196,13 +1359,13 @@
         shots.forEach(function (sh) {
           seq = seq.then(function () {
             return uploadShot(sh).then(function (u) {
-              if (u) urls.push(u);
+              if (u) urls.push({ url: u, label: sh.label || '', alt: sh.alt || '' });
               done++;
               say('Uploading… ' + done + ' / ' + total);
             });
           });
         });
-        return seq.then(function () { d._urls = urls; });
+        return seq.then(function () { d._plates = urls; });
       });
     });
 
@@ -1220,8 +1383,13 @@
         stat_height: d.stat_height, stat_bust: d.stat_bust, stat_waist: d.stat_waist,
         stat_high_hip: d.stat_high_hip, stat_hips: d.stat_hips, stat_shoe: d.stat_shoe,
         stat_hair: d.stat_hair, stat_eyes: d.stat_eyes, stat_skin: d.stat_skin,
-        photos: (d._urls || []).map(function (u) { return { url: u }; }),
-        cover_url: (d._urls || [])[0] || ''
+        country: d.country, country_code: d.country_code, geo_region: d.geo_region,
+        castable_for: d.castable_for, knows_about: d.knows_about,
+        specs_extra: d.specs_extra || {},
+        // ordered, cover first, each with the caption and alt he wrote
+        plates: d._plates || [],
+        photos: (d._plates || []).map(function (p) { return { url: p.url }; }),
+        cover_url: (d._plates || [])[0] ? d._plates[0].url : ''
       };
     }
 

@@ -41,6 +41,14 @@ Three ways to feed it:
   **in place**: same roster code, same URL, so a link already sent to a client
   keeps working, and any photo you removed is deleted from the site.
 
+**Tap any photo to see it properly.** It opens full size with the rest of the
+book behind it: ‹ › to move through, *Make cover*, *◀ Move / Move ▶* to set the
+running order, a **caption** and **alt text** for that plate (both publish), and
+*Remove*. The card also carries the fields the roster can hold beyond the form's
+own — country and country code (the roster is not only India and UAE), region
+code, castable-for, known-for, and your own measurement rows for whatever a
+client asks for next.
+
 Everything lands in one editable list. Each row is checked against the same
 rules the build enforces (name, city, 18+ confirmed, at least one photo, and no
 email / phone / Instagram / price anywhere in the copy) before **Push** lights
