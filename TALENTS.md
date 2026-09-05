@@ -27,7 +27,12 @@ Three ways to feed it:
   bytes — those are pulled into our own Cloudinary on push, so a roster plate is
   never a hotlink to something that can vanish.
 - **Applications** — everyone in the pipeline, filtered by *Waiting* / *On the
-  roster* / *Everyone*. Tick several and **Publish**, **Turn down** (out of the
+  roster* / *Everyone*. Each row carries **Open · Verify · Delete**: *Verify*
+  opens everything they sent inside the row — every photo, their Instagram, the
+  private contact, what they wrote — with *Publish this one* and *Turn down*
+  underneath, so checking somebody costs no scrolling. *Delete* erases that one
+  person. Tapping a row ticks it, and the buttons at the bottom count what they
+  will act on. Tick several and **Publish**, **Turn down** (out of the
   pipeline, record kept) or **Delete forever** (record destroyed, roster entry
   removed, their photographs deleted from the repo). **Open** puts one of them
   on the desk as an editable card — every field, their photos, and a private

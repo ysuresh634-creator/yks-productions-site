@@ -299,6 +299,10 @@
     if (tab === 'paste') paste(view);
     if (tab === 'photos') photos(view);
     if (tab === 'pending') applications(view);
+    // Whatever is staged belongs on screen on every tab — switching tabs used
+    // to wipe the cards from view while they were still staged, and leave the
+    // push bar behind pointing at them.
+    renderDrafts();
 
     // A dead GitHub token only shows up at publish — after the photos are
     // uploaded and the batch is staged. Ask once, on open, so it is the first
@@ -710,8 +714,101 @@
         var acts = el('div', 'ow-row');
         acts.style.marginTop = '9px';
         var open = el('button', 'ow-btn', 'Open');
+        open.title = 'Edit them on the desk';
         open.onclick = function () { openTalent(t, open); };
         acts.appendChild(open);
+
+        // Checking somebody should not cost a page of scrolling: everything
+        // they sent — every photo, their handle, the private facts — opens
+        // inside the row, and the decisions are right underneath it.
+        var panel2 = el('div');
+        panel2.hidden = true;
+        var vf = el('button', 'ow-btn', 'Verify');
+        vf.title = 'See everything they sent, without leaving the list';
+        vf.onclick = function () {
+          if (!panel2.hidden) { panel2.hidden = true; vf.textContent = 'Verify'; return; }
+          vf.textContent = 'Hide';
+          panel2.hidden = false;
+          if (panel2.dataset.loaded) return;
+          panel2.innerHTML = '<p class="ow-meta">Loading everything they sent…</p>';
+          api('/admin/api/t/' + encodeURIComponent(t.id)).then(function (j) {
+            if (!j || !j.ok) { panel2.innerHTML = '<p class="ow-err">' + esc((j && j.error) || 'could not load') + '</p>'; return; }
+            panel2.dataset.loaded = '1';
+            panel2.innerHTML = '';
+            var d = j.talent.data || {};
+            var pics = (d.photos || []).map(function (ph) { return typeof ph === 'string' ? ph : ph && ph.url; }).filter(Boolean);
+            var strip = el('div', 'ow-thumbs');
+            pics.forEach(function (u) {
+              var a = el('a');
+              a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer';
+              a.className = 'ow-th';
+              a.title = 'Open the full picture';
+              a.appendChild(thumb(u, 64, 80));
+              strip.appendChild(a);
+            });
+            if (!pics.length) strip.appendChild(el('p', 'ow-err', 'No photos on this application.'));
+            panel2.appendChild(strip);
+
+            var facts = [
+              ['Instagram', igUrl(d.socials)
+                ? '<a href="' + esc(igUrl(d.socials)) + '" target="_blank" rel="noopener noreferrer" style="color:#C9A96E">@' + esc(igHandle(d.socials)) + ' ↗</a>'
+                : (d.socials ? esc(d.socials) : '<span style="color:#e5533d">none given</span>')],
+              ['Age', esc(d.age_group || d.dob || '—')],
+              ['Contact', esc(d.contact || '—') + ' <span style="color:#7d746d">· private</span>'],
+              ['Height', esc(d.stat_height || '—')],
+              ['Works in', esc(d.work_preferences || '—')],
+              ['Languages', esc(d.languages || '—')],
+              ['They wrote', esc(String(d.about || '—').slice(0, 220))]
+            ];
+            var dl = el('div');
+            dl.style.cssText = 'margin-top:11px;font-size:13px;line-height:1.7';
+            dl.innerHTML = facts.map(function (f) {
+              return '<div><span style="display:inline-block;min-width:88px;color:#7d746d">' + f[0] + '</span>' + f[1] + '</div>';
+            }).join('');
+            panel2.appendChild(dl);
+
+            var quick = el('div', 'ow-row');
+            if (t.status !== 'live') {
+              var okb = el('button', 'ow-btn go', 'Publish this one');
+              okb.onclick = function () {
+                if (!confirm('Publish ' + (t.name || 'this talent') + ' to the roster?\n\nBy continuing you confirm they are 18 or over.')) return;
+                okb.disabled = true;
+                publish([t.id], true).then(function () { desk(); });
+              };
+              quick.appendChild(okb);
+            }
+            var downb = el('button', 'ow-btn', 'Turn down');
+            downb.onclick = function () {
+              if (!confirm('Turn down ' + (t.name || 'this talent') + '?')) return;
+              downb.disabled = true;
+              api('/admin/api/reject', { method: 'POST', body: { ids: [t.id] } }).then(function (r) {
+                if (r && r.ok) { say(esc(t.name || 'They') + ' turned down.', 'good'); desk(); }
+                else { downb.disabled = false; say('Failed: ' + esc((r && r.error) || ''), 'bad'); }
+              });
+            };
+            quick.appendChild(downb);
+            panel2.appendChild(quick);
+          });
+        };
+        acts.appendChild(vf);
+
+        var delb = el('button', 'ow-btn no', 'Delete');
+        delb.title = 'Erase them completely';
+        delb.onclick = function () {
+          if (!confirm('Erase ' + (t.name || 'this talent') + ' completely?\n\n' +
+              (t.status === 'live' ? 'They come off the roster, their photographs are deleted from the site, ' : 'Their photographs are deleted, ') +
+              'and the record here is destroyed. This cannot be undone.')) return;
+          delb.disabled = true;
+          api('/admin/api/delete', { method: 'POST', body: { ids: [t.id] } }).then(function (r) {
+            if (!r || !r.ok) { delb.disabled = false; return say('Failed: ' + esc((r && r.error) || 'unknown'), 'bad'); }
+            var one = (r.results || [])[0];
+            if (one && !one.ok) { delb.disabled = false; return say('Failed: ' + esc(one.error), 'bad'); }
+            drafts = drafts.filter(function (d) { return d.engineId !== t.id; });
+            say(esc(t.name || 'They') + ' erased — record, roster entry and photographs.', 'good');
+            desk();
+          });
+        };
+        acts.appendChild(delb);
         if (t.status === 'live') {
           var pull = el('button', 'ow-btn no', 'Take off the roster');
           pull.onclick = function () {
@@ -725,6 +822,7 @@
           acts.appendChild(pull);
         }
         meta.appendChild(acts);
+        meta.appendChild(panel2);
         wrap.appendChild(meta);
         row.appendChild(wrap);
         list.appendChild(row);
@@ -741,7 +839,32 @@
           .map(function (b) { return b.value; });
       };
 
+      // the count goes on the buttons, so it is obvious they act on the ticks
+      // above and not on whichever card happens to be open below
+      function syncCount() {
+        var n = ticked().length;
+        $$('button[data-bulk]', foot).forEach(function (b) {
+          b.textContent = b.getAttribute('data-bulk') + (n ? ' · ' + n : '');
+          b.disabled = !n;
+        });
+        var hint = $('#owTickHint');
+        if (hint) hint.hidden = !!n;
+      }
+      list.addEventListener('change', syncCount);
+      // the whole row is the target — a 20px box is a poor thing to aim at on a phone
+      list.addEventListener('click', function (e) {
+        if (e.target.closest('.ow-btn') || e.target.closest('a') || e.target.tagName === 'INPUT') return;
+        var row = e.target.closest ? e.target.closest('.ow-pend') : null;
+        if (!row) return;
+        var box = row.querySelector('input[type=checkbox]');
+        if (!box) return;
+        box.checked = !box.checked;
+        syncCount();
+      });
+
       var pub = el('button', 'ow-btn go', 'Publish selected');
+      pub.setAttribute('data-bulk', 'Publish selected');
+      pub.disabled = true;
       pub.onclick = function () {
         var ids = ticked();
         if (!ids.length) return say('Nothing ticked.', 'bad');
@@ -752,6 +875,8 @@
       row2.appendChild(pub);
 
       var rej = el('button', 'ow-btn', 'Turn down');
+      rej.setAttribute('data-bulk', 'Turn down');
+      rej.disabled = true;
       rej.onclick = function () {
         var ids = ticked();
         if (!ids.length) return say('Nothing ticked.', 'bad');
@@ -766,6 +891,8 @@
       row2.appendChild(rej);
 
       var del = el('button', 'ow-btn no', 'Delete forever');
+      del.setAttribute('data-bulk', 'Delete forever');
+      del.disabled = true;
       del.onclick = function () {
         var ids = ticked();
         if (!ids.length) return say('Nothing ticked.', 'bad');
@@ -782,7 +909,12 @@
       row2.appendChild(del);
 
       foot.appendChild(row2);
+      var hint = el('p', 'ow-meta', 'These act on the rows you tick above.');
+      hint.id = 'owTickHint';
+      hint.style.margin = '10px 0 0';
+      foot.appendChild(hint);
       view.appendChild(foot);
+      syncCount();
     });
   }
 
@@ -876,12 +1008,49 @@
       head.innerHTML = '<b style="font-size:15px">' + esc(d.name || 'Talent ' + (i + 1)) + '</b>' +
         (d.status === 'live' ? '<span class="ow-meta" style="color:#C9A96E">' + esc((d.code || '').toUpperCase()) + ' · live</span>'
           : d.engineId ? '<span class="ow-meta">from the pipeline</span>' : '');
-      var drop = el('button', 'ow-btn no', d.engineId ? 'Close' : 'Remove');
+      var drop = el('button', 'ow-btn', d.engineId ? 'Close' : 'Remove');
       drop.title = d.engineId ? 'Close without saving' : 'Take this one off the desk';
       drop.style.marginLeft = 'auto';
       drop.onclick = function () { drafts.splice(i, 1); renderDrafts(); };
       head.appendChild(drop);
       c.appendChild(head);
+
+      // Someone open on the desk is the person you are thinking about, so the
+      // two ways out live here as well as in the list. Looking at a card and
+      // hunting for the button that acts on it is a bad way to find out it
+      // acted on a tick-box somewhere above instead.
+      if (d.engineId) {
+        var outs = el('div', 'ow-row');
+        outs.style.margin = '0 0 4px';
+        var down = el('button', 'ow-btn', 'Turn down');
+        down.title = 'Out of the pipeline; the record stays';
+        down.onclick = function () {
+          if (!confirm('Turn down ' + (d.name || 'this talent') + '?')) return;
+          down.disabled = true;
+          api('/admin/api/reject', { method: 'POST', body: { ids: [d.engineId] } }).then(function (r) {
+            if (!r || !r.ok) { down.disabled = false; return say('Failed: ' + esc((r && r.error) || ''), 'bad'); }
+            drafts.splice(i, 1);
+            say(esc(d.name || 'They') + ' turned down.', 'good');
+            desk();
+          });
+        };
+        outs.appendChild(down);
+
+        var kill = el('button', 'ow-btn no', 'Delete forever');
+        kill.title = 'Off the roster, photographs deleted, record destroyed';
+        kill.onclick = function () {
+          if (!confirm('Erase ' + (d.name || 'this talent') + ' completely?\n\nIf they are live they come off the roster, their photographs are deleted from the site, and the record here is destroyed. This cannot be undone.')) return;
+          kill.disabled = true;
+          api('/admin/api/delete', { method: 'POST', body: { ids: [d.engineId] } }).then(function (r) {
+            if (!r || !r.ok) { kill.disabled = false; return say('Failed: ' + esc((r && r.error) || ''), 'bad'); }
+            drafts.splice(i, 1);
+            say(esc(d.name || 'They') + ' erased — record, roster entry and photographs.', 'good');
+            desk();
+          });
+        };
+        outs.appendChild(kill);
+        c.appendChild(outs);
+      }
 
       var grid = el('div', 'ow-grid');
       FIELDS.forEach(function (f) {
