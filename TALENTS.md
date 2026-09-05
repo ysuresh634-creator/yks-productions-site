@@ -16,9 +16,16 @@ Three ways to feed it:
   all. It works out which column is which and shows you the mapping to correct.
   A block of `Name: …` lines per person, blank line between, works too — that
   is how they arrive on WhatsApp.
-- **Photos** — drop everyone's pictures in one go. `priya-01.jpg`,
-  `priya-02.jpg` group themselves; anything else you re-group with the dropdown
-  under each thumbnail. First photo of a group is the cover.
+- **Photos, dragged in from anywhere** — Finder, Photos, a Files app, another
+  browser tab, a WhatsApp Web thread. Drop them on any part of the panel: files
+  named `priya-01.jpg`, `priya-02.jpg` group themselves into one person, a set
+  dragged off one web page becomes one, and camera or screenshot filenames are
+  ignored rather than used as a name. Drop onto a talent card to add to that
+  person, drag a thumbnail from one card to another to move it, tap a thumbnail
+  to make it the cover, ⌘V for a copied image. On a phone the picker opens the
+  camera roll instead. Pictures dragged off a web page arrive as a URL, not
+  bytes — those are pulled into our own Cloudinary on push, so a roster plate is
+  never a hotlink to something that can vanish.
 - **Applications** — everyone already waiting in the engine, ticked off in one
   pass instead of one at a time.
 

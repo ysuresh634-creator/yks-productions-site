@@ -160,6 +160,15 @@
       '.ow-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(7,6,10,.96);border-top:1px solid #241f2b;',
       '  padding:11px 16px;display:flex;gap:10px;align-items:center;justify-content:space-between}',
       '.ow-bar span{font-size:13px;color:#9a9088}',
+      '.ow-drop{border:1.5px dashed #3a3242;text-align:center}',
+      '.ow-drop.hot{border-color:#C9A96E;background:rgba(201,169,110,.07)}',
+      '.ow-card.hot{border-color:#C9A96E;box-shadow:0 0 0 1px rgba(201,169,110,.4)}',
+      '.ow-th img{cursor:grab}',
+      '.ow-th i{position:absolute;right:2px;top:2px;width:18px;height:18px;border-radius:50%;background:rgba(7,6,10,.82);',
+      '  color:#f4ede2;font:600 11px/18px sans-serif;font-style:normal;text-align:center;cursor:pointer}',
+      '.ow-veil{position:fixed;inset:0;z-index:10;background:rgba(7,6,10,.82);border:2px dashed #C9A96E;',
+      '  display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;',
+      '  font:600 17px/1.5 sans-serif;color:#C9A96E;pointer-events:none}',
       '@media(max-width:520px){.ow-grid{grid-template-columns:1fr}}'
     ].join('');
     document.head.appendChild(s);
@@ -209,6 +218,7 @@
     panel.appendChild(inner);
     document.body.appendChild(panel);
     document.documentElement.style.overflow = 'hidden';
+    wireDrops();
     key = '';
     try { key = sessionStorage.getItem(KEYSTORE) || localStorage.getItem(KEYSTORE) || ''; } catch (e) {}
     if (key) {
@@ -274,7 +284,7 @@
     body.appendChild(msgEl);
     if (lastMsg) say(lastMsg.text, lastMsg.kind, true);
     tabsEl = el('div', 'ow-tabs');
-    [['paste', 'Paste rows'], ['photos', 'Photos'], ['pending', 'Applications']].forEach(function (t) {
+    [['paste', 'Paste rows'], ['photos', 'Drop photos'], ['pending', 'Applications']].forEach(function (t) {
       var b = el('button', 'ow-tab' + (tab === t[0] ? ' on' : ''), t[1]);
       b.onclick = function () { tab = t[0]; lastMsg = null; desk(); };
       tabsEl.appendChild(b);
@@ -419,67 +429,189 @@
     }).filter(function (d) { return d.name; });
   }
 
-  /* ── 2. photos first: drop the pile, group it, fill in the few fields ── */
+  /* ── 2. photos, dragged in from wherever they live ─────────────────
+     Finder, Photos, a Files app, another browser tab, a WhatsApp Web thread.
+     A drag carries either the real file or — when the picture lives on
+     someone else's page — only its URL, so both are accepted; a URL is pulled
+     into our own Cloudinary at push time, because a roster plate must not be
+     a hotlink to something that can disappear. ⌘V pastes a copied image or a
+     screenshot. Dragging a thumbnail from one card to another moves it, which
+     is how you fix a group the filenames got wrong. ── */
+
+  var SHOT_TYPE = 'application/x-yks-shot';
+
+  function isImageFile(f) {
+    return !!f && (/^image\//.test(f.type || '') || /\.(jpe?g|png|webp|heic|heif|avif|gif)$/i.test(f.name || ''));
+  }
+  function carriesShots(e) {
+    var t = e.dataTransfer && e.dataTransfer.types;
+    if (!t) return false;
+    t = Array.prototype.slice.call(t);
+    return t.indexOf('Files') >= 0 || t.indexOf('text/uri-list') >= 0 || t.indexOf('text/html') >= 0 || t.indexOf(SHOT_TYPE) >= 0;
+  }
+
+  function shotsFrom(dt) {
+    var out = [], seen = {}, files = [];
+    if (dt.files && dt.files.length) files = Array.prototype.slice.call(dt.files);
+    else if (dt.items && dt.items.length) {
+      Array.prototype.forEach.call(dt.items, function (it) {
+        if (it.kind === 'file') { var f = it.getAsFile(); if (f) files.push(f); }
+      });
+    }
+    files.filter(isImageFile).forEach(function (f) { out.push({ file: f, name: f.name || '' }); });
+    if (out.length) return out;
+
+    var grab = function (type) { try { return dt.getData(type) || ''; } catch (e) { return ''; } };
+    var urls = [], htm = grab('text/html'), m, re = /<img[^>]+src=["']([^"']+)["']/gi;
+    while ((m = re.exec(htm))) urls.push(m[1]);
+    (grab('text/uri-list') + ' ' + grab('text/plain')).split(/\s+/).forEach(function (u) {
+      if (/^https?:\/\//i.test(u)) urls.push(u);
+    });
+    urls.forEach(function (u) {
+      u = u.replace(/&amp;/g, '&');
+      if (seen[u]) return;
+      seen[u] = 1;
+      out.push({ url: u, name: (u.split('/').pop() || '').split('?')[0] });
+    });
+    return out;
+  }
+
+  // A camera or a screenshot names a file after itself, not after the person
+  // in it — those stems are worse than nothing in the name field.
+  var JUNK_STEM = /^(img|image|photo|picture|pic|screenshot|screen shot|dsc|dscn|p|whatsapp image|whatsapp|untitled|final|edit|copy|download|unnamed|fullsizerender|render)\b/;
+  var stemOf = function (name) {
+    var stem = String(name || '').replace(/\.[^.]+$/, '').replace(/[-_ ]?\d+$/, '')
+      .replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+    return JUNK_STEM.test(stem) || /^\d+$/.test(stem) ? '' : stem;
+  };
+  var titleCase = function (s2) { return s2.replace(/\b\w/g, function (m2) { return m2.toUpperCase(); }); };
+
+  /* One drop, several people: filenames group it where they can (priya-01,
+     priya-02), and anything nameless — dragged straight off a web page — is
+     one person, because one drag is one person's pictures. */
+  function groupShots(shots) {
+    var groups = {}, order = [];
+    shots.forEach(function (sh) {
+      var k = sh.file ? (stemOf(sh.name) || '_drop') : '_drop';
+      if (!groups[k]) { groups[k] = []; order.push(k); }
+      groups[k].push(sh);
+    });
+    return order.map(function (k) {
+      return { name: k === '_drop' ? '' : titleCase(k), shots: groups[k] };
+    });
+  }
+
+  /* Where a drop lands: on a talent card it joins that person, anywhere else
+     it becomes new ones. */
+  function takeShots(shots, idx) {
+    if (!shots.length) { say('Nothing in that drop I could read as a photo.', 'bad'); return; }
+    if (idx >= 0 && drafts[idx]) {
+      drafts[idx].shots = drafts[idx].shots.concat(shots);
+      renderDrafts();
+      say(shots.length + ' photo' + (shots.length === 1 ? '' : 's') + ' added to ' +
+        esc(drafts[idx].name || 'that card') + '.', 'good');
+      return;
+    }
+    var made = groupShots(shots);
+    addDrafts(made);
+    renderDrafts();
+    say(made.length + (made.length === 1 ? ' talent' : ' talent') + ' staged from ' + shots.length +
+      ' photo' + (shots.length === 1 ? '' : 's') + '. Names and cities next, then push.', 'good');
+  }
+
+  function moveShot(from, shotIndex, to) {
+    var src = drafts[from], dst = drafts[to];
+    if (!src || !dst || from === to) return;
+    var sh = src.shots.splice(shotIndex, 1)[0];
+    if (!sh) return;
+    if (src.cover >= src.shots.length) src.cover = 0;
+    dst.shots.push(sh);
+    renderDrafts();
+  }
+
+  var hot = null;
+  function setHot(node) {
+    if (hot === node) return;
+    if (hot) hot.classList.remove('hot');
+    hot = node;
+    if (hot) hot.classList.add('hot');
+  }
+  function veil(on) {
+    var v = $('#owVeil');
+    if (on && !v) {
+      v = el('div', 'ow-veil', 'Drop the photos — on a card to add them to that talent, anywhere else to start new ones');
+      v.id = 'owVeil';
+      panel.appendChild(v);
+    } else if (!on && v) { v.parentNode.removeChild(v); }
+  }
+
+  function wireDrops() {
+    var depth = 0;
+    panel.addEventListener('dragenter', function (e) {
+      if (!carriesShots(e)) return;
+      e.preventDefault();
+      depth++;
+      if (!e.dataTransfer.types || Array.prototype.indexOf.call(e.dataTransfer.types, SHOT_TYPE) < 0) veil(true);
+    });
+    panel.addEventListener('dragover', function (e) {
+      if (!carriesShots(e)) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      setHot(e.target && e.target.closest ? e.target.closest('.ow-card[data-draft], .ow-drop') : null);
+    });
+    panel.addEventListener('dragleave', function (e) {
+      if (!carriesShots(e)) return;
+      depth--;
+      if (depth <= 0) { depth = 0; veil(false); setHot(null); }
+    });
+    panel.addEventListener('drop', function (e) {
+      if (!carriesShots(e)) return;
+      e.preventDefault();
+      depth = 0; veil(false);
+      var card = e.target && e.target.closest ? e.target.closest('.ow-card[data-draft]') : null;
+      setHot(null);
+      var moving = '';
+      try { moving = e.dataTransfer.getData(SHOT_TYPE); } catch (er) { moving = ''; }
+      if (moving && card) {
+        var parts = moving.split(':');
+        moveShot(+parts[0], +parts[1], +card.getAttribute('data-draft'));
+        return;
+      }
+      if (moving) return;                       // dropped a thumbnail on nothing
+      takeShots(shotsFrom(e.dataTransfer), card ? +card.getAttribute('data-draft') : -1);
+    });
+
+    document.addEventListener('paste', function (e) {
+      if (!panel || panel.hidden || !e.clipboardData) return;
+      var t = e.target && e.target.tagName;
+      if (t === 'INPUT' || t === 'TEXTAREA') return;     // pasting text into a field is not a photo
+      var shots = shotsFrom(e.clipboardData);
+      if (!shots.length) return;
+      e.preventDefault();
+      takeShots(shots, -1);
+    });
+  }
+
+  /* The tab is really just an explanation plus a picker — the drop works on
+     every tab, and on a phone (no dragging) the picker opens the camera roll. */
   function photos(view) {
-    var c = el('div', 'ow-card',
-      '<p class="ow-p">Drop everyone\'s photos at once. Files named <em>priya-01.jpg</em>, <em>priya-02.jpg</em> ' +
-      'group themselves; anything else you can re-group below. First photo of each group is the cover.</p>');
+    var c = el('div', 'ow-card ow-drop',
+      '<p class="ow-p" style="margin-bottom:14px"><b>Drop photos anywhere on this panel.</b><br>' +
+      'From Finder, Photos, a Files app, another browser tab, a WhatsApp Web thread — files or ' +
+      'pictures dragged straight off a page both work. Files named <em>priya-01.jpg</em>, ' +
+      '<em>priya-02.jpg</em> group themselves into one person; a set dragged off one page becomes one. ' +
+      '⌘V pastes a copied image. Drop onto a card to add to that talent, and drag a thumbnail from one ' +
+      'card to another to move it.</p>');
     var pick = el('input'); pick.type = 'file'; pick.multiple = true; pick.accept = 'image/*';
     pick.className = 'ow-in-f';
-    c.appendChild(pick);
-    var strip = el('div', 'ow-thumbs');
-    c.appendChild(strip);
-    var row = el('div', 'ow-row');
-    var go = el('button', 'ow-btn go', 'Make talent from these');
-    go.disabled = true;
-    row.appendChild(go);
-    c.appendChild(row);
-    view.appendChild(c);
-
-    var files = [];
     pick.onchange = function () {
-      files = Array.prototype.slice.call(pick.files);
-      strip.innerHTML = '';
-      var groups = {};
-      files.forEach(function (f) {
-        var stem = f.name.replace(/\.[^.]+$/, '').replace(/[-_ ]?\d+$/, '').trim().toLowerCase() || 'group';
-        (groups[stem] = groups[stem] || []).push(f);
-      });
-      var names = Object.keys(groups);
-      files.forEach(function (f, i) {
-        var stem = f.name.replace(/\.[^.]+$/, '').replace(/[-_ ]?\d+$/, '').trim().toLowerCase() || 'group';
-        var th = el('div', 'ow-th');
-        var img = el('img');
-        img.src = URL.createObjectURL(f);
-        th.appendChild(img);
-        var sel = el('select');
-        names.forEach(function (n) {
-          var o = el('option', '', n.slice(0, 12));
-          o.value = n;
-          if (n === stem) o.selected = true;
-          sel.appendChild(o);
-        });
-        sel.onchange = function () { f._group = sel.value; };
-        f._group = stem;
-        th.appendChild(sel);
-        strip.appendChild(th);
-      });
-      go.disabled = !files.length;
+      takeShots(Array.prototype.slice.call(pick.files).filter(isImageFile).map(function (f) {
+        return { file: f, name: f.name || '' };
+      }), -1);
+      pick.value = '';
     };
-
-    go.onclick = function () {
-      var byGroup = {};
-      files.forEach(function (f) { (byGroup[f._group] = byGroup[f._group] || []).push(f); });
-      var made = Object.keys(byGroup).map(function (g) {
-        return {
-          name: g.replace(/[-_]+/g, ' ').replace(/\b\w/g, function (m) { return m.toUpperCase(); }),
-          files: byGroup[g]
-        };
-      });
-      addDrafts(made);
-      renderDrafts();
-      say(made.length + ' talent staged from ' + files.length + ' photos. Fill in the fields, then push.', 'good');
-    };
+    c.appendChild(pick);
+    view.appendChild(c);
     renderDrafts();
   }
 
@@ -532,6 +664,14 @@
   /* ── staged drafts: the shared review list ─────────────────────────── */
   function addDrafts(list) {
     list.forEach(function (d) {
+      // photos reach a draft three ways — dropped/pasted (shots), picked as
+      // files, or as URLs in a pasted column — and are all one list from here
+      var shots = (d.shots || []).slice();
+      (d.files || []).forEach(function (f) { shots.push({ file: f, name: f.name || '' }); });
+      (d.photos || []).forEach(function (ph) {
+        var u = ph && (ph.url || ph);
+        if (u) shots.push({ url: u, name: '' });
+      });
       drafts.push({
         name: d.name || '', category: d.category || 'model', based_in: d.based_in || 'india',
         city: d.city || '', work_preferences: d.work_preferences || '',
@@ -539,7 +679,7 @@
         stat_hips: d.stat_hips || '', stat_shoe: d.stat_shoe || '', stat_hair: d.stat_hair || '',
         stat_eyes: d.stat_eyes || '', stat_skin: d.stat_skin || '', gender: d.gender || '',
         tagline: d.tagline || '', about: d.about || '',
-        over18: false, files: d.files || [], photos: d.photos || [], cover: 0
+        over18: false, shots: shots, cover: 0
       });
     });
   }
@@ -549,7 +689,7 @@
     if (!String(d.name).trim()) errs.push('needs a name');
     if (!String(d.city).trim()) errs.push('needs a city');
     if (!d.over18) errs.push('not confirmed 18+');
-    if (!(d.files.length + d.photos.length)) errs.push('no photos');
+    if (!d.shots.length) errs.push('no photos');
     var blob = [d.name, d.city, d.about, d.tagline, d.work_preferences].join(' ');
     GUARDS.forEach(function (g) { if (g[0].test(blob)) errs.push('contains ' + g[1]); });
     if (d._err) errs.push('engine refused it: ' + d._err);
@@ -568,6 +708,7 @@
     drafts.forEach(function (d, i) {
       var errs = problems(d);
       var c = el('div', 'ow-card' + (errs.length ? ' bad' : ''));
+      c.setAttribute('data-draft', i);
       var head = el('div', 'ow-row');
       head.style.marginTop = '0';
       head.innerHTML = '<b style="font-size:15px">' + esc(d.name || 'Talent ' + (i + 1)) + '</b>';
@@ -601,31 +742,36 @@
       });
       c.appendChild(grid);
 
-      // photos: local files (upload on push) and/or URLs already on the web
+      // the plates: dropped, pasted, picked or linked — all the same here.
+      // Tap one to make it the cover, drag it onto another card to move it.
       var strip = el('div', 'ow-thumbs');
-      d.files.forEach(function (f, n) {
+      d.shots.forEach(function (sh, n) {
         var th = el('div', 'ow-th' + (d.cover === n ? ' cover' : ''));
-        var img = el('img'); img.src = URL.createObjectURL(f);
+        var img = el('img');
+        img.src = sh.file ? URL.createObjectURL(sh.file) : sh.url;
+        img.draggable = true;
+        img.title = 'Tap to make this the cover · drag to another card to move it';
         img.onclick = function () { d.cover = n; renderDrafts(); };
+        img.addEventListener('dragstart', function (e) {
+          e.dataTransfer.setData(SHOT_TYPE, i + ':' + n);
+          e.dataTransfer.effectAllowed = 'move';
+        });
         th.appendChild(img);
         if (d.cover === n) th.appendChild(el('b', '', 'COVER'));
-        strip.appendChild(th);
-      });
-      d.photos.forEach(function (p) {
-        var th = el('div', 'ow-th');
-        var img = el('img'); img.src = p.url || p;
-        th.appendChild(img);
+        var x = el('i', '', '×');
+        x.title = 'Remove this photo';
+        x.onclick = function () {
+          d.shots.splice(n, 1);
+          if (d.cover >= d.shots.length) d.cover = 0;
+          renderDrafts();
+        };
+        th.appendChild(x);
         strip.appendChild(th);
       });
       c.appendChild(strip);
-
-      var add = el('input'); add.type = 'file'; add.multiple = true; add.accept = 'image/*';
-      add.className = 'ow-in-f'; add.style.marginTop = '10px';
-      add.onchange = function () {
-        d.files = d.files.concat(Array.prototype.slice.call(add.files));
-        renderDrafts();
-      };
-      c.appendChild(add);
+      c.appendChild(el('p', 'ow-meta', d.shots.length
+        ? 'Drop more onto this card to add them.'
+        : 'No photos yet — drop some onto this card.'));
 
       var age = el('label', '', '<input type="checkbox"' + (d.over18 ? ' checked' : '') + ' /> 18 or over');
       age.style.cssText = 'display:flex;gap:8px;align-items:center;font-size:13px;color:#9a9088;margin-top:12px';
@@ -648,16 +794,30 @@
   }
 
   /* ── push: photos up, entries in, then publish ─────────────────────── */
-  function upload(file) {
+  function upload(fileOrUrl) {
     return new Promise(function (resolve, reject) {
       var fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', fileOrUrl);          // Cloudinary takes bytes or a URL to fetch
       fd.append('upload_preset', PRESET);
       fd.append('folder', 'YKS Talents/roster');
       fetch('https://api.cloudinary.com/v1_1/' + CLOUD + '/auto/upload', { method: 'POST', body: fd })
         .then(function (r) { return r.json(); })
-        .then(function (j) { j && j.secure_url ? resolve(j.secure_url) : reject(new Error('upload failed')); })
+        .then(function (j) { j && j.secure_url ? resolve(j.secure_url) : reject(new Error((j && j.error && j.error.message) || 'upload failed')); })
         .catch(reject);
+    });
+  }
+
+  /* A dragged-in URL becomes ours rather than a hotlink: Cloudinary fetches it
+     server-side (no CORS in the way), and if that host refuses Cloudinary we
+     try to pull the bytes here instead. Only if both fail does the raw URL go
+     through — the engine gets one more attempt at it when it commits. */
+  function uploadShot(sh) {
+    if (sh.file) return upload(sh.file);
+    return upload(sh.url).catch(function () {
+      return fetch(sh.url, { mode: 'cors' })
+        .then(function (r) { if (!r.ok) throw new Error('fetch ' + r.status); return r.blob(); })
+        .then(function (b) { return upload(new File([b], 'plate.jpg', { type: b.type || 'image/jpeg' })); })
+        .catch(function () { return sh.url; });
     });
   }
 
@@ -665,22 +825,22 @@
     var ready = drafts.filter(function (d) { return !problems(d).length; });
     if (!ready.length) return;
     btn.disabled = true;
-    var total = ready.reduce(function (n, d) { return n + d.files.length; }, 0);
+    var total = ready.reduce(function (n, d) { return n + d.shots.length; }, 0);
     var done = 0;
     say('Uploading ' + total + ' photo' + (total === 1 ? '' : 's') + '…');
 
     var chain = Promise.resolve();
     ready.forEach(function (d) {
       chain = chain.then(function () {
-        var urls = d.photos.map(function (p) { return p.url || p; });
-        var files = d.files.slice();
+        var urls = [];
+        var shots = d.shots.slice();
         // cover first — the roster's 01.jpg is the card
-        if (d.cover > 0 && files[d.cover]) files.unshift(files.splice(d.cover, 1)[0]);
+        if (d.cover > 0 && shots[d.cover]) shots.unshift(shots.splice(d.cover, 1)[0]);
         var seq = Promise.resolve();
-        files.forEach(function (f) {
+        shots.forEach(function (sh) {
           seq = seq.then(function () {
-            return upload(f).then(function (u) {
-              urls.push(u);
+            return uploadShot(sh).then(function (u) {
+              if (u) urls.push(u);
               done++;
               say('Uploading… ' + done + ' / ' + total);
             });
