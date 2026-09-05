@@ -267,6 +267,7 @@
 
   /* ── the desk ──────────────────────────────────────────────────────── */
   var tab = 'paste';
+  var repoChecked = false;
   function desk() {
     body.innerHTML = '';
     msgEl = el('div', 'ow-msg'); msgEl.hidden = true;
@@ -284,6 +285,18 @@
     if (tab === 'paste') paste(view);
     if (tab === 'photos') photos(view);
     if (tab === 'pending') applications(view);
+
+    // A dead GitHub token only shows up at publish — after the photos are
+    // uploaded and the batch is staged. Ask once, on open, so it is the first
+    // thing on screen instead of the last.
+    if (!repoChecked) {
+      repoChecked = true;
+      api('/admin/api/repo').then(function (j) {
+        if (!j || j.ok) return;
+        say('<b>The site repo is not reachable</b> — ' + esc(j.error || 'unknown') +
+            '.<br>Staging works, publishing will not until that is fixed.', 'bad');
+      });
+    }
   }
 
   /* ── 1. paste rows out of a sheet, or a block of "Key: value" lines ── */
