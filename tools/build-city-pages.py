@@ -234,8 +234,8 @@ def page(c):
   gtag('js', new Date());
   gtag('config', 'G-C57X89TN45');
 </script>
-<title>Models in {e(c['city'])} — Book a Face, or Join the Women&rsquo;s Board | YKS Talents</title>
-<meta name="description" content="Cast models, actors and creators in {e(c['city'])} — send a brief, get a shortlist in 24 hours. Applications open on the women&#39;s board." />
+<title>Book Models in {e(c['city'])} — Casting &amp; Talent | YKS Talents</title>
+<meta name="description" content="Cast models, actors and creators in {e(c['city'])} — send a brief, get a shortlist. Every booking runs through YKS. Working talent can apply to the board." />
 <link rel="canonical" href="{url}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="geo.region" content="{e(c['geo'])}" />
@@ -271,8 +271,8 @@ def page(c):
     <p class="tal-h1sub">Modelling, acting and creator work in {e(c['city'])} — for the people doing it, and the brands casting it.</p>
     <p class="l-lede">{e(c['market'])}</p>
     <div class="l-cta-row">
-      <a class="btn btn-fill" href="/talents/apply.html">Apply to the women&rsquo;s board →</a>
-      <a class="btn btn-ghost" href="/casting-india.html#brief">I'm casting — send a brief</a>
+      <a class="btn btn-fill" href="/casting-india.html#brief">I&rsquo;m casting — send a brief</a>
+      <a class="btn btn-ghost" href="/talents/apply.html">I&rsquo;m talent — apply to the board →</a>
     </div>
   </div>
 </section>
@@ -283,12 +283,13 @@ def page(c):
 
       <div class="l-svcside">
         <p class="l-eyebrow">For talent in {e(c['city'])}</p>
-        <h2>The women&rsquo;s board is <em>open in {e(c['city'])}</em></h2>
+        <h2>The board is <em>open in {e(c['city'])}</em></h2>
         <p class="l-prose">{e(c['talent'])}</p>
-        <p class="l-prose">Over 18, photographs clear enough to see you properly, no fee at any
-        point. Nobody honest promises work — what I can promise is that briefs from
-        {e(c['city'])} get put in front of the right faces, and that the booking, the schedule
-        and the payment run through me. <a href="/talents/apply.html">The full terms are on the
+        <p class="l-prose">Over 18, photographs plain enough to see you properly, and no fee at
+        any point — not to join, not to stay on it. Every brief that comes through is paid work
+        for a real client. Nobody honest promises work; what I can promise is that briefs from
+        {e(c['city'])} go in front of the right faces, and that the booking, the schedule and the
+        payment all run through me. <a href="/talents/apply.html">The full terms are on the
         board &rarr;</a></p>
         <div class="l-cta-row">
           <a class="btn btn-fill" href="/talents/apply.html">Apply from {e(c['city'])} →</a>
