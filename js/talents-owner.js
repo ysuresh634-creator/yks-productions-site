@@ -46,10 +46,10 @@
 
   /* ── the fields a roster entry is made of ─────────────────────────── */
   var FIELDS = [
-    { k: 'name', label: 'Name', req: true },
-    { k: 'category', label: 'Category', chips: ['model', 'influencer', 'actor'] },
-    { k: 'based_in', label: 'Based in', chips: ['india', 'uae'] },
-    { k: 'city', label: 'City', req: true },
+    { k: 'name', label: 'Name', req: true, core: true },
+    { k: 'category', label: 'Category', chips: ['model', 'influencer', 'actor'], core: true },
+    { k: 'based_in', label: 'Based in', chips: ['india', 'uae'], core: true },
+    { k: 'city', label: 'City', req: true, core: true },
     { k: 'socials', label: 'Instagram', hint: 'private — how you check them; never published', priv: true },
     { k: 'work_preferences', label: 'Works in', hint: 'Fashion, Editorial, Commercial' },
     { k: 'stat_height', label: 'Height' },
@@ -498,6 +498,51 @@
   // A camera or a screenshot names a file after itself, not after the person
   // in it — those stems are worse than nothing in the name field.
   var JUNK_STEM = /^(img|image|photo|picture|pic|screenshot|screen shot|dsc|dscn|p|whatsapp image|whatsapp|untitled|final|edit|copy|download|unnamed|fullsizerender|render)\b/;
+  /* ── read a pasted message without asking anyone ────────────────────
+     Measurements arrive in a hundred shapes — "5'7", "Height 170cm", "Waist:
+     27". A regex gets those instantly and for free; the engine's model is only
+     asked for the rest. Nothing is invented here: a field stays empty unless
+     the text actually contained it. */
+  var STAT_WORDS = 'height|ht|bust|chest|waist|high hip|hips?|shoe|footwear|hair|eyes?|skin|complexion|name|city|based|from|location|insta(?:gram)?|ig';
+  var STAT_PATTERNS = [
+    ['stat_height', /(?:height|ht)\s*(?:is|[:\-–])?\s*([\d]{1,3}\s*(?:cm|["”′’\']\s*\d{0,2}\s*(?:["”]|in)?|ft\s*\d{0,2}))/i],
+    ['stat_height', /\b(\d\s*['’]\s*\d{1,2}\s*(?:["”]|in)?)/],
+    ['stat_bust', /(?:bust|chest)\s*(?:is|[:\-–])?\s*(\d{2,3}\s*(?:cm|in|["”])?\s*[A-Ha-h]{0,2})/i],
+    ['stat_waist', /waist\s*(?:is|[:\-–])?\s*(\d{2,3}\s*(?:cm|in|["”])?)/i],
+    ['stat_high_hip', /high\s*hip\s*(?:is|[:\-–])?\s*(\d{2,3}\s*(?:cm|in|["”])?)/i],
+    ['stat_hips', /(?<!high\s)hips?\s*(?:is|[:\-–])?\s*(\d{2,3}\s*(?:cm|in|["”])?)/i],
+    ['stat_shoe', /(?:shoe|footwear)\s*(?:size)?\s*(?:is|[:\-–])?\s*(\d{1,2}(?:\.5)?\s*(?:eu|uk|us|ind)?)/i],
+    ['stat_hair', /hair\s*(?:colou?r)?\s*(?:is|[:\-–])?\s*([A-Za-z]+(?:\s*\/\s*[A-Za-z]+)?)/i],
+    ['stat_eyes', /eyes?\s*(?:colou?r)?\s*(?:is|[:\-–])?\s*([A-Za-z]+(?:\s*\/\s*[A-Za-z]+)?)/i],
+    ['stat_skin', /(?:skin|complexion)\s*(?:tone)?\s*(?:is|[:\-–])?\s*([A-Za-z]+(?:\s+[A-Za-z]+)?)/i],
+    ['city', /(?:city|based in|based at|located in|from)\s*(?:is|[:\-–])?\s*([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)?)/],
+    ['name', /name\s*(?:is|[:\-–])\s*([A-Z][A-Za-z.'\-]+(?:\s+[A-Z][A-Za-z.'\-]+){0,3})/],
+    ['socials', /((?:https?:\/\/)?(?:www\.)?instagram\.com\/[A-Za-z0-9._]{2,30}|@[A-Za-z0-9._]{2,30})/i]
+  ];
+
+  /* A value in a run-on sentence has no delimiter of its own — "Hair Black
+     Eyes Brown" is two answers, not one — so a capture stops at the next
+     label word. */
+  function cut(v) {
+    var re = new RegExp('\\b(?:' + STAT_WORDS + ')\\b', 'i');
+    var m = re.exec(v);
+    if (m && m.index > 0) v = v.slice(0, m.index);
+    return v.replace(/[.,;:|]+$/, '').replace(/\s+/g, ' ').trim();
+  }
+
+  function readLocally(text) {
+    var found = {};
+    STAT_PATTERNS.forEach(function (pr) {
+      if (found[pr[0]]) return;
+      var m = pr[1].exec(text);
+      if (m && m[1]) {
+        var v = cut(m[1]);
+        if (v) found[pr[0]] = v;
+      }
+    });
+    return found;
+  }
+
   /* They type @name, instagram.com/name, a full URL, or just the name. All of
      those are the same profile; this is the one place that decides. */
   function igHandle(v) {
@@ -977,6 +1022,79 @@
     });
   }
 
+  /* ── the machine does the typing ────────────────────────────────────
+     Filling twenty boxes per person is not a bulk tool, it is data entry with
+     extra steps. The engine already writes bios, reads a pasted profile and
+     names a shot type for the apply form — the desk just was not asking it.
+     Everything below is derived from facts that exist: what he pasted, what
+     the applicant sent, what is in the photograph. Nothing invents a
+     measurement, a city or a credit. ── */
+
+  function aiFill(d, opts) {
+    opts = opts || {};
+    var steps = [];
+
+    // 1. a caption for each plate, read off the picture itself
+    if (opts.captions !== false) {
+      d.shots.forEach(function (sh) {
+        if (sh.label || !sh.file) return;              // already captioned, or not ours to read
+        steps.push(function () {
+          return shrink(sh.file).then(function (dataUrl) {
+            return api2('/ai/classify', { image: dataUrl }).then(function (j) {
+              if (j && j.category) sh.label = j.category;
+            });
+          }).catch(function () {});
+        });
+      });
+    }
+
+    // 2. the signature line and the profile paragraph, from what is actually known
+    var facts = function (kind) {
+      return {
+        kind: kind, name: d.name, category: d.category, role: d.category, city: d.city,
+        loves: String(d.work_preferences || '').split(/[,·|]/).map(function (x) { return x.trim(); }).filter(Boolean),
+        tone: 'warm'
+      };
+    };
+    if (!d.tagline && d.name) {
+      steps.push(function () {
+        return api2('/ai/write', facts('tagline')).then(function (j) { if (j && j.text) d.tagline = j.text; });
+      });
+    }
+    if (!d.about && d.name) {
+      steps.push(function () {
+        return api2('/ai/write', facts('about')).then(function (j) { if (j && j.text) d.about = j.text; });
+      });
+    }
+
+    var seq = Promise.resolve();
+    steps.forEach(function (st) { seq = seq.then(st); });
+    return seq.then(function () { return steps.length; });
+  }
+
+  /* the AI routes are public (the apply form uses them), so no passcode header */
+  function api2(path, body) {
+    return fetch(ENGINE + path, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); }).catch(function () { return null; });
+  }
+
+  /* a plate is 3–8MB off a phone; the classifier only needs a small one */
+  function shrink(file) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.onload = function () {
+        var w = 320, h = Math.round(img.height * (w / img.width));
+        var c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(c.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
   /* ── the photo, actually looked at ─────────────────────────────────
      A 64px thumbnail is enough to tell one picture from another and nothing
      else. Whether a plate is sharp, whether the crop works, whether it is the
@@ -1181,6 +1299,10 @@
       }
 
       var grid = el('div', 'ow-grid');
+      var more = el('div', 'ow-grid');
+      // .ow-grid sets display:grid, which outranks the hidden attribute — so
+      // this has to be display, not hidden, or "collapsed" shows everything
+      more.style.display = d._more ? 'grid' : 'none';
       FIELDS.forEach(function (f) {
         var box = el('div');
         if (f.big) box.style.gridColumn = '1 / -1';
@@ -1208,9 +1330,19 @@
             box.appendChild(go);
           }
         }
-        grid.appendChild(box);
+        (f.core ? grid : more).appendChild(box);
       });
       c.appendChild(grid);
+
+      // Four boxes decide whether someone can go on the roster. The other
+      // eighteen are refinements, and having them all in his face is what made
+      // this feel like data entry instead of a bulk tool.
+      var moreBtn = el('button', 'ow-btn', (d._more ? '▴ Less' : '▾ Everything else') +
+        ' (height, stats, bio, country, castable-for…)');
+      moreBtn.style.margin = '12px 0 0';
+      moreBtn.onclick = function () { d._more = !d._more; renderDrafts(); };
+      c.appendChild(moreBtn);
+      c.appendChild(more);
 
       // Nine measurements cover most calls; the tenth is always the one a
       // client asks for. His own rows go on the profile beside the others.
@@ -1242,9 +1374,11 @@
       addRow.onclick = function () {
         d.specs_extra = d.specs_extra || {};
         d.specs_extra['New row ' + (Object.keys(d.specs_extra).length + 1)] = '';
+        d._more = true;
         renderDrafts();
       };
       extras.appendChild(addRow);
+      extras.style.display = d._more ? '' : 'none';
       c.appendChild(extras);
 
       // the plates: dropped, pasted, picked or linked — all the same here.
@@ -1283,6 +1417,61 @@
       age.querySelector('input').onchange = function (e) { d.over18 = e.target.checked; renderDrafts(); };
       c.appendChild(age);
 
+      // Paste whatever they actually sent — the WhatsApp message, an agency
+      // profile, a bio — and let the machine take the fields out of it.
+      var pasteBox = el('div');
+      pasteBox.appendChild(el('label', 'ow-lab', 'Paste what they sent you <span style="text-transform:none;letter-spacing:0">· message, profile, bio — I read the fields out of it</span>'));
+      var pta = el('textarea', 'ow-ta');
+      pta.style.minHeight = '58px';
+      pta.placeholder = 'Name: Priya Menon\nMumbai\nHeight 5\'7"  Waist 27  Shoe 37\n@priya.menon';
+      pasteBox.appendChild(pta);
+      var prow = el('div', 'ow-row');
+      var readBtn = el('button', 'ow-btn', 'Read it');
+      readBtn.onclick = function () {
+        var text = pta.value.trim();
+        if (!text) return;
+        // whatever HE typed by hand is never overwritten by either pass
+        var typed = {};
+        FIELDS.forEach(function (f) { if (d[f.k]) typed[f.k] = true; });
+        var got = readLocally(text);
+        Object.keys(got).forEach(function (k) { if (!typed[k]) d[k] = got[k]; });
+        readBtn.disabled = true; readBtn.textContent = 'Reading…';
+        api2('/ai/extract', { text: text }).then(function (j) {
+          readBtn.disabled = false; readBtn.textContent = 'Read it';
+          if (j && !j.error) {
+            // the model gets the last word on the prose fields: a regex reads
+            // "my name is Priya Menon. I'm" and keeps the "is" and the "I"
+            var map = { name: 'name', city: 'city', socials: 'socials', gender: 'gender', preferences: 'work_preferences' };
+            Object.keys(map).forEach(function (k) { if (j[k] && !typed[map[k]]) d[map[k]] = j[k]; });
+            if (j.category) {
+              var c2 = String(j.category).toLowerCase();
+              d.category = c2.indexOf('influen') >= 0 || c2.indexOf('creator') >= 0 ? 'influencer'
+                : c2.indexOf('act') >= 0 ? 'actor' : 'model';
+            }
+            if (j.region) d.based_in = String(j.region).toLowerCase() === 'uae' ? 'uae' : 'india';
+          }
+          renderDrafts();
+          say('Read what I could from that. Nothing was invented — anything it did not say is still empty.', 'good');
+        });
+      };
+      prow.appendChild(readBtn);
+
+      var fillBtn = el('button', 'ow-btn go', 'Write the rest for me');
+      fillBtn.title = 'Captions off the photos, a signature line and a bio from the facts already here';
+      fillBtn.onclick = function () {
+        if (!d.name) return say('It needs a name first — everything else is written around it.', 'bad');
+        fillBtn.disabled = true; fillBtn.textContent = 'Writing…';
+        aiFill(d).then(function (n) {
+          fillBtn.disabled = false; fillBtn.textContent = 'Write the rest for me';
+          renderDrafts();
+          say(n ? 'Written — read it before you push, it is a machine describing someone it has not met.'
+                : 'Nothing left to write on that one.', n ? 'good' : '');
+        });
+      };
+      prow.appendChild(fillBtn);
+      pasteBox.appendChild(prow);
+      c.appendChild(pasteBox);
+
       var nb = el('div');
       nb.appendChild(el('label', 'ow-lab', 'Private note <span style="text-transform:none;letter-spacing:0">· yours only, never published</span>'));
       var nta = el('textarea', 'ow-ta');
@@ -1302,6 +1491,29 @@
     var live = readyList.filter(function (d) { return d.status === 'live'; }).length;
     var bar = el('div', 'ow-bar'); bar.id = 'owBar';
     bar.appendChild(el('span', '', ready + ' of ' + drafts.length + ' ready'));
+    // one press for the whole batch — the point of a bulk desk
+    var fillAll = el('button', 'ow-btn', 'Write all ' + drafts.length);
+    fillAll.title = 'Captions, signature lines and bios for every card that is missing them';
+    fillAll.onclick = function () {
+      var todo = drafts.filter(function (d) { return d.name; });
+      if (!todo.length) return say('They need names first.', 'bad');
+      fillAll.disabled = true;
+      var i = 0;
+      var seq = Promise.resolve();
+      todo.forEach(function (d) {
+        seq = seq.then(function () {
+          say('Writing ' + (++i) + ' of ' + todo.length + ' — ' + esc(d.name) + '…');
+          return aiFill(d);
+        });
+      });
+      seq.then(function () {
+        fillAll.disabled = false;
+        renderDrafts();
+        say('Written for ' + todo.length + '. Read them before pushing — a machine wrote them.', 'good');
+      });
+    };
+    bar.appendChild(fillAll);
+
     var push = el('button', 'ow-btn go',
       live === ready && ready ? 'Save ' + ready + ' live profile' + (ready === 1 ? '' : 's')
         : live ? 'Save & publish ' + ready

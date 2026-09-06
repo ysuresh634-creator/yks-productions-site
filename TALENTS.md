@@ -41,6 +41,17 @@ Three ways to feed it:
   **in place**: same roster code, same URL, so a link already sent to a client
   keeps working, and any photo you removed is deleted from the site.
 
+**You are not meant to type twenty boxes.** A card shows four — name,
+category, based-in, city — and hides the rest behind *Everything else*. Under
+them is a paste box: drop in whatever they actually sent (a WhatsApp message,
+an agency profile, a bio) and press **Read it** — measurements come out by
+pattern instantly, the prose fields go to the engine's extractor. Then **Write
+the rest for me** captions each photo from the picture itself, and writes the
+signature line and the bio from the facts that are already there. **Write all N**
+does the same for the whole batch in one press. Nothing is invented: a field the
+text did not contain stays empty, and no measurement is ever generated. Read the
+written bios before pushing — a machine wrote them about someone it has not met.
+
 **Tap any photo to see it properly.** It opens full size with the rest of the
 book behind it: ‹ › to move through, *Make cover*, *◀ Move / Move ▶* to set the
 running order, a **caption** and **alt text** for that plate (both publish), and
