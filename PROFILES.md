@@ -35,33 +35,34 @@ separated out in GA4.
 
 ---
 
-## Behance — BOTH profiles
+## Behance — dropped (9 Sep 2026)
 
-You have two accounts. Give them the same headline and the same link so
-they resolve to one person instead of two.
+His call: forget Behance. Both profiles are out of the entity.
 
-- behance.net/yedusuresha14c
-- behance.net/ysuresh634f0a1
+`behance.net/yedusuresha14c` had never been corrected and still pointed at
+linktr.ee; `behance.net/ysuresh634f0a1` was the one working citation, and
+losing it costs real corroboration — but a `sameAs` pointing at a profile
+nobody maintains is a weak claim, and two profiles describing one person
+differently was actively splitting the entity rather than fusing it.
 
-**Headline:**
+**linktr.ee/yksproductions went with them.** It had been sitting in the
+`sameAs` set on all 80 pages, which contradicts the rule three lines above:
+a link aggregator is not an identity, and declaring one as *him* spends
+authority instead of collecting it.
+
+**LinkedIn took the slot.** `linkedin.com/in/yedukrishnasuresh` was never
+declared anywhere despite being the most active profile he has.
+
+The canonical `sameAs` is now exactly two entries, and every page agrees:
+
 ```
-Photographer, Videographer & Cinematographer — YKS Productions
+https://www.instagram.com/yks_photoworks
+https://www.linkedin.com/in/yedukrishnasuresh
 ```
 
-**Location:** `Bangalore, India`
-
-**Website:** `https://yksproductions.com`  ← not linktr.ee, on both
-
-**About:**
-```
-Film-trained photographer, videographer and cinematographer working
-between Bangalore and Dubai. Unit still photographer on the Malayalam
-features Soothravakyam and Baby Girl; member, FEFKA Still Photographers
-Union. Shoots cinematic real-estate films, weddings, fashion editorial,
-brand campaigns and portraits across India and the UAE.
-```
-
----
+Two profiles that are alive, maintained and say the same thing beat four that
+disagree. If a third is ever added, it goes in `index.html` and propagates via
+`tools/wire-entity.py` — never typed onto pages by hand.
 
 ## Vimeo — dropped (4 Sep 2026)
 
