@@ -95,9 +95,14 @@
 .xb-go svg{width:19px;height:19px;flex:none}
 .xb-or{margin:15px 0 0;font-size:.9rem;color:var(--paper-dim)}
 .xb-or a{color:var(--amber);border-bottom:1px solid rgba(255,140,59,.4)}
-.xb-div{max-width:720px;margin:36px auto 4px;display:flex;align-items:center;gap:16px;color:var(--paper-dim);
+/* Sits directly between two <section>s, outside any .wrap, so it never
+   inherited the page's 36px/28px side gutter — the divider text ran flush
+   to the screen edge on narrow viewports. padding-inline gives it the same
+   gutter .wrap uses without touching the box's own margin/max-width. */
+.xb-div{max-width:720px;margin:36px auto 4px;padding-inline:36px;display:flex;align-items:center;gap:16px;color:var(--paper-dim);
   font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase}
 .xb-div::before,.xb-div::after{content:"";flex:1;height:1px;background:var(--line)}
+@media(max-width:600px){.xb-div{padding-inline:28px}}
 </style>
 
 <script type="application/ld+json">

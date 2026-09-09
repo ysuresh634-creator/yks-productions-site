@@ -66,47 +66,48 @@
   /* ── Agreement body ───────────────────────────── */
   .doc-title{font-family:var(--sans);font-size:17px;font-weight:800;letter-spacing:-.1px;text-align:center;line-height:1.3}
   .doc-sub{font-family:var(--sans);font-size:9px;letter-spacing:2.4px;text-transform:uppercase;color:var(--warm);text-align:center;margin-top:7px}
-  .recital{font-size:11.6px;line-height:1.7;margin-top:16px}
-  .party{font-size:11.6px;line-height:1.7;margin-top:10px;padding-left:16px;border-left:1px solid var(--line)}
+  .recital{font-size:11px;line-height:1.55;margin-top:13px}
+  .party{font-size:11px;line-height:1.55;margin-top:8px;padding-left:15px;border-left:1px solid var(--line)}
 
-  h2.sec{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:1.7px;text-transform:uppercase;
-         color:#fff;background:var(--band);padding:7px 12px;margin:22px 0 12px;
+  h2.sec{font-family:var(--sans);font-size:9.4px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+         color:#fff;background:var(--band);padding:6px 11px;margin:15px 0 8px;
          print-color-adjust:exact;-webkit-print-color-adjust:exact;break-after:avoid}
   h2.sec span{color:var(--gold);margin-right:9px;font-variant-numeric:tabular-nums}
 
-  .cl{display:grid;grid-template-columns:46px 1fr;gap:0 4px;margin-bottom:8px;break-inside:avoid}
+  .cl{display:grid;grid-template-columns:44px 1fr;gap:0 4px;margin-bottom:6px;orphans:2;widows:2}
   .cl > .num{font-family:var(--sans);font-size:10px;font-weight:700;color:var(--gold-deep);
-             font-variant-numeric:tabular-nums;padding-top:2.5px;letter-spacing:.2px}
-  .cl > .txt{font-size:11.5px;line-height:1.68;max-width:66ch}
+             font-variant-numeric:tabular-nums;padding-top:1.5px;letter-spacing:.2px}
+  .cl > .txt{font-size:10.9px;line-height:1.58;orphans:2;widows:2}
   .cl .txt b,.cl .txt strong{font-family:var(--sans);font-weight:700;font-size:11px}
   .cl .txt em{font-style:italic}
-  .sub{display:block;margin-top:5px;padding-left:15px;position:relative}
+  .sub{display:block;margin-top:3px;padding-left:14px;position:relative}
   .sub:before{content:"";position:absolute;left:2px;top:8px;width:4px;height:4px;background:var(--gold);border-radius:50%;
               print-color-adjust:exact;-webkit-print-color-adjust:exact}
 
-  .plain{border-left:2px solid var(--gold);background:var(--off);padding:9px 13px 10px;margin:-4px 0 14px;
-         max-width:70ch;print-color-adjust:exact;-webkit-print-color-adjust:exact;break-inside:avoid}
+  .plain{border-left:2px solid var(--gold);background:var(--off);padding:7px 12px 8px;margin:-2px 0 10px;
+         print-color-adjust:exact;-webkit-print-color-adjust:exact;break-inside:avoid}
   .plain .lab{font-family:var(--sans);font-size:7.6px;font-weight:700;letter-spacing:1.7px;text-transform:uppercase;
               color:var(--gold-deep);display:block;margin-bottom:3px}
-  .plain p{font-size:11.2px;line-height:1.6;font-style:italic;color:var(--text)}
+  .plain p{font-size:10.4px;line-height:1.55;font-style:italic;color:var(--text)}
   .plain p b{font-style:normal;font-family:var(--sans);font-weight:700;font-size:10.6px}
 
-  .flag{grid-column:1/-1;font-family:var(--sans);font-size:9.4px;line-height:1.55;color:var(--flag);
-        border:1px dashed rgba(185,64,64,.45);padding:7px 10px;margin:4px 0 10px;max-width:70ch}
+  .flag{font-family:var(--sans);font-size:9.4px;line-height:1.55;color:var(--flag);
+        border:1px dashed rgba(185,64,64,.45);padding:8px 11px;margin:0 0 9px;break-inside:avoid}
   .flag b{font-weight:700;letter-spacing:.3px}
 
   /* ── Tables / schedules ───────────────────────── */
-  .fill{width:100%;border-collapse:collapse;margin-top:10px;font-family:var(--sans)}
-  .fill th{background:var(--band);color:var(--gold);font-size:8px;font-weight:700;letter-spacing:1.2px;
-           text-transform:uppercase;padding:8px 10px;text-align:left;
+  .fill{width:100%;border-collapse:collapse;margin-top:8px;font-family:var(--sans);break-inside:auto}
+  .fill tr{break-inside:avoid}
+  .fill th{background:var(--band);color:var(--gold);font-size:7.6px;font-weight:700;letter-spacing:1.2px;
+           text-transform:uppercase;padding:6px 9px;text-align:left;
            print-color-adjust:exact;-webkit-print-color-adjust:exact}
-  .fill td{font-size:10.4px;padding:9px 10px;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.5}
+  .fill td{font-size:9.6px;padding:5px 9px;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.45}
   .fill td:first-child{width:38%;font-weight:600}
   .fill td .hint{display:block;font-size:8.8px;color:var(--warm);font-weight:400;margin-top:2px;font-style:italic}
   .fill tr:nth-child(odd) td{background:var(--off);print-color-adjust:exact;-webkit-print-color-adjust:exact}
   .blank{color:var(--warm);letter-spacing:.5px}
 
-  .sign-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:26px}
+  .sign-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:26px;break-inside:avoid}
   .sign-box .line{border-bottom:1px solid var(--warm);height:42px}
   .sign-box .lbl{font-family:var(--sans);font-size:9.5px;color:var(--warm);margin-top:7px;line-height:1.7}
   .sign-box .who{font-family:var(--sans);font-size:10.5px;font-weight:700;color:var(--text);margin-bottom:2px}
@@ -115,12 +116,15 @@
              border-top:1px solid var(--line);margin-top:26px;padding-top:11px}
 
   .break{break-before:page}
+  /* Category-conditional clauses. The printed master is the influencer edition;
+     the signable page swaps these at runtime from the talent's category. */
+  [hidden]{display:none !important}
 
   @page{size:A4;margin:0}
   @media print{
     body{background:#fff}
     .sheet{width:auto;margin:0;box-shadow:none}
-    .pad{padding:14mm 16mm}
+    .pad{padding:12mm 15mm}
     .cover-sheet .pad{padding:9mm 16mm 8mm}
     .cover-sheet .mast{padding:16px 16mm 13px}
   }
@@ -165,10 +169,181 @@
            border-radius:3px;border:1px solid var(--gold);cursor:pointer}
   .bar-btn.alt{background:transparent;color:var(--gold)}
   .bar-btn.go{background:var(--gold);color:#0D0B11;border-color:var(--gold)}
-  @media print{ .no-print{display:none !important} .wr{border-bottom:1px solid #B9B1A8} }
+  .signblk{margin-top:14px;display:grid;gap:11px}
+  .sf{display:block}
+  .sf-l{font-family:var(--sans);font-size:8px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+        color:var(--warm);display:block;margin-bottom:4px}
+  .sf-i{font-family:var(--sans);font-size:12px;color:var(--text);background:transparent;width:100%;max-width:340px;
+        border:none;border-bottom:1px solid var(--warm);padding:4px 2px 5px;outline-offset:3px}
+  .sf-i:focus{border-bottom-color:var(--gold-deep);background:rgba(201,169,110,.09)}
+  .consent{display:grid;grid-template-columns:15px 1fr;gap:9px;align-items:start;cursor:pointer;max-width:56ch}
+  .consent input{position:absolute;opacity:0;width:0;height:0}
+  .consent > span:first-of-type{width:14px;height:14px;border:1px solid var(--warm);border-radius:2px;margin-top:2px;
+        print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .consent input:checked + span{background:var(--gold-deep);border-color:var(--gold-deep);
+        box-shadow:inset 0 0 0 2px var(--paper)}
+  .consent input:focus-visible + span{outline:2px solid var(--gold-deep);outline-offset:2px}
+  .consent-t{font-size:10.6px;line-height:1.5;color:var(--text)}
+  .bar.done{background:#1B4332;justify-content:space-between;align-items:center}
+  .done-in{flex:1;min-width:0}
+  .done-t{font-family:var(--sans);font-size:12.5px;font-weight:700;color:#B7E4C7;letter-spacing:.3px}
+  .done-s{font-family:var(--sans);font-size:10px;color:#8FBFA5;margin-top:2px}
+  .bar-btn[disabled]{opacity:.55;cursor:default}
+  @media print{ .no-print{display:none !important} .wr{border-bottom:1px solid #B9B1A8}
+                .sign-clear,.signblk .consent{display:none} }
   @media (max-width:640px){ .prep{margin:0} .wr{max-width:100%} }
 </style>
 
+<!-- ENTITY:START -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://yksproductions.com/#business",
+      "name": "YKS Productions",
+      "alternateName": "Yedukrishna Suresh — Photography & Films",
+      "description": "Cinematic photography, videography and content creation — fashion, weddings, brand films and commercial shoots across India and the UAE.",
+      "url": "https://yksproductions.com/",
+      "logo": "https://yksproductions.com/assets/og-cover.jpg",
+      "image": "https://yksproductions.com/assets/og-cover.jpg",
+      "sameAs": [
+        "https://www.instagram.com/yks_photoworks",
+        "https://www.behance.net/yedusuresha14c",
+        "https://www.behance.net/ysuresh634f0a1",
+        "https://linktr.ee/yksproductions"
+      ],
+      "areaServed": [
+        {
+          "@type": "Country",
+          "name": "India"
+        },
+        {
+          "@type": "Country",
+          "name": "United Arab Emirates"
+        },
+        {
+          "@type": "City",
+          "name": "Dubai",
+          "containedInPlace": {
+            "@type": "Country",
+            "name": "United Arab Emirates"
+          }
+        },
+        {
+          "@type": "City",
+          "name": "Abu Dhabi",
+          "containedInPlace": {
+            "@type": "Country",
+            "name": "United Arab Emirates"
+          }
+        },
+        {
+          "@type": "City",
+          "name": "Mumbai",
+          "containedInPlace": {
+            "@type": "Country",
+            "name": "India"
+          }
+        },
+        {
+          "@type": "City",
+          "name": "Bangalore",
+          "containedInPlace": {
+            "@type": "Country",
+            "name": "India"
+          }
+        }
+      ],
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": "+971-50-195-5122",
+          "contactType": "customer service",
+          "areaServed": "AE",
+          "availableLanguage": [
+            "English",
+            "Hindi",
+            "Malayalam"
+          ]
+        },
+        {
+          "@type": "ContactPoint",
+          "telephone": "+91-9746679720",
+          "contactType": "customer service",
+          "areaServed": "IN",
+          "availableLanguage": [
+            "English",
+            "Hindi",
+            "Malayalam",
+            "Kannada"
+          ]
+        }
+      ],
+      "founder": {
+        "@id": "https://yksproductions.com/#yedukrishna"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://yksproductions.com/#yedukrishna",
+      "name": "Yedukrishna Suresh",
+      "jobTitle": [
+        "Photographer",
+        "Videographer",
+        "Cinematographer",
+        "Founder, YKS Productions"
+      ],
+      "hasOccupation": [
+        {
+          "@type": "Occupation",
+          "name": "Cinematographer"
+        },
+        {
+          "@type": "Occupation",
+          "name": "Still Photographer"
+        },
+        {
+          "@type": "Occupation",
+          "name": "Videographer"
+        }
+      ],
+      "image": "https://yksproductions.com/assets/yedu-portrait-2.jpg",
+      "url": "https://yksproductions.com/",
+      "sameAs": [
+        "https://www.instagram.com/yks_photoworks",
+        "https://www.behance.net/yedusuresha14c",
+        "https://www.behance.net/ysuresh634f0a1",
+        "https://linktr.ee/yksproductions"
+      ],
+      "worksFor": {
+        "@id": "https://yksproductions.com/#business"
+      },
+      "knowsLanguage": [
+        "English",
+        "Malayalam",
+        "Hindi"
+      ],
+      "workLocation": [
+        {
+          "@type": "Place",
+          "name": "Dubai, United Arab Emirates"
+        },
+        {
+          "@type": "Place",
+          "name": "Abu Dhabi, United Arab Emirates"
+        },
+        {
+          "@type": "Place",
+          "name": "Bangalore, Karnataka, India"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<!-- ENTITY:END -->
 </head>
 <body>
 
@@ -195,8 +370,7 @@
       <div class="badge">Creator<br>Agreement</div>
     </div>
     <div class="mast-contact">
-      yksproductions.com &middot; @yks_photoworks &middot; +91 97466 79720<br>
-      Udyam Reg. No. UDYAM-KL-01-0041092 &middot; Registered Micro Enterprise, Ministry of MSME, Govt. of India
+      yksproductions.com &middot; @yks_photoworks &middot; +91 97466 79720 &middot; yksproductions893@gmail.com
     </div>
   </div>
   <div class="rule-gold"></div>
@@ -249,18 +423,18 @@
 
     <div class="eyebrow" style="margin-top:18px">And just as importantly &mdash; what this is not</div>
     <div class="nots">
-      <div class="not"><b>Not exclusive.</b> You can work with other agencies, other managers, and direct
-        with brands. You are not locked to me.</div>
+      <div class="not"><b>Exclusive is your choice.</b> Sign non-exclusive and work with
+        anyone. Or go exclusive and get pitched first. You pick, in Schedule A.</div>
       <div class="not"><b>You pay me nothing.</b> No joining fee, no monthly fee, no commission,
         no cut of your earnings. I'm paid by the brand, never by you.</div>
-      <div class="not"><b>Not a guarantee of work.</b> I can promise effort and process. Nobody can honestly
-        promise bookings, and I won't.</div>
+      <div class="not"><b>Visibility, not signings.</b> I promise to get you seen and to run it
+        all properly. Nobody can honestly promise a brand says yes, and I won't.</div>
       <div class="not"><b>No obligation to say yes.</b> Any brief, any category, any brand &mdash; you can
         decline it with no penalty and no explanation owed.</div>
       <div class="not"><b>I don't own your content.</b> Your videos, your photos, your accounts stay yours.
         Brands get only the usage you agreed to, for the time you agreed to.</div>
-      <div class="not"><b>Not a lock-in.</b> Thirty days' notice in writing and we're done, cleanly, with
-        anything already booked seen through.</div>
+      <div class="not"><b>No notice period.</b> One email saying you're out and it's over that
+        day. Anything already booked still gets finished, and still gets paid.</div>
     </div>
 
     <div class="callout">
@@ -279,26 +453,27 @@
     <div class="doc-title">INFLUENCER REPRESENTATION &amp; MANAGEMENT AGREEMENT</div>
     <div class="doc-sub">Non-Exclusive &middot; India</div>
 
-    <div class="flag" style="margin-top:14px">
-      <b>DRAFT FOR REVIEW.</b> This template is drafted to read as a proper legal instrument and cites Indian
-      statute so that it holds up as one. Citation is not legal advice. Every bracketed item [ ] and every
-      red flag below must be settled &mdash; and the statutory references verified &mdash; with a qualified
-      Indian advocate before this is stamped, signed or issued to a creator.
-    </div>
 
     <p class="recital">
       This Influencer Representation &amp; Management Agreement (this &ldquo;<b>Agreement</b>&rdquo;) is made on
-      <input class="wr wr-s" id="f16" type="text" autocomplete="off"> (the &ldquo;<b>Effective Date</b>&rdquo;) and is governed by and constituted under the
+      <input class="wr wr-s" id="f25" type="text" autocomplete="off"> (the &ldquo;<b>Effective Date</b>&rdquo;) and is governed by and constituted under the
       Indian Contract Act, 1872.
+    </p>
+
+    <p class="recital">
+      <b>BACKGROUND.</b> YKS Productions is a production house working in brand films, fashion and campaign
+      photography and cinematography across Bangalore and Dubai. It has recently opened a talent division,
+      through which it lists, represents and actively pitches creators, models and actors to brands. The
+      Creator wishes to be represented by YKS on that basis, and YKS is willing to represent them on the
+      terms below.
     </p>
 
     <p class="recital"><b>BETWEEN:</b></p>
     <p class="party">
-      <b>YKS Productions</b>, a sole proprietorship operated by Mr. Yedukrishna Suresh, registered as a Micro
-      Enterprise under the Micro, Small and Medium Enterprises Development Act, 2006 (Udyam Reg. No.
-      UDYAM-KL-01-0041092), having its principal place of business at
-      <input class="wr wr-s" id="f17" type="text" autocomplete="off">, India (&ldquo;<b>YKS</b>&rdquo;, &ldquo;we&rdquo;,
-      &ldquo;us&rdquo;); and
+      <b>YKS Productions</b>, a sole proprietorship operated by Mr. Yedukrishna Suresh, having its principal
+      place of business at <input class="wr wr-s" id="f26" type="text" autocomplete="off">, Bangalore, Karnataka, India, and
+      contactable at <b>yksproductions893@gmail.com</b> and <b>+91 97466 79720</b>
+      (&ldquo;<b>YKS</b>&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;); and
     </p>
     <p class="party">
       the individual named in <b>Schedule A</b> (the &ldquo;<b>Creator</b>&rdquo;, &ldquo;you&rdquo;), being a
@@ -312,7 +487,7 @@
     </p>
 
     <h2 class="sec"><span>1</span>Definitions</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>These are just the words the rest of the document uses, so nothing is ambiguous later. You can skip this page and come back to it if a term ever confuses you.</p></div>
+    <div class="plain"><span class="lab">In plain words</span><p>Just the vocabulary the rest of the document uses. Skip it, and come back if a word ever confuses you.</p></div>
     <div class="cl"><div class="num">1.1</div><div class="txt"><b>&ldquo;Brand&rdquo;</b> means any brand, agency, producer, publication, platform or other person that engages, or is approached to engage, the Creator for a Campaign.</div></div>
     <div class="cl"><div class="num">1.2</div><div class="txt"><b>&ldquo;Campaign&rdquo;</b> means any paid or unpaid collaboration, endorsement, shoot, appearance, event, ambassadorship or content engagement between the Creator and a Brand.</div></div>
     <div class="cl"><div class="num">1.3</div><div class="txt"><b>&ldquo;Sourced Deal&rdquo;</b> means a Campaign with a Brand that YKS introduced to the Creator, or that came to the Creator through YKS's roster, outreach or referral.</div></div>
@@ -327,22 +502,30 @@
     <div class="cl"><div class="num">1.12</div><div class="txt">References to a statute are to that statute as amended, re-enacted or replaced from time to time. &ldquo;In writing&rdquo; includes email and WhatsApp message from the addresses and numbers in Schedule A.</div></div>
 
     <h2 class="sec"><span>2</span>Nature of the Relationship</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>You are not tied to me. Work with other agencies, other managers, direct with brands &mdash; all of it is fine, and none of it is a breach of anything. I also can't commit you to a job without asking you first: I can talk to a brand all day, but until you say yes in writing, there is no deal.</p></div>
+    <div class="plain"><span class="lab">In plain words</span><p>There are two ways to sign this, and you pick. <b>Non-exclusive</b> is the default: you work with other agencies, other managers, direct with brands, whatever you like, and none of it breaches anything. <b>Exclusive</b> means brand work goes through me for the year &mdash; and in return you go to the front of the queue: pitched first, offered the good briefs first, featured on the roster. Either way, I can talk to a brand all day but I cannot commit you to anything until you say yes.</p></div>
     <div class="cl"><div class="num">2.1</div><div class="txt"><b>Non-exclusive, both ways.</b> This Agreement is non-exclusive. The Creator remains entirely free to work with other agencies, other managers, and directly with Brands, and to accept work from any source, subject only to Clause 12 (Continuing Commission). YKS is likewise free to represent other creators, including in the Creator's category.</div></div>
     <div class="cl"><div class="num">2.2</div><div class="txt"><b>No restraint of trade.</b> Nothing in this Agreement restrains the Creator from exercising a lawful profession, trade or business, and this Agreement is not to be read as creating any such restraint, which would be void under Section 27 of the Indian Contract Act, 1872.</div></div>
     <div class="cl"><div class="num">2.3</div><div class="txt"><b>Independent parties.</b> Each Party is an independent principal. This Agreement creates no relationship of employer and employee, no partnership under the Indian Partnership Act, 1932, no joint venture, and no agency under Chapter X of the Indian Contract Act, 1872 beyond the limited authority expressly granted in Clause 2.4. The Creator is not an employee of YKS and is entitled to no employment benefit.</div></div>
     <div class="cl"><div class="num">2.4</div><div class="txt"><b>Limited authority.</b> YKS may approach Brands, present the Creator, negotiate commercial terms and correspond on the Creator's behalf. YKS may <em>not</em> bind the Creator to any Campaign, and may not confirm a Campaign to a Brand, without the Creator's prior confirmation in writing of the fee, deliverables, usage and dates. Once the Creator so confirms, that confirmation is binding on the Creator under Clause 10.</div></div>
     <div class="cl"><div class="num">2.5</div><div class="txt"><b>No guarantee of work.</b> YKS is under no obligation to obtain any minimum number of Campaigns, or any Campaign at all. Representation is a commitment of effort and process, not of income.</div></div>
     <div class="cl"><div class="num">2.6</div><div class="txt"><b>The Creator pays YKS nothing.</b> YKS charges the Creator no joining fee, registration fee, roster fee, portfolio fee, subscription, retainer or commission, and deducts nothing from any amount the Creator earns &mdash; at any time, on any Campaign, from any source. YKS's entire remuneration for representation is the YKS Margin, which is borne by the Brand. The only sum the Creator can ever owe YKS is the retainer under Schedule B, if and only if the Creator separately elects that optional service.</div></div>
+<div class="cl"><div class="num">2.7</div><div class="txt"><b>Two tiers of representation.</b> Schedule A records which tier applies:
+      <span class="sub"><b>Non-Exclusive</b> (the default) &mdash; as set out in Clause 2.1. The Creator gives up nothing.</span>
+      <span class="sub"><b>Exclusive</b> &mdash; elected in writing in Schedule A. For the Term, the Creator agrees that Brand collaborations are arranged through YKS, and will route approaches from Brands to YKS rather than negotiating them independently. This applies only while this Agreement is in force; it ends the moment the Agreement ends, and no exclusivity of any kind survives termination.</span></div></div>
+    <div class="cl"><div class="num">2.8</div><div class="txt"><b>What Exclusive buys.</b> Where the Exclusive tier is elected, YKS will: place the Creator first in the pitching order for their category; offer them first refusal on suitable briefs before other creators on the roster are offered them; and give them featured placement on the roster. These are priorities in how YKS allocates its effort; they are not service levels, response times or reporting obligations, and none of them is guaranteed to produce a Campaign. The Creator acknowledges that YKS weights its outreach effort toward Exclusive creators, and that a Non-Exclusive creator is therefore not promised equal pitch volume, placement or priority. Neither tier is a guarantee of work under Clause 2.5.</div></div>
+    <div class="cl"><div class="num">2.9</div><div class="txt"><b>YKS may pause or step away.</b> Representation is offered, not acquired. YKS may pause pitching the Creator, decline to pitch them to a particular Brand or category, or remove them from the roster, at its own discretion &mdash; including for capacity, category conflict with another represented creator, Brand feedback, or conduct under Clause 25 &mdash; on written notice to the Creator and without liability for doing so.</div></div>
+    
 
     <h2 class="sec"><span>3</span>What YKS Provides</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>This is what I'm actually promising to do. Not “we'll see what comes in” &mdash; put you somewhere brands can find you, pitch you out continuously, and then run the boring, unglamorous half: the emails, the scheduling, the invoice, the chasing.</p></div>
+    <div class="plain"><span class="lab">In plain words</span><p>This is what I'm actually promising to do &mdash; and it is <b>visibility, not signings</b>. I put you where brands can find you, I pitch you out continuously, and I run the boring half nobody sees: the emails, the scheduling, the invoice, the chasing. How I pitch you &mdash; which brands, which order, how often, how I frame it &mdash; is my call, because that's the craft I'm bringing. What I cannot do is commit you to anything without you.</p></div>
     <div class="cl"><div class="num">3.1</div><div class="txt"><b>Roster listing and discoverability.</b> YKS will list the Creator on its talents roster and maintain a profile optimised for search and category discovery, so that Brands searching the Creator's category can find them. The Creator's private contact details will not be published; enquiries are routed through YKS.</div></div>
     <div class="cl"><div class="num">3.2</div><div class="txt"><b>Active outreach.</b> YKS operates an automated and AI-assisted outreach system which pitches creator profiles to relevant Brands. YKS will include the Creator in that outreach for the Term. YKS warrants that it will not misstate the Creator's follower counts, engagement figures, rates, past clients or past work in any pitch, and will present only information the Creator has supplied or that is publicly visible on the Channels.</div></div>
     <div class="cl"><div class="num">3.3</div><div class="txt"><b>Deal management.</b> For every Managed Deal, YKS will: negotiate and agree the commercial terms; record them under Clause 10; coordinate scheduling, briefs, approvals and delivery; raise and follow up the invoice; chase payment; and remit or collect under Clause 7.</div></div>
     <div class="cl"><div class="num">3.4</div><div class="txt"><b>Social media management (optional).</b> If, and only if, Schedule B is completed and signed, YKS will additionally manage the Creator's Channels on the terms of that Schedule. Schedule B is a separate paid service and is not part of representation.</div></div>
     <div class="cl"><div class="num">3.5</div><div class="txt"><b>What YKS does not do.</b> YKS does not own, control or acquire any interest in the Channels or in Creator Content; will not post to, or alter, the Channels except as expressly permitted under Schedule B; and does not act as guarantor of any Brand's payment except where Clause 7.6 applies.</div></div>
-
+<div class="cl"><div class="num">3.6</div><div class="txt"><b>How the Creator is pitched is YKS's decision.</b> The Creator authorises YKS, for the Term, to use their profile, publicly posted content, media kit and metrics to pitch and present them to Brands at YKS's own discretion &mdash; including which Brands and categories to approach, the order and frequency of approaches, how the Creator is positioned and framed, which work is shown, which campaigns they are proposed for, and whether to approach a given Brand at all. YKS need not seek the Creator's approval before making a pitch, need not disclose its outreach list or Brand contacts, and a pitch creates no commitment on either side.</div></div>
+    <div class="cl"><div class="num">3.7</div><div class="txt"><b>The limits on that discretion.</b> Clause 3.6 is subject to, and only to: the excluded categories in Schedule A (Clause 4.3); the accuracy warranty in Clause 3.2; the requirement of the Creator's consent before any commitment (Clauses 2.4 and 22); the restricted sectors in Clause 9.4; and the requirement that nothing be presented unlawfully or in a manner defamatory of the Creator. Within those limits the Creator will not object to, or require withdrawal of, a pitch already made.</div></div>
+    
     <h2 class="sec"><span>4</span>Rates and Boundaries</h2>
     <div class="plain"><span class="lab">In plain words</span><p>Your rate is your rate. I won't quietly undercut it to close something faster, and I won't put you in front of a category you told me you don't do. And any single job &mdash; you can just say no. You don't owe me a reason.</p></div>
     <div class="cl"><div class="num">4.1</div><div class="txt">The Creator's rate card and rate floor are set out in Schedule A. YKS will not quote a Brand a Creator Fee below the floor in Schedule A without the Creator's prior written consent.</div></div>
@@ -371,34 +554,32 @@
     <div class="cl"><div class="num">6.8</div><div class="txt"><b>Cancellation and kill fees.</b> Any cancellation or kill fee YKS agrees with the Brand for a Managed Deal is passed to the Creator in the same proportion as the Creator Fee bore to the Gross Fee. Where the Creator cancels a confirmed Campaign other than for genuine illness or emergency, the Creator is responsible for any cancellation cost the Brand recovers, and repeated cancellations are a material breach entitling YKS to compensation under Section 73 of the Indian Contract Act, 1872.</div></div>
 
     <h2 class="sec"><span>7</span>How the Money Moves</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>This is the part that usually goes wrong at other agencies, so read it. Money either comes to me and goes straight out to you within seven working days, or the brand pays you directly and pays me separately &mdash; your call. If a brand goes quiet, I chase them. I'm honest about this: I can't magic money out of a brand that won't pay, unless I've given you a guaranteed date in writing &mdash; and if I have, you get paid on that date whether they've paid me or not.</p></div>
+    <div class="plain"><span class="lab">In plain words</span><p>The part that usually goes wrong elsewhere, so read it. Either the money comes to me and goes out to you within seven working days, or the brand pays you directly and pays me separately &mdash; your call. If a brand goes quiet, I chase. But I can't magic money out of a brand that won't pay, unless I've given you a guaranteed date in writing &mdash; and if I have, you're paid on that date whether they've paid me or not.</p></div>
     <div class="cl"><div class="num">7.1</div><div class="txt"><b>Payment route.</b> The Parties elect in Schedule A one of the two routes below. The route may be varied for an individual Campaign by written agreement.</div></div>
-    <div class="cl"><div class="num">7.2</div><div class="txt"><b>Route 1 &mdash; collection by YKS.</b> The Brand pays YKS the Gross Fee. YKS pays the Creator the <em>full</em> Creator Fee by bank transfer within <b>[seven (7)] business days</b> of receiving cleared funds, and will send a written statement showing the amount received attributable to the Creator, any statutory deduction under Clause 7.7 with its reason, and the amount remitted. No other deduction appears on that statement, because there is none.</div></div>
+    <div class="cl"><div class="num">7.2</div><div class="txt"><b>Route 1 &mdash; collection by YKS.</b> The Brand pays YKS the Gross Fee. YKS pays the Creator the <em>full</em> Creator Fee by bank transfer within <b><span class="tv" data-tv="pay" data-unit="business days">seven (7)</span> business days</b> of receiving cleared funds, and will send a written statement showing the amount received attributable to the Creator, any statutory deduction under Clause 7.7 with its reason, and the amount remitted. No other deduction appears on that statement, because there is none.</div></div>
     <div class="cl"><div class="num">7.3</div><div class="txt"><b>Route 2 &mdash; split payment.</b> The Brand pays the Creator Fee directly to the Creator, and pays the YKS Margin directly to YKS against YKS's own invoice to the Brand. The Creator will notify YKS within <b>[three (3)] business days</b> of receiving their funds. The Creator never invoices, collects or remits YKS's Margin, and owes YKS nothing if the Brand fails to pay YKS's share.</div></div>
     <div class="cl"><div class="num">7.4</div><div class="txt"><b>Client money.</b> Where Route 1 applies, amounts received from a Brand that are attributable to the Creator are received by YKS for the Creator's account, are not YKS's income, will be held for the Creator, and will not be applied to any other purpose.</div></div>
     <div class="cl"><div class="num">7.5</div><div class="txt"><b>Brand default.</b> YKS will pursue overdue Brand payments diligently, including written demand and escalation. YKS is not, however, a guarantor of any Brand's payment and is not obliged to pay the Creator for a Campaign the Brand has not paid for, save under Clause 7.6.</div></div>
     <div class="cl"><div class="num">7.6</div><div class="txt"><b>Guaranteed pay dates.</b> Where YKS expressly gives the Creator a <em>guaranteed pay date</em> in writing for a Campaign, YKS will pay the Creator on that date whether or not the Brand has paid, and will be subrogated to the Creator's claim against the Brand for that amount. Absent those express words, no guarantee arises.</div></div>
     <div class="cl"><div class="num">7.7</div><div class="txt"><b>Taxes.</b> Each Party is responsible for its own taxes. Payments may be subject to deduction of tax at source under the Income-tax Act, 1961 (including Sections 194C, 194J and 194H as applicable), and the Creator will provide their PAN &mdash; failing which deduction at the higher rate under Section 206AA applies. Goods and Services Tax under the Central and State GST Acts, 2017 applies where either Party is registered and liable. Each Party will pass on the relevant TDS certificate (Form 16A) it receives or issues.</div></div>
-    <div class="flag"><b>⚠ SETTLE BEFORE SIGNING &mdash; Route 1 has a GST consequence.</b> If Brand money for Campaigns flows through the YKS account, the full Gross Fee &mdash; not just YKS's margin &mdash; may count toward YKS's aggregate turnover for the ₹20 lakh GST registration threshold, unless YKS is properly documented as a <em>pure agent</em> under Rule 33 of the CGST Rules, 2017. Route 2 avoids this entirely. Confirm the position with a CA before electing Route 1 as the default in Schedule A, and get the pure-agent wording right if Route 1 is used.</div>
 
     <h2 class="sec"><span>8</span>Content, Ownership and Usage</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>Your videos, your photos, your accounts &mdash; yours. I don't own them, and signing this doesn't hand them to anyone. A brand gets exactly the usage you agreed to, for exactly as long as you agreed to it. If they want to run your face as a paid ad, that is a separate yes and a separate cheque, every time.</p></div>
+    <div class="plain"><span class="lab">In plain words</span><p>Your videos, your photos, your accounts &mdash; yours. Signing this hands them to nobody. A brand gets exactly the usage you agreed, for exactly as long as you agreed. If they want to run your face as a paid ad, that's a separate yes and a separate cheque, every time.</p></div>
     <div class="cl"><div class="num">8.1</div><div class="txt"><b>The Creator owns their work.</b> The Creator is the first owner of the copyright in Creator Content under Section 17 of the Copyright Act, 1957, and owns the Channels. Nothing in this Agreement transfers or assigns that ownership to YKS or to any Brand.</div></div>
     <div class="cl"><div class="num">8.2</div><div class="txt"><b>Brand usage is only what was agreed.</b> A Brand receives only the licence recorded for that Campaign under Clause 10 &mdash; specified as to media, territory, duration and whether it includes paid media. Any use beyond it requires a fresh licence and a fresh fee. Perpetual, worldwide, all-media usage will not be granted without the Creator's express written consent and a fee agreed for it.</div></div>
-    <div class="cl"><div class="num">8.3</div><div class="txt"><b>Paid amplification and whitelisting.</b> A Brand running the Creator's content as paid media, or running ads from or through the Creator's handle (including Meta Partnership Ads, Instagram branded-content ads, TikTok Spark Ads or equivalent), requires the Creator's separate written consent, a defined flight period, and a separate agreed fee. Handle-level advertising access, once granted, will be revoked at the end of the flight period.</div></div>
+    <div class="cl" data-cat="influencer"><div class="num">8.3</div><div class="txt"><b>Paid amplification and whitelisting.</b> A Brand running the Creator's content as paid media, or running ads from or through the Creator's handle (including Meta Partnership Ads, Instagram branded-content ads, TikTok Spark Ads or equivalent), requires the Creator's separate written consent, a defined flight period, and a separate agreed fee. Handle-level advertising access, once granted, will be revoked at the end of the flight period.</div></div>
     <div class="cl"><div class="num">8.4</div><div class="txt"><b>Licence to YKS &mdash; representation only.</b> The Creator grants YKS a non-exclusive, royalty-free, worldwide licence, for the Term and the tail period in Clause 8.6, to use the Creator's name, handle, publicly posted content, media kit, portfolio and performance metrics solely to: (a) build and maintain the Creator's roster profile; (b) present the Creator to prospective Brands under Clauses 3.1 and 3.2; and (c) refer to the Creator as a represented creator in YKS's own promotional material. This licence does not permit YKS to sell, sub-licence or commercially exploit Creator Content, and it terminates for all forward-looking use on termination.</div></div>
     <div class="cl"><div class="num">8.5</div><div class="txt"><b>Integrity of the work.</b> YKS will not remove, crop out or obscure the Creator's watermark or credit, will not materially alter Creator Content, and will not present it in a defamatory, obscene or unlawful context, or in any context unlawful under Section 294 of the Bharatiya Nyaya Sanhita, 2023.</div></div>
-    <div class="cl"><div class="num">8.6</div><div class="txt"><b>Tail.</b> Material already published or in circulation before termination may remain in place for <b>[six (6)]</b> months after termination, and archival copies may be retained indefinitely as a record of work done. Case-study use after termination requires the Creator's consent, not to be unreasonably withheld.</div></div>
+    <div class="cl"><div class="num">8.6</div><div class="txt"><b>Tail.</b> Material already published or in circulation before termination may remain in place for <b><span class="tv" data-tv="utail" data-unit="months">six (6)</span></b> months after termination, and archival copies may be retained indefinitely as a record of work done. Case-study use after termination requires the Creator's consent, not to be unreasonably withheld.</div></div>
     <div class="cl"><div class="num">8.7</div><div class="txt"><b>Moral rights.</b> Nothing in this Clause affects the Creator's author's special rights under Section 57 of the Copyright Act, 1957, or their Personality Rights.</div></div>
 
-    <h2 class="sec"><span>9</span>Advertising Law, Disclosure and Endorsement</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>This section protects you more than it protects me. Under Indian law the penalties for a misleading endorsement can land on <em>you</em>, personally &mdash; not just on the brand. So: always label the ad properly, never endorse something you haven't actually used, and never repeat a claim you think is rubbish. If a brand pushes, that's my conversation to have, not yours.</p></div>
-    <div class="cl"><div class="num">9.1</div><div class="txt"><b>Disclosure is mandatory.</b> Every Campaign post is an advertisement and must carry a disclosure label in accordance with the ASCI Guidelines for Influencer Advertising in Digital Media. The label must be upfront and prominent, on the content itself and not only in a comment, bio or link; in the same language as the post; superimposed and legible for long enough to be noticed in video; and repeated periodically in a live stream. YKS will pass on the Brand's disclosure requirements; the Creator is responsible for the label actually appearing.</div></div>
-    <div class="cl"><div class="num">9.2</div><div class="txt"><b>Endorser due diligence.</b> Under the Consumer Protection Act, 2019 and the Guidelines for Prevention of Misleading Advertisements and Endorsements for Misleading Advertisements, 2022, an endorser must have actually used or experienced the product or service, and must have exercised due diligence on the claims made. The Creator will not endorse a product they have not used, and will not repeat a claim they have reason to believe is untrue. The Creator acknowledges that penalties under that Act can attach to the endorser personally, including a ban on making endorsements.</div></div>
-    <div class="cl"><div class="num">9.3</div><div class="txt"><b>Right to refuse a claim.</b> The Creator may refuse to say anything they believe to be false, misleading or unsafe, and may require the Brand to substantiate a claim, without that refusal being a breach of this Agreement or of the Campaign.</div></div>
-    <div class="cl"><div class="num">9.4</div><div class="txt"><b>Restricted sectors.</b> Campaigns in regulated or restricted categories &mdash; including alcohol and surrogate advertising, tobacco, real-money gaming and betting, health, medical, nutraceutical, financial and virtual-digital-asset products &mdash; carry additional statutory and ASCI requirements. YKS will not pitch the Creator into these categories without asking first, and the Creator may decline any of them outright in Schedule A.</div></div>
-    <div class="cl"><div class="num">9.5</div><div class="txt"><b>Platform rules.</b> The Creator will use the platform's own paid-partnership or branded-content tool where the platform requires it, in addition to the disclosure under Clause 9.1.</div></div>
-    <div class="flag"><b>⚠ Lawyer to review:</b> ASCI guidance and the CCPA endorsement guidelines are updated periodically, and the influencer-specific due-diligence and health/finance-sector rules have tightened since 2023. Have current text confirmed before this is issued, and re-check annually.</div>
+    <h2 class="sec" data-cat="influencer"><span>9</span>Advertising Law, Disclosure and Endorsement</h2>
+    <div class="plain" data-cat="influencer"><span class="lab">In plain words</span><p>This one protects you more than me. Under Indian law the penalty for a misleading endorsement can land on <em>you</em>, personally &mdash; not just the brand. So label every ad properly, never endorse something you haven't used, and never repeat a claim you think is rubbish. If a brand pushes back, that's my conversation, not yours.</p></div>
+    <div class="cl" data-cat="influencer"><div class="num">9.1</div><div class="txt"><b>Disclosure is mandatory.</b> Every Campaign post is an advertisement and must carry a disclosure label in accordance with the ASCI Guidelines for Influencer Advertising in Digital Media. The label must be upfront and prominent, on the content itself and not only in a comment, bio or link; in the same language as the post; superimposed and legible for long enough to be noticed in video; and repeated periodically in a live stream. YKS will pass on the Brand's disclosure requirements; the Creator is responsible for the label actually appearing.</div></div>
+    <div class="cl" data-cat="influencer"><div class="num">9.2</div><div class="txt"><b>Endorser due diligence.</b> Under the Consumer Protection Act, 2019 and the Guidelines for Prevention of Misleading Advertisements and Endorsements for Misleading Advertisements, 2022, an endorser must have actually used or experienced the product or service, and must have exercised due diligence on the claims made. The Creator will not endorse a product they have not used, and will not repeat a claim they have reason to believe is untrue. The Creator acknowledges that penalties under that Act can attach to the endorser personally, including a ban on making endorsements.</div></div>
+    <div class="cl" data-cat="influencer"><div class="num">9.3</div><div class="txt"><b>Right to refuse a claim.</b> The Creator may refuse to say anything they believe to be false, misleading or unsafe, and may require the Brand to substantiate a claim, without that refusal being a breach of this Agreement or of the Campaign.</div></div>
+    <div class="cl" data-cat="influencer"><div class="num">9.4</div><div class="txt"><b>Restricted sectors.</b> Campaigns in regulated or restricted categories &mdash; including alcohol and surrogate advertising, tobacco, real-money gaming and betting, health, medical, nutraceutical, financial and virtual-digital-asset products &mdash; carry additional statutory and ASCI requirements. YKS will not pitch the Creator into these categories without asking first, and the Creator may decline any of them outright in Schedule A.</div></div>
+    <div class="cl" data-cat="influencer"><div class="num">9.5</div><div class="txt"><b>Platform rules.</b> The Creator will use the platform's own paid-partnership or branded-content tool where the platform requires it, in addition to the disclosure under Clause 9.1.</div></div>
 
     <h2 class="sec"><span>10</span>Confirming a Campaign</h2>
     <div class="plain"><span class="lab">In plain words</span><p>Nothing is a deal until you've seen it written down and said yes. Fee, deliverables, usage, dates, exclusivity &mdash; all of it on one sheet before you commit. No “we'll sort out the details later.”</p></div>
@@ -407,22 +588,21 @@
     <div class="cl"><div class="num">10.3</div><div class="txt">Where the terms of a Schedule C conflict with this Agreement, the Schedule C governs for that Campaign only, save that Clauses 8.1, 9 and 13 may not be varied by a Schedule C.</div></div>
 
     <h2 class="sec"><span>11</span>The Creator's Obligations</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>The other side of it &mdash; what I need from you. Reply in reasonable time, hit the dates you agreed, and be straight with me about your numbers. If your engagement is what it is, I'll pitch what it is. Inflated figures get found out, and it's your name on the account, not mine.</p></div>
+    <div class="plain"><span class="lab">In plain words</span><p>What I need from you. Reply in reasonable time, hit the dates you agreed, and be straight about your numbers &mdash; whatever your engagement is, I'll pitch that. Inflated figures get found out, and it's your name on the account.</p></div>
     <div class="cl"><div class="num">11.1</div><div class="txt">The Creator will: respond to Campaign offers within a reasonable time; meet agreed deadlines; submit drafts for approval where the Campaign requires it; not publish before the agreed go-live date; keep agreed category exclusivity for its agreed duration; and conduct themselves professionally with Brands and on set.</div></div>
-    <div class="cl"><div class="num">11.2</div><div class="txt">The Creator warrants that all information they give YKS &mdash; including follower counts, engagement figures, audience data, rate card and past clients &mdash; is true, and that they have not artificially inflated any metric through purchased followers, engagement or views.</div></div>
+    <div class="cl" data-cat="influencer"><div class="num">11.2</div><div class="txt">The Creator warrants that all information they give YKS &mdash; including follower counts, engagement figures, audience data, rate card and past clients &mdash; is true, and that they have not artificially inflated any metric through purchased followers, engagement or views.</div></div>
     <div class="cl"><div class="num">11.3</div><div class="txt">The Creator warrants that they own or are fully entitled to use everything in their content, including music, footage, fonts and third-party material, and that it does not infringe any third party's rights under the Copyright Act, 1957 or otherwise.</div></div>
     <div class="cl"><div class="num">11.4</div><div class="txt">The Creator will not, on a Managed Deal, bypass YKS by negotiating fees directly with the Brand, and will route the Brand's commercial communications on that Campaign to YKS.</div></div>
     <div class="cl"><div class="num">11.5</div><div class="txt">These warranties are continuing, and the Creator will notify YKS promptly of any change.</div></div>
 
     <h2 class="sec"><span>12</span>Continuing Commission on Introduced Brands</h2>
     <div class="plain"><span class="lab">In plain words</span><p>The only thing I ask in return for an introduction. If I bring you a brand and they come back for more, tell me &mdash; let me run it, so I get paid by them for the door I opened. It doesn't cost you a rupee and it doesn't stop you working with them. Just don't take the introduction and cut me out of it.</p></div>
-    <div class="cl"><div class="num">12.1</div><div class="txt">Where YKS introduced a Brand to the Creator, then for <b>[six (6)] months</b> after the last Managed Deal with that Brand, the Creator will tell YKS about any further approach from that Brand and will let YKS handle it as a Managed Deal, so that YKS can be paid its Margin by the Brand in the ordinary way. The Creator's own fee is unaffected, and the Creator still pays YKS nothing.</div></div>
+    <div class="cl"><div class="num">12.1</div><div class="txt">Where YKS introduced a Brand to the Creator, then for <b><span class="tv" data-tv="tail" data-unit="months">six (6)</span> months</b> after the last Managed Deal with that Brand, the Creator will tell YKS about any further approach from that Brand and will let YKS handle it as a Managed Deal, so that YKS can be paid its Margin by the Brand in the ordinary way. The Creator's own fee is unaffected, and the Creator still pays YKS nothing.</div></div>
     <div class="cl"><div class="num">12.2</div><div class="txt">This does <em>not</em> apply to: (a) any Brand listed as a Pre-Existing Brand in Schedule A; (b) any Brand the Creator can show they were already in contact with before YKS's introduction; or (c) any Brand the Creator sources independently. And it is never a bar to the Creator working with that Brand &mdash; if the Creator would rather handle the Brand themselves, they may say so, and their only obligation is to have told YKS first.</div></div>
     <div class="cl"><div class="num">12.3</div><div class="txt">This is a limited and reasonable covenant protecting YKS's introductions and goodwill. It is not a restraint on the exercise of a lawful profession under Section 27 of the Indian Contract Act, 1872: it does not prevent the Creator from working with any Brand, from engaging other agencies, or from working with an introduced Brand, and it imposes no payment on the Creator &mdash; it asks only for notice, and the chance to be paid brand-side, for a limited period.</div></div>
-    <div class="flag"><b>⚠ Lawyer to review:</b> Section 27 voids general restraints of trade. Keep this clause exactly as drafted &mdash; introduced Brands only, limited period, commission not prohibition. Do not add any &ldquo;work only through YKS&rdquo; wording; it would be unenforceable and would jeopardise this clause too.</div>
 
     <h2 class="sec"><span>13</span>Safety, Conduct and Boundaries</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>If anything on a job feels wrong, you leave. You still get paid for what you've already done, you don't need my permission, and you don't need to justify it afterwards. Bring someone with you to any shoot if you'd rather. Nothing intimate, ever, without you saying yes to that specific job in writing.</p></div>
+    <div class="plain"><span class="lab">In plain words</span><p>If anything on a job feels wrong, you leave &mdash; paid for what you've already done, no permission needed, no justification owed. Bring someone with you to any shoot if you'd rather. Nothing intimate, ever, without you saying yes to that specific job in writing.</p></div>
     <div class="cl"><div class="num">13.1</div><div class="txt">YKS will use reasonable efforts to ensure Campaigns are conducted in a safe, professional and respectful environment, consistent with the Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013, and will address any complaint of sexual harassment in the manner that Act requires.</div></div>
     <div class="cl"><div class="num">13.2</div><div class="txt">The Creator may decline or leave any engagement that is unsafe, or that falls outside the boundaries recorded in Schedule A, at any time and without penalty, and will still be paid for work already delivered.</div></div>
     <div class="cl"><div class="num">13.3</div><div class="txt">The Creator may bring a companion to any shoot or location engagement, at their own cost unless otherwise agreed.</div></div>
@@ -438,36 +618,37 @@
 
     <h2 class="sec"><span>15</span>Confidentiality</h2>
     <div class="plain"><span class="lab">In plain words</span><p>What you're paid stays between us. I won't tell another creator, and I won't use your rate to squeeze someone else's.</p></div>
-    <div class="cl"><div class="num">15.1</div><div class="txt">Each Party will keep confidential the other's non-public information &mdash; including Brand identities, rates, margins, commission terms, negotiation positions and the contents of any Schedule C &mdash; and will not disclose or use it except to perform this Agreement or as required by law. This obligation survives termination by <b>[two (2)] years</b>.</div></div>
+    <div class="cl"><div class="num">15.1</div><div class="txt">Each Party will keep confidential the other's non-public information &mdash; including Brand identities, rates, margins, commission terms, negotiation positions and the contents of any Schedule C &mdash; and will not disclose or use it except to perform this Agreement or as required by law. This obligation survives termination by <b><span class="tv" data-tv="conf" data-unit="years">two (2)</span> years</b>.</div></div>
     <div class="cl"><div class="num">15.2</div><div class="txt">Neither Party will disclose the terms of a Campaign to another Brand, another creator, or publicly, without the other's consent.</div></div>
 
     <h2 class="sec"><span>16</span>Indemnity and Liability</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>The fair-is-fair section. If something goes wrong because of what I did, that's on me. If it goes wrong because of something you told me that wasn't true, that's on you. I'm not liable for a brand going bust or for a reel underperforming &mdash; nobody can control an algorithm.</p></div>
+    <div class="plain"><span class="lab">In plain words</span><p>Fair is fair. If something goes wrong because of me, that's on me. If it goes wrong because of something you told me that wasn't true, that's on you. I'm not liable for a brand going bust or a reel underperforming &mdash; nobody controls an algorithm.</p></div>
     <div class="cl"><div class="num">16.1</div><div class="txt">The Creator indemnifies YKS (a contract of indemnity within Sections 124&ndash;125 of the Indian Contract Act, 1872) against loss, damage, claims and reasonable costs arising from: (a) breach of the warranties in Clause 11; (b) any claim that Creator Content infringes a third party's rights; (c) failure to make a disclosure required by Clause 9.1; or (d) the Creator's wilful misconduct.</div></div>
     <div class="cl"><div class="num">16.2</div><div class="txt">YKS indemnifies the Creator against loss, damage, claims and reasonable costs arising from: (a) YKS's breach of this Agreement; (b) any misrepresentation by YKS of the Creator's metrics, rates or work in breach of Clause 3.2; or (c) YKS's gross negligence or wilful misconduct.</div></div>
     <div class="cl"><div class="num">16.3</div><div class="txt">YKS is not liable for the acts, omissions, insolvency or non-payment of any Brand, nor for any failure to obtain Campaigns, nor for any change in platform algorithms, reach or the performance of any post.</div></div>
-    <div class="cl"><div class="num">16.4</div><div class="txt">Neither Party is liable for indirect, special or consequential loss. To the extent permitted by law, YKS's aggregate liability under this Agreement is limited to the total margin and commission it earned on the Creator's Campaigns in the <b>[six (6)]</b> months before the claim. Nothing here excludes liability that cannot lawfully be excluded, including for fraud or for death or personal injury caused by negligence.</div></div>
+    <div class="cl"><div class="num">16.4</div><div class="txt">Neither Party is liable for indirect, special or consequential loss. To the extent permitted by law, YKS's aggregate liability under this Agreement is limited to the total margin and commission it earned on the Creator's Campaigns in the <b><span class="tv" data-tv="cap" data-unit="months">six (6)</span></b> months before the claim. Nothing here excludes liability that cannot lawfully be excluded, including for fraud or for death or personal injury caused by negligence.</div></div>
 
     <h2 class="sec"><span>17</span>Term and Termination</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>How you leave, which matters as much as how you join. Thirty days in writing, that's it &mdash; no exit fee, no argument, no holding your money. Anything already booked gets finished properly and you get paid for it.</p></div>
-    <div class="cl"><div class="num">17.1</div><div class="txt">This Agreement begins on the Effective Date and continues for <b>[twelve (12)] months</b>, renewing automatically for successive twelve-month periods unless terminated.</div></div>
-    <div class="cl"><div class="num">17.2</div><div class="txt">Either Party may terminate at any time on <b>[thirty (30)] days'</b> written notice, for any reason or none. Either Party may terminate immediately on written notice for the other's material breach not remedied within <b>[fifteen (15)] days</b> of written notice of it.</div></div>
-    <div class="cl"><div class="num">17.3</div><div class="txt">On termination: Campaigns already confirmed under Clause 10 will be completed and paid through on the agreed terms unless the Brand cancels; YKS will remit everything owed to the Creator within <b>[seven (7)] business days</b> of receiving cleared funds; the Creator will be removed from the roster and from active outreach within a reasonable time; and the licence in Clause 8.4 ends save for the tail in Clause 8.6.</div></div>
-    <div class="cl"><div class="num">17.4</div><div class="txt">Clauses which by their nature should survive &mdash; including 8.1, 8.6, 8.7, 12, 14, 15, 16, 18 and 19 &mdash; survive termination.</div></div>
+    <div class="plain"><span class="lab">In plain words</span><p>How you leave, which matters as much as how you join. There is <b>no notice period</b> &mdash; you don't owe me thirty days or thirty minutes. Send one email saying you're out and it's done that day. It has to be an email, not a WhatsApp, and that's for your protection as much as mine: it puts a date on it that neither of us can argue about later. No exit fee, no penalty, no holding your money. Anything already booked gets finished properly and you get paid for it.</p></div>
+    <div class="cl"><div class="num">17.1</div><div class="txt">This Agreement begins on the Effective Date and continues for <b><span class="tv" data-tv="term" data-unit="months">twelve (12)</span> months</b>, renewing automatically for successive twelve-month periods unless terminated.</div></div>
+    <div class="cl"><div class="num">17.2</div><div class="txt"><b>Exit at will, by email, with no notice period.</b> Either Party may end this Agreement at any time, for any reason or none, and no notice period applies. To end it, that Party sends a formal email, from and to the email addresses recorded in Schedule A, stating that they are ending this Agreement. Termination takes effect when that email is sent, or on the next business day if sent outside business hours.</div></div>
+    <div class="cl"><div class="num">17.2A</div><div class="txt"><b>Only an email ends it.</b> A WhatsApp or other instant message, a verbal statement, a social media post, going quiet, or simply ceasing to respond does <em>not</em> terminate this Agreement. The email requirement is not a notice period and is not a barrier to leaving &mdash; it exists so that both Parties hold the same dated record of when representation ended, which is what determines who is owed what on Campaigns in progress and when the period in Clause 12 begins to run. Either Party may also terminate immediately for the other's material breach, by the same email route, without any cure period.</div></div>
+    <div class="cl"><div class="num">17.3</div><div class="txt">On termination: Campaigns already confirmed under Clause 10 will be completed and paid through on the agreed terms unless the Brand cancels; YKS will remit everything owed to the Creator within <b><span class="tv" data-tv="pay" data-unit="business days">seven (7)</span> business days</b> of receiving cleared funds; the Creator will be removed from the roster and from active outreach within a reasonable time; and the licence in Clause 8.4 ends save for the tail in Clause 8.6.</div></div>
+    <div class="cl"><div class="num">17.4</div><div class="txt">Clauses which by their nature should survive &mdash; including 8.1, 8.6, 8.7, 12, 14, 15, 16, 18, 19, 23, 24 and 25 &mdash; survive termination.</div></div>
+    <div class="cl"><div class="num">17.5</div><div class="txt"><b>Exclusivity does not survive.</b> Where the Exclusive tier under Clause 2.7 was elected, it ends at the moment of termination. From that moment the Creator is free to work with any Brand, agency or manager, without restriction of any kind, subject only to the notification obligation in Clause 12 for Brands YKS actually introduced.</div></div>
 
     <h2 class="sec"><span>18</span>Remedies and Force Majeure</h2>
     <div class="cl"><div class="num">18.1</div><div class="txt">The Parties acknowledge that a contract for the Creator's personal services is not specifically enforceable under Section 14 of the Specific Relief Act, 1963. The remedy for breach is therefore compensation under Section 73 of the Indian Contract Act, 1872 and, for breach of Clauses 8, 12 and 15, injunctive relief including under Section 42 of the Specific Relief Act, 1963.</div></div>
     <div class="cl"><div class="num">18.2</div><div class="txt">Neither Party is liable for delay or failure caused by events beyond its reasonable control; nothing in this Clause affects the operation of Section 56 of the Indian Contract Act, 1872.</div></div>
 
     <h2 class="sec"><span>19</span>Governing Law and Disputes</h2>
-    <div class="plain"><span class="lab">In plain words</span><p>If we ever fall out, we talk first. Court is a last resort and it's in Bengaluru.</p></div>
+    <div class="plain"><span class="lab">In plain words</span><p>If we ever fall out, we talk first. Court is a last resort and it's in Bangalore.</p></div>
     <div class="cl"><div class="num">19.1</div><div class="txt">This Agreement is governed by and construed in accordance with the laws of India.</div></div>
-    <div class="cl"><div class="num">19.2</div><div class="txt">The Parties will first attempt to resolve any dispute amicably. Failing resolution within <b>[thirty (30)] days</b>, the dispute will be subject to the exclusive jurisdiction of the courts at <b>[Bengaluru]</b>, India; or, if the Parties elect here [&nbsp;&nbsp;], referred to and finally resolved by arbitration by a sole arbitrator under the Arbitration and Conciliation Act, 1996 (seat and venue: [Bengaluru]; language: English).</div></div>
+    <div class="cl"><div class="num">19.2</div><div class="txt">The Parties will first attempt to resolve any dispute amicably. Failing resolution within <b>[thirty (30)] days</b>, the dispute will be subject to the exclusive jurisdiction of the courts at <b>Bangalore, Karnataka</b>, India; or, if the Parties elect here [&nbsp;&nbsp;], referred to and finally resolved by arbitration by a sole arbitrator under the Arbitration and Conciliation Act, 1996 (seat and venue: Bangalore; language: English).</div></div>
 
     <h2 class="sec"><span>20</span>Stamping and Execution</h2>
     <div class="cl"><div class="num">20.1</div><div class="txt">This Agreement shall be executed on non-judicial stamp paper or e-stamp of the value chargeable under the applicable stamp law (the Karnataka Stamp Act, 1957 or the Indian Stamp Act, 1899, as applicable to the place of execution), and each Party shall sign each page and initial any change.</div></div>
     <div class="cl"><div class="num">20.2</div><div class="txt">The Parties agree that this Agreement, the Creator's consent under Clause 14, and any Schedule C, may be executed and given by electronic means, and that electronic records and electronic signatures are legally valid and enforceable under Sections 4, 5 and 10A of the Information Technology Act, 2000.</div></div>
-    <div class="flag"><b>⚠ Lawyer to review:</b> Confirm the correct stamp-duty value and stamping method for the state of execution, and the manner of electronic execution. An unstamped or under-stamped agreement can be inadmissible in evidence.</div>
 
     <h2 class="sec"><span>21</span>General</h2>
     <div class="cl"><div class="num">21.1</div><div class="txt">This Agreement with its Schedules is the entire agreement between the Parties on its subject matter and supersedes all prior understandings.</div></div>
@@ -475,14 +656,57 @@
     <div class="cl"><div class="num">21.3</div><div class="txt">If any provision is held void or unenforceable, the remainder stays in effect and that provision is severed or read down to the minimum extent necessary to be valid.</div></div>
     <div class="cl"><div class="num">21.4</div><div class="txt">The Creator may not assign or transfer this Agreement. YKS may assign it to a successor of its business on notice to the Creator.</div></div>
     <div class="cl"><div class="num">21.5</div><div class="txt">No failure or delay in enforcing a term operates as a waiver of it.</div></div>
-    <div class="cl"><div class="num">21.6</div><div class="txt">Notices may be given in writing, including by email or WhatsApp, to the details in Schedule A.</div></div>
-  </div>
-</div>
+    <div class="cl"><div class="num">21.6</div><div class="txt">Day-to-day notices may be given in writing, including by email or WhatsApp, to the details in Schedule A. A notice terminating this Agreement is the one exception and must be sent by email under Clause 17.2.</div></div>
+
+    <h2 class="sec"><span>22</span>Decisions Are Made Together</h2>
+    <div class="plain"><span class="lab">In plain words</span><p>The line I hold: <b>getting you in front of brands is my call. Saying yes to anything is yours.</b> I don't accept a job for you, turn one down for you, drop your rate, or agree usage on your behalf. We talk, you decide, then I go and execute it. The only thing I'll ever do without you is tell a brand you're not available &mdash; because a deadline passed and you hadn't come back to me. I will never tell one you're in.</p></div>
+    <div class="cl"><div class="num">22.1</div><div class="txt"><b>Nothing is committed without the Creator.</b> YKS will not accept, decline, vary, renegotiate or withdraw from any Campaign, and will not agree a fee, a deliverable, a usage licence, an exclusivity window or a deadline on the Creator's behalf, without first discussing it with the Creator and obtaining their agreement.</div></div>
+    <div class="cl"><div class="num">22.2</div><div class="txt"><b>The dividing line.</b> Pitching, outreach, positioning and Brand approaches are matters for YKS's discretion under Clause 3.6 and require no prior consultation. Commitments &mdash; anything that binds the Creator, their time, their image or their fee &mdash; are joint, and require the Creator's agreement under Clause 2.4.</div></div>
+    <div class="cl"><div class="num">22.3</div><div class="txt"><b>Where the Creator does not respond.</b> If a Brand sets a deadline and the Creator has not responded to YKS by it, YKS may inform the Brand that the Creator is unavailable for that Campaign. YKS will not, in any circumstance, accept a Campaign, confirm availability, or agree terms on the Creator's behalf because they were slow to reply. Silence is never taken as agreement.</div></div>
+    <div class="cl"><div class="num">22.4</div><div class="txt"><b>The record of the decision.</b> The Creator's agreement is recorded in a Schedule C, or in a written message from the Creator confirming the terms. Where the Creator later says a term was not agreed, the Schedule C or written confirmation governs.</div></div>
+
+    <h2 class="sec"><span>23</span>Records and Proof of Introduction</h2>
+    <div class="plain"><span class="lab">In plain words</span><p>I keep a log of every brand I pitch you to and when. Not to police you &mdash; it's so that if a brand turns up months later, there's a dated record of who opened that door, instead of two people remembering it differently. You can ask me at any time whether I've already pitched a particular brand.</p></div>
+    <div class="cl"><div class="num">23.1</div><div class="txt">YKS maintains a dated record of Brands it has pitched the Creator to and introduced the Creator to, showing the date, the Brand, the contact approached and the medium used.</div></div>
+    <div class="cl"><div class="num">23.2</div><div class="txt">That record is the evidence of introduction for the purposes of Clause 12, and the Parties agree it may be relied on as such. A Brand does not become an introduced Brand unless it appears in that record.</div></div>
+    <div class="cl"><div class="num">23.3</div><div class="txt">The Creator may ask YKS at any time whether a named Brand has already been pitched or introduced, and YKS will answer. This does not oblige YKS to disclose its wider outreach list, Brand contacts or pitching schedule, which remain YKS's confidential business information under Clause 15.</div></div>
+
+    <h2 class="sec"><span>24</span>No Guarantee, and Nothing Relied On Outside This Document</h2>
+    <div class="plain"><span class="lab">In plain words</span><p>This one is blunt, and it's the honest one. <b>I am selling you visibility and handling, not brand signings.</b> Nobody can promise a brand will say yes, and I never have. If something was said in a call, a DM or a voice note that isn't written in this document, it isn't part of the deal &mdash; ask me to put it in here before you sign, and I will. What you see on these pages is the whole of what I've promised.</p></div>
+    <div class="cl"><div class="num">24.1</div><div class="txt"><b>What is promised.</b> YKS promises visibility, active pitching and diligent handling of Campaigns and payments, as set out in Clause 3. YKS does <em>not</em> promise, and has not promised, that any Brand will engage the Creator, that any pitch will receive a reply, that any minimum number of Campaigns, enquiries, introductions or rupees of income will result, or that the Creator's following, engagement or rates will grow.</div></div>
+    <div class="cl"><div class="num">24.2</div><div class="txt"><b>Non-reliance.</b> The Creator confirms that in entering this Agreement they have relied only on its written terms, and not on any statement, estimate, projection, illustration, example, opinion, message, call or presentation made before it &mdash; whether by YKS or anyone else &mdash; that is not written into this Agreement. Any expectation the Creator wishes to rely on must be written into this Agreement before signing.</div></div>
+    <div class="cl"><div class="num">24.3</div><div class="txt"><b>Opinions are not promises.</b> A view expressed by YKS about a Brand's likely interest, a probable fee, market rates, or how a Campaign may perform is an opinion given in good faith and is not a representation, warranty or guarantee, and no liability attaches to it.</div></div>
+    <div class="cl"><div class="num">24.4</div><div class="txt"><b>Platforms are outside anyone's control.</b> Neither Party is responsible for platform algorithm changes, reach, impressions, view counts, account restrictions, shadow-banning or account loss, none of which YKS influences or can be held to.</div></div>
+    <div class="cl"><div class="num">24.5</div><div class="txt">This Clause does not exclude liability for fraud or fraudulent misrepresentation, which cannot be excluded.</div></div>
+
+    <h2 class="sec"><span>25</span>Suspension, Conduct and Circumvention</h2>
+    <div class="plain"><span class="lab">In plain words</span><p>Two situations. One: if you do something that lands on my name &mdash; faked numbers, a brand defrauded, abuse of someone's staff &mdash; I can stop everything that day. Two: if I introduce you to a brand and you take them direct behind my back inside six months, I lose what that brand would have paid me, and I can claim that amount. Read that carefully, because it matters: <b>that is compensation for a broken promise, not a fee for representing you.</b> Representation stays free, always. This only ever comes up if you cut me out of a door I opened.</p></div>
+    <div class="cl"><div class="num">25.1</div><div class="txt"><b>Immediate suspension or termination.</b> YKS may suspend pitching, withdraw the Creator from live Campaigns where the Brand agrees, or terminate this Agreement immediately by email under Clause 17.2, where the Creator: supplies false follower, engagement or audience data; obtains or attempts to obtain payment from a Brand by deception; abuses or harasses a Brand's personnel or YKS; publishes content that is unlawful; conceals a category exclusivity that puts YKS in breach with a Brand; or engages in conduct that causes, or is likely to cause, material damage to YKS's reputation or its relationship with a Brand.</div></div>
+    <div class="cl"><div class="num">25.2</div><div class="txt"><b>Circumvention.</b> Where the Creator, in breach of Clause 12, works with a Brand that YKS introduced without routing it through YKS, YKS is deprived of the Margin the Brand would have paid it. That lost Margin is YKS's loss arising naturally from the breach, and is recoverable from the Creator as compensation under Section 73 of the Indian Contract Act, 1872. Where the actual Margin cannot be established, it is taken to be the Margin YKS earned on the most recent Managed Deal between the Creator and that Brand.</div></div>
+    <div class="cl"><div class="num">25.3</div><div class="txt"><b>This is damages, not a fee.</b> Clause 25.2 is a remedy for breach of contract and is not a commission, service charge, deduction or fee for representation. It does not qualify Clause 6.1, which remains absolute: while this Agreement is performed, the Creator pays YKS nothing. Clause 25.2 can only ever be engaged by the Creator's own breach of Clause 12, and never arises on any Campaign the Creator handles properly.</div></div>
+    <div class="cl"><div class="num">25.4</div><div class="txt"><b>Set-off.</b> Where YKS holds funds for the Creator under Route 1 and a sum is due to YKS under Clause 25.2, YKS may set that sum off against funds held only after giving the Creator written particulars of the claim and <b>[fifteen (15)] days</b> to dispute it. YKS will not withhold funds on a disputed claim beyond that, and will not withhold the Creator Fee on an unrelated Campaign.</div></div>
+
+
+    <h2 class="sec" data-cat="model"><span>26</span>Shoot Days, Call Times and Usage</h2>
+    <div class="plain" data-cat="model"><span class="lab">In plain words</span><p>The bits that only matter on a shoot. What a day actually is, what happens when it runs over, who pays for the travel, and &mdash; the one people get wrong &mdash; how long the brand can keep using the pictures. A shoot fee is not a licence to use your face forever.</p></div>
+    <div class="cl" data-cat="model"><div class="num">26.1</div><div class="txt"><b>What a day is.</b> A full shoot day is <b>eight (8) hours</b> on location including breaks, measured from the call time recorded in Schedule C. A half day is four (4) hours. Time beyond that is overtime, charged in full or part hours at the rate in Schedule A, and agreed with the Talent before it is worked.</div></div>
+    <div class="cl" data-cat="model"><div class="num">26.2</div><div class="txt"><b>Call times and cancellations.</b> The call time, location and wrap time are fixed in Schedule C. Where a Brand cancels a confirmed shoot inside <b>forty-eight (48) hours</b> of the call time, the Talent is entitled to the cancellation fee in Schedule A, and YKS will pursue it from the Brand on the same basis as the fee itself.</div></div>
+    <div class="cl" data-cat="model"><div class="num">26.3</div><div class="txt"><b>Fittings, tests and travel.</b> Fittings, wardrobe tests and rehearsals are chargeable separately at the Schedule A rate unless the Talent agrees otherwise in writing. Travel outside the Talent's home city is arranged and paid for by the Brand, together with accommodation and a per-diem, all agreed before the Talent commits.</div></div>
+    <div class="cl" data-cat="model"><div class="num">26.4</div><div class="txt"><b>Usage is separate from the day.</b> The fee for a shoot day buys the Talent's time, not their image in perpetuity. The Brand receives only the usage licence recorded in Schedule C &mdash; media, territory and duration &mdash; and any use beyond it needs a fresh licence and a fresh fee under Clause 8.2. An expired licence means the images come down.</div></div>
+    <div class="cl" data-cat="model"><div class="num">26.5</div><div class="txt"><b>On set.</b> The Talent will be given the brief, the wardrobe and the shot list in advance where the Brand provides them. Changing rate, brief, wardrobe or shot type on the day is a change of terms, and the Talent may decline it under Clause 22 without that being a cancellation by them.</div></div>
+    <div class="cl" data-cat="model"><div class="num">26.6</div><div class="txt"><b>Retouching and approval.</b> Where the Talent has image approval it is recorded in Schedule C. Absent that, the Brand may retouch within normal industry practice, but not so as to alter the Talent's body or features in a manner they have objected to in writing.</div></div>
+
+    <h2 class="sec" data-cat="actor"><span>26</span>Auditions, Call Sheets and Credit</h2>
+    <div class="plain" data-cat="actor"><span class="lab">In plain words</span><p>The parts specific to performance work. Auditions are unpaid, shoot days are not. Your credit is part of the deal, not a favour. And a performance fee is not the same as the right to use the performance forever, anywhere.</p></div>
+    <div class="cl" data-cat="actor"><div class="num">26.1</div><div class="txt"><b>Auditions and callbacks.</b> Auditions, self-tapes and callbacks are unpaid unless Schedule C says otherwise, and no Campaign exists until the Talent confirms one under Clause 10. YKS will not commit the Talent to a shoot date on the strength of an audition alone. Reasonable travel for an in-person callback outside their home city is recoverable from the Brand.</div></div>
+    <div class="cl" data-cat="actor"><div class="num">26.2</div><div class="txt"><b>Call sheets and shoot days.</b> A shoot day is <b>eight (8) hours</b> from the call time on the call sheet, excluding a meal break. Overtime is charged at the Schedule A rate and agreed before it is worked. The call sheet, location and scene order are the Brand's to set; a material change to the role, dialogue or wardrobe on the day is a change of terms under Clause 22.</div></div>
+    <div class="cl" data-cat="actor"><div class="num">26.3</div><div class="txt"><b>Credit.</b> Where a screen or billing credit is agreed it is recorded in Schedule C, and the Brand's failure to give it is a breach the Talent may enforce. Absent agreement, no credit is promised and its absence is not a breach.</div></div>
+    <div class="cl" data-cat="actor"><div class="num">26.4</div><div class="txt"><b>Dubbing, ADR and re-recording.</b> Post-production recall &mdash; dubbing, ADR, pick-ups or re-shoots &mdash; is chargeable at the Schedule A rate unless Schedule C includes a stated number of hours. The Talent will make reasonable efforts to be available.</div></div>
+    <div class="cl" data-cat="actor"><div class="num">26.5</div><div class="txt"><b>The performance and its use.</b> The Talent's performance may be used only in the media, territory and for the term recorded in Schedule C. Use in a different medium, a longer term, a new territory, or a re-cut for a different campaign requires a fresh licence and a fresh fee under Clause 8.2. Nothing here assigns the Talent's performer's rights beyond that licence.</div></div>
+    <div class="cl" data-cat="actor"><div class="num">26.6</div><div class="txt"><b>Doubles, stunts and intimacy.</b> Stunt work, body doubling, prosthetics and any intimate or partially clothed scene require the Talent's separate written consent for that Campaign, given in advance under Clause 13.4, with the arrangements recorded in Schedule C.</div></div>
 
 <!-- ══════════ SCHEDULES ══════════ -->
-<div class="sheet break">
-  <div class="pad">
-    <h2 class="sec" style="margin-top:0"><span>A</span>Schedule A &mdash; The Creator, the Rates, the Route</h2>
+    <h2 class="sec"><span>A</span>Schedule A &mdash; The Creator, the Rates, the Route</h2>
     <table class="fill">
       <tr><th colspan="2">Who</th></tr>
       <tr><td>Full legal name</td><td><input class="wr" id="k-name" type="text" autocomplete="off"></td></tr>
@@ -495,22 +719,32 @@
     </table>
 
     <table class="fill">
-      <tr><th colspan="2">The channels</th></tr>
-      <tr><td>Instagram handle / followers</td><td><input class="wr wr-s" id="k-ig" type="text" autocomplete="off"> <span class="wr-sep">/</span> <input class="wr wr-s" id="k-igf" type="text" autocomplete="off"></td></tr>
-      <tr><td>YouTube / followers</td><td><input class="wr wr-s" id="k-yt" type="text" autocomplete="off"> <span class="wr-sep">/</span> <input class="wr wr-s" id="k-ytf" type="text" autocomplete="off"></td></tr>
-      <tr><td>Other platform / followers</td><td><input class="wr wr-s" id="k-oth" type="text" autocomplete="off"> <span class="wr-sep">/</span> <input class="wr wr-s" id="k-othf" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><th colspan="2">The channels</th></tr>
+      <tr data-cat="influencer"><td>Instagram handle / followers</td><td><input class="wr wr-s" id="k-ig" type="text" autocomplete="off"> <span class="wr-sep">/</span> <input class="wr wr-s" id="k-igf" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><td>YouTube / followers</td><td><input class="wr wr-s" id="k-yt" type="text" autocomplete="off"> <span class="wr-sep">/</span> <input class="wr wr-s" id="k-ytf" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><td>Other platform / followers</td><td><input class="wr wr-s" id="k-oth" type="text" autocomplete="off"> <span class="wr-sep">/</span> <input class="wr wr-s" id="k-othf" type="text" autocomplete="off"></td></tr>
       <tr><td>Category<span class="hint">fashion, beauty, food, travel, tech, fitness, lifestyle&hellip;</span></td><td><input class="wr" id="k-cat" type="text" autocomplete="off"></td></tr>
-      <tr><td>Languages / cities they can shoot in</td><td><input class="wr" id="k-langs" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><td>Languages / cities they can shoot in</td><td><input class="wr" id="k-langs" type="text" autocomplete="off"></td></tr>
     </table>
 
     <table class="fill">
       <tr><th colspan="2">The rate card <span style="font-weight:400;text-transform:none;letter-spacing:0">(Clause 4)</span></th></tr>
-      <tr><td>1 reel (in-feed, organic only)</td><td>₹&nbsp;<input class="wr" id="k-r-reel" type="text" autocomplete="off"></td></tr>
-      <tr><td>1 static post / carousel</td><td>₹&nbsp;<input class="wr" id="k-r-post" type="text" autocomplete="off"></td></tr>
-      <tr><td>Story set (3 frames)</td><td>₹&nbsp;<input class="wr" id="k-r-story" type="text" autocomplete="off"></td></tr>
-      <tr><td>Bundle / month-long collaboration</td><td>₹&nbsp;<input class="wr" id="k-r-bundle" type="text" autocomplete="off"></td></tr>
-      <tr><td>Add-on: 30 days paid usage / whitelisting<span class="hint">Clause 8.3 &mdash; never included by default</span></td><td>₹&nbsp;<input class="wr" id="k-r-usage" type="text" autocomplete="off"></td></tr>
-      <tr><td>Add-on: category exclusivity, per month</td><td>₹&nbsp;<input class="wr" id="k-r-excl" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><td>1 reel (in-feed, organic only)</td><td>₹&nbsp;<input class="wr" id="k-r-reel" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><td>1 static post / carousel</td><td>₹&nbsp;<input class="wr" id="k-r-post" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><td>Story set (3 frames)</td><td>₹&nbsp;<input class="wr" id="k-r-story" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><td>Bundle / month-long collaboration</td><td>₹&nbsp;<input class="wr" id="k-r-bundle" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><td>Add-on: 30 days paid usage / whitelisting<span class="hint">Clause 8.3 &mdash; never included by default</span></td><td>₹&nbsp;<input class="wr" id="k-r-usage" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="influencer"><td>Add-on: category exclusivity, per month</td><td>₹&nbsp;<input class="wr" id="k-r-excl" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="model actor"><td>Full shoot day <span class="hint">eight hours including breaks &mdash; Clause 26.1</span></td><td><input class="wr" id="f1" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="model actor"><td>Half day <span class="hint">four hours</span></td><td><input class="wr" id="f2" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="model actor"><td>Overtime, per hour or part hour</td><td><input class="wr" id="f3" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="model"><td>Fitting / wardrobe test / rehearsal</td><td><input class="wr" id="f4" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="actor"><td>Dubbing / ADR / pick-ups, per hour</td><td><input class="wr" id="f5" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="model actor"><td>Usage buyout <span class="hint">per medium, per territory, per 12 months &mdash; Clause 26.4</span></td><td><input class="wr" id="f6" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="model actor"><td>Cancellation fee <span class="hint">inside 48 hours of call time</span></td><td><input class="wr" id="f7" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="model actor"><td>Category / brand exclusivity, per month</td><td><input class="wr" id="f-excl" type="text" autocomplete="off"></td></tr>
+      <tr data-cat="model actor"><td>Travel &amp; per-diem <span class="hint">outside home city &mdash; Clause 26.3</span></td><td>Arranged and paid by the Brand, agreed before committing</td></tr>
+      <tr data-cat="model actor"><td>Profile <span class="hint">height, sizes, showreel, languages &mdash; as applicable</span></td><td><input class="wr" id="f8" type="text" autocomplete="off"></td></tr>
       <tr><td><b>Rate floor</b><span class="hint">YKS will not quote below this without written consent</span></td><td>₹&nbsp;<input class="wr" id="k-floor" type="text" autocomplete="off"></td></tr>
     </table>
 
@@ -520,21 +754,23 @@
       <tr><td><b>How YKS is paid instead</b><span class="hint">Clauses 6.3 and 6.4</span></td><td>By the Brand. The Creator agrees their net in-hand fee first; whatever YKS negotiates above it, the Brand pays YKS. If there is nothing above it, YKS earns nothing and the Creator is still paid in full.</td></tr>
       <tr><td><b>Creator's minimum in-hand figure</b><span class="hint">Clause 6.4 &mdash; the number below which YKS will not agree a deal without asking</span></td><td>₹&nbsp;<input class="wr" id="k-min" type="text" autocomplete="off"> <span class="wr-sep">per deliverable / per campaign</span> </td></tr>
       <tr><td><b>Payment route</b><span class="hint">Clause 7.1 &mdash; tick one. See the GST flag at Clause 7.</span></td><td><label class="cbx"><input type="checkbox" id="route1"><span></span></label>Route 1 &mdash; Brand pays YKS, YKS remits within 7 business days<br><label class="cbx"><input type="checkbox" id="route2"><span></span></label>Route 2 &mdash; Brand pays Creator, Creator pays commission within 7 days</td></tr>
-      <tr><td>Representation</td><td><b>Non-exclusive</b> &mdash; the Creator stays free to work with anyone (Clause 2.1)</td></tr>
-      <tr><td>Term</td><td>12 months, auto-renewing &middot; 30 days' notice either side (Clause 17)</td></tr>
+      <tr><td><b>Representation tier</b><span class="hint">Clauses 2.7 and 2.8 &mdash; tick one. Exclusive is a choice, never a condition of being represented.</span></td><td><label class="cbx"><input type="checkbox" id="tier-nonex"><span></span></label><b>Non-Exclusive</b> &mdash; free to work with any agency, manager or Brand<br><label class="cbx"><input type="checkbox" id="tier-excl"><span></span></label><b>Exclusive</b> &mdash; Brand work runs through YKS for the Term. In return the Creator is placed first in the pitching order for their category, gets first refusal on suitable briefs, and is featured on the roster. Ends completely when this Agreement ends.</td></tr>
+      <tr><td>Term</td><td>12 months, auto-renewing &middot; <b>no notice period</b> &mdash; either side exits by formal email (Clause 17.2)</td></tr>
+      <tr><td><b>Formal notice email &mdash; the Creator</b><span class="hint">Clause 17.2A &mdash; the address an exit email must come from. Day-to-day talk stays on WhatsApp; only this ends the agreement.</span></td><td><input class="wr" id="f9" type="text" autocomplete="off"></td></tr>
+      <tr><td><b>Formal notice email &mdash; YKS</b></td><td><b>yksproductions893@gmail.com</b></td></tr>
     </table>
 
     <table class="fill">
       <tr><th colspan="2">Boundaries and disclosures</th></tr>
       <tr><td><b>Categories the Creator will NOT take</b><span class="hint">Clause 4.3 &mdash; YKS will not pitch these at all</span></td><td><input class="wr" id="k-excl1" type="text" autocomplete="off"><br><input class="wr" id="k-excl2" type="text" autocomplete="off"></td></tr>
-      <tr><td>Restricted categories &mdash; tick any the Creator refuses outright<span class="hint">Clause 9.4</span></td><td><label class="cbx"><input type="checkbox" id="cb3"><span></span></label>Alcohol / surrogate&nbsp; <label class="cbx"><input type="checkbox" id="cb4"><span></span></label>Tobacco&nbsp; <label class="cbx"><input type="checkbox" id="cb5"><span></span></label>Betting &amp; real-money gaming<br><label class="cbx"><input type="checkbox" id="cb6"><span></span></label>Crypto / VDA&nbsp; <label class="cbx"><input type="checkbox" id="cb7"><span></span></label>Health &amp; nutraceutical&nbsp; <label class="cbx"><input type="checkbox" id="cb8"><span></span></label>Political&nbsp; <label class="cbx"><input type="checkbox" id="cb9"><span></span></label>Weight-loss</td></tr>
-      <tr><td>Intimate / adult content<span class="hint">Clause 13.4 &mdash; never assumed, always separately consented per Campaign</span></td><td><label class="cbx"><input type="checkbox" id="cb10"><span></span></label>Will not consider &nbsp;&nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb11"><span></span></label>May consider, case by case with written consent</td></tr>
+      <tr><td>Restricted categories &mdash; tick any the Creator refuses outright<span class="hint">Clause 9.4</span></td><td><label class="cbx"><input type="checkbox" id="cb5"><span></span></label>Alcohol / surrogate&nbsp; <label class="cbx"><input type="checkbox" id="cb6"><span></span></label>Tobacco&nbsp; <label class="cbx"><input type="checkbox" id="cb7"><span></span></label>Betting &amp; real-money gaming<br><label class="cbx"><input type="checkbox" id="cb8"><span></span></label>Crypto / VDA&nbsp; <label class="cbx"><input type="checkbox" id="cb9"><span></span></label>Health &amp; nutraceutical&nbsp; <label class="cbx"><input type="checkbox" id="cb10"><span></span></label>Political&nbsp; <label class="cbx"><input type="checkbox" id="cb11"><span></span></label>Weight-loss</td></tr>
+      <tr><td>Intimate / adult content<span class="hint">Clause 13.4 &mdash; never assumed, always separately consented per Campaign</span></td><td><label class="cbx"><input type="checkbox" id="cb12"><span></span></label>Will not consider &nbsp;&nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb13"><span></span></label>May consider, case by case with written consent</td></tr>
       <tr><td>Comfort notes<span class="hint">anything else YKS should know before pitching</span></td><td><input class="wr" id="k-notes" type="text" autocomplete="off"></td></tr>
       <tr><td><b>Pre-Existing Brands</b><span class="hint">Clause 12.2 &mdash; brands the Creator already works with. No commission is ever claimed on these. List them now; anything not listed is harder to prove later.</span></td><td><input class="wr" id="k-pre1" type="text" autocomplete="off"><br><input class="wr" id="k-pre2" type="text" autocomplete="off"><br><input class="wr" id="k-pre3" type="text" autocomplete="off"></td></tr>
       <tr><td>Existing exclusivity commitments<span class="hint">Clause 4.4</span></td><td><input class="wr" id="k-excomm" type="text" autocomplete="off"></td></tr>
     </table>
 
-    <h2 class="sec break"><span>B</span>Schedule B &mdash; Social Media Management (optional)</h2>
+    <h2 class="sec"><span>B</span>Schedule B &mdash; Social Media Management (optional)</h2>
     <div class="cl"><div class="num">B.1</div><div class="txt">This Schedule applies <b>only</b> if it is completed and signed. It is a separate paid service; declining it changes nothing about the representation in the main Agreement.</div></div>
     <div class="cl"><div class="num">B.2</div><div class="txt"><b>The Creator owns the accounts.</b> Access granted to YKS is access, not ownership or control. YKS will use the platforms' delegated-access tools where available, will not change passwords, recovery details or account ownership, and will return or surrender all access within <b>[three (3)] days</b> of termination.</div></div>
     <div class="cl"><div class="num">B.3</div><div class="txt"><b>Approval.</b> Nothing is published without the Creator's approval, unless the Creator gives standing written approval for a defined content type. The Creator may take down anything from their own Channels at any time.</div></div>
@@ -543,47 +779,46 @@
     <div class="cl"><div class="num">B.6</div><div class="txt"><b>Assets YKS creates.</b> Content produced by YKS under this Schedule is licensed to the Creator perpetually for their own use once the month it belongs to is paid for. YKS may show that work in its own portfolio.</div></div>
     <table class="fill">
       <tr><th colspan="2">Scope and fee</th></tr>
-      <tr><td>Deliverables per month<span class="hint">e.g. 12 posts, 8 reels, daily stories, caption + hashtag strategy</span></td><td><input class="wr" id="f1" type="text" autocomplete="off"></td></tr>
-      <tr><td>Included<span class="hint">strategy, calendar, scheduling, community management, monthly report</span></td><td><input class="wr" id="f2" type="text" autocomplete="off"></td></tr>
-      <tr><td>Not included</td><td><input class="wr" id="f3" type="text" autocomplete="off"></td></tr>
-      <tr><td>Monthly retainer</td><td>₹&nbsp;<input class="wr" id="f4" type="text" autocomplete="off"> <span class="wr-sep">per month</span> </td></tr>
-      <tr><td>Billing<span class="hint">MSMED Act, 2006 &mdash; YKS is a registered Micro Enterprise; payment due within 45 days by statute</span></td><td>In advance, on the ____ of each month &middot; minimum commitment <input class="wr wr-s" id="f18" type="text" autocomplete="off"> months</td></tr>
-      <tr><td>Notice to end this Schedule</td><td><input class="wr" id="f5" type="text" autocomplete="off"> <span class="wr-sep">days, without ending the main Agreement</span> </td></tr>
+      <tr><td>Deliverables per month<span class="hint">e.g. 12 posts, 8 reels, daily stories, caption + hashtag strategy</span></td><td><input class="wr" id="f10" type="text" autocomplete="off"></td></tr>
+      <tr><td>Included<span class="hint">strategy, calendar, scheduling, community management, monthly report</span></td><td><input class="wr" id="f11" type="text" autocomplete="off"></td></tr>
+      <tr><td>Not included</td><td><input class="wr" id="f12" type="text" autocomplete="off"></td></tr>
+      <tr><td>Monthly retainer</td><td>₹&nbsp;<input class="wr" id="f13" type="text" autocomplete="off"> <span class="wr-sep">per month</span> </td></tr>
+      <tr><td>Billing</td><td>In advance, on the ____ of each month &middot; minimum commitment <input class="wr wr-s" id="f27" type="text" autocomplete="off"> months</td></tr>
+      <tr><td>Notice to end this Schedule</td><td><input class="wr" id="f14" type="text" autocomplete="off"> <span class="wr-sep">days, without ending the main Agreement</span> </td></tr>
     </table>
     <div class="sign-grid">
-      <div class="sign-box"><div class="who">The Creator &mdash; Schedule B</div><div class="line"></div><div class="lbl">Name: <input class="wr wr-s" id="f19" type="text" autocomplete="off">  Date: <input class="wr wr-s" id="f20" type="text" autocomplete="off"></div></div>
-      <div class="sign-box"><div class="who">For YKS Productions</div><div class="line"></div><div class="lbl">Name: <input class="wr wr-s" id="f21" type="text" autocomplete="off">  Date: <input class="wr wr-s" id="f22" type="text" autocomplete="off"></div></div>
+      <div class="sign-box"><div class="who">The Creator &mdash; Schedule B</div><div class="line"></div><div class="lbl">Name: <input class="wr wr-s" id="f28" type="text" autocomplete="off">  Date: <input class="wr wr-s" id="f29" type="text" autocomplete="off"></div></div>
+      <div class="sign-box"><div class="who">For YKS Productions</div><div class="line"></div><div class="lbl">Name: <input class="wr wr-s" id="f30" type="text" autocomplete="off">  Date: <input class="wr wr-s" id="f31" type="text" autocomplete="off"></div></div>
     </div>
 
-    <h2 class="sec break"><span>C</span>Schedule C &mdash; Campaign Confirmation Sheet</h2>
+    <h2 class="sec"><span>C</span>Schedule C &mdash; Campaign Confirmation Sheet</h2>
     <p class="recital" style="margin-top:0;font-size:11.3px">One of these is completed for every Campaign before the Creator is asked to accept it (Clause 10). The Creator's written confirmation of a completed sheet &mdash; email or WhatsApp is sufficient &mdash; is what makes the Campaign binding.</p>
     <table class="fill">
       <tr><th colspan="2">Campaign</th></tr>
-      <tr><td>Brand</td><td><input class="wr" id="f6" type="text" autocomplete="off"></td></tr>
-      <tr><td>Sourced by</td><td><label class="cbx"><input type="checkbox" id="cb12"><span></span></label>YKS (Sourced Deal) &nbsp;&nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb13"><span></span></label>Creator, handed to YKS (Inbound Deal)</td></tr>
-      <tr><td>Deliverables<span class="hint">exact count and format</span></td><td><input class="wr" id="f7" type="text" autocomplete="off"></td></tr>
-      <tr><td><b>Creator Fee</b><span class="hint">the amount that reaches the Creator</span></td><td>₹&nbsp;<input class="wr" id="f8" type="text" autocomplete="off"></td></tr>
-      <tr><td>Payment terms &amp; expected pay date</td><td><input class="wr" id="f9" type="text" autocomplete="off"></td></tr>
-      <tr><td>Guaranteed pay date?<span class="hint">Clause 7.6 &mdash; only binding if ticked and initialled</span></td><td><label class="cbx"><input type="checkbox" id="cb14"><span></span></label>No &nbsp;&nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb15"><span></span></label>Yes &mdash; guaranteed on <input class="wr wr-s" id="f23" type="text" autocomplete="off"> &nbsp; YKS initials: <input class="wr wr-s" id="f24" type="text" autocomplete="off"></td></tr>
-      <tr><td>Usage licence<span class="hint">media, territory, duration &mdash; Clause 8.2</span></td><td><input class="wr" id="f10" type="text" autocomplete="off"></td></tr>
-      <tr><td>Paid media / whitelisting<span class="hint">Clause 8.3 &mdash; separate consent and fee</span></td><td><label class="cbx"><input type="checkbox" id="cb16"><span></span></label>No &nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb17"><span></span></label>Yes &mdash; flight <input class="wr wr-s" id="f25" type="text" autocomplete="off"> days, fee ₹ <input class="wr wr-s" id="f26" type="text" autocomplete="off"></td></tr>
-      <tr><td>Category exclusivity</td><td><label class="cbx"><input type="checkbox" id="cb18"><span></span></label>None &nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb19"><span></span></label><input class="wr wr-s" id="f27" type="text" autocomplete="off"> category for <input class="wr wr-s" id="f28" type="text" autocomplete="off"> months, fee ₹ <input class="wr wr-s" id="f29" type="text" autocomplete="off"></td></tr>
-      <tr><td>Shoot date / go-live date</td><td><input class="wr wr-s" id="f11" type="text" autocomplete="off"> <span class="wr-sep">/</span> <input class="wr wr-s" id="f12" type="text" autocomplete="off"></td></tr>
-      <tr><td>Approval process &amp; revision rounds</td><td><input class="wr" id="f13" type="text" autocomplete="off"></td></tr>
-      <tr><td>Disclosure label required<span class="hint">Clause 9.1 &mdash; ASCI. Never optional.</span></td><td><input class="wr" id="f14" type="text" autocomplete="off"></td></tr>
-      <tr><td>Claims the Creator is asked to make<span class="hint">Clause 9.2 &mdash; the Creator must have used the product</span></td><td><input class="wr" id="f15" type="text" autocomplete="off"></td></tr>
+      <tr><td>Brand</td><td><input class="wr" id="f15" type="text" autocomplete="off"></td></tr>
+      <tr><td>Sourced by</td><td><label class="cbx"><input type="checkbox" id="cb14"><span></span></label>YKS (Sourced Deal) &nbsp;&nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb15"><span></span></label>Creator, handed to YKS (Inbound Deal)</td></tr>
+      <tr><td>Deliverables<span class="hint">exact count and format</span></td><td><input class="wr" id="f16" type="text" autocomplete="off"></td></tr>
+      <tr><td><b>Creator Fee</b><span class="hint">the amount that reaches the Creator</span></td><td>₹&nbsp;<input class="wr" id="f17" type="text" autocomplete="off"></td></tr>
+      <tr><td>Payment terms &amp; expected pay date</td><td><input class="wr" id="f18" type="text" autocomplete="off"></td></tr>
+      <tr><td>Guaranteed pay date?<span class="hint">Clause 7.6 &mdash; only binding if ticked and initialled</span></td><td><label class="cbx"><input type="checkbox" id="cb16"><span></span></label>No &nbsp;&nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb17"><span></span></label>Yes &mdash; guaranteed on <input class="wr wr-s" id="f32" type="text" autocomplete="off"> &nbsp; YKS initials: <input class="wr wr-s" id="f33" type="text" autocomplete="off"></td></tr>
+      <tr><td>Usage licence<span class="hint">media, territory, duration &mdash; Clause 8.2</span></td><td><input class="wr" id="f19" type="text" autocomplete="off"></td></tr>
+      <tr><td>Paid media / whitelisting<span class="hint">Clause 8.3 &mdash; separate consent and fee</span></td><td><label class="cbx"><input type="checkbox" id="cb18"><span></span></label>No &nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb19"><span></span></label>Yes &mdash; flight <input class="wr wr-s" id="f34" type="text" autocomplete="off"> days, fee ₹ <input class="wr wr-s" id="f35" type="text" autocomplete="off"></td></tr>
+      <tr><td>Category exclusivity</td><td><label class="cbx"><input type="checkbox" id="cb20"><span></span></label>None &nbsp;&nbsp; <label class="cbx"><input type="checkbox" id="cb21"><span></span></label><input class="wr wr-s" id="f36" type="text" autocomplete="off"> category for <input class="wr wr-s" id="f37" type="text" autocomplete="off"> months, fee ₹ <input class="wr wr-s" id="f38" type="text" autocomplete="off"></td></tr>
+      <tr><td>Shoot date / go-live date</td><td><input class="wr wr-s" id="f20" type="text" autocomplete="off"> <span class="wr-sep">/</span> <input class="wr wr-s" id="f21" type="text" autocomplete="off"></td></tr>
+      <tr><td>Approval process &amp; revision rounds</td><td><input class="wr" id="f22" type="text" autocomplete="off"></td></tr>
+      <tr><td>Disclosure label required<span class="hint">Clause 9.1 &mdash; ASCI. Never optional.</span></td><td><input class="wr" id="f23" type="text" autocomplete="off"></td></tr>
+      <tr><td>Claims the Creator is asked to make<span class="hint">Clause 9.2 &mdash; the Creator must have used the product</span></td><td><input class="wr" id="f24" type="text" autocomplete="off"></td></tr>
     </table>
     <div class="sign-grid">
-      <div class="sign-box"><div class="who">Creator confirms this Campaign</div><div class="line"></div><div class="lbl">Name: <input class="wr wr-s" id="f30" type="text" autocomplete="off">  Date: <input class="wr wr-s" id="f31" type="text" autocomplete="off"></div></div>
-      <div class="sign-box"><div class="who">For YKS Productions</div><div class="line"></div><div class="lbl">Name: <input class="wr wr-s" id="f32" type="text" autocomplete="off">  Date: <input class="wr wr-s" id="f33" type="text" autocomplete="off"></div></div>
+      <div class="sign-box"><div class="who">Creator confirms this Campaign</div><div class="line"></div><div class="lbl">Name: <input class="wr wr-s" id="f39" type="text" autocomplete="off">  Date: <input class="wr wr-s" id="f40" type="text" autocomplete="off"></div></div>
+      <div class="sign-box"><div class="who">For YKS Productions</div><div class="line"></div><div class="lbl">Name: <input class="wr wr-s" id="f41" type="text" autocomplete="off">  Date: <input class="wr wr-s" id="f42" type="text" autocomplete="off"></div></div>
     </div>
   </div>
 </div>
 
+
 <!-- ══════════ EXECUTION ══════════ -->
-<div class="sheet break">
-  <div class="pad">
-    <h2 class="sec" style="margin-top:0"><span>&sect;</span>Execution</h2>
+    <h2 class="sec"><span>&sect;</span>Execution</h2>
     <p class="recital" style="margin-top:4px">
       <b>IN WITNESS WHEREOF</b> the Parties have read and understood this Agreement, including the plain-English
       summary on the first page, and have executed it on the Effective Date. Each Party confirms that its consent
@@ -593,41 +828,39 @@
     <div class="sign-grid" style="margin-top:34px">
       <div class="sign-box">
         <div class="who">The Creator</div>
-        <canvas class="sig-pad no-print-empty" id="pad"></canvas>
+        <canvas class="sig-pad" id="pad"></canvas>
         <button type="button" class="sig-clear no-print" onclick="clearPad()">Clear signature</button>
-        <div class="lbl">Name: <input class="wr wr-s" id="f34" type="text" autocomplete="off"><br>Date: <input class="wr wr-s" id="f35" type="text" autocomplete="off">  Place: <input class="wr wr-s" id="f36" type="text" autocomplete="off"></div>
+        <div class="signblk">
+          <label class="sf"><span class="sf-l">Type your full name</span>
+            <input class="sf-i" id="sign-name" type="text" autocomplete="name" placeholder="Your full legal name"></label>
+          <label class="consent"><input type="checkbox" id="sign-consent"><span></span>
+            <span class="consent-t">I have read this Agreement, I agree to it, and I intend this to be my
+            signature and to be legally bound by it. I am 18 or over.</span></label>
+        </div>
+        <div class="lbl">Name: <input class="wr wr-s" id="f43" type="text" autocomplete="off"><br>Date: <input class="wr wr-s" id="f44" type="text" autocomplete="off">  Place: <input class="wr wr-s" id="f45" type="text" autocomplete="off"></div>
       </div>
       <div class="sign-box">
         <div class="who">For and on behalf of YKS Productions</div>
         <div class="line"></div>
-        <div class="lbl">Yedukrishna Suresh, Proprietor<br>Date: <input class="wr wr-s" id="f37" type="text" autocomplete="off">  Place: <input class="wr wr-s" id="f38" type="text" autocomplete="off"></div>
-      </div>
-    </div>
-    <div class="sign-grid" style="margin-top:40px">
-      <div class="sign-box">
-        <div class="who">Witness 1</div>
-        <div class="line"></div>
-        <div class="lbl">Name: <input class="wr wr-s" id="f39" type="text" autocomplete="off"><br>Address: <input class="wr wr-s" id="f40" type="text" autocomplete="off"></div>
-      </div>
-      <div class="sign-box">
-        <div class="who">Witness 2</div>
-        <div class="line"></div>
-        <div class="lbl">Name: <input class="wr wr-s" id="f41" type="text" autocomplete="off"><br>Address: <input class="wr wr-s" id="f42" type="text" autocomplete="off"></div>
+        <div class="lbl">Yedukrishna Suresh, Proprietor &middot; YKS Productions<br>yksproductions893@gmail.com &middot; +91 97466 79720<br>Date: <input class="wr wr-s" id="f46" type="text" autocomplete="off">  Place: Bangalore</div>
       </div>
     </div>
     <div class="foot-note">
-      DRAFT &mdash; template to be reviewed, the statutory citations verified, and finalised by a qualified Indian
-      advocate, then stamped and executed. Not legal advice. &copy; YKS Productions &middot; UDYAM-KL-01-0041092 &middot;
-      yksproductions.com
+      YKS Productions &middot; Yedukrishna Suresh, Proprietor &middot; Bangalore, Karnataka, India<br>
+      yksproductions.com &middot; @yks_photoworks &middot; yksproductions893@gmail.com &middot; +91 97466 79720
     </div>
-  </div>
+
+
+<div class="bar no-print" id="bar">
+  <button class="bar-btn alt" type="button" onclick="savePdf()">Save a copy</button>
+  <button class="bar-btn go" type="button" id="signbtn" onclick="signAndSend()">Sign &amp; send to YKS</button>
 </div>
-
-
-
-<div class="bar no-print">
-  <button class="bar-btn alt" onclick="resetAll()">Reset</button>
-  <button class="bar-btn go" onclick="savePdf()">Save as PDF</button>
+<div class="bar done no-print" id="bar-done" hidden>
+  <div class="done-in">
+    <div class="done-t">Signed and sent &#10003;</div>
+    <div class="done-s" id="done-s"></div>
+  </div>
+  <button class="bar-btn alt" type="button" onclick="savePdf()">Save a copy</button>
 </div>
 
 
@@ -648,12 +881,58 @@ const fill = (id,val) => { const el=$(id); if(el && val){ el.value=val; el.setAt
 const now = new Date();
 const fmt = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
 
-fill('k-name', CFG.name);  fill('k-city', CFG.city);   fill('k-cat', CFG.cat);
+// ── customisation: term values, then what the other party is called ──
+const WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve',
+  'thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+const TENS = ['','ten','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+function words(n){
+  n = Number(n);
+  if (!isFinite(n) || n < 0) return String(n);
+  if (WORDS[n]) return WORDS[n];
+  if (n < 100) {
+    const t = TENS[Math.floor(n / 10)], u = n % 10;
+    return u ? t + '-' + WORDS[u] : t;
+  }
+  return String(n);
+}
+// ── which edition of the agreement this is ──
+// A model's agreement should not carry ASCI disclosure or follower warranties, and
+// an influencer's should not carry call times and usage buyouts. Blocks are tagged
+// in the source; the category decides which ones exist for this reader.
+const CATKEY = (CFG.catkey || 'influencer').toLowerCase();
+document.querySelectorAll('[data-cat]').forEach(function (el) {
+  el.hidden = el.getAttribute('data-cat').split(/\s+/).indexOf(CATKEY) === -1;
+});
+
+if (CFG.terms) {
+  document.querySelectorAll('[data-tv]').forEach(function (el) {
+    const v = CFG.terms[el.getAttribute('data-tv')];
+    if (v) el.textContent = words(v) + ' (' + v + ')';
+  });
+}
+// The agreement calls the other party the "Creator". For a model or an actor that
+// reads wrong, so swap the defined term everywhere it appears as text. Attributes
+// and element ids are untouched — only what a reader actually sees.
+if (CFG.noun && CFG.noun !== 'Creator') {
+  const One = CFG.noun, one = One.toLowerCase();
+  const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while (walk.nextNode()) if (/Creator|creator/.test(walk.currentNode.nodeValue)) hits.push(walk.currentNode);
+  hits.forEach(function (n) {
+    n.nodeValue = n.nodeValue
+      .replace(/Creators/g, One + 's').replace(/creators/g, one + 's')
+      .replace(/Creator/g, One).replace(/creator/g, one);
+  });
+}
+
+fill('k-name', CFG.name);  fill('sign-name', CFG.name);  fill('k-city', CFG.city);   fill('k-cat', CFG.cat);
 fill('k-ig',   CFG.ig);    fill('k-igf',  CFG.igf);    fill('k-wa',  CFG.wa);
 fill('k-email',CFG.email); fill('k-min',  CFG.min);    fill('k-floor', CFG.min);
 fill('k-excl1',CFG.excl);  fill('k-pre1', CFG.pre);
 if(CFG.route === '1' && $('route1')) $('route1').checked = true;
 if(CFG.route === '2' && $('route2')) $('route2').checked = true;
+if(CFG.tier === 'ex'  && $('tier-excl'))  $('tier-excl').checked  = true;
+if(CFG.tier === 'non' && $('tier-nonex')) $('tier-nonex').checked = true;
 
 const fy  = (now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear()-1) % 100;
 const ref = CFG.ref || ('CRA-' + fy + (fy+1) + '-' + String(Math.floor(now.getTime()/1000) % 1000).padStart(3,'0'));
@@ -682,12 +961,69 @@ pad.addEventListener('pointermove', e => { if(!drawing) return; const p=pos(e); 
 ['pointerup','pointercancel','pointerleave'].forEach(ev => pad.addEventListener(ev, () => { drawing=false; }));
 function clearPad(){ const r=pad.getBoundingClientRect(); ctx.clearRect(0,0,r.width,r.height); dirty=false; }
 
-function savePdf(){
-  const name = ($('k-name') && $('k-name').value.trim()) || CFG.name || '';
-  if(!name || !dirty){
-    const missing = [!name && 'your name', !dirty && 'your signature'].filter(Boolean).join(' and ');
-    if(!confirm('You have not added ' + missing + '.\n\nSave the PDF anyway?')) return;
+// Where the signed agreement lands. Same Worker that runs the talents roster.
+const ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev';
+
+async function sha256(text){
+  if(!(crypto && crypto.subtle)) return '';
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function collectFields(){
+  const out = {};
+  document.querySelectorAll('input.wr').forEach(function(i){
+    if(i.value.trim()) out[i.id] = i.value.trim();
+  });
+  document.querySelectorAll('.cbx input:checked').forEach(function(c){ out[c.id] = true; });
+  return out;
+}
+async function signAndSend(){
+  const btn = $('signbtn');
+  const typed = ($('sign-name').value || '').trim();
+  if(!typed){ alert('Type your full name in the signature block before sending.'); $('sign-name').focus(); return; }
+  if(!dirty){ alert('Draw your signature in the box before sending.'); $('pad').scrollIntoView({block:'center'}); return; }
+  if(!$('sign-consent').checked){ alert('Tick the box confirming you agree and intend to be bound.'); return; }
+
+  btn.disabled = true; btn.textContent = 'Sending…';
+  const fields = collectFields();
+  const payload = {
+    ref: ref,
+    talent_id: CFG.tid || '',
+    name: typed,
+    email: fields['k-email'] || CFG.email || '',
+    phone: fields['k-wa'] || CFG.wa || '',
+    tier: $('tier-excl') && $('tier-excl').checked ? 'ex' : ($('tier-nonex') && $('tier-nonex').checked ? 'non' : ''),
+    route: $('route1') && $('route1').checked ? '1' : ($('route2') && $('route2').checked ? '2' : ''),
+    doc_version: await sha256(document.body.innerText),
+    fields: fields,
+    signature: pad.toDataURL('image/png'),
+    consent: true
+  };
+  try{
+    const r = await fetch(ENGINE + '/sign', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if(!r.ok || !d.ok) throw new Error(d && d.error ? d.error : 'Could not reach YKS.');
+    $('bar').hidden = true;
+    const done = $('bar-done'); done.hidden = false;
+    $('done-s').textContent = ref + ' · ' + new Date(d.signed_at || Date.now())
+      .toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    document.querySelectorAll('input.wr, .cbx input, #sign-name, #sign-consent')
+      .forEach(function(el){ el.disabled = true; });
+    const sc = document.querySelector('.sig-clear'); if(sc) sc.remove();
+    done.scrollIntoView({ block: 'center' });
+  }catch(e){
+    btn.disabled = false; btn.textContent = 'Sign & send to YKS';
+    // Never strand someone who has already signed — give them the offline route.
+    alert('That did not send: ' + (e.message || e) + '\n\nYour signature is still on the page. '
+      + 'Tap "Save a copy" and send that file to YKS on WhatsApp instead.');
   }
+}
+
+function savePdf(){
+  const name = ($('sign-name') && $('sign-name').value.trim())
+    || ($('k-name') && $('k-name').value.trim()) || CFG.name || '';
   document.title = 'YKS Creator Agreement — ' + (name || 'unsigned') + ' — ' + ref;
   window.print();
 }
@@ -695,6 +1031,7 @@ function resetAll(){
   if(!confirm('Clear everything you have typed, and the signature?')) return;
   document.querySelectorAll('.wr').forEach(i => { i.value=''; i.removeAttribute('value'); });
   document.querySelectorAll('.cbx input').forEach(c => c.checked = false);
+  $('sign-name').value = ''; $('sign-consent').checked = false;
   clearPad();
 }
 // keep typed values in the printed output

@@ -127,6 +127,21 @@ select.form-input{cursor:pointer}
 .item-row .form-input{padding:9px 10px;font-size:13px}
 .item-remove{background:rgba(192,57,43,.12);border:none;color:var(--red);border-radius:6px;width:32px;height:38px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
 .quick-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+/* talent pipeline */
+.t-stage{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;
+         border-radius:20px;background:rgba(201,169,110,.15);color:var(--gold);white-space:nowrap}
+.t-stage.live{background:rgba(111,191,149,.16);color:#6FBF95}
+.t-gates{display:flex;gap:4px;margin-top:7px}
+.t-g{flex:1;height:4px;border-radius:2px;background:var(--border)}
+.t-g.on{background:#6FBF95}
+.t-ready{font-size:12px;padding:10px 12px;border-radius:8px;margin-top:10px;line-height:1.5}
+.t-ready.yes{background:rgba(111,191,149,.12);color:#8FD9B4;border:1px solid rgba(111,191,149,.3)}
+.t-ready.no{background:rgba(192,57,43,.10);color:#E4948B;border:1px solid rgba(192,57,43,.28)}
+.gate-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.gate-row:last-child{border-bottom:none}
+.gate-row input{width:19px;height:19px;margin-top:1px;accent-color:#6FBF95;flex-shrink:0}
+.gate-row .g-t{font-size:13.5px;font-weight:600}
+.gate-row .g-s{font-size:11.5px;color:var(--sub);margin-top:2px;line-height:1.45}
 .quick-btn{background:var(--gold-lt);color:var(--gold);border:1px solid rgba(201,169,110,.2);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer}
 .quick-btn:active{background:rgba(201,169,110,.3)}
 .btn-add-item{width:100%;padding:11px;background:none;border:1px dashed var(--border);border-radius:8px;color:var(--sub);font-size:13px;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -244,19 +259,7 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
 /* ══════════ SITE EDITOR (merged in) ══════════ */
 
 
-
-
-
-
 /* ── LOCK ── */
-
-
-
-
-
-
-
-
 
 
 
@@ -388,8 +391,6 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--gold);color:var(--gold);padding:11px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:300;transition:transform .25s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
 .toast.on{transform:translateX(-50%) translateY(0)}
-
-
 /* ── merged layout: these must come last to beat both stylesheets ── */
 #screen-website.active{
   position:fixed; inset:0; bottom:var(--navh);
@@ -416,6 +417,11 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 @media print{
   #screen-website,#screen-website.active,.pubbar,.ov,.sheet,.toast,.ed-top,.ed-modes,.ed-stage{display:none!important}
 }
+
+/* ══════ QA-ENGINE MANAGED BLOCK — written by tools/qa/run.mjs · do not hand-edit ══════ */
+/* low-contrast · /studio.html @Desktop · raise contrast to 4.67:1 */
+#pin-enter{color:rgb(132,129,136)}
+/* ══════ END QA-ENGINE MANAGED BLOCK ══════ */
 </style>
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
 <link rel="canonical" href="https://yksproductions.com/studio.html" />
@@ -681,6 +687,154 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 </div>
 </div>
 
+<!-- ══ TALENT PIPELINE ══ -->
+<div id="screen-talent" class="screen">
+  <div class="hdr"><div class="hdr-inner">
+    <div><div class="brand">TALENT</div><div class="hdr-sub">ONBOARDING PIPELINE</div></div>
+    <button onclick="tNew()" style="background:none;border:none;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer">+ Add</button>
+  </div></div>
+  <div class="form-wrap">
+    <div class="form-field"><input class="form-input" id="t-q" type="search" placeholder="Search name or handle" oninput="renderTalents()" autocomplete="off"></div>
+    <div id="t-list"></div>
+  </div>
+</div>
+
+<!-- ══ TALENT DETAIL ══ -->
+<div id="screen-tdetail" class="screen">
+  <div class="hdr"><div class="hdr-inner">
+    <div><div class="brand" id="td-name">TALENT</div><div class="hdr-sub" id="td-sub"></div></div>
+    <button onclick="showScreen('talent')" style="background:none;border:none;color:var(--sub);font-size:12px;cursor:pointer">Done</button>
+  </div></div>
+  <div class="form-wrap">
+
+    <div id="td-ready"></div>
+
+    <div class="form-section">
+      <label class="form-label">Stage</label>
+      <select class="form-input" id="td-stage" onchange="tSave()">
+        <option value="0">0 — Arrived</option>
+        <option value="1">1 — Screened</option>
+        <option value="2">2 — Had the honest conversation</option>
+        <option value="3">3 — Agreement sent</option>
+        <option value="4">4 — Signed</option>
+        <option value="5">5 — Details pack in</option>
+        <option value="6">6 — Profile built</option>
+        <option value="7">7 — Live on the roster</option>
+        <option value="8">8 — In outreach</option>
+      </select>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">The four gates</label>
+      <div class="gate-row"><input type="checkbox" id="td-g1" onchange="tSave()">
+        <div><div class="g-t">Agreement signed</div><div class="g-s">Signed and filed. No signature, no roster listing and no pitching.</div></div></div>
+      <div class="gate-row"><input type="checkbox" id="td-g2" onchange="tSave()">
+        <div><div class="g-t">18+, proved with ID</div><div class="g-s">Aadhaar or passport on file. A minor's contract is void from the start.</div></div></div>
+      <div class="gate-row"><input type="checkbox" id="td-g3" onchange="tSave()">
+        <div><div class="g-t">Rate floor + refused categories</div><div class="g-s">Blank fields make clauses 4.3 and 6.4 unkeepable promises.</div></div></div>
+      <div class="gate-row"><input type="checkbox" id="td-g4" onchange="tSave()">
+        <div><div class="g-t">PAN + bank account</div><div class="g-s">No PAN means TDS at 20%. No bank means you can't pay them.</div></div></div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Who</label>
+      <div class="form-field"><input class="form-input" id="td-tname" placeholder="Full name" onchange="tSave()"></div>
+      <div class="form-row">
+        <div><label class="form-label">They are a</label>
+          <input class="form-input" id="td-noun" list="noun-list" placeholder="Creator" onchange="tSave()" autocomplete="off">
+          <datalist id="noun-list">
+            <option value="Creator"></option><option value="Influencer"></option><option value="Model"></option>
+            <option value="Actor"></option><option value="Artist"></option><option value="Dancer"></option>
+            <option value="Musician"></option><option value="Comedian"></option><option value="Presenter"></option>
+            <option value="Voice Artist"></option><option value="Athlete"></option><option value="Chef"></option>
+          </datalist></div>
+        <div><label class="form-label">Category</label><input class="form-input" id="td-cat" placeholder="Fashion" onchange="tSave()"></div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Agreement edition</label>
+        <select class="form-input" id="td-catkey" onchange="tSave()">
+          <option value="influencer">Influencer / creator &mdash; posts on their own channels</option>
+          <option value="model">Model &mdash; shoot days, call times, usage buyout</option>
+          <option value="actor">Actor / performer &mdash; auditions, call sheets, credit</option>
+          <option value="core">Core only &mdash; no category clauses</option>
+        </select>
+        <p class="field-note">This changes the clauses themselves. An influencer gets ASCI disclosure,
+        whitelisting and follower warranties. A model gets call times, overtime, fittings and usage buyout
+        instead &mdash; and a rate card of day rates rather than reels. Set from what you typed above, change
+        it if that's wrong.</p>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Instagram</label><input class="form-input" id="td-ig" placeholder="@handle" onchange="tSave()"></div>
+        <div><label class="form-label">Followers</label><input class="form-input" id="td-igf" placeholder="48,200" onchange="tSave()"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">City</label><input class="form-input" id="td-city" placeholder="Bangalore" onchange="tSave()"></div>
+        <div><label class="form-label">WhatsApp</label><input class="form-input" id="td-wa" type="tel" onchange="tSave()"></div>
+      </div>
+      <div class="form-field"><label class="form-label">Email</label><input class="form-input" id="td-email" type="email" onchange="tSave()"></div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Their terms</label>
+      <div class="form-field"><label class="form-label">Minimum in-hand fee (&#8377;)</label>
+        <input class="form-input" id="td-min" placeholder="25,000" onchange="tSave()"></div>
+      <div class="form-field"><label class="form-label">Categories they will NOT take</label>
+        <input class="form-input" id="td-excl" placeholder="Betting, weight-loss" onchange="tSave()"></div>
+      <div class="form-field"><label class="form-label">Brands they already work with</label>
+        <input class="form-input" id="td-pre" placeholder="Nykaa, Bewakoof" onchange="tSave()"></div>
+      <div class="form-row">
+        <div><label class="form-label">Tier</label>
+          <select class="form-input" id="td-tier" onchange="tSave()">
+            <option value="non">Non-exclusive</option><option value="ex">Exclusive</option><option value="">They choose</option>
+          </select></div>
+        <div><label class="form-label">Brand pays</label>
+          <select class="form-input" id="td-route" onchange="tSave()">
+            <option value="2">Route 2 — them</option><option value="1">Route 1 — you</option><option value="">Decide later</option>
+          </select></div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Agreement terms &mdash; change any of these</label>
+      <p class="field-note" style="margin:0 0 10px">These rewrite the clauses themselves. Leave them alone and
+      the standard terms apply. Whatever word you put in &ldquo;They are a&rdquo; becomes the defined term
+      right through the agreement &mdash; Model Fee, the Actor&rsquo;s Own Enquiries, and so on.</p>
+      <div class="form-row">
+        <div><label class="form-label">Pay them within (business days)</label><input class="form-input" id="td-pay" type="number" min="1" placeholder="7" onchange="tSave()"></div>
+        <div><label class="form-label">Agreement runs (months)</label><input class="form-input" id="td-term" type="number" min="1" placeholder="12" onchange="tSave()"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Introduced-brand window (months)</label><input class="form-input" id="td-tail" type="number" min="0" placeholder="6" onchange="tSave()"></div>
+        <div><label class="form-label">Content stays up after exit (months)</label><input class="form-input" id="td-utail" type="number" min="0" placeholder="6" onchange="tSave()"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Confidentiality (years)</label><input class="form-input" id="td-conf" type="number" min="0" placeholder="2" onchange="tSave()"></div>
+        <div><label class="form-label">Liability cap (months)</label><input class="form-input" id="td-cap" type="number" min="1" placeholder="6" onchange="tSave()"></div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Their agreement</label>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="tOpen()">&#128065; Preview</button>
+        <button class="quick-btn" onclick="tCopy()">&#128279; Copy link</button>
+        <button class="quick-btn" onclick="tWhatsApp()">&#128172; WhatsApp</button>
+        <button class="quick-btn" onclick="tEmail()">&#9993; Email</button>
+      </div>
+      <p class="field-note" id="td-note" style="margin-top:10px"></p>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Notes</label>
+      <textarea class="form-input" id="td-notes" rows="4" style="resize:vertical" onchange="tSave()"></textarea>
+    </div>
+
+    <div class="form-section">
+      <button class="btn-sm btn-del" style="width:100%;padding:12px" onclick="tDelete()">Remove this talent</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ CREATOR CONTRACT ══ -->
 <div id="screen-contract" class="screen">
   <div class="hdr"><div class="hdr-inner">
@@ -731,6 +885,28 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
         <input class="form-input" id="cr-pre" type="text" placeholder="Nykaa, Bewakoof">
         <p class="field-note">Pre-existing brands. You never take anything on these, and listing them now is
         what stops an argument later.</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Representation tier</label>
+        <select class="form-input" id="cr-tier">
+          <option value="non">Non-exclusive &mdash; they work with anyone</option>
+          <option value="ex">Exclusive &mdash; brand work runs through you</option>
+          <option value="">Let them choose on the page</option>
+        </select>
+        <p class="field-note">Exclusive buys them priority: first in the pitching order for their category,
+        first refusal on briefs, featured on the roster. It ends the day the agreement ends &mdash; nothing
+        exclusive survives, which is what keeps it clear of s.27 restraint of trade.</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Agreement edition</label>
+        <select class="form-input" id="cr-catkey">
+          <option value="influencer">Influencer / creator</option>
+          <option value="model">Model &mdash; shoot days and usage buyout</option>
+          <option value="actor">Actor / performer</option>
+          <option value="core">Core only</option>
+        </select>
+        <p class="field-note">Swaps the clauses to suit. Full pipeline with gates and stages lives in the
+        <b>Talent</b> tab &mdash; this is the quick send.</p>
       </div>
       <div class="form-field">
         <label class="form-label">How the brand pays</label>
@@ -1150,6 +1326,10 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
     Website
   </button>
+  <button class="nav-btn" id="nav-talent" onclick="showScreen('talent')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+    Talent
+  </button>
   <button class="nav-btn" id="nav-contract" onclick="showScreen('contract')">
     <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/><path d="M8.5 16.5c1.2-1.6 2-2.4 2.6-2.4.9 0 .5 2 1.4 2 .7 0 1.1-1.1 2-1.1.6 0 1 .4 1.5 1"/></svg>
     Contract
@@ -1427,7 +1607,7 @@ function exportBackup(){
   const docs=getDocs();
   if(!docs.length){ toast('Nothing to back up'); return; }
   const payload={format:'yks-studio-backup',version:1,exportedAt:new Date().toISOString(),
-    settings:getSettings(),counters:getCounters(),docs,contracts:getContracts()};
+    settings:getSettings(),counters:getCounters(),docs,contracts:getContracts(),talents:getTalents()};
   if(dlFile('yks-studio-backup-'+stamp()+'.json',JSON.stringify(payload,null,2))){
     localStorage.setItem(BK_KEY,String(Date.now()));
     toast('Backup saved \u2014 keep it somewhere safe');
@@ -1477,6 +1657,13 @@ function restoreBackup(input){
       if(n>(c[k]||1)) c[k]=n;
     });
     try{ localStorage.setItem('yks_ctrs',JSON.stringify(c)); }catch(e){}
+    if(Array.isArray(data && data.talents)){
+      const seenT={}; getTalents().forEach(t=>seenT[t.id]=t);
+      data.talents.forEach(t=>{ if(!t||!t.id) return;
+        const cur=seenT[t.id];
+        if(!cur || (t.updatedAt||0)>(cur.updatedAt||0)) seenT[t.id]=t; });
+      writeTalents(Object.keys(seenT).map(k=>seenT[k]).sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0)));
+    }
     if(Array.isArray(data && data.contracts)){
       const seen={}; getContracts().forEach(c=>seen[c.ref]=c);
       data.contracts.forEach(c=>{ if(c && c.ref && !seen[c.ref]) seen[c.ref]=c; });
@@ -1548,6 +1735,7 @@ function showScreen(name){
   if(name==='history') renderHistory();
   if(name==='settings') loadSettingsForm();
   if(name==='contract') renderContracts();
+  if(name==='talent') renderTalents();
   if(name!=='new') closeAI();
   if(name!=='website' && !publishing) closeSheets();
   document.getElementById('ai-float').classList.toggle('visible', name==='new');
@@ -1833,7 +2021,7 @@ function crBuild(){
   const cfg={ name, ref: crNextRef() };
   [['ig','cr-ig'],['igf','cr-igf'],['cat','cr-cat'],['city','cr-city'],
    ['wa','cr-wa'],['email','cr-email'],['min','cr-min'],['excl','cr-excl'],
-   ['pre','cr-pre'],['route','cr-route']].forEach(([k,id])=>{
+   ['pre','cr-pre'],['route','cr-route'],['tier','cr-tier'],['catkey','cr-catkey']].forEach(([k,id])=>{
      const val=v(id).trim(); if(val) cfg[k]=val;
    });
   const json=JSON.stringify(cfg);
@@ -1861,12 +2049,21 @@ function crCopy(){
 }
 function crMsg(cfg,url){
   const first=cfg.name.trim().split(' ')[0];
+  const tierLine = cfg.tier==='ex'
+    ? 'I\u2019ve marked it exclusive — brand work runs through me for the year, and you go first in the '
+      +'pitching queue for your category. If you\u2019d rather stay non-exclusive, just say so and I\u2019ll change it.'
+    : 'It\u2019s non-exclusive, so you keep working with whoever you want. There\u2019s an exclusive option in '
+      +'there too if you ever want to be pitched first — your call, never a condition.';
   return 'Hey '+first+' — here\u2019s the agreement, exactly how I explained it.\n\n'
+    +'Quick context in writing, since it matters: YKS Productions is a production house — brand films, '
+    +'fashion and campaign work out of Bangalore and Dubai. The talent board is new, which is exactly why '
+    +'being on it now is worth something: a small roster means far more attention per person.\n\n'
     +'First page is the plain-English version, and every section after it has a note in normal words '
     +'so you\u2019re not decoding legal language on your own.\n\n'
-    +'Two things worth saying up front: it\u2019s non-exclusive, so you keep working with whoever you want. '
-    +'And you pay me nothing — no joining fee, no monthly fee, no commission, nothing cut from what you earn. '
+    +tierLine+'\n\n'
+    +'You pay me nothing — no joining fee, no monthly fee, no commission, nothing cut from what you earn. '
     +'I get paid by the brand, above your number.\n\n'
+    +'And there\u2019s no notice period. If it\u2019s ever not working, one email and you\u2019re out that day.\n\n'
     +'Fill in what applies, sign it on your phone, save the PDF and send it back. Anything you want changed, '
     +'just tell me before you sign.\n\n'+url;
 }
@@ -1906,6 +2103,155 @@ function renderContracts(){
       +'<button class="btn-sm btn-del" onclick="crDelete(\''+c.ref+'\')">Remove</button>'
       +'</div></div>';
   }).join('');
+}
+// ── TALENT ONBOARDING PIPELINE ─────────────────────────────────────────────
+// One record per talent, carried through the nine stages with the four gates
+// that block a roster listing. The agreement link is built from this record, so
+// what you set here is what the talent actually signs.
+const T_STAGES = ['Arrived','Screened','Talked','Agreement sent','Signed','Details in','Profile built','Live','In outreach'];
+const T_FIELDS = [['tname','name'],['noun','noun'],['catkey','catkey'],['cat','cat'],['ig','ig'],['igf','igf'],['city','city'],
+                  ['wa','wa'],['email','email'],['min','min'],['excl','excl'],['pre','pre'],
+                  ['tier','tier'],['route','route'],['notes','notes'],
+                  ['pay','pay'],['term','term'],['tail','tail'],['utail','utail'],['conf','conf'],['cap','cap']];
+let tCurrent = null;
+
+function getTalents(){ try{ return JSON.parse(localStorage.getItem('yks_talents')||'[]'); }catch(e){ return []; } }
+function writeTalents(list){
+  try{ localStorage.setItem('yks_talents',JSON.stringify(list)); return true; }
+  catch(e){ alert('That could NOT be saved.\n\nStorage is full, or this is a private window. Back up from History before you lose anything.'); return false; }
+}
+function tGates(t){ return [t.g1,t.g2,t.g3,t.g4].filter(Boolean).length; }
+function tReady(t){ return tGates(t) === 4; }
+
+function tNew(){
+  const list = getTalents();
+  const t = { id: 'T'+Date.now().toString(36), noun:'Creator', stage:0, createdAt: Date.now() };
+  list.unshift(t);
+  if(!writeTalents(list)) return;
+  tOpenRecord(t.id);
+}
+// The word he types for "they are a" usually settles which edition applies, so
+// guess it once rather than making him pick twice. He can still override it.
+function editionFor(noun){
+  const n = (noun||'').toLowerCase();
+  if(/model/.test(n)) return 'model';
+  if(/actor|actress|performer|artist|dancer|presenter|comedian|musician/.test(n)) return 'actor';
+  if(/influencer|creator|blogger|youtuber/.test(n)) return 'influencer';
+  return 'influencer';
+}
+function tOpenRecord(id){
+  tCurrent = id;
+  const t = getTalents().find(x=>x.id===id);
+  if(!t){ showScreen('talent'); return; }
+  if(!t.catkey) t.catkey = editionFor(t.noun);
+  T_FIELDS.forEach(([el,key])=>{ const e=$('td-'+el); if(e) e.value = t[key]==null ? '' : t[key]; });
+  $('td-stage').value = String(t.stage||0);
+  [1,2,3,4].forEach(n=>{ $('td-g'+n).checked = !!t['g'+n]; });
+  tPaintHeader(t);
+  showScreen('tdetail');
+}
+function tPaintHeader(t){
+  $('td-name').textContent = (t.name || 'New talent').toUpperCase();
+  $('td-sub').textContent = [t.noun||'Creator', t.ig||'', T_STAGES[t.stage||0]].filter(Boolean).join(' · ').toUpperCase();
+  const r = $('td-ready');
+  if(tReady(t)){
+    r.innerHTML = '<div class="t-ready yes"><b>All four gates green.</b> Clear to go live on the roster and into outreach.</div>';
+  } else {
+    const missing = [!t.g1&&'agreement signed', !t.g2&&'ID / 18+', !t.g3&&'rate floor + refused categories', !t.g4&&'PAN + bank']
+      .filter(Boolean).join(', ');
+    r.innerHTML = '<div class="t-ready no"><b>Not clear to go live.</b> Still needed: '+esc(missing)+'.</div>';
+  }
+}
+function tSave(){
+  if(!tCurrent) return;
+  const list = getTalents(), t = list.find(x=>x.id===tCurrent);
+  if(!t) return;
+  const nounWas = t.noun;
+  T_FIELDS.forEach(([el,key])=>{ const e=$('td-'+el); if(e) t[key] = e.value.trim(); });
+  if(t.noun !== nounWas && !t.catkeySet){ t.catkey = editionFor(t.noun); $('td-catkey').value = t.catkey; }
+  if($('td-catkey').value !== editionFor(t.noun)) t.catkeySet = true;
+  t.stage = parseInt(v('td-stage'),10) || 0;
+  [1,2,3,4].forEach(n=>{
+    const on = $('td-g'+n).checked;
+    if(on && !t['g'+n]) t['g'+n+'At'] = Date.now();   // when a gate went green
+    t['g'+n] = on;
+  });
+  t.updatedAt = Date.now();
+  writeTalents(list);
+  tPaintHeader(t);
+}
+function tDelete(){
+  const t = getTalents().find(x=>x.id===tCurrent);
+  if(!t) return;
+  if(!confirm('Remove '+(t.name||'this talent')+' from the pipeline?\n\nThis only clears your record — it does not end any agreement they signed.')) return;
+  writeTalents(getTalents().filter(x=>x.id!==tCurrent));
+  tCurrent = null;
+  showScreen('talent');
+}
+function renderTalents(){
+  const el = $('t-list'); if(!el) return;
+  const q = (v('t-q')||'').trim().toLowerCase();
+  const all = getTalents();
+  const list = q ? all.filter(t=>((t.name||'')+' '+(t.ig||'')+' '+(t.cat||'')).toLowerCase().indexOf(q)>-1) : all;
+  if(!all.length){
+    el.innerHTML = '<p class="field-note" style="margin:0">Nobody in the pipeline yet. Tap <b>+ Add</b> to onboard your first talent — creator, model, actor, anyone.</p>';
+    return;
+  }
+  if(!list.length){ el.innerHTML = '<p class="field-note" style="margin:0">Nothing matches that.</p>'; return; }
+  el.innerHTML = list.map(t=>{
+    const n = tGates(t), live = (t.stage||0) >= 7;
+    const bars = [1,2,3,4].map(i=>'<div class="t-g'+(t['g'+i]?' on':'')+'"></div>').join('');
+    return '<div class="doc-card" style="margin:0 0 10px" onclick="tOpenRecord(\''+t.id+'\')">'
+      +'<div class="doc-card-top"><div>'
+      +'<div class="doc-client">'+esc(t.name||'Unnamed')+'</div>'
+      +'<div class="doc-meta">'+esc([t.noun||'Creator', t.ig||'', t.cat||''].filter(Boolean).join(' · '))+'</div>'
+      +'</div><span class="t-stage'+(live?' live':'')+'">'+esc(T_STAGES[t.stage||0])+'</span></div>'
+      +'<div class="t-gates">'+bars+'</div>'
+      +'<div class="doc-meta" style="margin-top:6px">'+n+' of 4 gates'+(n===4?' — clear to go live':'')+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+/* ── the agreement link, built from a talent record ── */
+function tCfg(){
+  const t = getTalents().find(x=>x.id===tCurrent);
+  if(!t){ toast('Open a talent first'); return null; }
+  if(!(t.name||'').trim()){ toast('Add their name first'); $('td-tname').focus(); return null; }
+  const cfg = { name: t.name, ref: crNextRef() };
+  ['ig','igf','cat','city','wa','email','min','excl','pre','tier','route'].forEach(k=>{ if(t[k]) cfg[k]=t[k]; });
+  if(t.noun && t.noun !== 'Creator') cfg.noun = t.noun;
+  cfg.catkey = t.catkey || editionFor(t.noun);
+  const terms = {};
+  ['pay','term','tail','utail','conf','cap'].forEach(k=>{ const n=parseInt(t[k],10); if(n>0) terms[k]=n; });
+  if(Object.keys(terms).length) cfg.terms = terms;
+  const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(cfg))));
+  return { url: CREATOR_AGREEMENT_URL+'#'+encodeURIComponent(b64), cfg, t };
+}
+function tOpen(){ const b=tCfg(); if(b) window.open(b.url,'_blank'); }
+function tCopy(){
+  const b=tCfg(); if(!b) return;
+  const done=()=>{ $('td-note').textContent='Link copied — send it to '+b.cfg.name.split(' ')[0]+'.'; toast('Link copied'); tAfterSend(b); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(b.url).then(done).catch(()=>{ agFallback(b.url); tAfterSend(b); });
+  } else { agFallback(b.url); tAfterSend(b); }
+}
+function tWhatsApp(){ const b=tCfg(); if(!b) return; tAfterSend(b); window.open('https://wa.me/'+(b.t.wa||'').replace(/[^0-9]/g,'')+'?text='+encodeURIComponent(crMsg(b.cfg,b.url)),'_blank'); }
+function tEmail(){
+  const b=tCfg(); if(!b) return; tAfterSend(b);
+  const body=crMsg(b.cfg,b.url)+'\n\nYedukrishna\n\uD83D\uDCF8 @yks_photoworks \u00B7 yksproductions.com';
+  window.open('mailto:'+encodeURIComponent(b.t.email||'')+'?subject='+encodeURIComponent('Working together — the agreement')+'&body='+encodeURIComponent(body),'_blank');
+}
+// Sending is what moves them to stage 3 and burns the reference — previewing does neither.
+function tAfterSend(b){
+  crRecord(b.cfg);
+  const list=getTalents(), t=list.find(x=>x.id===tCurrent);
+  if(t){
+    t.ref = b.cfg.ref;
+    if((t.stage||0) < 3){ t.stage = 3; $('td-stage').value='3'; }
+    t.updatedAt = Date.now();
+    writeTalents(list);
+    tPaintHeader(t);
+  }
 }
 
 function generateDoc(){
@@ -2176,8 +2522,6 @@ async function sendAI(){
 
 // ── WEBSITE EDITOR ────────────────────────────────────────────────────────
 // Editing now lives in edit.html — a direct visual editor (no AI find/replace).
-
-
 // ══ CONFIG ══
 const GH_OWNER='ysuresh634-creator', GH_REPO='yks-productions-site', GH_BRANCH='main';
 const SITE='https://yksproductions.com/';
@@ -3392,11 +3736,7 @@ async function doSave(){
 // ══ SHEETS ══
 function openSheet(id){ closeSheets(); $('ov').classList.add('on'); $(id).classList.add('on'); }
 function closeSheets(){ $('ov').classList.remove('on'); document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('on')); }
-
-
 window.addEventListener('resize',()=>{ if(pe && $('sh-photo').classList.contains('on')) peDraw(); });
-
-
 
 // ══ SELF-CHECK & RECOVER ENGINE ════════════════════════════════════════════
 // Catches every error so nothing fails silently, heals the known-safe failure

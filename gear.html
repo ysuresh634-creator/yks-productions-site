@@ -119,7 +119,8 @@ h2 em,h3 em{font-style:italic;background:linear-gradient(100deg,var(--amber),var
 .g-foot-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
 .g-foot-brand{font-family:var(--serif);font-size:18px;font-weight:600}
 .g-foot-brand span{color:var(--amber)}
-.g-foot-links{display:flex;gap:24px;font-family:var(--mono);font-size:10px;letter-spacing:.18em}
+.g-foot-links{display:flex;gap:0 24px;font-family:var(--mono);font-size:10px;letter-spacing:.18em}
+.g-foot-links a{display:inline-flex;align-items:center;min-height:44px}
 .g-foot-links a:hover{color:var(--amber)}
 .g-foot-disc{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:rgba(244,237,226,.3);
   line-height:1.7;margin-top:24px}
@@ -138,6 +139,9 @@ h2 em,h3 em{font-style:italic;background:linear-gradient(100deg,var(--amber),var
   .g-grid,.g-grid.two{grid-template-columns:1fr}
   .g-section{padding:56px 0 0}
   .g-foot-inner{flex-direction:column;align-items:flex-start}
+  /* six footer links in one nowrap flex row measured 376px inside a 349px
+     column, which pushed the whole page 5px sideways on a phone */
+  .g-foot-links{flex-wrap:wrap;gap:0 20px}
 }
 
 /* category strip — same component as the landing pages, inlined because
@@ -344,8 +348,6 @@ h2 em,h3 em{font-style:italic;background:linear-gradient(100deg,var(--amber),var
     <a href="/index.html#act-about">Story</a>
   </div>
 </div>
-
-
 <main>
 
 <!-- ── HERO ── -->
