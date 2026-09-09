@@ -98,11 +98,11 @@ def foot(c):
 def faqs(c):
     """City-specific first, then the questions every fresh talent actually types."""
     return [
-        (f'How do I join a modelling roster in {c["city"]}?',
-         f'Send your details and photographs through the application form. You do not need '
-         f'professional pictures to apply — clear, unedited photographs taken on a phone in '
-         f'daylight are enough to assess, and are what we ask for first. Applying is free and '
-         f'stays free. If you are put forward for a job, you are paid for that job.'),
+        (f'How do I join the casting roster in {c["city"]}?',
+         f'Applications are read from the form only — not WhatsApp, calls or DMs. Send your '
+         f'details and a few clear, unedited photographs taken on a phone in daylight; that is '
+         f'enough to assess. It is a selective, curated list brands are cast from, so not every '
+         f'application is added. There is no fee at any stage, and a booking is paid work.'),
         (f'Does YKS charge {c["city"]} models a joining or portfolio fee?',
          'No. There is no joining fee, no registration fee, no portfolio package and no '
          'compulsory shoot. Anyone in India asking a model to pay to be represented is '
@@ -115,10 +115,11 @@ def faqs(c):
          f'Yes. The roster is open to talent anywhere in India, not only {c["city"]} or the '
          f'cities listed. Where you are based matters for local jobs, but a brief that fits '
          f'you can come from anywhere, and travel is arranged as part of the booking.'),
-        ('Do I need experience or an existing portfolio?',
-         'No. New faces are cast constantly, and every model on any roster started without a '
-         'credit. What is actually required is being over 18, being reachable, and turning up '
-         'when you say you will.'),
+        ('Is this a photoshoot package, or a way to get discovered?',
+         'Neither. YKS is not a photography or portfolio-building service, and being on the '
+         'roster is not a paid shoot for you — it is a shortlist that brands cast from. What '
+         'is required is being over 18, camera-ready, reachable and reliable on a shoot day. '
+         'If your pictures are not working for casting, I will tell you why.'),
         (f'What does it cost to cast a model in {c["city"]}?',
          'It depends on the shoot — the number of days, the usage you need and how many people '
          'you are casting. Send the brief and you get one all-in number back covering the talent '
@@ -175,9 +176,9 @@ def page(c):
             {
                 '@type': 'WebPage', '@id': url + '#page', 'url': url,
                 'name': f'Models in {c["city"]} — cast for a shoot, or join the roster',
-                'description': (f'Cast models, actors and creators in {c["city"]}, or join the '
-                                f'YKS Talents roster from {c["city"]}. Free to join, bookings '
-                                f'arranged through YKS Productions.'),
+                'description': (f'Casting for commercial and fashion shoots in {c["city"]} — brands '
+                                f'send a brief and receive a shortlist from a curated roster of '
+                                f'working models and actors, booked only through YKS Productions.'),
                 'isPartOf': {'@id': f'{BASE}/#website'},
                 'about': {'@id': url + '#service'},
                 'significantLink': [f'{BASE}/talents/apply.html', f'{BASE}/casting-india.html'],
@@ -196,7 +197,7 @@ def page(c):
                     {'@type': 'BusinessAudience',
                      'audienceType': f'Brands and agencies casting in {c["city"]}'},
                     {'@type': 'Audience',
-                     'audienceType': f'Models, actors and creators in {c["city"]} seeking paid work'},
+                     'audienceType': f'Working models, actors and creators in {c["city"]}'},
                 ],
                 'availableChannel': [
                     {'@type': 'ServiceChannel', 'name': 'Casting brief',
@@ -235,7 +236,7 @@ def page(c):
   gtag('config', 'G-C57X89TN45');
 </script>
 <title>Book Models in {e(c['city'])} — Casting &amp; Talent | YKS Talents</title>
-<meta name="description" content="Cast models, actors and creators in {e(c['city'])} — send a brief, get a shortlist. Every booking runs through YKS. Working talent can apply to the board." />
+<meta name="description" content="Casting for commercial and fashion shoots in {e(c['city'])} — brands send a brief and get a shortlist. A curated roster of working models and actors, booked only through YKS. Not a photography or portfolio service." />
 <link rel="canonical" href="{url}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="geo.region" content="{e(c['geo'])}" />
@@ -243,7 +244,7 @@ def page(c):
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="YKS Productions" />
 <meta property="og:title" content="Models in {e(c['city'])} — cast for a shoot, or join the roster" />
-<meta property="og:description" content="A talent pool open to anyone in India, and a casting service for brands. Free to join. Bookings arranged through YKS Productions." />
+<meta property="og:description" content="A curated casting desk for brands shooting in {e(c['city'])}, and a selective roster of working talent. Bookings arranged through YKS Productions. Applications by form only." />
 <meta property="og:url" content="{url}" />
 <meta property="og:image" content="{BASE}/assets/og-cover.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -268,7 +269,7 @@ def page(c):
   <div class="wrap">
     <p class="l-eyebrow">Talent · {e(c['city'])} · {e(c['state'])}</p>
     <h1>Models in {e(c['city'])}</h1>
-    <p class="tal-h1sub">Modelling, acting and creator work in {e(c['city'])} — for the people doing it, and the brands casting it.</p>
+    <p class="tal-h1sub">Commercial and fashion casting in {e(c['city'])} — a curated roster of working talent, and the brands that book it.</p>
     <p class="l-lede">{e(c['market'])}</p>
     <div class="l-cta-row">
       <a class="btn btn-fill" href="/casting-india.html#brief">I&rsquo;m casting — send a brief</a>
@@ -283,16 +284,17 @@ def page(c):
 
       <div class="l-svcside">
         <p class="l-eyebrow">For talent in {e(c['city'])}</p>
-        <h2>The board is <em>open in {e(c['city'])}</em></h2>
+        <h2>A working roster, <em>in {e(c['city'])}</em></h2>
         <p class="l-prose">{e(c['talent'])}</p>
-        <p class="l-prose">Over 18, photographs plain enough to see you properly, and no fee at
-        any point — not to join, not to stay on it, and not for the portfolio you build here on
-        the way through. You keep that PDF either way. You also get mentoring: what your book
-        needs, how a casting actually runs, how to walk, and how to prepare if you are going in
-        for a pageant. If your pictures aren&rsquo;t working I will tell you why and what to
-        shoot instead, which is the conversation most new faces never get. Every brief that comes through is paid work for a real client. Nobody honest
-        promises work; what I can promise is that briefs from {e(c['city'])} go in front of the
-        right faces, and that the booking, the schedule and the payment all run through me.
+        <p class="l-prose">The roster is built for people who are over 18, camera-ready and
+        serious about commercial work — it is a shortlist brands are cast from, not a course and
+        not a way to get discovered. YKS is not a photography or portfolio-building service, so
+        being on it is not a paid shoot for you; a booking is paid work for a real client, and
+        the schedule and the payment run through me. There is no fee at any stage. Applications
+        are read from the form only — not WhatsApp, calls or DMs — and it is a curated list, so
+        not everyone is added. If your pictures aren&rsquo;t working for casting I will tell you
+        why. Nobody honest promises work; what I can promise is that briefs from {e(c['city'])}
+        go in front of the right faces.
         <a href="/talents/apply.html">The full terms are on the board &rarr;</a></p>
         <div class="l-cta-row">
           <a class="btn btn-fill" href="/talents/apply.html">Apply from {e(c['city'])} →</a>
