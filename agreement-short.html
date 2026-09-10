@@ -68,6 +68,19 @@
   .context p:last-child{margin:0}
   .context.hl{background:rgba(201,169,110,.12);border:1.5px solid var(--gold);border-left:1.5px solid var(--gold)}
   .context.hl .context-h{color:#0D0B11;background:var(--gold);display:inline-block;border-radius:5px;padding:3px 9px}
+  .tier{display:grid;gap:11px;margin-top:6px}
+  .tieropt{display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start;border:1px solid var(--line);
+       border-radius:11px;padding:13px 15px;cursor:pointer;background:var(--paper)}
+  .tieropt input{margin-top:2px;width:16px;height:16px;accent-color:var(--gold-deep)}
+  .tieropt .t-t{font-family:var(--sans);font-weight:700;font-size:14px}
+  .tieropt .t-d{font-size:12px;line-height:1.5;margin-top:3px}
+  .tieropt.ex{border:2px solid var(--gold);background:rgba(201,169,110,.12);box-shadow:0 2px 14px rgba(201,169,110,.20)}
+  .t-badge{display:inline-block;font-family:var(--sans);font-size:8px;font-weight:800;letter-spacing:1px;
+       text-transform:uppercase;color:#0D0B11;background:var(--gold);border-radius:4px;padding:2px 7px;margin-left:7px;vertical-align:middle}
+  .t-perks{list-style:none;margin:9px 0 0;padding:0;display:grid;gap:7px}
+  .t-perks li{position:relative;padding-left:20px;font-size:12px;line-height:1.5}
+  .t-perks li::before{content:"★";position:absolute;left:0;top:0;color:var(--gold-deep);font-size:11px}
+  .t-perks b{font-family:var(--sans)}
   /* ── points ── */
   ol.pts{list-style:none;margin:0;padding:0;counter-reset:p}
   ol.pts>li{counter-increment:p;position:relative;padding:13px 0 13px 40px;border-top:1px solid var(--line-soft)}
@@ -201,7 +214,7 @@
     <div class="context">
       <p class="context-h">Quick context — who you’re signing with, and how this works</p>
       <p>YKS Productions is a working production house — brand films, fashion and campaign shoots, out of <b>Bangalore and Dubai</b>. The talent roster is new, and that is the opportunity: being one of the first faces on it means more eyes and more pitches than a crowded agency can give you.</p>
-      <p>The whole model, in one line: <b>you cost me nothing — brands find me through the roster, they pay me, and I put you in front of them.</b> No joining fee, no portfolio fee, no commission, no money from you at any point. If an “agency” has ever burned you before, read points 2, 4 and 5 closely — this is built to be the exact opposite.</p>
+      <p>The whole model, in one line: <b>you cost me nothing — brands find me through the roster, they pay me, and I put you in front of them.</b> No joining fee, no portfolio fee, no commission — no money from you to represent you, ever (a couple of optional extras like social-media management exist, but you only pay if you choose one). If an “agency” has ever burned you before, read points 2, 4 and 5 closely — this is built to be the exact opposite.</p>
     </div>
 
     <div class="context hl">
@@ -224,7 +237,7 @@
           <li><b>On-set support <span class="svc-opt">optional</span></b> If you ask me well in advance and I’m free, I can be on the shoot with you — making sure the brief is honoured, you’re looked after, and it runs the way it should. It’s there if you want it, never assumed and never a guarantee.</li>
           <li><b>Protecting your rights.</b> Brands only use what they paid for, in the media and for the time agreed — I keep watch so your face isn’t running somewhere you never agreed to.</li>
           <li><b>Your portfolio &amp; comp card.</b> Built and kept current, so you always look brand-ready when I put you forward.</li>
-          <li><b>Growth &amp; content strategy.</b> I help you grow your own following too — content plans, hooks that actually hold attention, what to post and when, and how to build real traction and reach — powered by the <b>AI-driven growth system I’ve built</b>. (Having me run your accounts hands-on is the optional add-on below.)</li>
+          <li><b>Growth &amp; content strategy <span class="svc-opt">paid add-on</span></b> Want to grow your own following faster? Content plans, hooks that actually hold attention, what to post and when, and real traction — powered by the <b>AI-driven growth system I’ve built</b>. This one is a <b>separate paid service</b> — the cost is discussed and fixed with you upfront — and your free representation never depends on it.</li>
           <li><b>Your social media <span class="svc-opt">optional</span></b> If you want it, I’ll run your content, posting and growth too — tick the box in your details below. Leave it unticked and I simply won’t; your representation is exactly the same either way.</li>
         </ul></div></li>
       <li><b>You pay me nothing — and here’s exactly why.</b><div class="d">No joining fee, no monthly fee, no commission, nothing deducted from what you earn — on work I bring you and on your own enquiries alike. This isn’t charity, it’s my model: your profile is showcased openly on my website for the world to see, and that roster is how brands and agencies discover <b>me</b> and come to me to work with. Those brands are who pay me — your visibility is my business. So representing you genuinely costs you zero: you tell me the number you want in hand, that exact number reaches your account, and whatever I negotiate above it, the brand pays me.</div></li>
@@ -315,14 +328,31 @@
       </div>
       <div style="margin-top:4px">
         <span class="fh" style="display:block;margin-bottom:8px">How you work with me</span>
-        <div class="ticks">
-          <label class="tick"><input type="radio" name="tier" id="tier-non" checked> Non-exclusive — represented, and free to work with anyone</label>
-          <label class="tick"><input type="radio" name="tier" id="tier-ex"> Exclusive — brand work runs through me; in return you’re pitched first and get first pick of the best briefs &amp; brands</label>
+        <div class="tier">
+          <label class="tieropt">
+            <input type="radio" name="tier" id="tier-non" checked>
+            <div><span class="t-t">Non-exclusive</span>
+              <div class="t-d">Fully represented, and free to work with anyone — other managers, agencies, brands. Nothing locked, nothing lost.</div></div>
+          </label>
+          <label class="tieropt ex">
+            <input type="radio" name="tier" id="tier-ex">
+            <div><span class="t-t">Exclusive partnership</span><span class="t-badge">Recommended · best deals first</span>
+              <div class="t-d">Brand work runs through me for the term — and you go to the <b>front of the line</b>. This is how you go from “available” to <b>“in demand.”</b></div>
+              <ul class="t-perks">
+                <li><b>First pick of the good briefs.</b> A fashion label, a jewellery house, a beauty or a wedding campaign comes looking — your name goes out <b>first</b>, before anyone else on the roster.</li>
+                <li><b>Featured on the roster.</b> Your profile sits at the top, where brands look first — not buried in a list.</li>
+                <li><b>Priority on everything I do.</b> My pitches, my time, and my AI growth system all push <b>you</b> the hardest.</li>
+                <li><b>No lock-in, ever.</b> It ends the day the agreement ends. You go first while you’re here — never a trap, and never a promise a brand says yes.</li>
+              </ul>
+            </div>
+          </label>
         </div>
       </div>
       <div style="margin-top:16px">
-        <span class="fh" style="display:block;margin-bottom:8px">Social media <em style="font-family:var(--serif);text-transform:none;letter-spacing:0;font-style:italic;color:var(--warm)">— optional add-on</em></span>
-        <label class="tick"><input type="checkbox" id="smm"> Yes — also handle my social media (content, posting &amp; growth). We set this up separately; my representation of you is free either way.</label>
+        <span class="fh" style="display:block;margin-bottom:8px">Optional paid add-ons <em style="font-family:var(--serif);text-transform:none;letter-spacing:0;font-style:italic;color:var(--warm)">— separate from your free representation</em></span>
+        <label class="tick"><input type="checkbox" id="smm"> <span><b>Social media management</b> — you run my content, posting &amp; growth for me.</span></label>
+        <label class="tick" style="margin-top:9px"><input type="checkbox" id="strat"> <span><b>Growth &amp; content strategy</b> — plans, hooks &amp; traction via your AI growth system.</span></label>
+        <p class="fnote" style="margin-top:9px">Tick either only if you want it. Both are <b>separate paid services</b> — the cost is discussed and fixed with you first. Your representation stays 100% free either way.</p>
       </div>
     </div>
   </div>
@@ -488,7 +518,8 @@ async function sha256(t){ if(!(crypto&&crypto.subtle))return'';
   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
 function collect(){ const o={noun:NOUN}; document.querySelectorAll('.fi').forEach(i=>{ if(i.value.trim())o[i.id]=i.value.trim();});
-  o.tier=$('tier-ex').checked?'ex':'non'; o.social=$('smm').checked; return o; }
+  o.tier=$('tier-ex').checked?'ex':'non'; o.social=$('smm').checked;
+  o.strategy=$('strat')?$('strat').checked:false; return o; }
 
 async function signAndSend(){
   const btn=$('signbtn'); const typed=($('sign-name').value||'').trim();
