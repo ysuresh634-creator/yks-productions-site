@@ -41,6 +41,16 @@ Three ways to feed it:
   **in place**: same roster code, same URL, so a link already sent to a client
   keeps working, and any photo you removed is deleted from the site.
 
+**The fastest way in is a WhatsApp chat.** In their chat: **Export chat →
+Attach Media**. On the phone, save it to Files and pick it in the *From
+WhatsApp* tab; on the laptop, drag the zip anywhere on the panel. Each exported
+chat becomes one staged profile — their name off the transcript, every photo in
+the order they sent it, their measurements read out of their own messages. Drop
+several chats at once for several profiles. It unzips in the browser and
+nothing is uploaded until you push. A sender saved only as a phone number
+leaves the name blank on purpose — a number is contact detail, never a roster
+name.
+
 **You are not meant to type twenty boxes.** A card shows four — name,
 category, based-in, city — and hides the rest behind *Everything else*. Under
 them is a paste box: drop in whatever they actually sent (a WhatsApp message,
