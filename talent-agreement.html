@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Creator Agreement — YKS Productions</title>
+<title>Talent Representation Agreement — YKS Productions</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Fraunces:ital,wght@1,400&display=swap">
 <style>
@@ -221,9 +221,9 @@
     <div class="mast-row">
       <div>
         <div class="brand">YKS Productions</div>
-        <div class="tagline">Cinematography &middot; Brand Films &middot; Creator Representation</div>
+        <div class="tagline">Cinematography &middot; Brand Films &middot; Talent Representation</div>
       </div>
-      <div class="badge">Creator<br>Agreement</div>
+      <div class="badge">Talent<br>Agreement</div>
     </div>
     <div class="mast-contact">
       yksproductions.com &middot; @yks_photoworks &middot; +91 97466 79720 &middot; yksproductions893@gmail.com
@@ -306,12 +306,12 @@
 <!-- ══════════ AGREEMENT ══════════ -->
 <div class="sheet break">
   <div class="pad">
-    <div class="doc-title">INFLUENCER REPRESENTATION &amp; MANAGEMENT AGREEMENT</div>
+    <div class="doc-title">TALENT REPRESENTATION &amp; MANAGEMENT AGREEMENT</div>
     <div class="doc-sub">Non-Exclusive &middot; India</div>
 
 
     <p class="recital">
-      This Influencer Representation &amp; Management Agreement (this &ldquo;<b>Agreement</b>&rdquo;) is made on
+      This Talent Representation &amp; Management Agreement (this &ldquo;<b>Agreement</b>&rdquo;) is made on
       <input class="wr wr-s" id="f25" type="text" autocomplete="off"> (the &ldquo;<b>Effective Date</b>&rdquo;) and is governed by and constituted under the
       Indian Contract Act, 1872.
     </p>
@@ -755,7 +755,7 @@ function words(n){
 // A model's agreement should not carry ASCI disclosure or follower warranties, and
 // an influencer's should not carry call times and usage buyouts. Blocks are tagged
 // in the source; the category decides which ones exist for this reader.
-const CATKEY = (CFG.catkey || 'influencer').toLowerCase();
+const CATKEY = (CFG.catkey || 'model').toLowerCase();
 document.querySelectorAll('[data-cat]').forEach(function (el) {
   el.hidden = el.getAttribute('data-cat').split(/\s+/).indexOf(CATKEY) === -1;
 });
@@ -769,7 +769,7 @@ if (CFG.terms) {
 // The agreement calls the other party the "Creator". For a model or an actor that
 // reads wrong, so swap the defined term everywhere it appears as text. Attributes
 // and element ids are untouched — only what a reader actually sees.
-const wantNoun = CFG.noun || 'Creator';
+const wantNoun = CFG.noun || 'Talent';
 if (wantNoun && wantNoun !== 'Creator') {
   const One = wantNoun, one = One.toLowerCase();
   const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -786,14 +786,14 @@ fill('k-name', CFG.name);  fill('sign-name', CFG.name);  fill('k-city', CFG.city
 fill('k-ig',   CFG.ig);    fill('k-igf',  CFG.igf);    fill('k-wa',  CFG.wa);
 fill('k-email',CFG.email); fill('k-min',  CFG.min);    fill('k-floor', CFG.min);
 fill('k-excl1',CFG.excl);  fill('k-pre1', CFG.pre);
-const routeWant = CFG.route || '';
+const routeWant = CFG.route || '1';
 if(routeWant === '1' && $('route1')) $('route1').checked = true;
 if(routeWant === '2' && $('route2')) $('route2').checked = true;
 if(CFG.tier === 'ex'  && $('tier-excl'))  $('tier-excl').checked  = true;
 if(CFG.tier === 'non' && $('tier-nonex')) $('tier-nonex').checked = true;
 
 const fy  = (now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear()-1) % 100;
-const ref = CFG.ref || ('CRA-' + fy + (fy+1) + '-' + String(Math.floor(now.getTime()/1000) % 1000).padStart(3,'0'));
+const ref = CFG.ref || ('TRA-' + fy + (fy+1) + '-' + String(Math.floor(now.getTime()/1000) % 1000).padStart(3,'0'));
 $('p-name').textContent = CFG.name || 'you';
 $('p-ref').textContent  = ref;
 $('p-date').textContent = fmt(now);
@@ -882,7 +882,7 @@ async function signAndSend(){
 function savePdf(){
   const name = ($('sign-name') && $('sign-name').value.trim())
     || ($('k-name') && $('k-name').value.trim()) || CFG.name || '';
-  document.title = 'YKS Creator Agreement — ' + (name || 'unsigned') + ' — ' + ref;
+  document.title = 'YKS Talent Agreement — ' + (name || 'unsigned') + ' — ' + ref;
   window.print();
 }
 function resetAll(){

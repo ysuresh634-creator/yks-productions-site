@@ -898,6 +898,15 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
         exclusive survives, which is what keeps it clear of s.27 restraint of trade.</p>
       </div>
       <div class="form-field">
+        <label class="form-label">Form</label>
+        <select class="form-input" id="cr-form">
+          <option value="short">Short &mdash; one page, hassle-free e-sign (TRA-&hellip;)</option>
+          <option value="full">Full &mdash; the long-form agreement (CRA-&hellip;)</option>
+        </select>
+        <p class="field-note">Short is the one-page version most talent actually sign &mdash; type-to-sign,
+        their name stamped on it. Each one gets its own <b>TRA-</b> number; the full form runs CRA-.</p>
+      </div>
+      <div class="form-field">
         <label class="form-label">Agreement edition</label>
         <select class="form-input" id="cr-catkey">
           <option value="influencer">Influencer / creator</option>
@@ -946,7 +955,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
   <div class="settings-wrap">
     <div class="form-section">
       <label class="form-label">Your Details</label>
-      <div class="form-field"><label class="form-label">Your Name</label><input class="form-input" id="s-name" type="text" placeholder="Yedukrishna Suresh"></div>
+      <div class="form-field"><label class="form-label">Your Name</label><input class="form-input" id="s-name" type="text" placeholder="Yedukrishna S"></div>
       <div class="form-field"><label class="form-label">Company</label><input class="form-input" id="s-company" type="text" placeholder="YKS Productions"></div>
       <div class="form-field"><label class="form-label">India Phone</label><input class="form-input" id="s-phone-in" type="tel" placeholder="+91 XXXXX XXXXX"></div>
       <div class="form-field"><label class="form-label">UAE Phone</label><input class="form-input" id="s-phone-ae" type="tel" placeholder="+971 XX XXX XXXX"></div>
@@ -1494,7 +1503,7 @@ document.addEventListener('keydown', e => {
 let currentType='INVOICE';
 
 // ── Settings ───────────────────────────────────────────────────────────────
-const DEFAULTS={name:'Yedukrishna Suresh',company:'YKS Productions',
+const DEFAULTS={name:'Yedukrishna S',company:'YKS Productions',
   phoneIn:'+91 XXXXX XXXXX',phoneAe:'+971 XX XXX XXXX',
   web:'yksproductions.com',ig:'@yks_photoworks',
   udyam:'UDYAM-KL-01-0041092'};
@@ -2005,37 +2014,48 @@ function ag2Email(){
 // canonical legal source by tools/build_creator_agreement.py — edit the contract
 // there, not here.
 const CREATOR_AGREEMENT_URL = 'https://yksproductions.com/creator-agreement.html';
+const SHORT_AGREEMENT_URL   = 'https://yksproductions.com/agreement-short.html';
+// The short form's picker uses a plain noun, not the clause-switch catkey.
+const NOUN_BY_CAT = { influencer:'Influencer', model:'Model', actor:'Actor', core:'Talent' };
 
 function getContracts(){ try{ return JSON.parse(localStorage.getItem('yks_contracts')||'[]'); }catch(e){ return []; } }
 function writeContracts(list){
   try{ localStorage.setItem('yks_contracts',JSON.stringify(list)); return true; }
   catch(e){ alert('That contract could NOT be added to the list.\n\nThe link itself still works — send it now and note the name down.'); return false; }
 }
-function crNextRef(){
+function crForm(){ return v('cr-form')||'short'; }
+function crNextRef(form){
   const c=getCounters();
-  return 'CRA-'+DOC_SERIES+'-'+String(c.cra||1).padStart(3,'0');
+  return (form==='short')
+    ? 'TRA-'+DOC_SERIES+'-'+String(c.tra||1).padStart(3,'0')
+    : 'CRA-'+DOC_SERIES+'-'+String(c.cra||1).padStart(3,'0');
 }
 function crBuild(){
   const name=v('cr-name').trim();
   if(!name){ toast('Add their name first'); return null; }
-  const cfg={ name, ref: crNextRef() };
+  const form=crForm();
+  const cfg={ name, ref: crNextRef(form), form };
   [['ig','cr-ig'],['igf','cr-igf'],['cat','cr-cat'],['city','cr-city'],
    ['wa','cr-wa'],['email','cr-email'],['min','cr-min'],['excl','cr-excl'],
    ['pre','cr-pre'],['route','cr-route'],['tier','cr-tier'],['catkey','cr-catkey']].forEach(([k,id])=>{
      const val=v(id).trim(); if(val) cfg[k]=val;
    });
+  // the short form reads a plain noun for its title/label, not the catkey
+  if(form==='short') cfg.noun = NOUN_BY_CAT[cfg.catkey||'core'] || 'Talent';
   const json=JSON.stringify(cfg);
   const b64=btoa(String.fromCharCode(...new TextEncoder().encode(json)));
-  return { url: CREATOR_AGREEMENT_URL+'#'+encodeURIComponent(b64), cfg };
+  const base = form==='short' ? SHORT_AGREEMENT_URL : CREATOR_AGREEMENT_URL;
+  return { url: base+'#'+encodeURIComponent(b64), cfg };
 }
 // Only a link that actually went out gets a number and a place in the list —
 // previewing one on screen must not burn a reference.
 function crRecord(cfg){
   const list=getContracts();
   if(list.some(x=>x.ref===cfg.ref)) return;
-  list.unshift({ ref:cfg.ref, name:cfg.name, ig:cfg.ig||'', cat:cfg.cat||'', sentAt:Date.now() });
+  list.unshift({ ref:cfg.ref, name:cfg.name, ig:cfg.ig||'', cat:cfg.cat||'', form:cfg.form||'', sentAt:Date.now() });
   if(!writeContracts(list)) return;
-  const c=getCounters(); c.cra=(c.cra||1)+1;
+  const c=getCounters();
+  if(String(cfg.ref).startsWith('TRA-')) c.tra=(c.tra||1)+1; else c.cra=(c.cra||1)+1;
   try{ localStorage.setItem('yks_ctrs',JSON.stringify(c)); }catch(e){}
   renderContracts();
 }
