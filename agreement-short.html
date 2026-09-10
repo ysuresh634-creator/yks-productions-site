@@ -421,7 +421,8 @@
   <button class="bar-btn go" type="button" id="signbtn" onclick="signAndSend()">Sign &amp; send to YKS</button>
 </div>
 <div class="bar done no-print" id="bar-done" hidden>
-  <div><div class="done-t">Signed and sent ✓</div><div class="done-s" id="done-s"></div></div>
+  <div class="done-in"><div class="done-t">Signed ✓</div><div class="done-s" id="done-s"></div></div>
+  <button class="bar-btn go" type="button" onclick="tellWhatsApp()">Tell YKS on WhatsApp</button>
   <button class="bar-btn alt" type="button" onclick="savePdf()">Save a copy</button>
 </div>
 
@@ -529,6 +530,15 @@ function collect(){ const o={noun:NOUN}; document.querySelectorAll('.fi').forEac
   o.tier=$('tier-ex').checked?'ex':'non'; o.social=$('smm').checked;
   o.strategy=$('strat')?$('strat').checked:false; return o; }
 
+// After signing, the talent taps this to message YKS on WhatsApp themselves —
+// a direct heads-up straight to his phone, on top of the record in the Studio.
+let SIGNED_INFO=null;
+function tellWhatsApp(){
+  const nm=(SIGNED_INFO&&SIGNED_INFO.name)||($('sign-name')&&$('sign-name').value.trim())||'';
+  const rf=(SIGNED_INFO&&SIGNED_INFO.ref)||ref;
+  const msg='Hi Yedukrishna, I’ve just signed the YKS agreement ✍️\nName: '+nm+'\nRef: '+rf;
+  window.open('https://wa.me/919746679720?text='+encodeURIComponent(msg),'_blank');
+}
 async function signAndSend(){
   const btn=$('signbtn'); const typed=($('sign-name').value||'').trim();
   if(!typed){ alert('Type your full name before sending.'); $('sign-name').focus(); return; }
@@ -545,8 +555,10 @@ async function signAndSend(){
     const r=await fetch(ENGINE+'/sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const d=await r.json(); if(!r.ok||!d.ok) throw new Error(d&&d.error?d.error:'Could not reach YKS.');
     $('bar').hidden=true; const done=$('bar-done'); done.hidden=false;
+    SIGNED_INFO={ name: typed, ref: ref };
     $('done-s').textContent = ref+' · '+new Date(d.signed_at||Date.now()).toLocaleString('en-IN',
-      {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      + ' · Now tap “Tell YKS on WhatsApp” so I know you’re in.';
     document.querySelectorAll('.fi,.chip,.chip-in,#sign-consent,#ack-vital,.tick input').forEach(el=>el.disabled=true);
     const c=document.querySelector('.clr'); if(c)c.remove(); done.scrollIntoView({block:'center'});
   }catch(e){ btn.disabled=false; btn.textContent='Sign & send to YKS';
