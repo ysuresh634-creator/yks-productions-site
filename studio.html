@@ -694,6 +694,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
     <button onclick="tNew()" style="background:none;border:none;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer">+ Add</button>
   </div></div>
   <div class="form-wrap">
+    <div id="t-apps"></div>
     <div class="form-field"><input class="form-input" id="t-q" type="search" placeholder="Search name or handle" oninput="renderTalents()" autocomplete="off"></div>
     <div id="t-list"></div>
   </div>
@@ -955,7 +956,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 
 <!-- ══ SIGNED & ONBOARDED ══ -->
 <div id="screen-signed" class="screen">
-  <div class="hdr"><div class="hdr-inner"><div class="brand">Signed &amp; Onboarded</div></div></div>
+  <div class="hdr"><div class="hdr-inner"><div class="brand">Agreements &mdash; signed &amp; sent</div></div></div>
   <div class="form-wrap">
     <div id="sg-connect" class="form-section" style="display:none">
       <label class="form-label">Connect once</label>
@@ -973,7 +974,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
         <div id="sg-signed" style="margin-top:8px"></div>
       </div>
       <div class="form-section">
-        <label class="form-label">Onboarded <span id="sg-onb-n" style="color:var(--muted,#948C85)"></span></label>
+        <label class="form-label">Sent, awaiting signature <span id="sg-onb-n" style="color:var(--muted,#948C85)"></span></label>
         <div id="sg-onb" style="margin-top:8px"></div>
       </div>
     </div>
@@ -1780,7 +1781,7 @@ function showScreen(name){
   if(name==='settings') loadSettingsForm();
   if(name==='contract') renderContracts();
   if(name==='signed') loadSigned();
-  if(name==='talent') renderTalents();
+  if(name==='talent'){ renderTalents(); loadApplications(); }
   if(name!=='new') closeAI();
   if(name!=='website' && !publishing) closeSheets();
   document.getElementById('ai-float').classList.toggle('visible', name==='new');
@@ -2158,6 +2159,7 @@ async function sgFetch(path){
   return r.json();
 }
 function sgPill(){ return '<span style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:rgba(111,191,149,.16);color:#4faf7f;white-space:nowrap">Signed</span>'; }
+function sgPillWait(){ return '<span style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:rgba(201,169,110,.16);color:#C9A96E;white-space:nowrap">Sent</span>'; }
 async function loadSigned(force){
   const cn=$('sg-connect'), bd=$('sg-body'); if(!cn||!bd) return;
   if(!sgKey()){ cn.style.display=''; bd.style.display='none'; return; }
@@ -2165,8 +2167,12 @@ async function loadSigned(force){
   const sEl=$('sg-signed'), oEl=$('sg-onb');
   sEl.innerHTML='<p class="field-note" style="margin:0">Loading…</p>'; oEl.innerHTML='';
   try{
-    const [sig,tal]=await Promise.all([sgFetch('/admin/api/signed'),sgFetch('/admin/api/talents')]);
+    const sig=await sgFetch('/admin/api/signed');
     const signed=(sig&&sig.signed)||[];
+    // this view is ONLY the agreement-link cohort: who signed, and who was sent a link
+    const signedRefs={}, signedNames={};
+    signed.forEach(function(r){ if(r.ref) signedRefs[r.ref]=true; if(r.name) signedNames[String(r.name).toLowerCase().trim()]=true; });
+    // ── SIGNED ──
     $('sg-signed-n').textContent=signed.length?'('+signed.length+')':'';
     sEl.innerHTML=signed.length? signed.map(function(r){
       const d=r.signed_at?new Date(r.signed_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'';
@@ -2175,21 +2181,44 @@ async function loadSigned(force){
       return '<div class="doc-card" style="margin:0 0 10px;cursor:default"><div class="doc-card-top">'
         +'<div><div class="doc-num">'+esc(r.ref||'—')+'</div><div class="doc-client">'+esc(r.name||'')+'</div>'
         +'<div class="doc-meta">'+esc(meta)+'</div></div>'+sgPill()+'</div></div>';
-    }).join(''):'<p class="field-note" style="margin:0">No one has signed yet. As your talents sign, they show up here.</p>';
-    const onb=(tal&&tal.talents)||[];
-    $('sg-onb-n').textContent=onb.length?'('+onb.length+')':'';
-    oEl.innerHTML=onb.length? onb.map(function(t){
-      const sub=[t.category,t.city].filter(Boolean).join(' · ');
+    }).join(''):'<p class="field-note" style="margin:0">No one has signed yet. As talents open their link and sign, they appear here.</p>';
+    // ── SENT, AWAITING SIGNATURE ── from the Studio's own sent list, minus anyone already signed
+    const sent=(getContracts()||[]).filter(function(c){
+      return c.ref && !signedRefs[c.ref] && !(c.name && signedNames[String(c.name).toLowerCase().trim()]);
+    });
+    $('sg-onb-n').textContent=sent.length?'('+sent.length+')':'';
+    oEl.innerHTML=sent.length? sent.map(function(c){
+      const d=c.sentAt?new Date(c.sentAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'';
+      const sub=[c.ig,c.cat].filter(Boolean).join(' · ');
       return '<div class="doc-card" style="margin:0 0 10px;cursor:default"><div class="doc-card-top">'
-        +'<div><div class="doc-client">'+esc(t.name||'')+'</div>'
-        +'<div class="doc-meta">'+esc([sub,t.status].filter(Boolean).join(' · '))+'</div></div></div></div>';
-    }).join(''):'<p class="field-note" style="margin:0">No talents onboarded yet.</p>';
+        +'<div><div class="doc-num">'+esc(c.ref||'')+'</div><div class="doc-client">'+esc(c.name||'')+'</div>'
+        +'<div class="doc-meta">'+esc([sub,'sent '+d].filter(Boolean).join(' · '))+'</div></div>'+sgPillWait()+'</div></div>';
+    }).join(''):'<p class="field-note" style="margin:0">No links awaiting signature. Links you generate here from the Contract tab show up in this list until they’re signed.</p>';
   }catch(e){
     if(e.message==='auth'){ try{localStorage.removeItem('yks_ak');}catch(_){}
       cn.style.display=''; bd.style.display='none';
       $('sg-err').textContent='That passcode did not work. Please try again.'; return; }
     sEl.innerHTML='<p class="field-note" style="margin:0">Could not load — check your connection and tap Refresh.</p>';
   }
+}
+
+// Website applicants (from the apply form) — shown on the Talent tab, separate
+// from the agreement cohort. Only loads if you've connected on the Signed tab.
+async function loadApplications(){
+  const el=$('t-apps'); if(!el) return;
+  if(!sgKey()){ el.innerHTML=''; return; }
+  try{
+    const tal=await sgFetch('/admin/api/talents');
+    const apps=(tal&&tal.talents)||[];
+    if(!apps.length){ el.innerHTML=''; return; }
+    el.innerHTML='<div class="form-section" style="margin:0 0 14px">'
+      +'<label class="form-label">From the website <span style="color:#948C85">('+apps.length+')</span></label>'
+      +'<p class="field-note" style="margin:2px 0 9px">People who applied through your talents page. Review, then send them an agreement from the Contract tab.</p>'
+      + apps.map(function(t){ const sub=[t.category,t.city].filter(Boolean).join(' · ');
+          return '<div class="doc-card" style="margin:0 0 8px;cursor:default"><div class="doc-card-top"><div>'
+            +'<div class="doc-client">'+esc(t.name||'')+'</div><div class="doc-meta">'+esc([sub,t.status].filter(Boolean).join(' · '))+'</div></div></div></div>'; }).join('')
+      +'</div>';
+  }catch(e){ el.innerHTML=''; }
 }
 
 function renderContracts(){
