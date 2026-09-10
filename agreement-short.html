@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agreement — YKS Productions</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Fraunces:ital,wght@1,400&family=Dancing+Script:wght@600;700&display=swap">
+<style>
+  :root{
+    --ink:#0D0B11; --gold:#C9A96E; --gold-deep:#8A6F3A;
+    --paper:#FFFFFF; --off:#FAF7F3; --line:#E7E0D6; --line-soft:#F0EBE3;
+    --text:#1A1720; --warm:#8C8480;
+    --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+    --sans:Archivo,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  }
+  /* Locked to a white-paper legal look — the document reads black-on-white
+     for everyone, in every theme, and prints the same. No dark variant. */
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0}
+  body{background:var(--off);color:var(--text);color-scheme:light;font-family:var(--serif);
+       -webkit-text-size-adjust:100%;padding-bottom:92px}
+  .wrap{max-width:210mm;margin:0 auto;background:var(--paper);min-height:100vh;
+        box-shadow:0 1px 40px rgba(0,0,0,.06)}
+  /* ── name picker ── */
+  .pick{background:var(--ink);color:#fff;padding:14px 20px calc(14px);position:sticky;top:0;z-index:30}
+  .pick-l{font-family:var(--sans);font-size:8.5px;font-weight:700;letter-spacing:1.6px;
+          text-transform:uppercase;color:var(--gold);display:block;margin-bottom:8px}
+  .pick-row{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+  .chip{font-family:var(--sans);font-size:12px;font-weight:600;color:#E8E3DC;
+        background:rgba(255,255,255,.06);border:1px solid rgba(201,169,110,.35);
+        border-radius:999px;padding:7px 15px;cursor:pointer}
+  .chip.on{background:var(--gold);color:#0D0B11;border-color:var(--gold)}
+  .chip-in{font-family:var(--sans);font-size:12px;color:#fff;background:rgba(255,255,255,.06);
+           border:1px solid rgba(201,169,110,.35);border-radius:999px;padding:7px 13px;width:150px;outline-offset:2px}
+  .chip-in::placeholder{color:var(--warm)}
+  .chip-in.nm{width:100%;max-width:340px;margin-top:7px;font-weight:600}
+  .prepared{font-family:var(--sans);font-size:12.5px;font-weight:700;letter-spacing:.2px;color:var(--gold-deep);
+       background:rgba(201,169,110,.09);border:1px solid var(--gold);border-radius:8px;padding:9px 14px;
+       margin:0 0 16px;display:inline-block}
+  .prepared b{color:var(--text)}
+  /* ── masthead ── */
+  .mast{padding:22px 22px 0}
+  .mast-row{display:flex;align-items:center;gap:14px}
+  .emblem{width:56px;height:56px;flex:none;filter:drop-shadow(0 2px 7px rgba(0,0,0,.18))}
+  .brand{font-family:var(--sans);font-size:19px;font-weight:800;letter-spacing:-.3px}
+  .tag{font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:1.5px;
+       text-transform:uppercase;color:var(--gold-deep);margin-top:3px}
+  .mast-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:5px 16px;margin-top:15px;
+       padding-top:10px;border-top:1px solid var(--line-soft);font-family:var(--sans);font-size:9px;
+       font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--warm)}
+  .mast-meta .conf{color:var(--gold-deep);display:inline-flex;align-items:center;gap:5px}
+  .mast-meta .conf::before{content:"";width:7px;height:7px;border:1.5px solid var(--gold-deep);border-radius:2px}
+  .mast-meta b{color:var(--text)}
+  .seal-row{display:flex;align-items:flex-start;gap:15px}
+  .seal{width:86px;height:86px;flex:none}
+  .rule{height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin:14px 22px 0}
+  .pad{padding:20px 22px 8px}
+  h1{font-family:var(--sans);font-size:25px;font-weight:800;letter-spacing:-.4px;margin:6px 0 2px;line-height:1.1}
+  .sub{font-family:var(--serif);font-style:italic;color:var(--gold-deep);font-size:15px;margin:0 0 16px}
+  .lede{font-size:13.5px;line-height:1.6;margin:0 0 18px}
+  .context{background:var(--off);border:1px solid var(--line);border-left:3px solid var(--gold);
+       border-radius:8px;padding:14px 16px;margin:0 0 20px}
+  .context-h{font-family:var(--sans);font-size:8.5px;font-weight:700;letter-spacing:1.4px;
+       text-transform:uppercase;color:var(--gold-deep);margin:0 0 9px}
+  .context p{font-size:12.8px;line-height:1.62;margin:0 0 9px}
+  .context p:last-child{margin:0}
+  /* ── points ── */
+  ol.pts{list-style:none;margin:0;padding:0;counter-reset:p}
+  ol.pts>li{counter-increment:p;position:relative;padding:13px 0 13px 40px;border-top:1px solid var(--line-soft)}
+  ol.pts>li:first-child{border-top:none}
+  ol.pts>li::before{content:counter(p);position:absolute;left:0;top:12px;width:26px;height:26px;
+        border-radius:50%;background:var(--off);border:1px solid var(--gold);color:var(--gold-deep);
+        font-family:var(--sans);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+  ol.pts b{font-family:var(--sans);font-size:13.5px;font-weight:700}
+  ol.pts .d{font-size:13px;line-height:1.6;margin-top:3px;color:var(--text)}
+  ul.svc{list-style:none;margin:10px 0 2px;padding:0;display:grid;gap:9px}
+  ul.svc li{position:relative;padding-left:23px;font-size:12.5px;line-height:1.5}
+  ul.svc li::before{content:"✓";position:absolute;left:0;top:0;width:15px;height:15px;color:var(--gold-deep);
+       font-family:var(--sans);font-weight:800;font-size:12px}
+  ul.svc b{font-family:var(--sans);font-weight:700}
+  ol.pts>li.hi{background:rgba(201,169,110,.11);border:1.5px solid var(--gold);border-radius:12px;
+       padding:15px 16px 16px 47px;margin:8px 0}
+  ol.pts>li.hi::before{left:14px;top:16px;background:var(--gold);color:#0D0B11;border-color:var(--gold)}
+  ol.pts>li.hi .kbadge{display:inline-block;font-family:var(--sans);font-size:8px;font-weight:800;
+       letter-spacing:1.4px;text-transform:uppercase;color:#0D0B11;background:var(--gold);
+       border-radius:4px;padding:2px 7px;margin-bottom:7px}
+  .svc-opt{display:inline-block;font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.6px;
+       text-transform:uppercase;color:var(--gold-deep);border:1px solid var(--gold);border-radius:4px;
+       padding:1px 6px;margin-left:5px;vertical-align:middle}
+  /* ── fill fields ── */
+  .fields{margin:22px 0 6px;background:var(--off);border-left:3px solid var(--gold);padding:16px 18px}
+  .fh{font-family:var(--sans);font-size:8.5px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+      color:var(--warm);margin:0 0 12px}
+  .frow{display:flex;flex-wrap:wrap;gap:5px 22px;margin-bottom:13px}
+  .fl{display:flex;flex-direction:column;flex:1;min-width:150px}
+  .fl span{font-family:var(--sans);font-size:10px;color:var(--warm);margin-bottom:3px}
+  .fi{font-family:var(--sans);font-size:13px;color:var(--text);background:transparent;
+      border:none;border-bottom:1px solid var(--line);padding:4px 2px 5px;outline-offset:3px}
+  .fi:focus{border-bottom-color:var(--gold-deep);background:rgba(201,169,110,.08)}
+  .fl.full{flex:1 1 100%;min-width:100%}
+  .subh{font-family:var(--sans);font-size:8px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+        color:var(--gold-deep);margin:16px 0 4px}
+  .fnote{font-family:var(--serif);font-style:italic;font-size:11.5px;color:var(--warm);margin:2px 0 14px;line-height:1.5}
+  .ticks{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+  .tick{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:12.5px;cursor:pointer}
+  .tick input{width:15px;height:15px;accent-color:var(--gold-deep)}
+  /* ── signature ── */
+  .sign{padding:8px 22px 26px}
+  .who{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.4px;margin:20px 0 6px}
+  .cap{font-family:var(--sans);font-size:8.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+       color:var(--warm);margin:2px 0 6px}
+  .pad-c{width:100%;height:110px;border:1px dashed var(--gold);border-radius:5px;
+         background:rgba(201,169,110,.05);touch-action:none;display:block;cursor:crosshair}
+  .clr{font-family:var(--sans);font-size:9.5px;letter-spacing:.5px;color:var(--warm);background:none;
+       border:none;padding:6px 0 0;cursor:pointer;text-decoration:underline}
+  .consent{display:grid;grid-template-columns:16px 1fr;gap:9px;align-items:start;margin-top:16px;cursor:pointer}
+  .consent input{width:15px;height:15px;margin-top:1px;accent-color:var(--gold-deep)}
+  .consent span{font-size:12px;line-height:1.5}
+  .sig-reassure{font-family:var(--sans);font-size:12px;line-height:1.55;color:var(--gold-deep);
+       background:rgba(201,169,110,.08);border-radius:8px;padding:11px 13px;margin:4px 0 14px}
+  .sigmode{display:inline-flex;margin:6px 0 8px;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .segbtn{font-family:var(--sans);font-size:11.5px;font-weight:700;padding:9px 15px;background:transparent;
+       color:var(--warm);border:none;cursor:pointer}
+  .segbtn.on{background:var(--gold);color:#0D0B11}
+  .sig-preview{min-height:60px;border-bottom:1.5px solid var(--line);font-family:"Dancing Script",cursive;
+       font-weight:700;font-size:42px;line-height:1.35;color:var(--text);padding:6px 4px 4px;
+       word-break:break-word;overflow:hidden}
+  .sig-preview:empty::before{content:"your name will appear here as your signature";font-family:var(--serif);
+       font-style:italic;font-size:13px;color:var(--warm);font-weight:400}
+  .sig-hint{font-family:var(--sans);font-size:8.5px;letter-spacing:1.2px;text-transform:uppercase;
+       color:var(--warm);margin-top:5px}
+  .yks{margin-top:24px;font-family:var(--sans);font-size:11px;color:var(--warm);line-height:1.7}
+  .yks b{color:var(--text)}
+  .foot{border-top:1px solid var(--line);margin:22px;padding-top:12px;font-family:var(--sans);
+        font-size:9.5px;color:var(--warm);line-height:1.6}
+  /* ── bar ── */
+  .bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);display:flex;gap:10px;
+       padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:40}
+  .bar-btn{flex:1;font-family:var(--sans);font-size:12.5px;font-weight:700;letter-spacing:.6px;padding:14px;
+           border-radius:4px;border:1px solid var(--gold);cursor:pointer}
+  .bar-btn.alt{background:transparent;color:var(--gold)}
+  .bar-btn.go{background:var(--gold);color:#0D0B11}
+  .bar-btn[disabled]{opacity:.55;cursor:default}
+  .bar.done{background:#1B4332;justify-content:space-between;align-items:center}
+  .done-t{font-family:var(--sans);font-size:12.5px;font-weight:700;color:#B7E4C7}
+  .done-s{font-family:var(--sans);font-size:10px;color:#8FBFA5;margin-top:2px}
+  @media print{
+    .no-print{display:none!important} body{background:#fff;padding:0}
+    .wrap{box-shadow:none;max-width:100%} .pad-c{border-color:#B9B1A8}
+  }
+  @media (max-width:640px){ h1{font-size:22px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- name picker -->
+  <div class="pick no-print">
+    <span class="pick-l">This agreement is with a…</span>
+    <div class="pick-row" id="pickRow">
+      <button type="button" class="chip on" data-n="Talent">Talent</button>
+      <button type="button" class="chip" data-n="Influencer">Influencer</button>
+      <button type="button" class="chip" data-n="Model">Model</button>
+      <button type="button" class="chip" data-n="Actor">Actor</button>
+      <button type="button" class="chip" data-n="Creator">Creator</button>
+      <input class="chip-in" id="customN" type="text" placeholder="or type your own…" autocomplete="off">
+    </div>
+    <label class="pick-l" for="talentName" style="margin-top:14px">Prepared exclusively for</label>
+    <input class="chip-in nm" id="talentName" type="text" placeholder="The talent’s full name" autocomplete="off">
+  </div>
+
+  <div class="mast">
+    <div class="mast-row">
+      <svg class="emblem" viewBox="0 0 72 72" aria-label="YKS Productions">
+        <rect x="2.5" y="2.5" width="67" height="67" rx="12" fill="#0D0B11" stroke="var(--gold)" stroke-width="1.6"/>
+        <rect x="7.5" y="7.5" width="57" height="57" rx="8.5" fill="none" stroke="var(--gold-deep)" stroke-width=".9" opacity=".6"/>
+        <text x="36" y="38" text-anchor="middle" dominant-baseline="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="21" fill="var(--gold)" letter-spacing="1.5">YKS</text>
+      </svg>
+      <div>
+        <div class="brand">YKS Productions</div>
+        <div class="tag">Cinematography · Brand Films · <span class="tn">Talent</span> Representation</div>
+      </div>
+    </div>
+    <div class="mast-meta">
+      <span class="conf">Private &amp; Confidential · For signature</span>
+      <span>Ref <b id="m-ref">—</b> · <b id="m-date">—</b></span>
+    </div>
+  </div>
+  <div class="rule"></div>
+
+  <div class="pad">
+    <h1><span class="tn">Talent</span> Agreement</h1>
+    <p class="sub">The short version — the whole deal, in plain words.</p>
+    <p class="prepared" id="preparedFor" hidden></p>
+    <p class="lede">This is the agreement between <b>YKS Productions</b> (Yedukrishna S, sole proprietor, Bengaluru) and <span id="ledeName">the person who signs below</span> (the “<span class="tn">Talent</span>”, “you”). It’s deliberately short. A longer, fully-detailed version exists for larger brand contracts, and either of us can ask for it.</p>
+
+    <div class="context">
+      <p class="context-h">Quick context — who you’re signing with, and how this works</p>
+      <p>YKS Productions is a working production house — brand films, fashion and campaign shoots, out of <b>Bangalore and Dubai</b>. The talent roster is new, and that is the opportunity: being one of the first faces on it means more eyes and more pitches than a crowded agency can give you.</p>
+      <p>The whole model, in one line: <b>you cost me nothing — brands find me through the roster, they pay me, and I put you in front of them.</b> No joining fee, no portfolio fee, no commission, no money from you at any point. If an “agency” has ever burned you before, read points 2, 4 and 5 closely — this is built to be the exact opposite.</p>
+    </div>
+
+    <ol class="pts">
+      <li><b>Everything I run for you.</b><div class="d">This isn’t a listing you sit on and wait. From the day you sign, I’m working your name across all of this:
+        <ul class="svc">
+          <li><b>Getting you found.</b> A roster profile built and optimised for search, so when a brand or agency looks for someone in your category, you’re who comes up.</li>
+          <li><b>Pitching you out, actively.</b> I put your profile in front of the right brands directly and continuously — the right people, the right categories — not sitting back waiting for enquiries.</li>
+          <li><b>The leads you bring me.</b> Any enquiry landing in your own DMs — hand it to me and I take it over: I negotiate the rate and terms, and I follow up with the client so nothing stalls or goes cold.</li>
+          <li><b>Holding your rate.</b> I negotiate hard for the best number, protect your floor, and never quote you cheap to close something faster.</li>
+          <li><b>Filtering the junk.</b> Lowball offers, unsafe shoots, brands that don’t pay — I screen them out before they ever reach you.</li>
+          <li><b>Running the whole job.</b> Brief, scheduling, call sheets, approvals, revisions, delivery, the contract, the usage terms — all handled so you just turn up and perform.</li>
+          <li><b>Getting you paid.</b> I raise the invoice, chase the client, and make sure the money actually reaches your account on time — not stuck for weeks.</li>
+          <li><b>On-set support <span class="svc-opt">optional</span></b> If you ask me well in advance and I’m free, I can be on the shoot with you — making sure the brief is honoured, you’re looked after, and it runs the way it should. It’s there if you want it, never assumed and never a guarantee.</li>
+          <li><b>Protecting your rights.</b> Brands only use what they paid for, in the media and for the time agreed — I keep watch so your face isn’t running somewhere you never agreed to.</li>
+          <li><b>Your portfolio &amp; comp card.</b> Built and kept current, so you always look brand-ready when I put you forward.</li>
+          <li><b>Your social media <span class="svc-opt">optional</span></b> If you want it, I’ll run your content, posting and growth too — tick the box in your details below. Leave it unticked and I simply won’t; your representation is exactly the same either way.</li>
+        </ul></div></li>
+      <li><b>You pay me nothing — and here’s exactly why.</b><div class="d">No joining fee, no monthly fee, no commission, nothing deducted from what you earn — on work I bring you and on your own enquiries alike. This isn’t charity, it’s my model: your profile is showcased openly on my website for the world to see, and that roster is how brands and agencies discover <b>me</b> and come to me to work with. Those brands are who pay me — your visibility is my business. So representing you genuinely costs you zero: you tell me the number you want in hand, that exact number reaches your account, and whatever I negotiate above it, the brand pays me.</div></li>
+      <li class="hi"><span class="kbadge">Key term</span><b>The fair exchange — what you do for YKS, free.</b><div class="d">Your representation costs you nothing, so in return — and at no cost to either of us — you agree to:
+        <ul class="svc">
+          <li><b>One complimentary shoot with me</b>, no fee either way — including the <b>behind-the-scenes</b> — which I use for my Instagram, website and advertising to promote the roster and pull brands in.</li>
+          <li><b>Post our shoot as an Instagram “collab” (co-authored)</b> so it appears on your grid and mine — your audience sees YKS, and that shared reach is what keeps this free.</li>
+          <li><b>Announce that you’ve joined</b> — a story tagging <b>@yks_photoworks</b> when you come on board.</li>
+          <li><b>Show you’re represented</b> — add “Represented by YKS Productions” (or @yks_photoworks) to your bio or a pinned story highlight while you’re on the roster.</li>
+          <li><b>Tag YKS at least once a month</b> — one story or post tagging <b>@yks_photoworks</b> while represented, plus credit me on content from our shoots and reshare when I ask (kept reasonable, never spammy).</li>
+          <li><b>A short testimonial</b> — text or a quick video — I can use, once you’ve seen how I work.</li>
+        </ul>
+        It’s a fair exchange: this is the engine that keeps your representation free, and you walk away with professional work and visibility of your own too. Your comfort boundaries always apply — nothing intimate or beyond what you’ve agreed.</div></li>
+      <li class="hi"><span class="kbadge">Read this carefully</span><b>I’ll never lie to you — no false promises, ever.</b><div class="d">You’ve probably seen the other kind: “agencies” that swear you’ll be a star, <b>guarantee</b> you work, ask you for money for a “portfolio” or a “registration,” and then go quiet. <b>That is not me, and it never will be.</b> Here’s the honest truth — I cannot make a brand say yes. Nobody can, and anyone who promises they can is lying to you. What I <b>can</b> promise, and what I do every single day, is put you where brands are looking, pitch you to them directly and again and again, and handle everything properly the moment a yes comes — the rate, the shoot, and your money reaching your account the same day. <b>Honesty over hype.</b> I’d rather tell you the truth and earn your trust than promise you the moon and lose it. This is real visibility, run properly — not a guarantee of stardom, because that guarantee doesn’t exist anywhere.</div></li>
+      <li class="hi"><span class="kbadge">Key term</span><b>Your money is yours — I never touch it.</b><div class="d">This is the part that goes wrong at other agencies, so read it carefully. You onboard once; from then on the brand pays me, and I pass your <b>full agreed amount to you the same day the brand’s payment reaches me</b> — I don’t hold it overnight, I don’t sit on it for weeks, and <b>I never touch a single rupee of it</b>. I’m genuinely not interested in your money: what I earn is what the brand pays <b>me</b>, on top and separately. Your money is protected, and it lands in your account the same day it lands in mine.<span style="display:block;margin-top:9px">One thing in return: when <b>I introduce you to a brand</b>, that brand’s work runs through me — you won’t go around me to deal with them directly. It still costs you nothing.</span></div></li>
+      <li><b>You own your content — and you let me use it to work for you.</b><div class="d">Everything you make stays yours. But so I can actually do everything in point 1, you grant me the right to use the photos and videos you share with me, in three specific ways:
+        <ul class="svc">
+          <li><b>To pitch you to brands</b> — including through the private <b>AI system I’ve built</b> that puts your profile and work in front of the right brands, automatically and at scale.</li>
+          <li><b>To share with my clients</b> — showing your work to the brands and agencies I’m in conversation with.</li>
+          <li><b>To make social-media creatives</b> — content and posts that promote you and the roster.</li>
+        </ul>
+        This licence is only ever to <b>represent and promote you</b> — I never sell your content, and any use by a <b>brand</b> is a separate deal for only what that brand pays for. Nothing intimate, nude or suggestive is ever used, pitched or shot without your separate written yes.</div></li>
+      <li><b>You can always say no.</b><div class="d">Any brief, any brand — decline it, no reason owed, no penalty, any time before you confirm it. Your comfort and your choices come first, always.</div></li>
+      <li><b>You’re safe, and you’re respected — always.</b><div class="d">Every shoot I put you on is a professional, respectful environment. You can <b>bring someone with you</b> to any shoot. You can <b>walk away from anything that feels unsafe, unprofessional or wrong</b> — on the spot, no permission needed — and you’re still paid for what you’ve already done. And <b>nothing intimate, nude or suggestive is ever pitched, agreed or shot without your separate, specific written “yes”</b> for that exact job. If anything ever crosses a line, you tell me and I deal with it — that is my job, not yours.</div></li>
+      <li><b>Your details stay private.</b><div class="d">Your phone number, address and bank details never go to a brand without your say-so. Enquiries come to me first.</div></li>
+      <li class="hi"><span class="kbadge">Key term</span><b>My privacy, my identity and YKS Productions — strictly protected.</b><div class="d">My privacy matters as much as yours, and on this there is no grey area. During this agreement and <b>at any time after it ends</b>, you will <b>not</b> — in any form, by any means, on any platform, to any person:
+        <ul class="svc">
+          <li><b>use or disclose my name, my photo, image, likeness, voice or signature</b> anywhere, for anything, whether or not it names me;</li>
+          <li><b>reveal or discuss anything about me or about YKS Productions</b> — my identity, private life, whereabouts, my methods or working model, or the company’s business, clients, dealings or any detail of it — to any client, brand or other person;</li>
+          <li><b>post any “callout”, accusation, screenshot, chat, tag, mention, review or other content</b> about me or YKS Productions, publicly or privately, online or offline;</li>
+          <li><b>photograph, film or record me, or take, use or post a photo or video with me</b>, without my explicit written permission each time.</li>
+        </ul>
+        My name, image, voice and likeness are protected by my personality and publicity rights under <b>Article 21 of the Constitution</b> and Indian personality-rights law; the YKS Productions name and marks under the <b>Trade Marks Act, 1999</b>; the company’s private information as confidential; and any false or damaging public statement is defamation under <b>s.356 of the Bharatiya Nyaya Sanhita, 2023</b>. Any breach is a <b>serious breach that ends this agreement immediately, without notice</b>, and entitles me to an injunction under the Specific Relief Act, 1963 and to compensation under s.73 of the Indian Contract Act, 1872. These obligations are <b>permanent and survive termination</b>. <em>This never prevents you from making a genuine complaint to the police, a court or a lawful authority — that right always remains.</em></div></li>
+      <li><b>Keep this strictly between us.</b><div class="d">This agreement is private and confidential. You will not discuss our working terms with anyone — not your rate, not what I earn, not how we work, not what is in this document — with other talent, other agencies, brands, or in public. <b>You will also not discuss me, my working model, my methods or my principles with a client, a brand, or any person other than me.</b> Doing so is treated as bad conduct and can end this agreement <b>immediately, without prior notice</b>. I hold the exact same confidence about you. This protects both of us, and it continues even after the agreement ends.</div></li>
+      <li><b>Respect, both ways — and where it ends.</b><div class="d">We deal with each other, and with every brand, professionally. Any conduct that insults, embarrasses, defames or brings me, YKS Productions or a brand into disrepute — online or in person — is not expected and not accepted, and if it happens I may end this agreement at my sole discretion, with immediate effect. This runs both ways: I owe you the same respect and professionalism at all times.</div></li>
+      <li><b>Leaving is easy — and how it ends in law.</b><div class="d">Either of us can end this at any time, for any reason, by one formal email to the other — no notice period, no exit fee. A WhatsApp, a call, a post or going quiet does not end it; only the email does, so we both hold the same dated record of when it ended. Anything already booked gets finished and paid. On exit you come off the roster, you keep everything that is yours (point 6), and privacy (point 9) plus anything already agreed stay in force. Because this is a contract for personal services, under <b>s.14 of the Specific Relief Act, 1963</b> neither of us can be forced to keep working together — the only remedy for a breach is compensation under s.73 of the Contract Act, never compulsion.</div></li>
+      <li><b>The law — and that this is binding.</b><div class="d">This is a valid, enforceable contract under the <b>Indian Contract Act, 1872</b>: both of us are competent to contract (s.11), we consent freely (s.14), and the purpose is lawful (s.23/25). It’s governed by Indian law with the courts at Bengaluru, and is signed electronically under s.10A of the Information Technology Act, 2000. If either side breaks it, the remedy is compensation under s.73 of the Contract Act. It’s deliberately short — but it binds, both ways.</div></li>
+    </ol>
+
+    <div class="fields">
+      <p class="fh">Your details</p>
+      <p class="fnote">Fill in what you can — the more complete your profile, the faster I can put you forward. Everything here stays private (point 7); only your work is ever shown to a brand.</p>
+      <div class="frow">
+        <label class="fl"><span>Full name</span><input class="fi" id="k-name" autocomplete="name"></label>
+        <label class="fl"><span>Date of birth <em style="color:var(--warm);font-style:normal">(must be 18+)</em></span><input class="fi" id="k-dob" placeholder="DD / MM / YYYY"></label>
+      </div>
+      <div class="frow">
+        <label class="fl"><span>Gender</span><input class="fi" id="k-gender" placeholder="Woman / Man / Other"></label>
+        <label class="fl"><span>Nationality</span><input class="fi" id="k-nat" placeholder="Indian"></label>
+      </div>
+
+      <p class="subh">Contact &amp; address</p>
+      <div class="frow">
+        <label class="fl"><span>Phone / WhatsApp</span><input class="fi" id="k-wa" autocomplete="tel"></label>
+        <label class="fl"><span>Email <em style="color:var(--warm);font-style:normal">(your exit-notice address)</em></span><input class="fi" id="k-email" autocomplete="email" placeholder="you@email.com"></label>
+      </div>
+      <div class="frow">
+        <label class="fl full"><span>Full address <em style="color:var(--warm);font-style:normal">(house / street / area)</em></span><input class="fi" id="k-addr" autocomplete="street-address"></label>
+      </div>
+      <div class="frow">
+        <label class="fl"><span>City</span><input class="fi" id="k-city"></label>
+        <label class="fl"><span>State</span><input class="fi" id="k-state"></label>
+      </div>
+      <div class="frow">
+        <label class="fl"><span>PIN code</span><input class="fi" id="k-pin" inputmode="numeric"></label>
+        <label class="fl"><span>Languages you speak</span><input class="fi" id="k-langs" placeholder="English, Hindi…"></label>
+      </div>
+
+      <p class="subh">Emergency contact <em style="font-family:var(--serif);text-transform:none;letter-spacing:0;font-style:italic;color:var(--warm)">— for your safety on a shoot</em></p>
+      <div class="frow">
+        <label class="fl"><span>Name</span><input class="fi" id="k-ecname"></label>
+        <label class="fl"><span>Their phone</span><input class="fi" id="k-ecphone" inputmode="tel"></label>
+      </div>
+
+      <p class="subh">Your work</p>
+      <div class="frow">
+        <label class="fl"><span>Instagram <em style="color:var(--warm);font-style:normal">(only I see this)</em></span><input class="fi" id="k-ig" placeholder="@yourhandle"></label>
+        <label class="fl"><span>Category</span><input class="fi" id="k-cat" placeholder="fashion, commercial…"></label>
+      </div>
+      <div class="frow">
+        <label class="fl"><span>Your rate floor <em style="color:var(--warm);font-style:normal">(I won’t quote below this)</em></span><input class="fi" id="k-floor" placeholder="₹"></label>
+      </div>
+
+      <p class="subh">So I can pay you <em style="font-family:var(--serif);text-transform:none;letter-spacing:0;font-style:italic;color:var(--warm)">— kept private, share later if you prefer</em></p>
+      <div class="frow">
+        <label class="fl"><span>PAN <em style="color:var(--warm);font-style:normal">(else TDS is higher)</em></span><input class="fi" id="k-pan" placeholder="ABCDE1234F" style="text-transform:uppercase"></label>
+        <label class="fl"><span>Bank <em style="color:var(--warm);font-style:normal">(A/C · IFSC)</em></span><input class="fi" id="k-bank"></label>
+      </div>
+      <div style="margin-top:4px">
+        <span class="fh" style="display:block;margin-bottom:8px">How you work with me</span>
+        <div class="ticks">
+          <label class="tick"><input type="radio" name="tier" id="tier-non" checked> Non-exclusive — free to work with anyone</label>
+          <label class="tick"><input type="radio" name="tier" id="tier-ex"> Exclusive — brand work through me, pitched first</label>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <span class="fh" style="display:block;margin-bottom:8px">Social media <em style="font-family:var(--serif);text-transform:none;letter-spacing:0;font-style:italic;color:var(--warm)">— optional add-on</em></span>
+        <label class="tick"><input type="checkbox" id="smm"> Yes — also handle my social media (content, posting &amp; growth). We set this up separately; my representation of you is free either way.</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="sign">
+    <div class="who">The <span class="tn">Talent</span></div>
+    <p class="sig-reassure no-print">No app, no printing, no scanning. Just type your name below — that counts as your signature, a valid electronic signature under the IT Act, 2000. Ten seconds and you’re done.</p>
+    <div class="frow">
+      <label class="fl"><span>Type your full name</span><input class="fi" id="sign-name" autocomplete="name" placeholder="Your full legal name"></label>
+      <label class="fl"><span>Date</span><input class="fi" id="k-date"></label>
+    </div>
+    <div class="sigmode no-print">
+      <button type="button" class="segbtn on" data-mode="type">Use typed signature</button>
+      <button type="button" class="segbtn" data-mode="draw">Draw it instead</button>
+    </div>
+    <div id="typeWrap">
+      <div class="sig-preview" id="sigPreview"></div>
+      <div class="sig-hint no-print">↑ this is your signature</div>
+    </div>
+    <div id="drawWrap" hidden>
+      <div class="cap no-print">Sign with your finger inside the box</div>
+      <canvas class="pad-c" id="pad"></canvas>
+      <button type="button" class="clr no-print" onclick="clearPad()">Clear signature</button>
+    </div>
+    <label class="consent"><input type="checkbox" id="sign-consent"><span>I’ve read this agreement, I agree to it, and I intend this (typed or drawn) to be my signature and to be legally bound by it. I am 18 or over.</span></label>
+
+    <div class="yks">
+      <div class="seal-row">
+        <svg class="seal" viewBox="0 0 120 120" aria-label="YKS Productions seal">
+          <circle cx="60" cy="60" r="55" fill="none" stroke="var(--gold)" stroke-width="1.4"/>
+          <circle cx="60" cy="60" r="47" fill="none" stroke="var(--gold-deep)" stroke-width=".8" opacity=".8"/>
+          <defs><path id="sealArc" d="M60,9 a51,51 0 1,1 -0.1,0" fill="none"/></defs>
+          <text font-family="Archivo,sans-serif" font-size="8" font-weight="700" letter-spacing="3" fill="var(--gold-deep)">
+            <textPath href="#sealArc" startOffset="2%">YKS PRODUCTIONS · TALENT REPRESENTATION · BENGALURU · </textPath>
+          </text>
+          <text x="60" y="56" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="19" fill="var(--gold)" letter-spacing="1.5">YKS</text>
+          <line x1="44" y1="66" x2="76" y2="66" stroke="var(--gold-deep)" stroke-width=".9"/>
+          <text x="60" y="76" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="700" font-size="6.5" fill="var(--gold-deep)" letter-spacing="2.5">PRODUCTIONS</text>
+        </svg>
+        <div>
+          <b>For and on behalf of YKS Productions</b><br>
+          Yedukrishna S, Proprietor · Bengaluru<br>
+          yksproductions893@gmail.com · +91 97466 79720
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b style="color:var(--text);letter-spacing:.3px">This is a legally binding agreement</b> under the Indian Contract Act, 1872, executed electronically under s.10A of the Information Technology Act, 2000. Governing law: India · Jurisdiction: Bengaluru, Karnataka.<br><br>
+    YKS Productions · Yedukrishna S, Sole Proprietor · Bengaluru, Karnataka, India · yksproductions.com · @yks_photoworks<br>
+    Private &amp; Confidential — a fuller set of terms is available on request. © YKS Productions.
+  </div>
+</div>
+
+<div class="bar no-print" id="bar">
+  <button class="bar-btn alt" type="button" onclick="savePdf()">Save a copy</button>
+  <button class="bar-btn go" type="button" id="signbtn" onclick="signAndSend()">Sign &amp; send to YKS</button>
+</div>
+<div class="bar done no-print" id="bar-done" hidden>
+  <div><div class="done-t">Signed and sent ✓</div><div class="done-s" id="done-s"></div></div>
+  <button class="bar-btn alt" type="button" onclick="savePdf()">Save a copy</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+// details can ride in the URL fragment (never sent to a server), like the long form
+let CFG = {};
+try{ const raw = decodeURIComponent(location.hash.replace(/^#/,''));
+  if(raw){ CFG = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(raw), c=>c.charCodeAt(0)))); }
+}catch(e){ CFG = {}; }
+
+// ── the name picker: swaps the label everywhere it appears ──
+let NOUN = (CFG.noun || 'Talent');
+function applyNoun(n){
+  NOUN = n.trim() || 'Talent';
+  document.querySelectorAll('.tn').forEach(el => el.textContent = NOUN);
+  document.title = NOUN + ' Agreement — YKS Productions';
+}
+$('pickRow').addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  b.classList.add('on'); $('customN').value=''; applyNoun(b.dataset.n);
+});
+$('customN').addEventListener('input', e=>{
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  applyNoun(e.target.value || 'Talent');
+});
+if(CFG.noun){ // preset from Studio
+  const match = [...document.querySelectorAll('.chip')].find(c=>c.dataset.n.toLowerCase()===CFG.noun.toLowerCase());
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  if(match){ match.classList.add('on'); } else { $('customN').value = CFG.noun; }
+  applyNoun(CFG.noun);
+}
+// ── exclusive personalisation: the talent's name stamps the whole document ──
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function applyName(){
+  const v=($('talentName').value||'').trim();
+  const prep=$('preparedFor'), lede=$('ledeName');
+  if(v){ prep.hidden=false; prep.innerHTML='Prepared exclusively for <b>'+esc(v)+'</b>';
+    lede.textContent=v;
+    const kn=$('k-name'); if(kn){ kn.value=v; kn.setAttribute('value',v); }
+    const sn=$('sign-name'); if(sn && !sn.value){ sn.value=v; updatePreview&&updatePreview(); }
+  } else { prep.hidden=true; lede.textContent='the person who signs below'; }
+}
+$('talentName').addEventListener('input',applyName);
+
+// prefill
+const fill=(id,v)=>{ const el=$(id); if(el&&v){ el.value=v; el.setAttribute('value',v);} };
+fill('k-name',CFG.name); fill('sign-name',CFG.name); fill('k-wa',CFG.wa); fill('k-email',CFG.email);
+fill('k-dob',CFG.dob); fill('k-gender',CFG.gender);
+fill('k-city',CFG.city); fill('k-ig',CFG.ig); fill('k-cat',CFG.cat); fill('k-floor',CFG.min);
+if(CFG.name) $('talentName').value=CFG.name; applyName();
+const now=new Date();
+$('k-date').value = now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+if(CFG.tier==='ex') $('tier-ex').checked=true;
+const fy=(now.getMonth()>=3?now.getFullYear():now.getFullYear()-1)%100;
+const ref = CFG.ref || ('TRA-'+fy+(fy+1)+'-'+String(Math.floor(now.getTime()/1000)%1000).padStart(3,'0'));
+if($('m-ref')) $('m-ref').textContent = ref;
+if($('m-date')) $('m-date').textContent = now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+
+// keep typed values in the printed copy
+document.querySelectorAll('.fi').forEach(i=>i.addEventListener('input',()=>i.setAttribute('value',i.value)));
+
+// ── signature: typed (default, hassle-free) or drawn ──
+let SIGMODE='type';
+const sigPrev=$('sigPreview');
+function updatePreview(){ sigPrev.textContent=($('sign-name').value||'').trim(); }
+$('sign-name').addEventListener('input',updatePreview); updatePreview();
+document.querySelectorAll('.segbtn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.segbtn').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); SIGMODE=b.dataset.mode;
+  $('typeWrap').hidden=(SIGMODE!=='type'); $('drawWrap').hidden=(SIGMODE!=='draw');
+  if(SIGMODE==='draw') sizePad();
+}));
+// render a typed name as a signature image, so the record carries a real signature mark
+async function typedSigDataUrl(name){
+  try{ await document.fonts.load('700 54px "Dancing Script"'); }catch(e){}
+  const dpr=2, W=620, H=150, c=document.createElement('canvas');
+  c.width=W*dpr; c.height=H*dpr; const x=c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0);
+  x.fillStyle='#141118'; x.textBaseline='middle'; let s=56;
+  x.font='700 '+s+'px "Dancing Script", cursive';
+  while(x.measureText(name).width>W-24 && s>22){ s-=2; x.font='700 '+s+'px "Dancing Script", cursive'; }
+  x.fillText(name,12,H/2); return c.toDataURL('image/png');
+}
+
+// ── signature pad ──
+const pad=$('pad'), ctx=pad.getContext('2d'); let drawing=false, dirty=false;
+function sizePad(){ const r=pad.getBoundingClientRect(); const dpr=Math.min(2,devicePixelRatio||1);
+  const prev=dirty?pad.toDataURL():null; pad.width=Math.round(r.width*dpr); pad.height=Math.round(r.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineWidth=1.9; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#141118';
+  if(prev){ const img=new Image(); img.onload=()=>ctx.drawImage(img,0,0,r.width,r.height); img.src=prev; } }
+sizePad(); addEventListener('resize',sizePad);
+const pos=e=>{ const r=pad.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
+pad.addEventListener('pointerdown',e=>{ drawing=true; dirty=true; pad.setPointerCapture(e.pointerId);
+  const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
+pad.addEventListener('pointermove',e=>{ if(!drawing)return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); });
+['pointerup','pointercancel','pointerleave'].forEach(ev=>pad.addEventListener(ev,()=>drawing=false));
+function clearPad(){ const r=pad.getBoundingClientRect(); ctx.clearRect(0,0,r.width,r.height); dirty=false; }
+
+const ENGINE='https://yks-talents-engine.ysuresh634.workers.dev';
+async function sha256(t){ if(!(crypto&&crypto.subtle))return'';
+  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+function collect(){ const o={noun:NOUN}; document.querySelectorAll('.fi').forEach(i=>{ if(i.value.trim())o[i.id]=i.value.trim();});
+  o.tier=$('tier-ex').checked?'ex':'non'; o.social=$('smm').checked; return o; }
+
+async function signAndSend(){
+  const btn=$('signbtn'); const typed=($('sign-name').value||'').trim();
+  if(!typed){ alert('Type your full name before sending.'); $('sign-name').focus(); return; }
+  if(SIGMODE==='draw' && !dirty){ alert('Draw your signature in the box, or switch to “Use typed signature”.'); pad.scrollIntoView({block:'center'}); return; }
+  if(!$('sign-consent').checked){ alert('Tick the box confirming you agree.'); return; }
+  btn.disabled=true; btn.textContent='Sending…';
+  const sigData = (SIGMODE==='draw') ? pad.toDataURL('image/png') : await typedSigDataUrl(typed);
+  const fields=collect();
+  const payload={ ref, talent_id:CFG.tid||'', name:typed, email:fields['k-email']||CFG.email||'', phone:fields['k-wa']||CFG.wa||'',
+    tier:fields.tier, route:'1', form:'short', noun:NOUN, sig_method:SIGMODE,
+    doc_version:await sha256(document.body.innerText), fields, signature:sigData, consent:true };
+  try{
+    const r=await fetch(ENGINE+'/sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json(); if(!r.ok||!d.ok) throw new Error(d&&d.error?d.error:'Could not reach YKS.');
+    $('bar').hidden=true; const done=$('bar-done'); done.hidden=false;
+    $('done-s').textContent = ref+' · '+new Date(d.signed_at||Date.now()).toLocaleString('en-IN',
+      {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.querySelectorAll('.fi,.chip,.chip-in,#sign-consent,.tick input').forEach(el=>el.disabled=true);
+    const c=document.querySelector('.clr'); if(c)c.remove(); done.scrollIntoView({block:'center'});
+  }catch(e){ btn.disabled=false; btn.textContent='Sign & send to YKS';
+    alert('That didn’t send: '+(e.message||e)+'\n\nYour signature is still here. Tap “Save a copy” and send that file to YKS on WhatsApp instead.'); }
+}
+function savePdf(){ const nm=($('sign-name').value||$('k-name').value||CFG.name||'').trim();
+  document.title='YKS '+NOUN+' Agreement — '+(nm||'unsigned')+' — '+ref; window.print(); }
+</script>
+</body>
+</html>
