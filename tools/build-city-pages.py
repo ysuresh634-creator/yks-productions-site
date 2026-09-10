@@ -99,10 +99,11 @@ def faqs(c):
     """City-specific first, then the questions every fresh talent actually types."""
     return [
         (f'How do I join the casting roster in {c["city"]}?',
-         f'Applications are read from the form only — not WhatsApp, calls or DMs. Send your '
-         f'details and a few clear, unedited photographs taken on a phone in daylight; that is '
-         f'enough to assess. It is a selective, curated list brands are cast from, so not every '
-         f'application is added. There is no fee at any stage, and a booking is paid work.'),
+         f'This volume is casting women only, and applications are read from the form only — not '
+         f'WhatsApp, calls or DMs. Send your details and a few clear, unedited photographs taken '
+         f'on a phone in daylight; that is enough to assess. It is a selective, curated list '
+         f'brands are cast from, so not every application is added. There is no fee at any stage, '
+         f'and a booking is paid work. Men are cast by referral for specific briefs, not the form.'),
         (f'Does YKS charge {c["city"]} models a joining or portfolio fee?',
          'No. There is no joining fee, no registration fee, no portfolio package and no '
          'compulsory shoot. Anyone in India asking a model to pay to be represented is '
@@ -286,8 +287,9 @@ def page(c):
         <p class="l-eyebrow">For talent in {e(c['city'])}</p>
         <h2>A working roster, <em>in {e(c['city'])}</em></h2>
         <p class="l-prose">{e(c['talent'])}</p>
-        <p class="l-prose">The roster is built for people who are over 18, camera-ready and
-        serious about commercial work — it is a shortlist brands are cast from, not a course and
+        <p class="l-prose">This open board is casting <b>women only</b> — men are cast by referral
+        for specific briefs, not from the form. It is built for women who are over 18, camera-ready
+        and serious about commercial work — a shortlist brands are cast from, not a course and
         not a way to get discovered. YKS is not a photography or portfolio-building service, so
         being on it is not a paid shoot for you; a booking is paid work for a real client, and
         the schedule and the payment run through me. There is no fee at any stage. Applications
