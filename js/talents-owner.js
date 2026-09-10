@@ -51,6 +51,7 @@
     { k: 'based_in', label: 'Based in', chips: ['india', 'uae'], core: true },
     { k: 'city', label: 'City', req: true, core: true },
     { k: 'socials', label: 'Instagram', hint: 'private — how you check them; never published', priv: true },
+    { k: 'contact', label: 'Phone / WhatsApp', hint: 'private — how you reach them; never published', priv: true, core: true, contact: true },
     { k: 'work_preferences', label: 'Works in', hint: 'Fashion, Editorial, Commercial' },
     { k: 'stat_height', label: 'Height' },
     { k: 'stat_bust', label: 'Bust' },
@@ -134,6 +135,15 @@
       '.ow-in-f,.ow-ta{width:100%;background:#141018;border:1px solid #2a2430;border-radius:9px;color:#f4ede2;',
       '  padding:10px 11px;font:15px/1.4 inherit;-webkit-appearance:none}',
       '.ow-ta{min-height:78px;resize:vertical}',
+      '.ow-contact-val{font:600 17px/1.3 inherit;color:#f4ede2;letter-spacing:.02em;padding:4px 0 2px}',
+      '.ow-contact-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}',
+      '.ow-contact-btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;',
+      '  border:1px solid #2a2430;border-radius:9px;padding:8px 14px;font:600 13px/1 inherit;',
+      '  color:#f4ede2;background:#141018}',
+      '.ow-contact-btn:hover{border-color:#C9A96E}',
+      '.ow-contact-btn.wa{border-color:rgba(37,211,102,.5);color:#25d366}',
+      '.ow-contact-btn.wa:hover{background:rgba(37,211,102,.10);border-color:#25d366}',
+      '.ow-contact-none{font:14px/1.4 inherit;color:#e5533d;padding:6px 0}',
       '.ow-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}',
       '.ow-chips{display:flex;flex-wrap:wrap;gap:6px}',
       '.ow-chip{background:none;border:1px solid #2a2430;color:#9a9088;border-radius:20px;padding:7px 13px;font-size:13px}',
@@ -299,7 +309,7 @@
     body.appendChild(msgEl);
     if (lastMsg) say(lastMsg.text, lastMsg.kind, true);
     tabsEl = el('div', 'ow-tabs');
-    [['paste', 'Paste rows'], ['photos', 'Drop photos'], ['pending', 'Applications']].forEach(function (t) {
+    [['paste', 'Paste rows'], ['photos', 'From WhatsApp'], ['pending', 'Applications']].forEach(function (t) {
       var b = el('button', 'ow-tab' + (tab === t[0] ? ' on' : ''), t[1]);
       b.onclick = function () { tab = t[0]; lastMsg = null; desk(); };
       tabsEl.appendChild(b);
@@ -448,6 +458,212 @@
     }).filter(function (d) { return d.name; });
   }
 
+  /* ── WhatsApp is where the talent actually are ──────────────────────
+     Nobody fills in a form to reach him. They send photographs and a message
+     on WhatsApp, and until now getting that onto the roster meant saving each
+     picture, opening the desk, typing the name, and re-reading their message
+     to copy the measurements across.
+
+     WhatsApp will hand over the whole conversation itself: Export Chat, with
+     media, which produces a zip of every photograph plus a transcript. Drop
+     that zip here and it becomes a profile — their name off the transcript,
+     their photographs in the order they sent them, and their own words read
+     for measurements. Same gesture on the phone (Export Chat → Save to Files →
+     pick it here) and on the laptop (export, then drag it in).
+
+     The unzipping happens in this browser. Nothing is uploaded until he
+     pushes, and a chat that turns out to be someone else's is one Remove. ── */
+
+  var CHAT_NOISE = /end-to-end encrypted|Messages and calls are|created group|added you|changed the subject|joined using this group|security code changed/i;
+  var ATTACH_IOS = /<attached:\s*([^>]+)>/i;
+  var ATTACH_ANDROID = /^(.+?\.(?:jpe?g|png|webp|heic|mp4|pdf))\s*\(file attached\)/i;
+  /* The two export formats have to be matched separately. One pattern loose
+     enough for both reads the Android line
+       08/09/2026, 12:12 - +91 98765 43210: Kavya Nair, Kochi
+     and hands back "0" as the sender — the last digit of the number, because
+     the greedy half eats everything up to the final colon. */
+  var CHAT_IOS = /^\[(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}),\s*[^\]]+\]\s*([^:]{1,48}?):\s?([\s\S]*)$/;
+  var CHAT_ANDROID = /^(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}),\s*\d{1,2}:\d{2}(?::\d{2})?\s*(?:[ap]\.?m\.?)?\s*[-–]\s*([^:]{1,48}?):\s?([\s\S]*)$/i;
+
+  /* Raw deflate, straight from the browser — no library, and if the browser is
+     too old to have it the import says so instead of failing silently. */
+  function inflateRaw(bytes) {
+    if (typeof DecompressionStream === 'undefined') return Promise.reject(new Error('old-browser'));
+    var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Response(stream).arrayBuffer().then(function (b) { return new Uint8Array(b); });
+  }
+
+  /* A zip is a list of files with a directory at the end. This reads that
+     directory rather than guessing, so entry order and names are the real
+     ones WhatsApp wrote. */
+  function readZip(file) {
+    return file.arrayBuffer().then(function (buf) {
+      var dv = new DataView(buf), u8 = new Uint8Array(buf);
+      var i = u8.length - 22, min = Math.max(0, u8.length - 66000), found = -1;
+      for (; i >= min; i--) { if (dv.getUint32(i, true) === 0x06054b50) { found = i; break; } }
+      if (found < 0) throw new Error('that file is not a zip');
+      var count = dv.getUint16(found + 10, true), cd = dv.getUint32(found + 16, true);
+      var entries = [], q = cd, n;
+      for (n = 0; n < count; n++) {
+        if (q + 46 > u8.length || dv.getUint32(q, true) !== 0x02014b50) break;
+        var method = dv.getUint16(q + 10, true);
+        var csize = dv.getUint32(q + 20, true);
+        var nameLen = dv.getUint16(q + 28, true);
+        var extraLen = dv.getUint16(q + 30, true);
+        var cmtLen = dv.getUint16(q + 32, true);
+        var lho = dv.getUint32(q + 42, true);
+        var name = new TextDecoder().decode(u8.subarray(q + 46, q + 46 + nameLen));
+        entries.push({ name: name, method: method, csize: csize, lho: lho });
+        q += 46 + nameLen + extraLen + cmtLen;
+      }
+      var out = [];
+      var chain = Promise.resolve();
+      entries.forEach(function (e) {
+        if (/\/$/.test(e.name) || /(^|\/)__MACOSX\//.test(e.name)) return;
+        chain = chain.then(function () {
+          var lp = e.lho;
+          if (dv.getUint32(lp, true) !== 0x04034b50) return;
+          var nl = dv.getUint16(lp + 26, true), xl = dv.getUint16(lp + 28, true);
+          var at = lp + 30 + nl + xl;
+          var raw = u8.subarray(at, at + e.csize);
+          if (e.method === 0) { out.push({ name: e.name, bytes: raw }); return; }
+          if (e.method !== 8) return;
+          return inflateRaw(raw).then(function (b) { out.push({ name: e.name, bytes: b }); })
+            .catch(function () { /* one unreadable entry must not lose the rest */ });
+        });
+      });
+      return chain.then(function () { return out; });
+    });
+  }
+
+  /* Who is the talent, what did they say, and which pictures did they send —
+     read off the transcript. His own messages are ignored; a sender saved only
+     as a phone number becomes a blank name rather than a published number. */
+  function parseChat(text) {
+    var lines = String(text || '').replace(/[‎‏‪-‮]/g, '').split(/\r?\n/);
+    var senders = {}, order = [], current = null;
+    lines.forEach(function (line) {
+      if (!line.trim()) return;
+      var m = CHAT_IOS.exec(line) || CHAT_ANDROID.exec(line);
+      if (m) {
+        var who = m[2].trim();
+        var body = m[3] || '';
+        if (CHAT_NOISE.test(body) || CHAT_NOISE.test(who)) { current = null; return; }
+        current = who;
+        if (!senders[who]) { senders[who] = { msgs: [], files: [] }; order.push(who); }
+        var a = ATTACH_IOS.exec(body) || ATTACH_ANDROID.exec(body);
+        if (a) senders[who].files.push(a[1].trim());
+        else if (body.trim()) senders[who].msgs.push(body.trim());
+        return;
+      }
+      // a wrapped continuation line belongs to whoever spoke last
+      if (current && senders[current] && line.trim()) senders[current].msgs.push(line.trim());
+    });
+
+    var mine = /yedu|yks|productions/i;
+    var best = null;
+    order.forEach(function (who) {
+      if (mine.test(who)) return;
+      var s2 = senders[who];
+      if (!best) { best = who; return; }
+      var b = senders[best];
+      if (s2.files.length > b.files.length ||
+         (s2.files.length === b.files.length && s2.msgs.length > b.msgs.length)) best = who;
+    });
+    if (!best) return null;
+
+    // a name that is really a phone number is contact detail, not a name
+    var name = /^[+\d][\d\s()\-]{6,}$/.test(best) ? '' : best;
+    return { name: name, message: senders[best].msgs.join('\n'), files: senders[best].files };
+  }
+
+  /* One exported chat → one staged talent. */
+  function importChat(file) {
+    say('Reading ' + esc(file.name) + '…');
+    return readZip(file).then(function (entries) {
+      var txt = null, byName = {};
+      entries.forEach(function (e) {
+        if (/\.txt$/i.test(e.name)) { if (!txt) txt = e; return; }
+        byName[e.name.split('/').pop()] = e;
+      });
+      if (!txt) throw new Error('no chat transcript in that zip — export it again with "Attach Media"');
+      var chat = parseChat(new TextDecoder().decode(txt.bytes));
+      if (!chat) throw new Error('could not read who sent what in that chat');
+
+      // their pictures, in the order they sent them
+      var shots = [];
+      chat.files.forEach(function (fn) {
+        var e = byName[fn.split('/').pop()];
+        if (!e || !/\.(jpe?g|png|webp|heic|heif)$/i.test(e.name)) return;
+        shots.push({ file: new File([e.bytes], e.name.split('/').pop(), { type: 'image/jpeg' }), name: e.name });
+      });
+      // some exports list attachments differently than they are named; fall back
+      // to every image in the zip rather than importing a talent with no book
+      if (!shots.length) {
+        Object.keys(byName).forEach(function (fn) {
+          if (!/\.(jpe?g|png|webp|heic|heif)$/i.test(fn)) return;
+          shots.push({ file: new File([byName[fn].bytes], fn, { type: 'image/jpeg' }), name: fn });
+        });
+      }
+
+      var draft = { name: chat.name, shots: shots };
+      var got = readLocally(chat.message);
+      Object.keys(got).forEach(function (k) { if (!draft[k]) draft[k] = got[k]; });
+      addDrafts([draft]);
+      var d = drafts[drafts.length - 1];
+      renderDrafts();
+
+      // and let the engine read the prose while he is still looking at it
+      return api2('/ai/extract', { text: chat.message.slice(0, 3000) }).then(function (j) {
+        if (j && !j.error) {
+          if (j.name && !d.name) d.name = j.name;
+          if (j.city && !d.city) d.city = j.city;
+          if (j.socials && !d.socials) d.socials = j.socials;
+          if (j.gender && !d.gender) d.gender = j.gender;
+          if (j.preferences && !d.work_preferences) d.work_preferences = j.preferences;
+          if (j.category) {
+            var c2 = String(j.category).toLowerCase();
+            d.category = c2.indexOf('influen') >= 0 || c2.indexOf('creator') >= 0 ? 'influencer'
+              : c2.indexOf('act') >= 0 ? 'actor' : 'model';
+          }
+          if (j.region) d.based_in = String(j.region).toLowerCase() === 'uae' ? 'uae' : 'india';
+        }
+        renderDrafts();
+        return { name: d.name, shots: shots.length };
+      }).catch(function () { return { name: d.name, shots: shots.length }; });
+    });
+  }
+
+  function importChats(files) {
+    var results = [], errs = [];
+    var seq = Promise.resolve();
+    files.forEach(function (f) {
+      seq = seq.then(function () {
+        return importChat(f)
+          .then(function (r) { results.push(r); })
+          .catch(function (e) {
+            errs.push(esc(f.name) + ' — ' +
+              esc(e && e.message === 'old-browser'
+                ? 'this browser cannot unzip; save the photos to your camera roll and drop those instead'
+                : (e && e.message) || 'could not read it'));
+          });
+      });
+    });
+    return seq.then(function () {
+      var msg = [];
+      if (results.length) {
+        var noName = results.filter(function (r) { return !r.name; }).length;
+        msg.push('<b>' + results.length + ' staged from WhatsApp</b> — ' +
+          results.map(function (r) { return esc(r.name || 'name needed') + ' (' + r.shots + ' photos)'; }).join(', ') +
+          '. Check the name and city, confirm 18+, push.' +
+          (noName ? '<br><span style="color:#7d746d">' + noName + ' had no saved contact name in the chat — only a number, ' +
+            'which is contact detail and never becomes a roster name. Type theirs in.</span>' : ''));
+      }
+      errs.forEach(function (e) { msg.push('✗ ' + e); });
+      say(msg.join('<br>'), errs.length ? 'bad' : 'good');
+    });
+  }
+
   /* ── 2. photos, dragged in from wherever they live ─────────────────
      Finder, Photos, a Files app, another browser tab, a WhatsApp Web thread.
      A drag carries either the real file or — when the picture lives on
@@ -459,6 +675,9 @@
 
   var SHOT_TYPE = 'application/x-yks-shot';
 
+  function isChatExport(f) {
+    return !!f && (/\.zip$/i.test(f.name || '') || f.type === 'application/zip' || f.type === 'application/x-zip-compressed');
+  }
   function isImageFile(f) {
     return !!f && (/^image\//.test(f.type || '') || /\.(jpe?g|png|webp|heic|heif|avif|gif)$/i.test(f.name || ''));
   }
@@ -512,9 +731,9 @@
     ['stat_high_hip', /high\s*hip\s*(?:is|[:\-–])?\s*(\d{2,3}\s*(?:cm|in|["”])?)/i],
     ['stat_hips', /(?<!high\s)hips?\s*(?:is|[:\-–])?\s*(\d{2,3}\s*(?:cm|in|["”])?)/i],
     ['stat_shoe', /(?:shoe|footwear)\s*(?:size)?\s*(?:is|[:\-–])?\s*(\d{1,2}(?:\.5)?\s*(?:eu|uk|us|ind)?)/i],
-    ['stat_hair', /hair\s*(?:colou?r)?\s*(?:is|[:\-–])?\s*([A-Za-z]+(?:\s*\/\s*[A-Za-z]+)?)/i],
-    ['stat_eyes', /eyes?\s*(?:colou?r)?\s*(?:is|[:\-–])?\s*([A-Za-z]+(?:\s*\/\s*[A-Za-z]+)?)/i],
-    ['stat_skin', /(?:skin|complexion)\s*(?:tone)?\s*(?:is|[:\-–])?\s*([A-Za-z]+(?:\s+[A-Za-z]+)?)/i],
+    ['stat_hair', /hair[^\S\n]*(?:colou?r)?[^\S\n]*(?:is|[:\-–])?[^\S\n]*([A-Za-z]+(?:[^\S\n]*[\/][^\S\n]*[A-Za-z]+|[^\S\n]+[A-Za-z]+)?)/i],
+    ['stat_eyes', /eyes?[^\S\n]*(?:colou?r)?[^\S\n]*(?:is|[:\-–])?[^\S\n]*([A-Za-z]+(?:[^\S\n]*[\/][^\S\n]*[A-Za-z]+|[^\S\n]+[A-Za-z]+)?)/i],
+    ['stat_skin', /(?:skin|complexion)[^\S\n]*(?:tone)?[^\S\n]*(?:is|[:\-–])?[^\S\n]*([A-Za-z]+(?:[^\S\n]+[A-Za-z]+)?)/i],
     ['city', /(?:city|based in|based at|located in|from)\s*(?:is|[:\-–])?\s*([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)?)/],
     ['name', /name\s*(?:is|[:\-–])\s*([A-Z][A-Za-z.'\-]+(?:\s+[A-Z][A-Za-z.'\-]+){0,3})/],
     ['socials', /((?:https?:\/\/)?(?:www\.)?instagram\.com\/[A-Za-z0-9._]{2,30}|@[A-Za-z0-9._]{2,30})/i]
@@ -524,6 +743,7 @@
      Eyes Brown" is two answers, not one — so a capture stops at the next
      label word. */
   function cut(v) {
+    v = String(v).split('\n')[0];        // never runs into the next message
     var re = new RegExp('\\b(?:' + STAT_WORDS + ')\\b', 'i');
     var m = re.exec(v);
     if (m && m.index > 0) v = v.slice(0, m.index);
@@ -557,6 +777,26 @@
   function igUrl(v) {
     var h = igHandle(v);
     return h ? 'https://www.instagram.com/' + h + '/' : '';
+  }
+
+  /* Phone / WhatsApp — the number is stored exactly as they typed it, so this
+     only ever normalises for the link. A bare 10-digit number is assumed India
+     (+91); anything already carrying a country code is left as it is. */
+  function telHref(v) {
+    var d = String(v || '').replace(/[^\d+]/g, '');
+    return d.replace(/\D/g, '').length >= 7 ? 'tel:' + d : '';
+  }
+  function waDigits(v) {
+    var d = String(v || '').replace(/\D/g, '');
+    if (!d) return '';
+    d = d.replace(/^0+/, '');           // drop a trunk 0
+    if (d.length === 10) d = '91' + d;  // bare Indian mobile → +91
+    return d.length >= 10 ? d : '';
+  }
+  function waHref(v, text) {
+    var d = waDigits(v);
+    if (!d) return '';
+    return 'https://wa.me/' + d + (text ? '?text=' + encodeURIComponent(text) : '');
   }
 
   var stemOf = function (name) {
@@ -658,6 +898,15 @@
         return;
       }
       if (moving) return;                       // dropped a thumbnail on nothing
+
+      // a WhatsApp export is a zip, and means something quite different from
+      // a handful of photographs: it is one person, with their own words
+      var all = e.dataTransfer.files ? Array.prototype.slice.call(e.dataTransfer.files) : [];
+      var zips = all.filter(isChatExport);
+      if (zips.length) {
+        importChats(zips);
+        if (zips.length === all.length) return;
+      }
       takeShots(shotsFrom(e.dataTransfer), card ? +card.getAttribute('data-draft') : -1);
     });
 
@@ -676,23 +925,38 @@
      every tab, and on a phone (no dragging) the picker opens the camera roll. */
   function photos(view) {
     var c = el('div', 'ow-card ow-drop',
-      '<p class="ow-p" style="margin-bottom:14px"><b>Drop photos anywhere on this panel.</b><br>' +
-      'From Finder, Photos, a Files app, another browser tab, a WhatsApp Web thread — files or ' +
-      'pictures dragged straight off a page both work. Files named <em>priya-01.jpg</em>, ' +
-      '<em>priya-02.jpg</em> group themselves into one person; a set dragged off one page becomes one. ' +
-      '⌘V pastes a copied image. Drop onto a card to add to that talent, and drag a thumbnail from one ' +
-      'card to another to move it.</p>');
-    var pick = el('input'); pick.type = 'file'; pick.multiple = true; pick.accept = 'image/*';
+      '<p class="ow-p" style="margin-bottom:6px"><b>Add them straight from WhatsApp.</b></p>' +
+      '<p class="ow-p" style="margin-bottom:14px;text-align:left">' +
+      'In their chat: <b>Export chat → Attach Media</b>.<br>' +
+      '<span style="color:#7d746d">On the phone — save it to Files, then pick it below.<br>' +
+      'On the laptop — export it, then drag the zip anywhere on this panel.</span><br><br>' +
+      'It reads their name off the chat, takes every photo they sent in the order they sent them, ' +
+      'and pulls the measurements out of their own messages. Nothing uploads until you push.</p>');
+    var pick = el('input');
+    pick.type = 'file';
+    pick.multiple = true;
+    pick.accept = '.zip,application/zip,image/*';
     pick.className = 'ow-in-f';
     pick.onchange = function () {
-      takeShots(Array.prototype.slice.call(pick.files).filter(isImageFile).map(function (f) {
-        return { file: f, name: f.name || '' };
-      }), -1);
+      var all = Array.prototype.slice.call(pick.files);
+      var zips = all.filter(isChatExport);
+      if (zips.length) importChats(zips);
+      var pics = all.filter(isImageFile);
+      if (pics.length) {
+        takeShots(pics.map(function (f) { return { file: f, name: f.name || '' }; }), -1);
+      }
       pick.value = '';
     };
     c.appendChild(pick);
     view.appendChild(c);
-    renderDrafts();
+
+    var alt = el('div', 'ow-card',
+      '<p class="ow-p" style="margin:0"><b>Or just the photographs.</b> Drop them anywhere on this panel — ' +
+      'from Finder, Photos, a Files app, another browser tab. Files named <em>priya-01.jpg</em>, ' +
+      '<em>priya-02.jpg</em> group themselves into one person; a set dragged off one page becomes one. ' +
+      '⌘V pastes a copied image. Drop onto a card to add to that talent, and drag a thumbnail from one ' +
+      'card to another to move it.</p>');
+    view.appendChild(alt);
   }
 
   /* ── 3. the pipeline: applications, and everyone already on the roster ──
@@ -1010,6 +1274,10 @@
         stat_hair: d.stat_hair || '', stat_eyes: d.stat_eyes || '', stat_skin: d.stat_skin || '',
         gender: d.gender || '', nationality: d.nationality || '',
         socials: d.socials || d.instagram || '',
+        // their phone/WhatsApp — read from the application so he can actually
+        // reach them. Display-only in the console; it is NEVER pushed to the
+        // roster (the build aborts on any contact detail in the data).
+        contact: d.contact || d.phone_whatsapp || d.phone || d.whatsapp || '',
         country: d.country || '', country_code: d.country_code || '', geo_region: d.geo_region || '',
         castable_for: d.castable_for || '', knows_about: d.knows_about || '',
         specs_extra: d.specs_extra || {},
@@ -1315,6 +1583,26 @@
             chips.appendChild(b);
           });
           box.appendChild(chips);
+        } else if (f.contact) {
+          // Phone / WhatsApp — shown so he can actually reach them, with a tap
+          // to call and a tap to WhatsApp. Never an editable roster field: it
+          // is read from the application and never travels to the roster data.
+          var num = String(d.contact || '').trim();
+          if (num) {
+            var val = el('div', 'ow-contact-val', esc(num));
+            box.appendChild(val);
+            var acts = el('div', 'ow-contact-acts');
+            var tel = telHref(num), wa = waHref(num, 'Hi, this is Yedukrishna from YKS Productions.');
+            if (tel) { var ca = el('a', 'ow-contact-btn', '📞 Call'); ca.href = tel; acts.appendChild(ca); }
+            if (wa) {
+              var wb = el('a', 'ow-contact-btn wa', '💬 WhatsApp');
+              wb.href = wa; wb.target = '_blank'; wb.rel = 'noopener noreferrer';
+              acts.appendChild(wb);
+            }
+            box.appendChild(acts);
+          } else {
+            box.appendChild(el('div', 'ow-contact-none', 'No number on their application'));
+          }
         } else {
           var input = el(f.big ? 'textarea' : 'input', f.big ? 'ow-ta' : 'ow-in-f');
           input.value = d[f.k] || '';
@@ -1665,23 +1953,41 @@
     });
   }
 
+  /* ── publishing a batch ─────────────────────────────────────
+     One person per request, always. A Worker request may make 50 outbound
+     calls on the free plan, and one talent with seven photographs already
+     spends about twenty-three of them — fetch the plate, read its sha, write
+     it. So a batch of three in a single request hit a wall that had nothing to
+     do with the roster, and looked from here like bulk add simply not working.
+     Publishing one at a time costs a few seconds more and removes the ceiling:
+     twelve people go through as twelve requests, each reporting as it lands,
+     and one failure never takes the rest with it. */
   function publish(ids, confirm18) {
-    say('Publishing ' + ids.length + ' to the roster — committing plates and roster.json…');
-    return api('/admin/api/publish', { method: 'POST', body: { ids: ids, confirm18: !!confirm18 } })
-      .then(function (j) {
-        if (!j || !j.ok) { say('Publish failed: ' + esc((j && j.error) || 'unknown'), 'bad'); return null; }
-        var ok = (j.results || []).filter(function (r) { return r.ok; });
-        var bad = (j.results || []).filter(function (r) { return !r.ok; });
-        var lines = [];
-        if (ok.length) {
-          lines.push('<b>' + ok.length + ' on the roster</b> as ' +
-            ok.map(function (r) { return r.code.toUpperCase(); }).join(', ') +
-            '. The build runs on the commit; the cards are live in a couple of minutes.');
-        }
-        bad.forEach(function (r) { lines.push('✗ ' + esc(r.error)); });
-        say(lines.join('<br>'), bad.length ? 'bad' : 'good');
-        return ok;
+    var done = [], failed = [];
+    var seq = Promise.resolve();
+    ids.forEach(function (id, i) {
+      seq = seq.then(function () {
+        say('Publishing ' + (i + 1) + ' of ' + ids.length +
+          '… <span style="color:#7d746d">committing their plates and the roster entry</span>');
+        return api('/admin/api/publish', { method: 'POST', body: { ids: [id], confirm18: !!confirm18 } })
+          .then(function (j) {
+            if (!j || !j.ok) { failed.push({ error: (j && j.error) || 'unknown' }); return; }
+            (j.results || []).forEach(function (r) { (r.ok ? done : failed).push(r); });
+          });
       });
+    });
+    return seq.then(function () {
+      var lines = [];
+      if (done.length) {
+        lines.push('<b>' + done.length + ' on the roster</b> as ' +
+          done.map(function (r) { return String(r.code || '').toUpperCase(); }).join(', ') +
+          '. The build runs on the commit; the cards are live in a couple of minutes.');
+      }
+      failed.forEach(function (r) { lines.push('✗ ' + esc(r.error || 'failed')); });
+      if (!lines.length) lines.push('Nothing published.');
+      say(lines.join('<br>'), failed.length ? 'bad' : 'good');
+      return done;
+    });
   }
 
   /* ── ways in ───────────────────────────────────────────────────────── */
