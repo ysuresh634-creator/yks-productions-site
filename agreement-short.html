@@ -376,8 +376,8 @@
       <div class="tier-eg">
         <span class="eg-h">A simple example</span>
         Say you already work with <b>Agency X</b>.
-        <div class="eg-row">✅ <b>Non-exclusive</b> → you keep Agency X exactly as it is, and I bring you <b>extra</b> brand work on top. You give up nothing.</div>
-        <div class="eg-row">⭐ <b>Exclusive</b> → your brand deals come <b>only through me</b> for the year — not through Agency X — and in return you’re the <b>first name I send</b> when the best brands come looking.</div>
+        <div class="eg-row"><b>Non-exclusive:</b> you keep Agency X exactly as it is, and I bring you <b>extra</b> brand work on top. You give up nothing.</div>
+        <div class="eg-row"><b>Exclusive:</b> your brand deals come <b>only through me</b> for the year — not through Agency X — and in return you’re the <b>first name I send</b> when the best brands come looking.</div>
       </div>
       <p>You pick below. Exclusive just earns you priority. It’s never a condition of being represented, you can still say no to any single job, and it’s never a promise a brand will say yes.</p>
     </div>
@@ -692,7 +692,7 @@ let SIGNED_INFO=null;
 function tellWhatsApp(){
   const nm=(SIGNED_INFO&&SIGNED_INFO.name)||($('sign-name')&&$('sign-name').value.trim())||'';
   const rf=(SIGNED_INFO&&SIGNED_INFO.ref)||ref;
-  const msg='Hi Yedukrishna, I’ve just signed the YKS agreement ✍️\nName: '+nm+'\nRef: '+rf;
+  const msg='Hi Yedukrishna, I have just signed the YKS agreement.\nName: '+nm+'\nRef: '+rf;
   window.open('https://wa.me/919746679720?text='+encodeURIComponent(msg),'_blank');
 }
 async function signAndSend(){
