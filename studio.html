@@ -984,7 +984,7 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
 <!-- ══ SIGNED RECORD MODAL ══ -->
 <style>
   .sg-modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:flex-start;
-       justify-content:center;z-index:80;padding:18px 12px;overflow:auto}
+       justify-content:center;z-index:200;padding:18px 12px 120px;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .sg-modal.open{display:flex}
   .sg-modal-in{background:#17141d;border:1px solid #2b2634;border-radius:15px;max-width:540px;width:100%;
        padding:22px 18px 26px;position:relative;margin:auto}
@@ -2254,10 +2254,10 @@ async function sgOpen(id){
       +'<button class="quick-btn" type="button" onclick="sgViewFull()" style="display:inline-block;margin-top:16px">View the full agreement as they signed it</button>'
       +'<div style="margin-top:16px;padding-top:14px;border-top:1px solid #2b2634">'
       +'<div style="font-size:12px;color:#948C85;margin-bottom:9px">Status: <b style="color:'+(r.status==='hold'?'#C9A96E':'#4faf7f')+'">'+(r.status==='hold'?'On hold':'Active')+'</b></div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:8px">'
-      +'<button class="btn-sm" type="button" onclick="sgHold(\''+esc(r.id)+'\',\''+(r.status==='hold'?'active':'hold')+'\')">'+(r.status==='hold'?'Set active':'Put on hold')+'</button>'
-      +'<button class="btn-sm" type="button" onclick="sgEdit(\''+esc(r.id)+'\')">Edit details</button>'
-      +'<button class="btn-sm btn-del" type="button" onclick="sgDelete(\''+esc(r.id)+'\')">Delete</button>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:9px">'
+      +'<button class="btn-sm" type="button" style="padding:11px 16px;font-size:13px" onclick="sgHold(\''+esc(r.id)+'\',\''+(r.status==='hold'?'active':'hold')+'\')">'+(r.status==='hold'?'Set active':'Put on hold')+'</button>'
+      +'<button class="btn-sm" type="button" style="padding:11px 16px;font-size:13px" onclick="sgEdit(\''+esc(r.id)+'\')">Edit details</button>'
+      +'<button class="btn-sm btn-del" type="button" style="padding:11px 16px;font-size:13px" onclick="sgDelete(\''+esc(r.id)+'\')">Delete</button>'
       +'</div></div>';
   }catch(e){ b.innerHTML='<p class="field-note" style="margin:0;color:#948C85">Could not load this record. Tap outside to close.</p>'; }
 }
