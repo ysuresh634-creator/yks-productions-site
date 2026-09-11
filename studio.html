@@ -2205,7 +2205,7 @@ async function loadSigned(force){
       const meta=['signed '+d,tier,r.phone||'',r.email||''].filter(Boolean).join(' · ');
       return '<div class="doc-card" style="margin:0 0 10px;cursor:pointer" onclick="sgOpen(\''+esc(r.id)+'\')"><div class="doc-card-top">'
         +'<div><div class="doc-num">'+esc(r.ref||'—')+'</div><div class="doc-client">'+esc(r.name||'')+'</div>'
-        +'<div class="doc-meta">'+esc(meta)+' · tap to view signature</div></div>'+sgPill()+'</div></div>';
+        +'<div class="doc-meta">'+esc(meta)+' · tap to view signature</div></div>'+(r.status==='hold'?sgPillHold():sgPill())+'</div></div>';
     }).join(''):'<p class="field-note" style="margin:0">No one has signed yet. As talents open their link and sign, they appear here.</p>';
     // ── SENT, AWAITING SIGNATURE ── from the Studio's own sent list, minus anyone already signed
     const sent=(getContracts()||[]).filter(function(c){
@@ -2251,8 +2251,54 @@ async function sgOpen(id){
       +'<div class="sg-sig-lbl">Their signature</div>'
       +'<div class="sg-sig-wrap">'+(r.signature_png?'<img class="sg-sig" src="'+esc(r.signature_png)+'" alt="signature of '+esc(r.name||'')+'">':'<span style="color:#948C85;font-size:13px">No signature image on this record.</span>')+'</div>'
       +'<table class="sg-tbl">'+rows.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>';}).join('')+'</table>'
-      +'<button class="quick-btn" type="button" onclick="sgViewFull()" style="display:inline-block;margin-top:16px">View the full agreement as they signed it</button>';
+      +'<button class="quick-btn" type="button" onclick="sgViewFull()" style="display:inline-block;margin-top:16px">View the full agreement as they signed it</button>'
+      +'<div style="margin-top:16px;padding-top:14px;border-top:1px solid #2b2634">'
+      +'<div style="font-size:12px;color:#948C85;margin-bottom:9px">Status: <b style="color:'+(r.status==='hold'?'#C9A96E':'#4faf7f')+'">'+(r.status==='hold'?'On hold':'Active')+'</b></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:8px">'
+      +'<button class="btn-sm" type="button" onclick="sgHold(\''+esc(r.id)+'\',\''+(r.status==='hold'?'active':'hold')+'\')">'+(r.status==='hold'?'Set active':'Put on hold')+'</button>'
+      +'<button class="btn-sm" type="button" onclick="sgEdit(\''+esc(r.id)+'\')">Edit details</button>'
+      +'<button class="btn-sm btn-del" type="button" onclick="sgDelete(\''+esc(r.id)+'\')">Delete</button>'
+      +'</div></div>';
   }catch(e){ b.innerHTML='<p class="field-note" style="margin:0;color:#948C85">Could not load this record. Tap outside to close.</p>'; }
+}
+// ── edit / hold / delete a signed record ──
+function sgPillHold(){ return '<span style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:rgba(201,169,110,.18);color:#C9A96E;white-space:nowrap">On hold</span>'; }
+async function sgAction(path, body){
+  const r=await fetch(SG_ENGINE+path,{method:'POST',headers:{'X-Admin-Key':sgKey(),'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+  if(r.status===401||r.status===403) throw new Error('auth');
+  if(!r.ok) throw new Error('net');
+  return r.json();
+}
+async function sgHold(id,status){
+  try{ await sgAction('/admin/api/signed/'+id+'/set',{status}); sgClose(); loadSigned(true); }
+  catch(e){ alert('Could not update the status.'); }
+}
+async function sgDelete(id){
+  if(!confirm('Delete this signed record permanently?\n\nThis removes their signature and details from your list, and cannot be undone.')) return;
+  try{ await sgAction('/admin/api/signed/'+id+'/delete',{}); sgClose(); loadSigned(true); }
+  catch(e){ alert('Could not delete.'); }
+}
+function sgEdit(id){
+  const r=window._sgRec; if(!r) return; const f=r.fields||{};
+  const inp=function(k,label,val){ return '<label style="display:block;margin-bottom:10px"><span style="display:block;font-size:11px;color:#948C85;margin-bottom:4px">'+esc(label)+'</span><input class="form-input" data-ek="'+esc(k)+'" value="'+esc(val||'')+'" style="width:100%"></label>'; };
+  let h='<div class="sg-mtitle">Edit &mdash; '+esc(r.name||'')+'</div><div class="sg-msub" style="margin-bottom:14px">'+esc(r.ref||'')+'</div>';
+  h+=inp('__name','Name',r.name);
+  h+=inp('__email','Email',r.email||f['k-email']);
+  h+=inp('__phone','Phone',r.phone||f['k-wa']);
+  h+='<label style="display:block;margin-bottom:10px"><span style="display:block;font-size:11px;color:#948C85;margin-bottom:4px">Tier</span><select class="form-input" data-ek="__tier" style="width:100%"><option value="non"'+(r.tier==='non'?' selected':'')+'>Non-exclusive</option><option value="ex"'+(r.tier==='ex'?' selected':'')+'>Exclusive</option></select></label>';
+  Object.keys(f).forEach(function(k){ if(['noun','sign-name','tier','social','strategy','k-email','k-wa'].indexOf(k)>=0) return; h+=inp('f:'+k, sgPretty(k), f[k]); });
+  h+='<div style="display:flex;gap:8px;margin-top:16px"><button class="btn-sm" type="button" onclick="sgSave(\''+esc(id)+'\')">Save changes</button><button class="btn-sm" type="button" onclick="sgOpen(\''+esc(id)+'\')">Cancel</button></div>';
+  $('sg-modal-body').innerHTML=h;
+}
+async function sgSave(id){
+  const body={fields:{}};
+  document.querySelectorAll('#sg-modal-body [data-ek]').forEach(function(el){
+    const k=el.getAttribute('data-ek'), v=el.value;
+    if(k==='__name') body.name=v; else if(k==='__email') body.email=v; else if(k==='__phone') body.phone=v;
+    else if(k==='__tier') body.tier=v; else if(k.indexOf('f:')===0) body.fields[k.slice(2)]=v;
+  });
+  try{ await sgAction('/admin/api/signed/'+id+'/set', body); await sgOpen(id); loadSigned(true); }
+  catch(e){ alert('Could not save the changes.'); }
 }
 // Open the completed, read-only signed copy (their details + signature in place).
 // Same-origin localStorage carries the record to the agreement page.
