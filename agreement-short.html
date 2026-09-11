@@ -443,7 +443,7 @@
 
     <div class="fields">
       <p class="fh">Your details</p>
-      <p class="fnote">Fill in what you can — the more complete your profile, the faster I can put you forward. Everything here stays private (point 7); only your work is ever shown to a brand.</p>
+      <p class="fnote"><b>Please fill in all of these — every field is required</b> before you can sign. Everything here stays private (point 7); only your work is ever shown to a brand.</p>
       <div class="frow">
         <label class="fl"><span>Full name</span><input class="fi" id="k-name" autocomplete="name"></label>
         <label class="fl"><span>Date of birth <em style="color:var(--warm);font-style:normal">(must be 18+)</em></span><input class="fi" id="k-dob" placeholder="DD / MM / YYYY"></label>
@@ -485,7 +485,7 @@
         <label class="fl"><span>Your rate floor <em style="color:var(--warm);font-style:normal">(I won’t quote below this)</em></span><input class="fi" id="k-floor" placeholder="₹"></label>
       </div>
 
-      <p class="subh">So I can pay you <em style="font-family:var(--serif);text-transform:none;letter-spacing:0;font-style:italic;color:var(--warm)">— kept private, share later if you prefer</em></p>
+      <p class="subh">So I can pay you <em style="font-family:var(--serif);text-transform:none;letter-spacing:0;font-style:italic;color:var(--warm)">— required, and kept private</em></p>
       <div class="frow">
         <label class="fl"><span>PAN <em style="color:var(--warm);font-style:normal">(else TDS is higher)</em></span><input class="fi" id="k-pan" placeholder="ABCDE1234F" style="text-transform:uppercase"></label>
         <label class="fl"><span>Bank <em style="color:var(--warm);font-style:normal">(A/C · IFSC)</em></span><input class="fi" id="k-bank"></label>
@@ -722,6 +722,16 @@ function tellWhatsApp(){
 async function signAndSend(){
   const btn=$('signbtn'); const typed=($('sign-name').value||'').trim();
   if(!typed){ alert('Type your full name before sending.'); $('sign-name').focus(); return; }
+  // every detail is required — don't let anyone sign a half-empty record
+  const REQUIRED=['k-name','k-dob','k-gender','k-nat','k-wa','k-email','k-addr','k-city','k-state','k-pin','k-langs','k-ecname','k-ecphone','k-ig','k-cat','k-floor','k-pan','k-bank'];
+  document.querySelectorAll('.fi').forEach(function(el){ el.style.borderBottomColor=''; });
+  const missing=REQUIRED.filter(function(id){ const el=$(id); return el && !el.value.trim(); });
+  if(missing.length){
+    missing.forEach(function(id){ const el=$(id); if(el) el.style.borderBottomColor='#c0392b'; });
+    const first=$(missing[0]); if(first){ first.scrollIntoView({block:'center'}); first.focus(); }
+    alert('Please fill in every field before signing — '+missing.length+' still empty. I have highlighted them in red just above.');
+    return;
+  }
   if(SIGMODE==='draw' && !dirty){ alert('Draw your signature in the box, or switch to “Use typed signature”.'); pad.scrollIntoView({block:'center'}); return; }
   if(!$('ack-vital').checked){ alert('Please tick the box acknowledging how the agreement ends and the licence to use your photos.'); $('ack-vital').scrollIntoView({block:'center'}); return; }
   if(!$('sign-consent').checked){ alert('Tick the box confirming you agree.'); return; }
