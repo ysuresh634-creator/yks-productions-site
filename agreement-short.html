@@ -491,7 +491,14 @@
       <p class="subh">So I can pay you <em style="font-family:var(--serif);text-transform:none;letter-spacing:0;font-style:italic;color:var(--warm)">— required, and kept private</em></p>
       <div class="frow">
         <label class="fl"><span>PAN <em style="color:var(--warm);font-style:normal">(else TDS is higher)</em></span><input class="fi" id="k-pan" placeholder="ABCDE1234F" style="text-transform:uppercase"></label>
-        <label class="fl"><span>Bank <em style="color:var(--warm);font-style:normal">(A/C · IFSC)</em></span><input class="fi" id="k-bank"></label>
+        <label class="fl"><span>Account holder name <em style="color:var(--warm);font-style:normal">(as in your bank)</em></span><input class="fi" id="k-bank-name"></label>
+      </div>
+      <div class="frow">
+        <label class="fl"><span>Bank account number</span><input class="fi" id="k-bank-acc" inputmode="numeric" autocomplete="off"></label>
+        <label class="fl"><span>IFSC code</span><input class="fi" id="k-bank-ifsc" placeholder="SBIN0001234" style="text-transform:uppercase"></label>
+      </div>
+      <div class="frow">
+        <label class="fl full"><span>Bank name &amp; branch</span><input class="fi" id="k-bank-bank" placeholder="State Bank of India — MG Road, Bengaluru"></label>
       </div>
       <div style="margin-top:4px">
         <span class="fh" style="display:block;margin-bottom:8px">How you work with me</span>
@@ -726,7 +733,7 @@ async function signAndSend(){
   const btn=$('signbtn'); const typed=($('sign-name').value||'').trim();
   if(!typed){ alert('Type your full name before sending.'); $('sign-name').focus(); return; }
   // every detail is required — don't let anyone sign a half-empty record
-  const REQUIRED=['k-name','k-dob','k-gender','k-nat','k-wa','k-email','k-addr','k-city','k-state','k-pin','k-langs','k-ecname','k-ecphone','k-ig','k-cat','k-floor','k-pan','k-bank'];
+  const REQUIRED=['k-name','k-dob','k-gender','k-nat','k-wa','k-email','k-addr','k-city','k-state','k-pin','k-langs','k-ecname','k-ecphone','k-ig','k-cat','k-floor','k-pan','k-bank-name','k-bank-acc','k-bank-ifsc','k-bank-bank'];
   document.querySelectorAll('.fi').forEach(function(el){ el.style.borderBottomColor=''; });
   const missing=REQUIRED.filter(function(id){ const el=$(id); return el && !el.value.trim(); });
   if(missing.length){
@@ -742,6 +749,8 @@ async function signAndSend(){
   if($('k-ecphone').value.replace(/\D/g,'').length<10) bad.push(['k-ecphone','a valid emergency contact number']);
   if($('k-pin').value.replace(/\D/g,'').length!==6) bad.push(['k-pin','a 6-digit PIN code']);
   if(!/^[A-Za-z]{5}[0-9]{4}[A-Za-z]$/.test($('k-pan').value.trim())) bad.push(['k-pan','a valid PAN, like ABCDE1234F']);
+  if($('k-bank-acc').value.replace(/\D/g,'').length<9) bad.push(['k-bank-acc','a valid bank account number (at least 9 digits)']);
+  if(!/^[A-Za-z]{4}0[A-Za-z0-9]{6}$/.test($('k-bank-ifsc').value.trim())) bad.push(['k-bank-ifsc','a valid IFSC code, like SBIN0001234']);
   if(bad.length){
     document.querySelectorAll('.fi').forEach(function(el){ el.style.borderBottomColor=''; });
     bad.forEach(function(x){ const el=$(x[0]); if(el) el.style.borderBottomColor='#c0392b'; });

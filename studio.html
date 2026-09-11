@@ -2228,7 +2228,7 @@ async function loadSigned(force){
 }
 
 // Open one signed record — their signature + everything they filled in.
-const SG_KEYMAP={'k-name':'Name','k-dob':'Date of birth','k-gender':'Gender','k-nat':'Nationality','k-wa':'Phone / WhatsApp','k-email':'Email','k-addr':'Address','k-city':'City','k-state':'State','k-pin':'PIN code','k-langs':'Languages','k-ecname':'Emergency contact','k-ecphone':'Emergency phone','k-ig':'Instagram','k-cat':'Category','k-floor':'Rate floor','k-pan':'PAN','k-bank':'Bank','k-date':'Date signed','sign-name':'Signed name'};
+const SG_KEYMAP={'k-name':'Name','k-dob':'Date of birth','k-gender':'Gender','k-nat':'Nationality','k-wa':'Phone / WhatsApp','k-email':'Email','k-addr':'Address','k-city':'City','k-state':'State','k-pin':'PIN code','k-langs':'Languages','k-ecname':'Emergency contact','k-ecphone':'Emergency phone','k-ig':'Instagram','k-cat':'Category','k-floor':'Rate floor','k-pan':'PAN','k-bank-name':'Account holder','k-bank-acc':'Account number','k-bank-ifsc':'IFSC','k-bank-bank':'Bank & branch','k-date':'Date signed','sign-name':'Signed name'};
 function sgPretty(k){ return SG_KEYMAP[k]||k.replace(/^k-/,'').replace(/-/g,' '); }
 function sgClose(){ const m=$('sg-modal'); if(m)m.classList.remove('open'); document.body.style.overflow=''; }
 async function sgOpen(id){
