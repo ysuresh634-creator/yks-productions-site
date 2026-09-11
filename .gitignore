@@ -4,3 +4,6 @@ review.html
 contact-sheet.html
 .claude/
 .studio-backups/
+
+# QA engine output (reports, screenshots, logs)
+tools/qa/out/

@@ -102,6 +102,10 @@ tr:nth-child(even) td{background:var(--wash)}
 .btn-go:hover{background:var(--peach)}
 .btn-alt{background:none;border:1px solid #3A3440;color:#BDB4AC}
 .btn-alt:hover{border-color:var(--gold);color:var(--gold)}
+/* js/rail.js pins the scroll rail at bottom:22px — on this page that drops its
+   buttons straight onto the fixed action bar and covers .bar-note. Lift it
+   clear of the bar (higher specificity than rail.js's own .yks-rail rule). */
+body .yks-rail{bottom:88px}
 
 .foot{padding:20px 46px 26px;font-size:10.5px;color:#8C8480;background:var(--dark);
       border-top:1px solid rgba(255,255,255,.06);line-height:1.75}

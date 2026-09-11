@@ -1,0 +1,27 @@
+{
+  "_note": "Settings for yksproductions.com, used by ../webqa. Pages disallowed in robots.txt are treated as internal tools automatically — presentation and SEO rules are dropped on them, functional ones are not. Do not list them again here.",
+  "name": "YKS Productions",
+  "viewports": "standard",
+  "skipDirs": [
+    "klr-thumbs",
+    "worker",
+    "studio-ai"
+  ],
+  "suppress": [
+    {
+      "rule": "failed-request",
+      "match": "assets/frames/[^/]+/manifest\\.json",
+      "why": "Deliberate feature probe. js/cinema.js asks whether a Higgsfield frame sequence was shipped for this act and falls back to the procedural shader when it was not. The 404 is the answer, not a fault."
+    },
+    {
+      "rule": "text-collision",
+      "match": "store-num|svc-num",
+      "why": "The oversized ghost numerals behind the store and service cards are decorative and sit deliberately under the card text."
+    },
+    {
+      "rule": "text-collision",
+      "match": "ap-h3-num",
+      "why": "Decorative frame-number labels on the rotated photo-plate mock in the apply-page hero. The plate itself is rendered at opacity .45 and the 8.5px mono label sits over it by design — same pattern as store-num/svc-num."
+    }
+  ]
+}

@@ -160,8 +160,14 @@
        button now offers an outcome ("Let's talk") plus reassurance (a live
        dot and "usually replies in minutes"), and the channels appear only
        once you've shown intent, each with a reason to pick it. */
+    /* The bar itself paints nothing. On phones it stretches the full width
+       (left:14px;right:14px) so the pill can sit flush right — which made it
+       swallow every tap in a 54px stripe across the bottom of every page,
+       including the nav drawer's own links. It must not take pointer events;
+       only the things inside it that you can actually see may. */
     + '.yc-bar{position:fixed;right:20px;bottom:20px;z-index:301;display:flex;flex-direction:column;'
-    + 'align-items:flex-end;gap:10px;font-family:Inter,system-ui,-apple-system,sans-serif}'
+    + 'align-items:flex-end;gap:10px;pointer-events:none;font-family:Inter,system-ui,-apple-system,sans-serif}'
+    + '.yc-bar > *{pointer-events:auto}'
     + '.yc-bar.hide{display:none}'
     + '.yc-cta{display:flex;align-items:center;gap:10px;height:56px;padding:0 22px;border:0;cursor:pointer;'
     + 'border-radius:32px;background:linear-gradient(135deg,#ff8c3b,#ffb27a 55%,#ffc9a3);color:#07060a;'
@@ -229,8 +235,11 @@
     + 'transition:opacity .4s ease,transform .4s cubic-bezier(.22,.61,.36,1)}'
     + '.yc-tease.on{opacity:1;transform:none}'
     + '.yc-tease b{color:#ff8c3b;font-weight:600}'
-    + '.yc-tease .yc-tx{position:absolute;top:5px;right:7px;background:none;border:0;color:rgba(244,237,226,.45);'
-    + 'font-size:17px;line-height:1;cursor:pointer;padding:3px 5px}'
+    /* 20x23px was not a target anyone could hit with a thumb — the dismiss
+       is now a full 44px square, drawn inside the same visual footprint. */
+    + '.yc-tease .yc-tx{position:absolute;top:0;right:0;width:44px;height:44px;display:flex;'
+    + 'align-items:flex-start;justify-content:flex-end;padding:5px 7px 0 0;background:none;border:0;'
+    + 'color:rgba(244,237,226,.45);font-size:17px;line-height:1;cursor:pointer}'
     + '.yc-tease .yc-tx:hover{color:#ff8c3b}'
     /* panel */
     + '.yc-panel{position:fixed;right:18px;bottom:18px;z-index:302;width:min(392px,calc(100vw - 36px));'
@@ -303,7 +312,8 @@
     + '.yc-bar{right:14px;bottom:14px;left:14px;align-items:flex-end}'
     + '.yc-cta{height:54px;padding:0 20px;font-size:14.5px}'
     + '.yc-menu{width:100%}'
-    + '.yc-tease{right:14px;left:14px;bottom:76px;max-width:none}'
+    /* clear of the hero's scroll cue, which runs up the left of the same edge */
+    + '.yc-tease{right:14px;left:14px;bottom:84px;max-width:none}'
     + '.yc-panel{right:0;left:0;bottom:0;width:100%;height:86vh;height:86dvh;'
     + 'border-radius:22px 22px 0 0;border-bottom:0}'
     + '.yc-panel.on{animation:ycUp .34s cubic-bezier(.22,.61,.36,1)}'
@@ -383,6 +393,11 @@
     menu.classList.toggle('on', on);
     bar.classList.toggle('open', on);
     cta.setAttribute('aria-expanded', on ? 'true' : 'false');
+    // Opening the menu is the visitor showing intent — the invitation has done
+    // its job. Without this, someone who opens the menu inside the first 5.5s
+    // gets the teaser dropped on top of it a moment later, covering ~78% of
+    // the Call row, phone number and all.
+    if (on) { engaged = true; killTease(); }
   }
   cta.onclick = function (e) {
     e.stopPropagation();
@@ -420,6 +435,7 @@
 
   /* ── the invitation ────────────────────────────────────────── */
   var tease = null;
+  var engaged = false;      // the visitor has already opened the menu or the chat
   function killTease() {
     if (!tease) return;
     tease.classList.remove('on');
@@ -427,7 +443,7 @@
     setTimeout(function () { if (t.parentNode) t.remove(); }, 420);
   }
   function showTease() {
-    if (started || tease) return;
+    if (started || tease || engaged) return;
     try { if (sessionStorage.getItem('yksIris')) return; } catch (e) {}
     tease = document.createElement('div');
     tease.className = 'yc-tease';

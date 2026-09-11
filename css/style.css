@@ -80,6 +80,12 @@ img{display:block;max-width:100%;height:auto}
    the solid .nav.scrolled background still takes over on scroll. */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
   padding:20px 32px;transition:.45s var(--ease);mix-blend-mode:normal}
+/* Unscrolled, the bar is only a scrim — the wide gap between the brandmark
+   and the burger paints nothing, so it must not intercept taps on whatever
+   is underneath it. Once .scrolled paints a solid background it should block
+   again, because you cannot click through something you can see. */
+.nav:not(.scrolled){pointer-events:none}
+.nav > *{pointer-events:auto}
 .nav::before{content:"";position:absolute;inset:-1px 0 auto 0;height:132px;pointer-events:none;z-index:-1;
   background:linear-gradient(180deg,rgba(7,6,10,.82) 0%,rgba(7,6,10,.55) 46%,rgba(7,6,10,0) 100%);
   transition:opacity .45s var(--ease)}
@@ -162,7 +168,10 @@ img{display:block;max-width:100%;height:auto}
 .hero-scrollcue span{width:1px;height:46px;background:linear-gradient(var(--amber),transparent);
   animation:drip 1.8s var(--ease) infinite}
 @keyframes drip{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
-.hero-frameinfo{position:absolute;bottom:34px;right:38px;display:flex;gap:26px;z-index:2}
+/* The contact pill is fixed at bottom-right (20px/20px, 56px tall), so the
+   timecode readout has to keep out of that corner or it is buried on every
+   desktop load. Moved to the left of the hero instead. */
+.hero-frameinfo{position:absolute;bottom:34px;left:38px;right:auto;display:flex;gap:26px;z-index:2}
 
 /* ───────────────────────── TICKER ───────────────────────── */
 .ticker{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
@@ -685,6 +694,15 @@ img{display:block;max-width:100%;height:auto}
       16px and never zooms back — kills the booking form on iPhone.
    2. The footer service list grew to 19 links; single-column made it an
       828px wall on a phone. Two columns + tighter tracking halves it. */
+/* The contact pill is pinned to the bottom-right of every phone screen
+   (x 213-379 at 393px wide) and the Iris teaser sits in a full-width band
+   just above it. The hero's scroll cue was centred on that same bottom edge,
+   so the pill covered a third of it on first load. Lifting the cue only
+   pushed it into the teaser — so move it out of the pill's lane instead and
+   let it run from the left, which is where a cinema slate would sit anyway. */
+@media (max-width:640px){
+  .hero-scrollcue{bottom:18px;left:24px;transform:none;align-items:flex-start}
+}
 @media (max-width:640px){
   .book-form input,
   .book-form select,
@@ -778,8 +796,13 @@ img{display:block;max-width:100%;height:auto}
 @keyframes navRowIn{from{opacity:0;transform:translateX(-7px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.nav-drop.on .nav-mega-list a,.nav-drop.on .nav-mega-view{animation:none}}
 
-/* inside the burger panel it becomes an indented list — no floating card */
-@media(max-width:1020px){
+/* inside the burger panel it becomes an indented list — no floating card.
+   Must match the burger breakpoint (1200px, above): between 1021 and 1200 the
+   burger drawer is the nav, but this block used to stop at 1020, so the Work
+   sub-menu was still the 548px position:absolute desktop card — it broke out of
+   the 320px drawer and landed on top of the pinned hero (occlusion + dead taps
+   on laptop-width screens). */
+@media(max-width:1200px){
   /* no hover here, so the bridge isn't needed and would add dead space */
   .nav-drop{flex-direction:column;align-items:flex-start;width:100%;gap:0;
     padding-bottom:0;margin-bottom:0}

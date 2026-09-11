@@ -121,8 +121,12 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
 .l-foot-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
 .l-foot-brand{font-family:var(--serif);font-size:18px;font-weight:600}
 .l-foot-brand span{color:var(--amber)}
-.l-foot-links{display:flex;flex-wrap:wrap;gap:14px 24px;font-family:var(--mono);font-size:10px;letter-spacing:.18em}
-.l-foot-links a{color:var(--paper-dim);transition:color .3s}
+.l-foot-links{display:flex;flex-wrap:wrap;gap:0 24px;font-family:var(--mono);font-size:10px;letter-spacing:.18em}
+/* 10px mono type gave these a 17px-tall hit area — unhittable with a thumb on
+   the 73 pages that share this footer. The padding grows the target to 44px
+   without moving the type: the row's own gap absorbs it. */
+.l-foot-links a{color:var(--paper-dim);transition:color .3s;
+  display:inline-flex;align-items:center;min-height:44px}
 .l-foot-links a:hover{color:var(--amber)}
 .l-related{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:rgba(244,237,226,.4);margin-top:22px;line-height:2}
 .l-related a{color:var(--paper-dim);border-bottom:1px solid rgba(255,140,59,.3)}
@@ -189,7 +193,7 @@ html{scrollbar-color:var(--amber) var(--black);scrollbar-width:thin}
   scrollbar-width:none;-ms-overflow-style:none}
 .l-cats-inner::-webkit-scrollbar{display:none}
 .l-cats a{flex:none;font-family:var(--mono);font-size:12.5px;letter-spacing:.015em;
-  min-height:38px;padding:0 15px;display:inline-flex;align-items:center;
+  min-height:44px;min-width:44px;padding:0 15px;display:inline-flex;align-items:center;justify-content:center;
   border:1px solid rgba(244,237,226,.18);border-radius:999px;color:var(--paper-dim);
   white-space:nowrap;transition:border-color .3s,color .3s,background .3s}
 .l-cats a:hover{border-color:var(--amber);color:var(--amber);background:rgba(255,140,59,.08)}

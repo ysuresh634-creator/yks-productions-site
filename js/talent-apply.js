@@ -1400,7 +1400,8 @@
       // Whole-text fallbacks — only fill what the line pass missed (handles no-separator pastes like "34-26-36" or "brown eyes")
       var t = ' ' + String(text).replace(/\s+/g, ' ').trim() + ' ', low = t.toLowerCase(), m;
       if (!o.height) { if (m = t.match(/(\d)\s*['’]\s*(\d{1,2})/)) o.height = m[1] + "'" + m[2] + '"'; else if (m = low.match(/\b(1[3-9]\d|2[0-1]\d)\s*cm\b/)) o.height = m[1] + ' cm'; }
-      var tr = t.match(/\b([2-4]\d)\s*[-\/x]\s*([1-3]\d)\s*[-\/x]\s*([2-4]\d)\b/i);
+      // bust-waist-hips as a triple: "34-26-36", "34/26/36", "34x26x36", or space-separated "34 28 36"
+      var tr = t.match(/\b([2-4]\d)\s*[-\/x\s]\s*([1-3]\d)\s*[-\/x\s]\s*([2-4]\d)\b/i);
       if (tr) { o.bust = o.bust || tr[1]; o.waist = o.waist || tr[2]; o.hips = o.hips || tr[3]; }
       if (!o.hair) { var HAIR = ['jet black', 'black', 'dark brown', 'light brown', 'brown', 'blonde', 'blond', 'auburn', 'red', 'ginger', 'grey', 'gray']; for (var i = 0; i < HAIR.length; i++) if (new RegExp('\\b' + HAIR[i] + '\\b\\s*hair').test(low)) { o.hair = cap(HAIR[i]); break; } }
       if (!o.eyes) { var EYES = ['dark brown', 'light brown', 'brown', 'black', 'blue', 'green', 'hazel', 'grey', 'gray', 'amber']; for (var j = 0; j < EYES.length; j++) if (new RegExp('\\b' + EYES[j] + '\\b\\s*eyes?').test(low)) { o.eyes = cap(EYES[j]); break; } }
@@ -1444,7 +1445,9 @@
     });
 
     var UAE_CITIES = /\b(dubai|abu dhabi|sharjah|ajman|fujairah|ras al khaimah|umm al quwain|al ain)\b/i;
-    function lineVal(line) { var i = line.search(/[:\-–]/); return i < 0 ? '' : line.slice(i + 1).replace(/^[\s:–-]+/, '').trim(); }
+    // labels are separated from their value by any of : - – ? = — a "?" is
+    // what a questionnaire-style paste uses ("Full name ? Priya", "Languages you speak ? Hindi")
+    function lineVal(line) { var i = line.search(/[:\-–?=]/); return i < 0 ? '' : line.slice(i + 1).replace(/^[\s:–\-?=]+/, '').trim(); }
     function clean(v) { return String(v || '').replace(/[.,;]+$/, '').trim(); }
 
     function parseProfile(text) {
@@ -1474,6 +1477,8 @@
         else if (/\bstate\b/.test(low) && !o.state) o.state = v;
       });
       if (!o.name && (first || last)) o.name = (first + ' ' + last).trim();
+      // "residing state / state" is where they live too — fill the city field from it if nothing better came through
+      if (!o.city && o.state) o.city = o.state;
       var t = ' ' + String(text).replace(/\s+/g, ' ') + ' ', low = t.toLowerCase(), m;
       // fallbacks for unlabelled pastes
       if (!o.contact && (m = t.match(/\+?\d[\d\s().-]{7,17}\d/))) { var dg = m[0].replace(/[^\d+]/g, ''); if (dg.replace(/\D/g, '').length >= 9) o.contact = dg; }
@@ -1495,7 +1500,20 @@
       if (o.marital) o.marital = pickOne(o.marital, [['single', 'Single'], ['relationship', 'In a relationship'], ['married', 'Married'], ['not to say', 'Prefer not to say']]);
       if (o.availability) o.availability = pickOne(o.availability, [['full', 'Full-time'], ['weekend', 'Weekends & evenings'], ['evening', 'Weekends & evenings'], ['part', 'Part-time'], ['project', 'Project by project']]);
       if (o.travel) o.travel = pickOne(o.travel, [['anywhere', 'Yes — anywhere'], ['abroad', 'Yes — anywhere'], ['country', 'Within my country'], ['india', 'Within my country'], ['city', 'Within my city only'], ['not right now', 'Not right now'], ['no', 'Not right now']]);
-      if (o.education) o.education = pickOne(o.education, [['in school', 'In school'], ['high school', 'High school'], ['diploma', 'Diploma'], ['bachelor', 'Bachelor\u2019s degree'], ['master', 'Master\u2019s or higher'], ['phd', 'Master\u2019s or higher'], ['degree', 'Bachelor\u2019s degree']]) || o.education;
+      if (o.education) o.education = pickOne(o.education, [
+        // master-level first, so an "mba"/"mca" is never mistaken for a bachelor's
+        ['master', 'Master\u2019s or higher'], ['mba', 'Master\u2019s or higher'], ['mca', 'Master\u2019s or higher'],
+        ['m.com', 'Master\u2019s or higher'], ['msc', 'Master\u2019s or higher'], ['m.sc', 'Master\u2019s or higher'],
+        ['m.a', 'Master\u2019s or higher'], ['phd', 'Master\u2019s or higher'], ['post grad', 'Master\u2019s or higher'], ['postgrad', 'Master\u2019s or higher'],
+        // bachelor-level, including the common Indian abbreviations
+        ['bachelor', 'Bachelor\u2019s degree'], ['bba', 'Bachelor\u2019s degree'], ['bca', 'Bachelor\u2019s degree'],
+        ['b.com', 'Bachelor\u2019s degree'], ['bcom', 'Bachelor\u2019s degree'], ['b.tech', 'Bachelor\u2019s degree'], ['btech', 'Bachelor\u2019s degree'],
+        ['b.sc', 'Bachelor\u2019s degree'], ['bsc', 'Bachelor\u2019s degree'], ['b.a', 'Bachelor\u2019s degree'],
+        ['hons', 'Bachelor\u2019s degree'], ['graduat', 'Bachelor\u2019s degree'],
+        ['diploma', 'Diploma'],
+        ['high school', 'High school'], ['12th', 'High school'], ['plus two', 'High school'], ['+2', 'High school'], ['in school', 'In school'],
+        ['degree', 'Bachelor\u2019s degree']
+      ]) || o.education;
       // gender → the options this form offers
       if (o.gender) {
         var g = o.gender.toLowerCase();
@@ -1576,7 +1594,10 @@
       // free-form prose ("I'm an actor based in Dubai…") has no labels to match, so hand it to the engine
       // ask the engine unless the essentials are already in — a field count alone is a poor test
       var haveKey = ['name', 'city', 'contact'].every(function (k) { return form[k] && (form[k].value || '').trim(); });
-      if (haveKey) return report();
+      // Only fall back to the AI reader when the local parse barely caught anything.
+      // A labelled/questionnaire paste that already yielded a few fields must not
+      // stall for 20s waiting on the engine (and looking broken if it's unreachable).
+      if (haveKey || filled.length >= 3) return report();
       if (msg) { msg.textContent = '✨ Reading it with AI…'; msg.className = 'ap-statsmsg'; }
       var done = false, to = setTimeout(function () { if (!done) { done = true; report(); } }, 20000);
       fetch(ENGINE_URL + '/ai/extract', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text }) })
