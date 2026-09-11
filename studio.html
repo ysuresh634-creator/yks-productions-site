@@ -2237,6 +2237,7 @@ async function sgOpen(id){
   b.innerHTML='<p class="field-note" style="margin:0;color:#948C85">Loading…</p>';
   try{
     const d=await sgFetch('/admin/api/signed/'+id); const r=d.record||{}; const f=r.fields||{};
+    window._sgRec=r;
     const dt=r.signed_at?new Date(r.signed_at).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
     const tier=r.tier==='ex'?'Exclusive':(r.tier==='non'?'Non-exclusive':'—');
     const rows=[['Reference',r.ref||'—'],['Signed',dt],['Tier',tier],['Email',r.email||f['k-email']||'—'],['Phone',r.phone||f['k-wa']||'—']];
@@ -2250,8 +2251,16 @@ async function sgOpen(id){
       +'<div class="sg-sig-lbl">Their signature</div>'
       +'<div class="sg-sig-wrap">'+(r.signature_png?'<img class="sg-sig" src="'+esc(r.signature_png)+'" alt="signature of '+esc(r.name||'')+'">':'<span style="color:#948C85;font-size:13px">No signature image on this record.</span>')+'</div>'
       +'<table class="sg-tbl">'+rows.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>';}).join('')+'</table>'
-      +'<a class="quick-btn" href="https://yksproductions.com/agreement-short.html" target="_blank" rel="noopener" style="display:inline-block;margin-top:16px;text-decoration:none">Open the agreement document</a>';
+      +'<button class="quick-btn" type="button" onclick="sgViewFull()" style="display:inline-block;margin-top:16px">View the full agreement as they signed it</button>';
   }catch(e){ b.innerHTML='<p class="field-note" style="margin:0;color:#948C85">Could not load this record. Tap outside to close.</p>'; }
+}
+// Open the completed, read-only signed copy (their details + signature in place).
+// Same-origin localStorage carries the record to the agreement page.
+function sgViewFull(){
+  const r=window._sgRec; if(!r) return;
+  try{ localStorage.setItem('yks_signed_view', JSON.stringify(r)); }
+  catch(e){ alert('Could not open the signed copy — the record may be too large.'); return; }
+  window.open('/agreement-short.html?view=signed','_blank');
 }
 
 // Website applicants (from the apply form) — shown on the Talent tab, separate

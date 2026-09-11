@@ -594,6 +594,23 @@ try{ const raw = decodeURIComponent(location.hash.replace(/^#/,''));
   if(raw){ CFG = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(raw), c=>c.charCodeAt(0)))); }
 }catch(e){ CFG = {}; }
 
+// ── Signed-copy view ── the Studio hands one signed record over via same-origin
+// localStorage and opens this page with ?view=signed. We then render a read-only
+// completed copy: their details filled in, their signature in place.
+let SIGNED_VIEW=null;
+try{
+  if(/[?#&]view=signed/.test(location.href)){
+    const raw=localStorage.getItem('yks_signed_view');
+    if(raw) SIGNED_VIEW=JSON.parse(raw);
+  }
+}catch(e){ SIGNED_VIEW=null; }
+if(SIGNED_VIEW){
+  CFG.name = SIGNED_VIEW.name || CFG.name;
+  CFG.ref  = SIGNED_VIEW.ref  || CFG.ref;
+  CFG.tier = SIGNED_VIEW.tier || CFG.tier;
+  CFG.noun = (SIGNED_VIEW.fields && SIGNED_VIEW.fields.noun) || CFG.noun;
+}
+
 // ── the name picker: swaps the label everywhere it appears ──
 let NOUN = (CFG.noun || 'Talent');
 function applyNoun(n){
@@ -729,6 +746,35 @@ async function signAndSend(){
 }
 function savePdf(){ const nm=($('sign-name').value||$('k-name').value||CFG.name||'').trim();
   document.title='YKS '+NOUN+' Agreement — '+(nm||'unsigned')+' — '+ref; window.print(); }
+
+// Render the completed, read-only signed copy for review.
+function applySignedView(){
+  const r=SIGNED_VIEW; if(!r) return; const f=r.fields||{};
+  Object.keys(f).forEach(function(k){ const el=$(k); if(el && el.tagName==='INPUT' && el.type!=='checkbox' && el.type!=='radio'){ el.value=f[k]; el.setAttribute('value',f[k]); } });
+  if(r.tier==='ex'){ if($('tier-ex'))$('tier-ex').checked=true; } else if($('tier-non')){ $('tier-non').checked=true; }
+  if(f.social && $('smm')) $('smm').checked=true;
+  if(f.strategy && $('strat')) $('strat').checked=true;
+  if($('ack-vital'))$('ack-vital').checked=true; if($('sign-consent'))$('sign-consent').checked=true;
+  if($('sign-name')) $('sign-name').value = f['sign-name'] || r.name || '';
+  try{ updatePreview(); }catch(e){}
+  ['typeWrap','drawWrap'].forEach(function(id){ const el=$(id); if(el) el.hidden=true; });
+  document.querySelectorAll('.sigmode,.sig-reassure,.clr').forEach(function(e){ e.remove(); });
+  const who=document.querySelector('.who');
+  if(who && r.signature_png){
+    const dt=r.signed_at?new Date(r.signed_at).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+    const wrap=document.createElement('div');
+    wrap.innerHTML='<img src="'+r.signature_png+'" alt="Signature" style="display:block;max-width:300px;width:100%;border-bottom:1px solid var(--warm);padding-bottom:4px;margin:10px 0 6px">'
+      +'<div style="font-family:var(--sans);font-size:10.5px;color:var(--warm)">Signed '+dt+' &middot; '+(r.ref||'')+'</div>';
+    who.insertAdjacentElement('afterend', wrap);
+  }
+  document.querySelectorAll('input,textarea,select').forEach(function(el){ el.disabled=true; });
+  document.querySelectorAll('.chip,.chip-in,.segbtn').forEach(function(el){ el.disabled=true; el.style.pointerEvents='none'; });
+  const pick=document.querySelector('.pick'); if(pick) pick.style.display='none';
+  const bar=$('bar'); if(bar){ bar.innerHTML='<div style="flex:1;align-self:center;color:#1B4332;font-family:var(--sans);font-size:12.5px;font-weight:800">Signed copy ✓</div><button class="bar-btn alt" type="button" onclick="savePdf()">Save as PDF</button>'; }
+  const conf=document.querySelector('.mast-meta .conf'); if(conf) conf.textContent='Signed copy';
+  document.title='Signed — '+(r.name||'')+' — '+(r.ref||'');
+}
+if(SIGNED_VIEW) applySignedView();
 </script>
 </body>
 </html>
