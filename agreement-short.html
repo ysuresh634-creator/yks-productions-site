@@ -635,7 +635,10 @@ const now=new Date();
 $('k-date').value = now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
 if(CFG.tier==='ex') $('tier-ex').checked=true;
 const fy=(now.getMonth()>=3?now.getFullYear():now.getFullYear()-1)%100;
-const ref = CFG.ref || ('TRA-'+fy+(fy+1)+'-'+String(Math.floor(now.getTime()/1000)%1000).padStart(3,'0'));
+// A Studio-issued link carries its own clean ref (TRA-2526-001…). The common
+// link has none, so every signer gets a guaranteed-unique reference here —
+// timestamp + random, so two people signing at once never collide.
+const ref = CFG.ref || ('TRA-'+fy+(fy+1)+'-'+(Date.now().toString(36).slice(-4)+Math.random().toString(36).slice(2,4)).toUpperCase());
 if($('m-ref')) $('m-ref').textContent = ref;
 if($('m-date')) $('m-date').textContent = now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
 
