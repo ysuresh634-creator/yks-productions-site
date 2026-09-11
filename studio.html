@@ -981,6 +981,31 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
   </div>
 </div>
 
+<!-- ══ SIGNED RECORD MODAL ══ -->
+<style>
+  .sg-modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:flex-start;
+       justify-content:center;z-index:80;padding:18px 12px;overflow:auto}
+  .sg-modal.open{display:flex}
+  .sg-modal-in{background:#17141d;border:1px solid #2b2634;border-radius:15px;max-width:540px;width:100%;
+       padding:22px 18px 26px;position:relative;margin:auto}
+  .sg-x{position:absolute;top:11px;right:13px;background:none;border:none;color:#948C85;font-size:20px;cursor:pointer;line-height:1}
+  .sg-mtitle{font-family:var(--sans,Archivo,sans-serif);font-size:19px;font-weight:700;color:#EDE8E1;padding-right:24px}
+  .sg-msub{font-family:var(--sans,Archivo,sans-serif);font-size:12px;color:#948C85;margin-top:3px}
+  .sg-sig-lbl{font-family:var(--sans,Archivo,sans-serif);font-size:9px;font-weight:700;letter-spacing:1.4px;
+       text-transform:uppercase;color:#C9A96E;margin:16px 0 6px}
+  .sg-sig-wrap{background:#fff;border-radius:9px;padding:12px;display:flex;justify-content:center}
+  .sg-sig{max-width:100%;display:block}
+  .sg-tbl{width:100%;border-collapse:collapse;margin-top:14px}
+  .sg-tbl td{font-size:13px;padding:8px 0;border-bottom:1px solid #2b2634;vertical-align:top;color:#EDE8E1}
+  .sg-tbl td:first-child{color:#948C85;width:44%;padding-right:10px}
+</style>
+<div id="sg-modal" class="sg-modal" onclick="if(event.target===this)sgClose()">
+  <div class="sg-modal-in">
+    <button class="sg-x" type="button" onclick="sgClose()">&times;</button>
+    <div id="sg-modal-body"></div>
+  </div>
+</div>
+
 <!-- ══ SETTINGS ══ -->
 <div id="screen-settings" class="screen">
   <div class="hdr"><div class="hdr-inner"><div class="brand">Settings</div></div></div>
@@ -2178,9 +2203,9 @@ async function loadSigned(force){
       const d=r.signed_at?new Date(r.signed_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'';
       const tier=r.tier==='ex'?'Exclusive':(r.tier==='non'?'Non-exclusive':'');
       const meta=['signed '+d,tier,r.phone||'',r.email||''].filter(Boolean).join(' · ');
-      return '<div class="doc-card" style="margin:0 0 10px;cursor:default"><div class="doc-card-top">'
+      return '<div class="doc-card" style="margin:0 0 10px;cursor:pointer" onclick="sgOpen(\''+esc(r.id)+'\')"><div class="doc-card-top">'
         +'<div><div class="doc-num">'+esc(r.ref||'—')+'</div><div class="doc-client">'+esc(r.name||'')+'</div>'
-        +'<div class="doc-meta">'+esc(meta)+'</div></div>'+sgPill()+'</div></div>';
+        +'<div class="doc-meta">'+esc(meta)+' · tap to view signature</div></div>'+sgPill()+'</div></div>';
     }).join(''):'<p class="field-note" style="margin:0">No one has signed yet. As talents open their link and sign, they appear here.</p>';
     // ── SENT, AWAITING SIGNATURE ── from the Studio's own sent list, minus anyone already signed
     const sent=(getContracts()||[]).filter(function(c){
@@ -2200,6 +2225,33 @@ async function loadSigned(force){
       $('sg-err').textContent='That passcode did not work. Please try again.'; return; }
     sEl.innerHTML='<p class="field-note" style="margin:0">Could not load — check your connection and tap Refresh.</p>';
   }
+}
+
+// Open one signed record — their signature + everything they filled in.
+const SG_KEYMAP={'k-name':'Name','k-dob':'Date of birth','k-gender':'Gender','k-nat':'Nationality','k-wa':'Phone / WhatsApp','k-email':'Email','k-addr':'Address','k-city':'City','k-state':'State','k-pin':'PIN code','k-langs':'Languages','k-ecname':'Emergency contact','k-ecphone':'Emergency phone','k-ig':'Instagram','k-cat':'Category','k-floor':'Rate floor','k-pan':'PAN','k-bank':'Bank','k-date':'Date signed','sign-name':'Signed name'};
+function sgPretty(k){ return SG_KEYMAP[k]||k.replace(/^k-/,'').replace(/-/g,' '); }
+function sgClose(){ const m=$('sg-modal'); if(m)m.classList.remove('open'); document.body.style.overflow=''; }
+async function sgOpen(id){
+  const m=$('sg-modal'), b=$('sg-modal-body'); if(!m||!b) return;
+  m.classList.add('open'); document.body.style.overflow='hidden';
+  b.innerHTML='<p class="field-note" style="margin:0;color:#948C85">Loading…</p>';
+  try{
+    const d=await sgFetch('/admin/api/signed/'+id); const r=d.record||{}; const f=r.fields||{};
+    const dt=r.signed_at?new Date(r.signed_at).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+    const tier=r.tier==='ex'?'Exclusive':(r.tier==='non'?'Non-exclusive':'—');
+    const rows=[['Reference',r.ref||'—'],['Signed',dt],['Tier',tier],['Email',r.email||f['k-email']||'—'],['Phone',r.phone||f['k-wa']||'—']];
+    // everything else they typed into the form
+    const skip={noun:1,'sign-name':1,tier:1,social:1,strategy:1,'k-email':1,'k-wa':1};
+    Object.keys(f).forEach(function(k){ if(skip[k]||String(f[k]).trim()==='') return; rows.push([sgPretty(k),f[k]]); });
+    rows.push(['Social-media add-on', f.social?'Yes — wants it':'No']);
+    rows.push(['Growth-strategy add-on', f.strategy?'Yes — wants it':'No']);
+    b.innerHTML='<div class="sg-mtitle">'+esc(r.name||'')+'</div>'
+      +'<div class="sg-msub">Signed agreement · reviewed as it is</div>'
+      +'<div class="sg-sig-lbl">Their signature</div>'
+      +'<div class="sg-sig-wrap">'+(r.signature_png?'<img class="sg-sig" src="'+esc(r.signature_png)+'" alt="signature of '+esc(r.name||'')+'">':'<span style="color:#948C85;font-size:13px">No signature image on this record.</span>')+'</div>'
+      +'<table class="sg-tbl">'+rows.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>';}).join('')+'</table>'
+      +'<a class="quick-btn" href="https://yksproductions.com/agreement-short.html" target="_blank" rel="noopener" style="display:inline-block;margin-top:16px;text-decoration:none">Open the agreement document</a>';
+  }catch(e){ b.innerHTML='<p class="field-note" style="margin:0;color:#948C85">Could not load this record. Tap outside to close.</p>'; }
 }
 
 // Website applicants (from the apply form) — shown on the Talent tab, separate
