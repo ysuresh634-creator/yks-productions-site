@@ -540,6 +540,19 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
     <div class="bk-acts" style="margin-top:10px">
       <button class="bk-btn primary" onclick="openPitchForm()">＋ Log a pitch</button>
       <button class="bk-btn" onclick="pastePitch()">Paste from engine</button>
+      <button class="bk-btn" onclick="toggleSync()">⟳ Auto-sync</button>
+    </div>
+    <div id="sync-status" class="mono" style="font-size:10px;color:var(--sub);margin-top:8px"></div>
+  </div>
+
+  <div id="sync-panel" class="pform hidden">
+    <p class="field-note" style="margin-bottom:12px">Connect this to your Talents Engine and every pitch logs itself automatically — created by the engine, synced here, visible on any device. Leave it off and pitches stay in this browser only. The key is your engine's ADMIN_KEY.</p>
+    <div><label class="form-label">Engine URL</label><input class="form-input" id="sync-url" placeholder="https://yks-talents-engine.<you>.workers.dev"></div>
+    <div style="margin-top:10px"><label class="form-label">Engine key (ADMIN_KEY)</label><input class="form-input" id="sync-key" type="password" placeholder="your admin passcode"></div>
+    <div class="bk-acts" style="margin-top:14px">
+      <button class="bk-btn primary" onclick="saveSync()">Save &amp; sync now</button>
+      <button class="bk-btn" onclick="document.getElementById('sync-panel').classList.add('hidden')">Cancel</button>
+      <button class="bk-btn" onclick="disconnectSync()" style="color:#c86b6b">Disconnect</button>
     </div>
   </div>
 
@@ -1910,7 +1923,7 @@ function showScreen(name){
   if(nb) nb.classList.add('active');
   curScreen=name;
   if(name==='history') renderHistory();
-  if(name==='pitches') renderPitches();
+  if(name==='pitches'){ renderPitches(); pullPitches(); }
   if(name==='settings') loadSettingsForm();
   if(name==='contract') renderContracts();
   if(name==='signed') loadSigned();
@@ -2876,6 +2889,7 @@ function savePitch(){
   if(p.status==='replied' && !p.repliedAt) p.repliedAt=today();
   if(!isNew && prevStatus!==p.status){ (p.log=p.log||[]).push({at:new Date().toISOString(),event:p.status}); }
   if(!savePitches(all)) return;
+  pushPitch(p);
   closePitchForm(); renderPitches(); toast(isNew?'Pitch logged':'Pitch updated');
 }
 function pastePitch(){
@@ -2884,18 +2898,20 @@ function pastePitch(){
   let m; try{ m=JSON.parse(raw); }catch(e){ alert('That was not valid JSON.'); return; }
   const all=getPitches(); const id='p'+Date.now();
   const talents=(m.talents||[]).map(t=>typeof t==='string'?t:(t.name||t.slug||'')).filter(Boolean);
-  all.push({id,createdAt:Date.now(),brand:m.brand||'—',status:m.status||'drafted',
+  const np={id,createdAt:Date.now(),brand:m.brand||'—',status:m.status||'drafted',
     contact:{name:(m.contact&&m.contact.name)||'',email:m.to||(m.contact&&m.contact.email)||'',verified:!!m.verified},
     talents,subject:m.subject||'',concept:m.concept||'',sentAt:m.sentAt||'',repliedAt:'',
-    body:m.htmlBody||m.body||'',notes:m.notes||'',log:[{at:new Date().toISOString(),event:'imported from engine'}]});
+    body:m.htmlBody||m.body||'',notes:m.notes||'',log:[{at:new Date().toISOString(),event:'imported from engine'}]};
+  all.push(np);
   if(!savePitches(all)) return;
+  pushPitch(np);
   renderPitches(); toast('Pitch imported');
 }
 function quickStatus(id,st){
   const all=getPitches(); const p=all.find(x=>x.id===id); if(!p) return;
   p.status=st; if(st==='sent'&&!p.sentAt) p.sentAt=today(); if(st==='replied'&&!p.repliedAt) p.repliedAt=today();
   (p.log=p.log||[]).push({at:new Date().toISOString(),event:st});
-  if(!savePitches(all)) return; renderPitches(); if(curPitch===id) openPitch(id); toast('Marked '+st);
+  if(!savePitches(all)) return; pushPitch(p); renderPitches(); if(curPitch===id) openPitch(id); toast('Marked '+st);
 }
 function openPitch(id){ const p=getPitches().find(x=>x.id===id); if(!p) return; curPitch=id; renderPitchDetail(p); showScreen('pdetail'); }
 function renderPitchDetail(p){
@@ -2932,11 +2948,34 @@ function renderPitchDetail(p){
   if(p.body && bodyIsHtml){ const fr=document.getElementById('pd-iframe'); if(fr){ fr.srcdoc=p.body; fr.onload=()=>{ try{ fr.style.height=Math.min(fr.contentWindow.document.body.scrollHeight+24,420)+'px'; }catch(e){ fr.style.height='420px'; } }; } }
 }
 function editPitch(){ const p=getPitches().find(x=>x.id===curPitch); if(!p) return; showScreen('pitches'); setPitchForm(p); document.getElementById('pitch-form').classList.remove('hidden'); document.getElementById('pitch-form').scrollIntoView({block:'start'}); }
-function deletePitch(id){ if(!confirm('Delete this pitch from the log?')) return; savePitches(getPitches().filter(x=>x.id!==id)); renderPitches(); }
-function deletePitchConfirm(){ if(!curPitch) return; if(!confirm('Delete this pitch from the log?')) return; savePitches(getPitches().filter(x=>x.id!==curPitch)); showScreen('pitches'); }
+function deletePitch(id){ if(!confirm('Delete this pitch from the log?')) return; savePitches(getPitches().filter(x=>x.id!==id)); deletePitchRemote(id); renderPitches(); }
+function deletePitchConfirm(){ if(!curPitch) return; if(!confirm('Delete this pitch from the log?')) return; const id=curPitch; savePitches(getPitches().filter(x=>x.id!==id)); deletePitchRemote(id); showScreen('pitches'); }
 function pickPitchRestore(){ const el=document.getElementById('pitch-restore-file'); if(el){ el.value=''; el.click(); } }
 function restorePitches(input){ const f=input.files&&input.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); mergePitches(data.pitches||(Array.isArray(data)?data:[])); renderPitches(); }catch(e){ alert('Could not read that backup.'); } }; r.readAsText(f); }
 function mergePitches(incoming){ if(!incoming||!incoming.length) return 0; const cur=getPitches(); const byId={}; cur.forEach(p=>byId[p.id]=p); let added=0; incoming.forEach(p=>{ if(p&&p.id){ if(!byId[p.id]) added++; byId[p.id]=Object.assign(byId[p.id]||{},p); } }); savePitches(Object.values(byId)); return added; }
+
+// ── Auto-sync with the Talents Engine ────────────────────────────────────────
+// When configured, every pitch logs itself: the engine (rep.py) pushes on
+// creation, Studio pulls on open and pushes on every change. Off by default —
+// then pitches stay in this browser like the rest of the archive.
+function getEngine(){ const u=localStorage.getItem('yks_engine_url'), k=localStorage.getItem('yks_engine_key'); return (u&&k)?{url:u.replace(/\/+$/,''),key:k}:null; }
+function toggleSync(){ const e=getEngine(); set('sync-url',(e&&e.url)||''); set('sync-key',(e&&e.key)||''); document.getElementById('sync-panel').classList.toggle('hidden'); }
+function saveSync(){ const u=v('sync-url').trim(), k=v('sync-key').trim(); if(!u||!k){ alert('Enter both the engine URL and the key.'); return; } localStorage.setItem('yks_engine_url',u); localStorage.setItem('yks_engine_key',k); document.getElementById('sync-panel').classList.add('hidden'); toast('Sync on — pulling…'); pullPitches(true); }
+function disconnectSync(){ localStorage.removeItem('yks_engine_url'); localStorage.removeItem('yks_engine_key'); document.getElementById('sync-panel').classList.add('hidden'); syncStatus(); toast('Sync off — pitches stay on this device'); }
+function syncStatus(msg){ const el=document.getElementById('sync-status'); if(!el) return; const e=getEngine(); el.textContent = msg!=null ? msg : (e? '⟳ Auto-sync on · '+e.url.replace(/^https?:\/\//,'') : 'Auto-sync off — pitches saved on this device only'); }
+async function pullPitches(loud){
+  const e=getEngine(); if(!e){ syncStatus(); return; }
+  syncStatus('⟳ syncing…');
+  try{
+    const r=await fetch(e.url+'/admin/api/pitches',{headers:{'X-Admin-Key':e.key}});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data=await r.json(); const n=mergePitches(data.pitches||[]);
+    renderPitches(); syncStatus('⟳ synced · '+new Date().toLocaleTimeString('en-IN'));
+    if(loud) toast(n?('Pulled '+n+' new'):'Up to date');
+  }catch(err){ syncStatus('⚠ sync failed — check URL/key (still saved locally)'); if(loud) alert('Could not reach the engine: '+err.message); }
+}
+function pushPitch(p){ const e=getEngine(); if(!e||!p) return; fetch(e.url+'/admin/api/pitch',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Key':e.key},body:JSON.stringify(p)}).then(r=>{ if(r.ok) syncStatus('⟳ synced · '+new Date().toLocaleTimeString('en-IN')); }).catch(()=>{}); }
+function deletePitchRemote(id){ const e=getEngine(); if(!e) return; fetch(e.url+'/admin/api/pitch/'+encodeURIComponent(id)+'/delete',{method:'POST',headers:{'X-Admin-Key':e.key}}).catch(()=>{}); }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function v(id){ return(document.getElementById(id)||{}).value||''; }
