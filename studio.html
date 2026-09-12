@@ -489,6 +489,108 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
   <input type="file" id="arc-restore-file" accept="application/json,.json" style="display:none" onchange="restoreBackup(this)">
 </div>
 
+<!-- ══ PITCHES ══ -->
+<style>
+  .pstatus{display:inline-block;font-size:9px;letter-spacing:.6px;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:20px;border:1px solid;vertical-align:middle}
+  .ps-drafted{color:#9a93a6;border-color:#3a3547}
+  .ps-sent{color:#e4a93f;border-color:#6a4e14;background:rgba(228,169,63,.08)}
+  .ps-replied{color:#5aa9e6;border-color:#2b4e6a;background:rgba(90,169,230,.08)}
+  .ps-won{color:#57c07a;border-color:#255c38;background:rgba(87,192,122,.10)}
+  .ps-lost{color:#c86b6b;border-color:#5c2b2b}
+  .ps-quiet{color:#8f897b;border-color:#3a382f}
+  .pform{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:0 16px 16px}
+  .pform.hidden{display:none}
+  .pform .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:520px){.pform .row2{grid-template-columns:1fr}}
+  select.form-input,textarea.form-input{width:100%;font-family:inherit}
+  textarea.form-input{min-height:80px;resize:vertical;line-height:1.5}
+  .pd-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:0 16px 14px}
+  .pd-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}
+  .pd-row:last-child{border-bottom:none}
+  .pd-row .k{color:var(--sub);font-size:11px;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0;padding-top:2px}
+  .pd-row .val{color:var(--text);text-align:right;word-break:break-word}
+  .pd-body{background:#12100c;border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;color:#cfc9bb;line-height:1.6;white-space:pre-wrap;max-height:360px;overflow:auto}
+  .pd-body-rich{background:#fff;color:#222;border-radius:10px;padding:6px;max-height:420px;overflow:auto}
+  .pd-body-rich iframe{width:100%;border:none;background:#fff;border-radius:6px}
+  .p-timeline{list-style:none;margin:0;padding:0}
+  .p-timeline li{position:relative;padding:0 0 12px 18px;border-left:1px solid var(--border);margin-left:4px;font-size:12.5px;color:var(--sub)}
+  .p-timeline li:before{content:"";position:absolute;left:-4px;top:3px;width:7px;height:7px;border-radius:50%;background:var(--gold)}
+  .p-timeline li b{color:var(--text);font-weight:600}
+</style>
+<div id="screen-pitches" class="screen">
+  <div class="hdr"><div class="hdr-inner">
+    <div><div class="brand">YKS STUDIO</div><div class="hdr-sub">OUTBOUND PITCHES</div></div>
+    <button onclick="lockApp()" style="background:none;border:none;color:var(--sub);font-size:11px;cursor:pointer;letter-spacing:1px">LOCK</button>
+  </div></div>
+  <div class="history-header">
+    <span class="section-title">Pitches</span>
+    <span class="arc-count" id="pitch-count"></span>
+  </div>
+  <div id="pitch-backup-bar"></div>
+  <div class="arc-tools">
+    <input class="arc-search" id="pitch-q" type="search" placeholder="Search brand, contact, concept" autocomplete="off" oninput="renderPitches()">
+    <div class="arc-chips" style="flex-wrap:wrap">
+      <button class="arc-chip on" id="pchip-all"     onclick="setPitchFilter('all')">All</button>
+      <button class="arc-chip"    id="pchip-drafted" onclick="setPitchFilter('drafted')">Drafted</button>
+      <button class="arc-chip"    id="pchip-sent"    onclick="setPitchFilter('sent')">Sent</button>
+      <button class="arc-chip"    id="pchip-replied" onclick="setPitchFilter('replied')">Replied</button>
+      <button class="arc-chip"    id="pchip-won"     onclick="setPitchFilter('won')">Won</button>
+      <button class="arc-chip"    id="pchip-lost"    onclick="setPitchFilter('lost')">Lost</button>
+    </div>
+    <div class="bk-acts" style="margin-top:10px">
+      <button class="bk-btn primary" onclick="openPitchForm()">＋ Log a pitch</button>
+      <button class="bk-btn" onclick="pastePitch()">Paste from engine</button>
+    </div>
+  </div>
+
+  <div id="pitch-form" class="pform hidden">
+    <input type="hidden" id="pf-id">
+    <div class="row2">
+      <div><label class="form-label">Brand *</label><input class="form-input" id="pf-brand" placeholder="Ridhi Mehra"></div>
+      <div><label class="form-label">Status</label>
+        <select class="form-input" id="pf-status">
+          <option value="drafted">Drafted</option><option value="sent">Sent</option>
+          <option value="replied">Replied</option><option value="won">Won</option>
+          <option value="lost">Lost</option><option value="quiet">Quiet</option>
+        </select></div>
+    </div>
+    <div class="row2">
+      <div><label class="form-label">Contact name</label><input class="form-input" id="pf-cname" placeholder="Studio inbox"></div>
+      <div><label class="form-label">Contact email</label><input class="form-input" id="pf-cemail" placeholder="info@brand.com"></div>
+    </div>
+    <div class="row2">
+      <div><label class="form-label">Email verified?</label>
+        <select class="form-input" id="pf-verified"><option value="no">No — unconfirmed</option><option value="yes">Yes — verified</option></select></div>
+      <div><label class="form-label">Creators offered</label><input class="form-input" id="pf-talents" placeholder="Roster (unnamed) / names for your eyes"></div>
+    </div>
+    <div><label class="form-label">Subject line</label><input class="form-input" id="pf-subject" placeholder="May I send a 15-second thing?"></div>
+    <div style="margin-top:10px"><label class="form-label">The angle / concept</label><input class="form-input" id="pf-concept" placeholder="Free 15-sec taste from their own pieces"></div>
+    <div class="row2" style="margin-top:10px">
+      <div><label class="form-label">Sent on</label><input class="form-input" id="pf-sent" type="date"></div>
+      <div><label class="form-label">Replied on</label><input class="form-input" id="pf-replied" type="date"></div>
+    </div>
+    <div style="margin-top:10px"><label class="form-label">Email body (paste the full pitch)</label><textarea class="form-input" id="pf-body" placeholder="Paste the email you sent, or a summary"></textarea></div>
+    <div style="margin-top:10px"><label class="form-label">Report / notes</label><textarea class="form-input" id="pf-notes" placeholder="Link to the diagnosis, follow-up reminders, what they said…"></textarea></div>
+    <div class="bk-acts" style="margin-top:14px">
+      <button class="bk-btn primary" onclick="savePitch()">Save pitch</button>
+      <button class="bk-btn" onclick="closePitchForm()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="pitch-list"></div>
+  <input type="file" id="pitch-restore-file" accept="application/json,.json" style="display:none" onchange="restorePitches(this)">
+</div>
+
+<!-- ══ PITCH DETAIL ══ -->
+<div id="screen-pdetail" class="screen">
+  <div class="preview-toolbar no-print">
+    <button class="btn" onclick="showScreen('pitches')">‹ Back</button>
+    <button class="btn" id="pd-edit-btn" onclick="editPitch()">Edit</button>
+    <button class="btn" onclick="deletePitchConfirm()" style="margin-left:auto;color:#c86b6b">Delete</button>
+  </div>
+  <div id="pdetail-content" style="padding:16px 0"></div>
+</div>
+
 <!-- ══ NEW DOC ══ -->
 <div id="screen-new" class="screen">
   <div class="hdr"><div class="hdr-inner"><div class="brand">New Document</div></div></div>
@@ -1388,6 +1490,10 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
     Invoice
   </button>
+  <button class="nav-btn" id="nav-pitches" onclick="showScreen('pitches')">
+    <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    Pitches
+  </button>
   <button class="nav-btn" id="nav-website" onclick="showScreen('website')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
     Website
@@ -1675,9 +1781,9 @@ function dlFile(name,text,mime){
 function stamp(){ const d=new Date(),p=n=>String(n).padStart(2,'0'); return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes()); }
 function exportBackup(){
   const docs=getDocs();
-  if(!docs.length){ toast('Nothing to back up'); return; }
+  if(!docs.length && !getPitches().length){ toast('Nothing to back up'); return; }
   const payload={format:'yks-studio-backup',version:1,exportedAt:new Date().toISOString(),
-    settings:getSettings(),counters:getCounters(),docs,contracts:getContracts(),talents:getTalents()};
+    settings:getSettings(),counters:getCounters(),docs,contracts:getContracts(),talents:getTalents(),pitches:getPitches()};
   if(dlFile('yks-studio-backup-'+stamp()+'.json',JSON.stringify(payload,null,2))){
     localStorage.setItem(BK_KEY,String(Date.now()));
     toast('Backup saved \u2014 keep it somewhere safe');
@@ -1744,6 +1850,7 @@ function restoreBackup(input){
         const n=parseInt(m[2],10)+1; if(n>(c2.cra||1)) c2.cra=n; });
       try{ localStorage.setItem('yks_ctrs',JSON.stringify(c2)); }catch(e){}
     }
+    if(Array.isArray(data && data.pitches)){ mergePitches(data.pitches); }
     if(data && data.settings && !localStorage.getItem('yks_settings')){
       try{ localStorage.setItem('yks_settings',JSON.stringify(data.settings)); }catch(e){}
     }
@@ -1803,6 +1910,7 @@ function showScreen(name){
   if(nb) nb.classList.add('active');
   curScreen=name;
   if(name==='history') renderHistory();
+  if(name==='pitches') renderPitches();
   if(name==='settings') loadSettingsForm();
   if(name==='contract') renderContracts();
   if(name==='signed') loadSigned();
@@ -2689,6 +2797,146 @@ function openDoc(id){ const doc=getDocs().find(d=>d.id===id); if(doc) previewDoc
 function confirmDelete(id){ if(confirm('Delete this document?')) deleteDoc(id); }
 function clearAll(){ if(confirm('Delete ALL documents? Cannot be undone.')){ localStorage.removeItem('yks_docs'); renderHistory(); showScreen('history'); } }
 function goBack(){ showScreen('history'); }
+
+// ── Outbound pitches ─────────────────────────────────────────────────────────
+// Every pitch we send gets logged here so he can open, view and see exactly what
+// went out and when. Lives in this browser like the rest of the archive, and
+// rides the same backup file.
+const PITCH_KEY='yks_pitches';
+let pitchFilter='all', curPitch=null;
+function getPitches(){ try{ return JSON.parse(localStorage.getItem(PITCH_KEY)||'[]'); }catch(e){ return []; } }
+function savePitches(a){ try{ localStorage.setItem(PITCH_KEY,JSON.stringify(a)); return true; }catch(e){ alert('Could not save this pitch — the browser storage is full. Export a backup and clear space.'); return false; } }
+function pfmtD(d){ if(!d) return ''; const dt=new Date(d+'T00:00:00'); return isNaN(dt)?'':dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+function today(){ return new Date().toISOString().slice(0,10); }
+
+function setPitchFilter(f){ pitchFilter=f;
+  ['all','drafted','sent','replied','won','lost'].forEach(x=>{ const el=document.getElementById('pchip-'+x); if(el) el.classList.toggle('on', x===f); });
+  renderPitches();
+}
+function renderPitchBackupBar(all){
+  const bar=document.getElementById('pitch-backup-bar'); if(!bar) return;
+  if(!all.length){ bar.innerHTML=''; return; }
+  bar.innerHTML=`<div class="bk-bar"><b>${all.length} pitch${all.length>1?'es':''} logged.</b> They live only in this browser — they're saved inside your Studio backup file.<div class="bk-acts"><button class="bk-btn primary" onclick="exportBackup()">Back up now</button><button class="bk-btn" onclick="pickPitchRestore()">Restore</button></div></div>`;
+}
+function renderPitches(){
+  const all=getPitches(); const list=document.getElementById('pitch-list');
+  renderPitchBackupBar(all);
+  const q=(v('pitch-q')||'').trim().toLowerCase();
+  const rows=all.filter(p=>{
+    if(pitchFilter!=='all' && (p.status||'drafted')!==pitchFilter) return false;
+    if(!q) return true;
+    const hay=[p.brand,p.concept,p.subject,(p.contact&&p.contact.name),(p.contact&&p.contact.email),(p.talents||[]).join(' '),p.notes,p.body].join(' ').toLowerCase();
+    return hay.indexOf(q)>-1;
+  });
+  const cnt=document.getElementById('pitch-count');
+  if(cnt) cnt.textContent = all.length ? (rows.length===all.length? all.length+' total' : rows.length+' of '+all.length) : '';
+  if(!all.length){ list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><p>No pitches logged yet.<br>Tap <b>Log a pitch</b> when you send one, or <b>Paste from engine</b> to drop one straight in.</p></div>`; return; }
+  if(!rows.length){ list.innerHTML=`<div class="empty-state"><p>Nothing matches that.</p></div>`; return; }
+  const sorted=rows.slice().sort((a,b)=>{ const ad=a.sentAt||'',bd=b.sentAt||''; if(ad!==bd) return ad<bd?1:-1; return (b.createdAt||0)-(a.createdAt||0); });
+  list.innerHTML=sorted.map(p=>{
+    const st=(p.status||'drafted'), c=p.contact||{};
+    return `<div class="doc-card">
+      <div class="doc-card-top">
+        <div><div class="doc-num">${esc(p.brand||'—')} <span class="pstatus ps-${st}">${esc(st)}</span></div>
+          <div class="doc-client">${esc(c.name||'')}${c.email?(c.name?' · ':'')+esc(c.email):''}${c.verified?' ✓':''}</div>
+          <div class="doc-meta">${p.sentAt?'Sent '+pfmtD(p.sentAt):'Not sent yet'}${p.repliedAt?' · Replied '+pfmtD(p.repliedAt):''}</div></div>
+      </div>
+      ${p.concept?`<div style="font-size:13px;color:var(--sub);margin:2px 0 10px">${esc(p.concept)}</div>`:''}
+      <div class="doc-actions">
+        <button class="btn-sm btn-view" onclick="openPitch('${p.id}')">Open</button>
+        ${st==='drafted'?`<button class="btn-sm btn-agree" onclick="quickStatus('${p.id}','sent')">Mark sent</button>`:''}
+        ${st==='sent'?`<button class="btn-sm btn-agree" onclick="quickStatus('${p.id}','replied')">Mark replied</button>`:''}
+        <button class="btn-sm btn-del" onclick="deletePitch('${p.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openPitchForm(){ setPitchForm(null); document.getElementById('pitch-form').classList.remove('hidden'); document.getElementById('pitch-form').scrollIntoView({behavior:'smooth',block:'start'}); }
+function closePitchForm(){ document.getElementById('pitch-form').classList.add('hidden'); }
+function setPitchForm(p){
+  p=p||{}; const c=p.contact||{};
+  set('pf-id',p.id||''); set('pf-brand',p.brand||''); set('pf-status',p.status||'drafted');
+  set('pf-cname',c.name||''); set('pf-cemail',c.email||''); set('pf-verified',c.verified?'yes':'no');
+  set('pf-talents',(p.talents||[]).join(', ')); set('pf-subject',p.subject||''); set('pf-concept',p.concept||'');
+  set('pf-sent',p.sentAt||''); set('pf-replied',p.repliedAt||''); set('pf-body',p.body||''); set('pf-notes',p.notes||'');
+}
+function savePitch(){
+  const brand=v('pf-brand').trim(); if(!brand){ alert('Give the brand a name.'); return; }
+  const all=getPitches(); const id=v('pf-id')||('p'+Date.now());
+  let p=all.find(x=>x.id===id);
+  const isNew=!p; if(isNew){ p={id,createdAt:Date.now(),log:[{at:new Date().toISOString(),event:'logged'}]}; all.push(p); }
+  const prevStatus=p.status;
+  p.brand=brand; p.status=v('pf-status')||'drafted';
+  p.contact={name:v('pf-cname').trim(),email:v('pf-cemail').trim(),verified:v('pf-verified')==='yes'};
+  p.talents=v('pf-talents').split(',').map(s=>s.trim()).filter(Boolean);
+  p.subject=v('pf-subject').trim(); p.concept=v('pf-concept').trim();
+  p.sentAt=v('pf-sent')||''; p.repliedAt=v('pf-replied')||''; p.body=v('pf-body'); p.notes=v('pf-notes');
+  if(p.status==='sent' && !p.sentAt) p.sentAt=today();
+  if(p.status==='replied' && !p.repliedAt) p.repliedAt=today();
+  if(!isNew && prevStatus!==p.status){ (p.log=p.log||[]).push({at:new Date().toISOString(),event:p.status}); }
+  if(!savePitches(all)) return;
+  closePitchForm(); renderPitches(); toast(isNew?'Pitch logged':'Pitch updated');
+}
+function pastePitch(){
+  const raw=prompt('Paste the pitch JSON from the engine (the pitches/<brand>.json contents):');
+  if(!raw) return;
+  let m; try{ m=JSON.parse(raw); }catch(e){ alert('That was not valid JSON.'); return; }
+  const all=getPitches(); const id='p'+Date.now();
+  const talents=(m.talents||[]).map(t=>typeof t==='string'?t:(t.name||t.slug||'')).filter(Boolean);
+  all.push({id,createdAt:Date.now(),brand:m.brand||'—',status:m.status||'drafted',
+    contact:{name:(m.contact&&m.contact.name)||'',email:m.to||(m.contact&&m.contact.email)||'',verified:!!m.verified},
+    talents,subject:m.subject||'',concept:m.concept||'',sentAt:m.sentAt||'',repliedAt:'',
+    body:m.htmlBody||m.body||'',notes:m.notes||'',log:[{at:new Date().toISOString(),event:'imported from engine'}]});
+  if(!savePitches(all)) return;
+  renderPitches(); toast('Pitch imported');
+}
+function quickStatus(id,st){
+  const all=getPitches(); const p=all.find(x=>x.id===id); if(!p) return;
+  p.status=st; if(st==='sent'&&!p.sentAt) p.sentAt=today(); if(st==='replied'&&!p.repliedAt) p.repliedAt=today();
+  (p.log=p.log||[]).push({at:new Date().toISOString(),event:st});
+  if(!savePitches(all)) return; renderPitches(); if(curPitch===id) openPitch(id); toast('Marked '+st);
+}
+function openPitch(id){ const p=getPitches().find(x=>x.id===id); if(!p) return; curPitch=id; renderPitchDetail(p); showScreen('pdetail'); }
+function renderPitchDetail(p){
+  const c=p.contact||{}, st=p.status||'drafted';
+  const row=(k,val)=> val?`<div class="pd-row"><span class="k">${k}</span><span class="val">${val}</span></div>`:'';
+  const details=`<div class="pd-block">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-size:20px;font-weight:700;color:var(--text)">${esc(p.brand||'—')}</div>
+      <span class="pstatus ps-${st}">${esc(st)}</span></div>
+    ${row('Contact', esc(c.name||'')+(c.email?(c.name?' · ':'')+esc(c.email):'')+(c.verified?' <span style="color:#57c07a">✓ verified</span>':(c.email?' <span style="color:#c86b6b">unverified</span>':'')))}
+    ${row('Creators', (p.talents||[]).length?esc(p.talents.join(', ')):'')}
+    ${row('Subject', esc(p.subject||''))}
+    ${row('Angle', esc(p.concept||''))}
+    ${row('Sent', p.sentAt?pfmtD(p.sentAt):'<span style="color:var(--sub)">not sent yet</span>')}
+    ${row('Replied', p.repliedAt?pfmtD(p.repliedAt):'')}
+    ${row('Logged', p.createdAt?new Date(p.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'')}
+  </div>`;
+  const acts=`<div class="pd-block"><div class="k" style="color:var(--sub);font-size:11px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">Move it along</div>
+    <div class="bk-acts">
+      <button class="bk-btn ${st==='sent'?'primary':''}" onclick="quickStatus('${p.id}','sent')">Sent</button>
+      <button class="bk-btn ${st==='replied'?'primary':''}" onclick="quickStatus('${p.id}','replied')">Replied</button>
+      <button class="bk-btn ${st==='won'?'primary':''}" onclick="quickStatus('${p.id}','won')">Won</button>
+      <button class="bk-btn ${st==='lost'?'primary':''}" onclick="quickStatus('${p.id}','lost')">Lost</button>
+      <button class="bk-btn" onclick="quickStatus('${p.id}','quiet')">Quiet</button>
+    </div></div>`;
+  const bodyIsHtml=/<[a-z][\s\S]*>/i.test(p.body||'');
+  const bodyBlock=`<div class="pd-block"><div class="k" style="color:var(--sub);font-size:11px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">What we sent</div>${
+    p.body ? (bodyIsHtml?`<div class="pd-body-rich"><iframe id="pd-iframe" sandbox=""></iframe></div>`:`<div class="pd-body">${esc(p.body)}</div>`)
+           : '<div style="color:var(--sub);font-size:13px">No email body saved.</div>'}</div>`;
+  const notes=p.notes?`<div class="pd-block"><div class="k" style="color:var(--sub);font-size:11px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Report / notes</div><div style="white-space:pre-wrap;font-size:14px;color:var(--text);line-height:1.6">${esc(p.notes)}</div></div>`:'';
+  const tl=(p.log||[]).slice().reverse().map(e=>`<li><b>${esc(e.event)}</b> · ${new Date(e.at).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}${e.note?' — '+esc(e.note):''}</li>`).join('')||'<li>No history yet.</li>';
+  const timeline=`<div class="pd-block"><div class="k" style="color:var(--sub);font-size:11px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">History</div><ul class="p-timeline">${tl}</ul></div>`;
+  document.getElementById('pdetail-content').innerHTML=details+acts+bodyBlock+notes+timeline;
+  if(p.body && bodyIsHtml){ const fr=document.getElementById('pd-iframe'); if(fr){ fr.srcdoc=p.body; fr.onload=()=>{ try{ fr.style.height=Math.min(fr.contentWindow.document.body.scrollHeight+24,420)+'px'; }catch(e){ fr.style.height='420px'; } }; } }
+}
+function editPitch(){ const p=getPitches().find(x=>x.id===curPitch); if(!p) return; showScreen('pitches'); setPitchForm(p); document.getElementById('pitch-form').classList.remove('hidden'); document.getElementById('pitch-form').scrollIntoView({block:'start'}); }
+function deletePitch(id){ if(!confirm('Delete this pitch from the log?')) return; savePitches(getPitches().filter(x=>x.id!==id)); renderPitches(); }
+function deletePitchConfirm(){ if(!curPitch) return; if(!confirm('Delete this pitch from the log?')) return; savePitches(getPitches().filter(x=>x.id!==curPitch)); showScreen('pitches'); }
+function pickPitchRestore(){ const el=document.getElementById('pitch-restore-file'); if(el){ el.value=''; el.click(); } }
+function restorePitches(input){ const f=input.files&&input.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); mergePitches(data.pitches||(Array.isArray(data)?data:[])); renderPitches(); }catch(e){ alert('Could not read that backup.'); } }; r.readAsText(f); }
+function mergePitches(incoming){ if(!incoming||!incoming.length) return 0; const cur=getPitches(); const byId={}; cur.forEach(p=>byId[p.id]=p); let added=0; incoming.forEach(p=>{ if(p&&p.id){ if(!byId[p.id]) added++; byId[p.id]=Object.assign(byId[p.id]||{},p); } }); savePitches(Object.values(byId)); return added; }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function v(id){ return(document.getElementById(id)||{}).value||''; }
