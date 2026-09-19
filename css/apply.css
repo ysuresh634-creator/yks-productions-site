@@ -1162,3 +1162,24 @@
 
 /* what you get — same cards as the bar, one lit because it is the trust line */
 .ap-get{border-top:1px solid var(--mag-line);background:var(--mag-paper-2)}
+
+/* ── real-work proof (apply page) — answers "is this real/safe?" ─── */
+.ap-proof-lede{color:var(--mag-ink-2);max-width:60ch;line-height:1.65;margin:0 0 22px}
+.ap-proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.ap-proof-tile{position:relative;display:block;border-radius:6px;overflow:hidden;aspect-ratio:3/4;background:#15121a}
+.ap-proof-tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
+.ap-proof-tile:hover img{transform:scale(1.05)}
+.ap-proof-tile span{position:absolute;left:0;right:0;bottom:0;padding:26px 12px 11px;display:flex;flex-direction:column;gap:2px;background:linear-gradient(to top,rgba(7,6,10,.92),transparent);color:#fff}
+.ap-proof-tile b{font-size:13.5px;font-weight:600}
+.ap-proof-tile i{font-size:11px;color:rgba(255,255,255,.72);font-style:normal;letter-spacing:.02em}
+.ap-proof-note{margin:18px 0 0;font-size:13px;color:var(--mag-soft)}
+@media(max-width:560px){.ap-proof-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── worked-example callouts on the apply steps ─── */
+.ap-eg{margin:10px 0 0;padding:11px 14px;border-left:2px solid var(--mag-accent);
+  background:rgba(255,148,72,.05);border-radius:0 4px 4px 0;
+  font-size:13.5px;line-height:1.65;color:var(--mag-ink-2)}
+.ap-eg b{color:var(--mag-ink)}
+.ap-eg-ok,.ap-eg-no{display:block;margin-top:5px;font-size:13px}
+.ap-eg-ok{color:#8fd08f}
+.ap-eg-no{color:#e0a3a3}
