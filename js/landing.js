@@ -50,7 +50,11 @@
      person said so outright: he could not tell who the call was for, so he
      used the pop-up instead. The page keeps its own labelled WhatsApp links
      under the submit button and for sending files after applying. */
-  if (/\/talents\/apply/.test(location.pathname)) return;
+  // The whole talent + casting funnel routes through the on-page forms, not a
+  // one-tap line to Yedukrishna's phone — this FAB (WhatsApp + Call) is what
+  // turned applicants' questions into casting DMs and cold calls. Iris
+  // (chat.js) still helps on these pages; only the direct line is withheld.
+  if (/\/talents|\/models-in-|\/casting-india/.test(location.pathname)) return;
   var waLink = document.querySelector('a[href*="wa.me/"]');
   var num = (document.body && document.body.getAttribute('data-wa')) || (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1]) || '971501955122';
   /* The opening line depends on which page you are standing on. This button

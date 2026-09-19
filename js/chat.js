@@ -46,6 +46,13 @@
         ? "Hi Yedukrishna, I'm looking to cast talent from your roster."
         : "Hi Yedukrishna, I'd like to enquire about a shoot.");
 
+  /* On the talent + casting funnel, every route is a FORM — not a one-tap line
+     to Yedukrishna's phone. Iris still answers here (a confused applicant or a
+     cautious one is exactly who needs her), but the WhatsApp and Call
+     affordances are withheld: they are what turned "how do I apply" into
+     casting DMs and cold calls, because the button wrote the message for them. */
+  var TALENT_FUNNEL = /\/talents|\/models-in-|\/casting-india/.test(location.pathname);
+
   /* ── languages ─────────────────────────────────────────────────
      Iris answers in whatever the visitor writes. These just decide
      how she OPENS — worth getting right, since a Gulf or Kerala
@@ -129,9 +136,10 @@
   /* Chips beginning with → are actions, not messages. */
   var ACTIONS = {
     '→ Get a quote': '/quote.html',
-    '→ WhatsApp him': WA_URL,
     'See his work': 'https://www.instagram.com/yks_photoworks/'
   };
+  // No one-tap WhatsApp on the talent/casting funnel — those routes are forms.
+  if (!TALENT_FUNNEL) ACTIONS['→ WhatsApp him'] = WA_URL;
 
   /* ── the aperture mark ─────────────────────────────────────────
      Blades live in their own group so they can animate: the dock CTA
@@ -372,14 +380,15 @@
     +   '<span class="yc-oi amber">' + APERTURE + '</span>'
     +   '<span class="yc-ot"><b>Ask ' + BOT + '</b><small>Instant answers, any language</small></span>'
     + '</button>'
-    + '<a class="yc-opt" href="' + WA_URL + '" target="_blank" rel="noopener" role="menuitem">'
-    +   '<span class="yc-oi green">' + WA_ICON + '</span>'
-    +   '<span class="yc-ot"><b>WhatsApp</b><small>Yedukrishna replies himself</small></span>'
-    + '</a>'
-    + '<a class="yc-opt" href="tel:+' + NUM + '" role="menuitem">'
-    +   '<span class="yc-oi plain">' + TEL_ICON + '</span>'
-    +   '<span class="yc-ot"><b>Call</b><small>' + prettyNum(NUM) + '</small></span>'
-    + '</a>'
+    + (TALENT_FUNNEL ? '' :
+        '<a class="yc-opt" href="' + WA_URL + '" target="_blank" rel="noopener" role="menuitem">'
+      +   '<span class="yc-oi green">' + WA_ICON + '</span>'
+      +   '<span class="yc-ot"><b>WhatsApp</b><small>Yedukrishna replies himself</small></span>'
+      + '</a>'
+      + '<a class="yc-opt" href="tel:+' + NUM + '" role="menuitem">'
+      +   '<span class="yc-oi plain">' + TEL_ICON + '</span>'
+      +   '<span class="yc-ot"><b>Call</b><small>' + prettyNum(NUM) + '</small></span>'
+      + '</a>')
     + '</div>'
     + '<button class="yc-cta" aria-expanded="false" aria-controls="ycMenu">'
     +   '<span class="yc-cmark" aria-hidden="true">' + APERTURE + '</span>' + ctaLabel() + CHEV
@@ -417,16 +426,20 @@
   panel.innerHTML =
       '<div class="yc-head"><div class="yc-av">' + APERTURE + '</div>'
     + '<div class="yc-ttl"><b>' + BOT + '</b><span><i></i>Replies instantly</span></div>'
-    + '<a class="yc-hbtn wa" href="' + WA_URL + '" target="_blank" rel="noopener" title="WhatsApp Yedukrishna" aria-label="WhatsApp Yedukrishna">' + WA_ICON + '</a>'
-    + '<a class="yc-hbtn tel" href="tel:+' + NUM + '" title="Call Yedukrishna" aria-label="Call Yedukrishna">' + TEL_ICON + '</a>'
+    + (TALENT_FUNNEL ? '' :
+        '<a class="yc-hbtn wa" href="' + WA_URL + '" target="_blank" rel="noopener" title="WhatsApp Yedukrishna" aria-label="WhatsApp Yedukrishna">' + WA_ICON + '</a>'
+      + '<a class="yc-hbtn tel" href="tel:+' + NUM + '" title="Call Yedukrishna" aria-label="Call Yedukrishna">' + TEL_ICON + '</a>')
     + '<button class="yc-hbtn x" aria-label="Close chat">&times;</button></div>'
     + '<div class="yc-langs">' + LANG_STRIP + '</div>'
     + '<div class="yc-log" id="ycLog"></div>'
     + '<div class="yc-chips" id="ycChips"></div>'
     + '<div class="yc-foot"><textarea class="yc-in" id="ycIn" rows="1" dir="auto" placeholder="' + T.ph + '"></textarea>'
     + '<button class="yc-send" id="ycSend" aria-label="Send"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div>'
-    + '<div class="yc-note">' + BOT + ' is an AI assistant — for anything urgent, '
-    + '<a href="' + WA_URL + '" target="_blank" rel="noopener">message Yedukrishna</a></div>';
+    + '<div class="yc-note">' + BOT + ' is an AI assistant. '
+    + (TALENT_FUNNEL
+        ? 'Applications and casting briefs go through the form on this page.'
+        : 'For anything urgent, <a href="' + WA_URL + '" target="_blank" rel="noopener">message Yedukrishna</a>')
+    + '</div>';
   document.body.appendChild(panel);
 
   var log = panel.querySelector('#ycLog'), input = panel.querySelector('#ycIn'),
