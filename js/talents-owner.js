@@ -1087,15 +1087,47 @@
             }).join('');
             panel2.appendChild(dl);
 
+            // FOLLOW CHECK — the one verification only Yedukrishna can do.
+            // A website cannot read an Instagram follow, so publishing is
+            // gated on him eyeballing his own follower list for this handle
+            // first. The tick is remembered per applicant so a reload of the
+            // desk does not lose it.
+            var FKEY = 'yks_ow_follow_' + t.id;
+            var followedOk = false; try { followedOk = localStorage.getItem(FKEY) === '1'; } catch (e) {}
+            var fcHandle = igHandle(d.socials);
+            var fc = el('div', 'ow-followcheck');
+            fc.style.cssText = 'margin-top:12px;padding:11px 13px;border:1px solid rgba(201,169,110,.4);border-radius:6px;background:rgba(201,169,110,.06)';
+            fc.innerHTML =
+              '<div style="font-size:12px;color:#7d746d;margin-bottom:7px">Follow check — required before publishing</div>' +
+              (igUrl(d.socials)
+                ? '<a href="' + esc(igUrl(d.socials)) + '" target="_blank" rel="noopener noreferrer" style="color:#C9A96E;font-size:13px">Open @' + esc(fcHandle) + ' on Instagram ↗</a> <span style="color:#7d746d;font-size:12px">— then check they follow you</span>'
+                : '<span style="color:#e5533d;font-size:13px">No usable handle given — verify another way before publishing.</span>') +
+              '<label style="display:flex;align-items:center;gap:9px;margin-top:9px;cursor:pointer;font-size:13.5px">' +
+                '<input type="checkbox" style="width:17px;height:17px;flex:none;accent-color:#C9A96E"' + (followedOk ? ' checked' : '') + '>' +
+                '<span>I checked my followers — ' + (fcHandle ? '<b>@' + esc(fcHandle) + '</b>' : 'this person') + ' follows @yks_photoworks</span>' +
+              '</label>';
+            panel2.appendChild(fc);
+            var fcb = fc.querySelector('input');
+            fcb.addEventListener('change', function () {
+              try { localStorage.setItem(FKEY, fcb.checked ? '1' : '0'); } catch (e) {}
+            });
+
             var quick = el('div', 'ow-row');
             if (t.status !== 'live') {
               var okb = el('button', 'ow-btn go', 'Publish this one');
+              okb.disabled = !followedOk;
+              okb.title = followedOk ? '' : 'Confirm the follow check first';
               okb.onclick = function () {
-                if (!confirm('Publish ' + (t.name || 'this talent') + ' to the roster?\n\nBy continuing you confirm they are 18 or over.')) return;
+                if (!confirm('Publish ' + (t.name || 'this talent') + ' to the roster?\n\nBy continuing you confirm they are 18 or over and that they follow @yks_photoworks.')) return;
                 okb.disabled = true;
                 publish([t.id], true).then(function () { desk(); });
               };
               quick.appendChild(okb);
+              // the follow check gates publishing
+              fcb.addEventListener('change', function () {
+                okb.disabled = !fcb.checked;
+                okb.title = fcb.checked ? '' : 'Confirm the follow check first';
+              });
             }
             var downb = el('button', 'ow-btn', 'Turn down');
             downb.onclick = function () {
