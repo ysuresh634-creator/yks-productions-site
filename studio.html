@@ -1968,7 +1968,23 @@ function addItem(desc='',rate=''){
   document.getElementById('items-container').appendChild(div);
   calcTotals();
 }
-function quickAdd(desc){ addItem(desc,''); const rows=document.querySelectorAll('#items-container .item-row'); const last=rows[rows.length-1]; if(last) last.querySelectorAll('input')[1].focus(); }
+function quickAdd(desc){
+  const defaults = {
+    'Photography': '15000',
+    'Videography': '25000',
+    'Event Film': '35000',
+    '50 Edited Photos': '8000',
+    'Fuel': '2000',
+    'Equipment': '5000',
+    'Reel': '6000',
+    'Studio': '10000'
+  };
+  const rate = defaults[desc] || '';
+  addItem(desc, rate);
+  const rows=document.querySelectorAll('#items-container .item-row');
+  const last=rows[rows.length-1];
+  if(last) last.querySelectorAll('input')[1].focus();
+}
 function removeItem(id){ const el=document.getElementById(id); if(el){el.remove();calcTotals();} }
 function getItems(){
   return Array.from(document.querySelectorAll('#items-container .item-row')).map(row=>{
@@ -4285,7 +4301,10 @@ function logErr(kind, msg, extra){
   try{
     window.__yksErr.push(Object.assign({t:new Date().toISOString().slice(11,19), kind, msg:scrub(msg).slice(0,220)}, extra||{}));
     if(window.__yksErr.length>30) window.__yksErr.shift();
-    const g=document.getElementById('glitch'); if(g) g.classList.add('on');
+    // Only show the glitch banner after multiple errors to avoid noise
+    if(window.__yksErr.length >= 3){
+      const g=document.getElementById('glitch'); if(g) g.classList.add('on');
+    }
   }catch(_){}
 }
 function gotoSelfCheck(){
