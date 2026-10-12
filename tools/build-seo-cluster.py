@@ -83,7 +83,7 @@ AUTHOR = '''<section class="l-section l-author">
       <img src="/assets/yedu-portrait.jpg" width="{w}" height="{h}" alt="Yedukrishna Suresh, marketing specialist, photographer and videographer" loading="lazy" decoding="async" />
       <div class="l-prose">
         <p>I&rsquo;m a marketing specialist with 8 years in content, video and photography, and the founder of YKS Productions. I&rsquo;ve created for brands including <strong>Vaseline (Unilever)</strong>, <strong>Marriott</strong>, <strong>KL Rahul</strong> and <strong>Cindrebay School of Design</strong>, and worked as still photographer on the Malayalam films <strong>Soothravakyam</strong> and <strong>Baby Girl</strong>. One campaign reel I made reached <strong>3.3M views</strong>, and my Instagram <a href="https://www.instagram.com/yks_photoworks/" target="_blank" rel="noopener">@yks_photoworks</a> has passed <strong>1.4M profile views</strong>.</p>
-        <p>I work with brands in Dubai, Abu Dhabi, Bangalore, Mumbai and Delhi NCR. Email <a href="mailto:yksproductions893@gmail.com">yksproductions893@gmail.com</a> or WhatsApp <a href="https://wa.me/971501955122">+971 50 195 5122</a>.</p>
+        <p>I work with brands in Dubai, Abu Dhabi, Bangalore, Mumbai and Delhi NCR. Email <a href="mailto:yksproductions893@gmail.com">yksproductions893@gmail.com</a> or WhatsApp {phone}.</p>
       </div>
     </div>
   </div>
@@ -106,6 +106,15 @@ def place(city, country):
         return [{"@type": "City", "name": n, "containedInPlace": {"@type": "Country", "name": c}} for n, c in
                 [("Dubai","United Arab Emirates"),("Abu Dhabi","United Arab Emirates"),("Bangalore","India"),("Mumbai","India"),("Delhi","India")]]
     return {"@type": "City", "name": city.replace(' NCR', ''), "containedInPlace": {"@type": "Country", "name": country}}
+
+def entity(cc):
+    if not cc: return ENTITY
+    a = ENTITY.index('<script type="application/ld+json">') + len('<script type="application/ld+json">')
+    b = ENTITY.index('</script>', a)
+    d = json.loads(ENTITY[a:b])
+    for n in d['@graph']:
+        if 'contactPoint' in n: n['contactPoint'] = [c for c in n['contactPoint'] if c.get('areaServed') == cc]
+    return ENTITY[:a] + '\n' + json.dumps(d, indent=1, ensure_ascii=False) + '\n' + ENTITY[b:]
 
 def head(path, title, desc, ogtitle, schema, region=None, placename=None, ogtype='website'):
     url = f'{SITE}/{path}'
@@ -143,10 +152,10 @@ def head(path, title, desc, ogtitle, schema, region=None, placename=None, ogtype
 <script type="application/ld+json">
 {json.dumps(schema, indent=1, ensure_ascii=False)}
 </script>
-{ENTITY}
+{entity(CUR['cc'])}
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
 </head>
-<body data-wa="971501955122">
+<body{(' data-wa="' + NUM[CUR['cc']][0] + '"') if CUR['cc'] else ''}>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -171,9 +180,12 @@ def faq_ld(faqs):
     return {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": strip(q),
         "acceptedAnswer": {"@type": "Answer", "text": strip(a)}} for q, a in faqs]}
 
+NUM = {'AE': ('971501955122', '+971 50 195 5122', '+971-50-195-5122'), 'IN': ('919746679720', '+91 97466 79720', '+91-9746679720')}
+CUR = {'cc': None}
 def wa(text):
     from urllib.parse import quote
-    return 'https://wa.me/971501955122?text=' + quote(text)
+    n = NUM[CUR['cc'] or 'AE'][0]
+    return f'https://wa.me/{n}?text=' + quote(text)
 
 def hero(eyebrow, h1, h1em, lede, crumbs, watext):
     return f'''
@@ -233,7 +245,10 @@ def places(links):
 
 def tail(source, watext, related_line=''):
     aw, ah = Image.open(os.path.join(ROOT, 'assets/yedu-portrait.jpg')).size
-    return AUTHOR.replace('{w}', str(aw)).replace('{h}', str(ah)) + f'''
+    cc = CUR['cc']
+    phone = f'<a href="https://wa.me/{NUM[cc][0]}">{NUM[cc][1]}</a>' if cc else '<a href="https://wa.me/971501955122" data-geo-phone>+971 50 195 5122</a>'
+    geo = '' if cc else '<script src="/js/geo-wa.js?v=1"></script>\n'
+    return AUTHOR.replace('{w}', str(aw)).replace('{h}', str(ah)).replace('{phone}', phone) + f'''
 
 </main>
 
@@ -274,7 +289,7 @@ def tail(source, watext, related_line=''):
   </div>
 </footer>
 
-<script src="/js/landing.js?v=17"></script>
+{geo}<script src="/js/landing.js?v=17"></script>
 <script src="/js/fx.js?v=6"></script>
 <script src="/js/lead.js?v=2"></script>
 <script src="/js/chat-config.js"></script>
@@ -290,7 +305,7 @@ def tail(source, watext, related_line=''):
 def service_ld(name, stype, desc, url, area):
     return {"@type": "Service", "name": name, "serviceType": stype, "description": desc, "url": url,
             "provider": {"@type": "LocalBusiness", "@id": SITE + "/#business", "name": "YKS Productions", "url": SITE + "/",
-                         "email": "yksproductions893@gmail.com", "telephone": "+971-50-195-5122", "areaServed": area},
+                         "email": "yksproductions893@gmail.com", **({"telephone": NUM[CUR['cc']][2]} if CUR['cc'] else {}), "areaServed": area},
             "areaServed": area}
 
 written = []
@@ -311,6 +326,7 @@ CITY_LINKS = {
 BLOG_LINKS = {k: [b for b, v in B.items() if P[k]['slug'] in v['links']] for k in P}
 
 for k, p in P.items():
+    CUR['cc'] = None
     url = f"{SITE}/{p['slug']}"
     name = strip(p['h1'] + ' ' + p['h1em'])
     crumbs = [('Home', '/'), ('Services', '/marketing.html'), (p['key'], '/' + p['slug'])] if k != 'marketing' else [('Home', '/'), (p['key'], '/marketing.html')]
@@ -339,6 +355,7 @@ CITY_EXTRA = {
  'Delhi NCR': ['marketing-agency-delhi.html','videographer-delhi.html','photographer-delhi.html','models-in-delhi.html'],
 }
 for path, c in C.items():
+    CUR['cc'] = c['cc']
     hk = HUBKEY[c['hub']]; hub = P[hk]
     url = f'{SITE}/{path}'
     name = strip(c['h1'] + ' ' + c['h1em'])
@@ -359,7 +376,9 @@ for path, c in C.items():
     write(path, head(path, c['title'], c['desc'], name + ' — YKS Productions', schema, c['region'], c['city'] + ', ' + c['country']) + body + tail(f"{hub['key']} · {c['city']}", watext))
 
 # Blogs
+BCC = {'blog/meta-ads-vs-google-ads-dubai.html': 'AE', 'blog/brand-video-cost-bangalore.html': 'IN', 'blog/linkedin-personal-branding-founders-mumbai.html': 'IN', 'blog/marketing-agency-vs-consultant-india.html': 'IN'}
 for path, b in B.items():
+    CUR['cc'] = BCC.get(path)
     url = f'{SITE}/{path}'
     name = strip(b['h1'] + ' ' + b['h1em'])
     crumbs = [('Home', '/'), ('Journal', '/blog/'), (name, '/' + path)]
