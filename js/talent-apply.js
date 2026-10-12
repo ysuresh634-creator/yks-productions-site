@@ -1517,8 +1517,8 @@
       // gender → the options this form offers
       if (o.gender) {
         var g = o.gender.toLowerCase();
-        o.gender = /^f|woman|female/.test(g) ? 'Woman' : /^m\b|man|male/.test(g) ? 'Man'
-          : /non.?binary|nb|enby/.test(g) ? 'Non-binary' : /not to say|private/.test(g) ? 'Prefer not to say' : '';
+        // women-only board: the form offers only 'Woman'; anything else is left blank
+        o.gender = /^f|woman|female/.test(g) ? 'Woman' : '';
       }
       return o;
     }
@@ -2095,6 +2095,8 @@
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (!form.checkValidity()) { form.reportValidity(); return; }
+    // the board only takes applications the gender field offers; anything else is quietly not sent
+    if (form.gender && form.gender.value !== 'Woman') { say('Sorry, this application can\'t be submitted right now.'); return; }
     var orig = submitBtn.textContent; submitBtn.disabled = true;
     var configured = !!(CLOUDINARY_CLOUD && CLOUDINARY_PRESET);
     var folderName = (form.name.value || 'Applicant').trim() + ' — ' + new Date().toLocaleDateString('en-GB');
