@@ -1517,7 +1517,7 @@
       // gender → the options this form offers
       if (o.gender) {
         var g = o.gender.toLowerCase();
-        // women-only board: the form offers only 'Woman'; anything else is left blank
+        // map to the single option the form offers; anything else is left blank
         o.gender = /^f|woman|female/.test(g) ? 'Woman' : '';
       }
       return o;

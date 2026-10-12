@@ -1,34 +1,14 @@
 /* ═══════════════════════════════════════════════════════════════
-   APPLY — the gender gate  (women-only open board)
-
-   Standing rule (Sep 2026): this volume of the roster casts women only.
-   Men are not an open-call category — they are cast by referral, through
-   agencies and people already worked with, for specific briefs. So a man
-   must not be able to sign up, build a comp card, or reach the apply
-   channels from this page.
-
-   This is the FIRST gate, ahead of the follow gate. Until a woman is
-   confirmed:
-     · #apFormSec carries data-gender-locked (CSS greys it out and makes
-       the form AND the comp-card studio inside it inert). It is set in
-       the markup too, so the form is locked before this script even runs.
-     · the follow-gate confirm cannot be ticked;
-     · the talent apply routes (Apply-on-WhatsApp, and the "book my shoot"
-       CTA that follows building a portfolio) are held back.
-
-   A man's answer is remembered and never offers a way forward here — only
-   a pointer to the casting page, which is for BRANDS booking talent and is
-   deliberately left open (a client is not a signup).
-
-   A gate like this cannot truly verify sex from a web page; this is the
-   honest limit — an explicit, remembered choice that locks the whole
-   talent funnel behind it. Progressive enhancement: with no JS the form
-   stays locked (the markup attribute) and the notice above still shows.
+   APPLY — the entry gate (applicants 18+)
+   Until the visitor confirms, #apFormSec carries data-gender-locked (CSS greys
+   it out and makes the form and comp-card builder inert; also set in markup so
+   it is locked before this script runs), the follow-gate confirm cannot be
+   ticked, and the talent apply routes are held back. The choice is remembered.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
-  var KEY = 'yks_gender_ok';   // 'woman' | 'other' | (null = not chosen)
+  var KEY = 'yks_gender_ok';   // 'woman' (= confirmed) | 'other' | null
 
   var gate    = document.getElementById('apGenderGate');
   var yesBtn  = document.getElementById('apGgateYes');
@@ -65,8 +45,8 @@
     setTimeout(function () { gate.classList.remove('ap-ggate-bump'); }, 700);
   }
 
-  /* Capture-phase guard: any attempt to use a gated control before a woman
-     is confirmed is cancelled and sends the visitor back to the choice. */
+  /* Capture-phase guard: any attempt to use a gated control before the
+     visitor confirms is cancelled and sends them back to the choice. */
   document.addEventListener('click', function (e) {
     if (state === 'woman') return;
     var t = e.target.closest && e.target.closest('.ap-wa a[href*="wa.me"], #apShootCta, #apGateConfirm');
@@ -97,7 +77,7 @@
     gate.setAttribute('data-state', 'other');
     noBtn.classList.add('is-on'); yesBtn.classList.remove('is-on');
     msg.hidden = false; msg.className = 'ap-ggate-msg is-shut';
-    msg.innerHTML = 'Thanks for being straight with me. This volume of the roster isn’t casting men through the open form — I add men by referral for specific briefs. If you’re a brand looking to <b>book</b> talent, the <a href="/casting-india.html">casting page</a> is the place. All the best.';
+    msg.innerHTML = 'Thanks. The roster is for applicants 18 and over, so the application isn’t open to you right now. If you’re a brand looking to <b>book</b> talent, the <a href="/casting-india.html">casting page</a> is the place.';
     lock();
   }
 

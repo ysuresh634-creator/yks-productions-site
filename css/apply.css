@@ -1056,7 +1056,7 @@
   background:var(--mag-accent);padding:12px 20px;border-radius:3px;text-align:center;
   max-width:calc(100% - 40px);box-shadow:0 8px 30px rgba(0,0,0,.35)}
 
-/* ── gender gate (women-only open board) ─────────────────────────
+/* ── entry gate (applicants 18+) ─────────────────────────
    The first gate. Its lock mirrors the follow lock; placed AFTER it so
    that when both attributes are present the gender message wins. */
 .ap-ggate-sec{padding-top:0}
@@ -1082,7 +1082,7 @@
 
 #apFormSec[data-gender-locked]{position:relative}
 #apFormSec[data-gender-locked] .tal-apply{filter:grayscale(.5) opacity(.5);pointer-events:none;user-select:none}
-#apFormSec[data-gender-locked]::before{content:"👗  This volume is casting women — choose above to open the application";
+#apFormSec[data-gender-locked]::before{content:"Confirm you are 18 or over above to open the application";
   position:absolute;left:50%;top:34px;transform:translateX(-50%);z-index:4;
   font-family:var(--mag-mono);font-size:12.5px;letter-spacing:.05em;color:#0a0810;
   background:var(--mag-accent);padding:12px 20px;border-radius:3px;text-align:center;
