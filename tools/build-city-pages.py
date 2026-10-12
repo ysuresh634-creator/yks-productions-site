@@ -237,7 +237,7 @@ def page(c):
   gtag('config', 'G-C57X89TN45');
 </script>
 <title>Book Models in {e(c['city'])} — Casting &amp; Talent | YKS Talents</title>
-<meta name="description" content="Casting for commercial and fashion shoots in {e(c['city'])} — brands send a brief and get a shortlist. A curated roster of working models and actors, booked only through YKS. Not a photography or portfolio service." />
+<meta name="description" content="Casting for fashion and commercial shoots in {e(c['city'])}: send a brief, get a shortlist of working models and actors. Booked only through YKS Talents." />
 <link rel="canonical" href="{url}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="geo.region" content="{e(c['geo'])}" />
@@ -247,7 +247,14 @@ def page(c):
 <meta property="og:title" content="Models in {e(c['city'])} — cast for a shoot, or join the roster" />
 <meta property="og:description" content="A curated casting desk for brands shooting in {e(c['city'])}, and a selective roster of working talent. Bookings arranged through YKS Productions. Applications by form only." />
 <meta property="og:url" content="{url}" />
-<meta property="og:image" content="{BASE}/assets/og-cover.jpg" />
+<meta property="og:image" content="{BASE}/assets/og/og-city-{c['slug']}.jpg" />
+<meta property="og:image:secure_url" content="{BASE}/assets/og/og-city-{c['slug']}.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Models, actors and creators in {e(c['city'])} — cast for a shoot or join the roster" />
+<meta property="og:locale" content="en_IN" />
+<meta name="twitter:image" content="{BASE}/assets/og/og-city-{c['slug']}.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48.png" />

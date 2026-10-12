@@ -148,7 +148,7 @@ img{display:block;max-width:100%;height:auto}
 .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
   align-items:center;text-align:center;padding:clamp(76px,9vh,104px) 24px 0;z-index:2}
 .hero-eyebrow{font-family:var(--font-m);font-size:12px;letter-spacing:.42em;text-transform:uppercase;color:var(--peach);margin-bottom:30px}
-.hero-title{font-size:clamp(56px,15vw,240px);font-weight:600;line-height:.84;letter-spacing:.01em}
+.hero-title{font-family:var(--font-d);font-size:clamp(56px,15vw,240px);font-weight:600;line-height:.84;letter-spacing:.01em}
 .hero-title .line{display:block;white-space:nowrap}
 .hero-title .line-2{font-size:clamp(36px,10.6vw,170px);letter-spacing:.02em;margin-top:.04em}
 .hero-name{margin-top:34px;font-family:var(--font-d);font-size:clamp(26px,4vw,52px);font-weight:500;letter-spacing:.04em}
@@ -157,7 +157,7 @@ img{display:block;max-width:100%;height:auto}
   -webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-title .line-2 .char{background:linear-gradient(168deg,var(--peach) 10%,var(--amber) 48%,var(--magenta) 88%);
   -webkit-background-clip:text;background-clip:text;color:transparent}
-.hero-roles{margin-top:30px;font-size:clamp(14px,1.8vw,19px);color:rgba(244,237,226,.88);font-style:italic;font-family:var(--font-d)}
+.hero-roles{margin-top:30px;font-weight:400;line-height:1.6;letter-spacing:normal;font-size:clamp(14px,1.8vw,19px);color:rgba(244,237,226,.88);font-style:italic;font-family:var(--font-d)}
 .hero-meta{display:flex;gap:54px;margin-top:46px;flex-wrap:wrap;justify-content:center}
 .hero-meta b{display:block;font-family:var(--font-m);font-weight:400;font-size:9.5px;letter-spacing:.3em;
   text-transform:uppercase;color:rgba(244,237,226,.5);margin-bottom:6px}
