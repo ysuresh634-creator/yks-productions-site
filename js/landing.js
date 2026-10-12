@@ -196,7 +196,7 @@
 
   function show(i) {
     idx = (i + group.length) % group.length;
-    var src = group[idx].currentSrc || group[idx].src;
+    var src = group[idx].dataset.full || group[idx].currentSrc || group[idx].src;
     big.style.opacity = 0;
     var pre = new Image();
     pre.onload = function () { big.src = src; big.alt = group[idx].alt || ''; big.style.opacity = 1; };

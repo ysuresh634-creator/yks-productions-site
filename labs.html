@@ -120,7 +120,7 @@
     </div>
     <div class="tilt-stage" id="tiltStage">
       <figure class="tilt" id="tiltCard">
-        <img width="1068" height="1600" src="/assets/rukmini/rukmini-1.jpg" alt="Rukmini Vasanth — editorial portrait" />
+        <img width="1068" height="1600" src="/assets/rukmini/rukmini-1.webp" alt="Rukmini Vasanth — editorial portrait" data-full="/assets/rukmini/rukmini-1.webp" srcset="/assets/rukmini/rukmini-1-800.webp 800w, /assets/rukmini/rukmini-1.webp 1068w" sizes="(max-width: 800px) 100vw, 800px" fetchpriority="high" decoding="async" />
         <span class="gloss"></span>
         <span class="frame"></span>
         <figcaption>Rukmini Vasanth · editorial</figcaption>
@@ -284,7 +284,7 @@
   FRAMES.forEach(function (f, i) {
     var el = document.createElement('figure');
     el.className = 'plane';
-    el.innerHTML = '<img src="' + f[0] + '" alt="' + f[1] + '" loading="lazy" /><figcaption>' + f[1] + '</figcaption>';
+    el.innerHTML = '<img src="' + f[0] + '" alt="' + f[1] + '" loading="lazy" decoding="async" /><figcaption>' + f[1] + '</figcaption>';
     var side = (i % 2 ? 1 : -1) * (26 + (i % 3) * 7);
     var z = -420 - i * SPACING;
     el.dataset.z = z;
