@@ -83,7 +83,7 @@ AUTHOR = '''<section class="l-section l-author">
       <img src="/assets/yedu-portrait.jpg" width="{w}" height="{h}" alt="Yedukrishna Suresh, marketing specialist, photographer and videographer" loading="lazy" decoding="async" />
       <div class="l-prose">
         <p>I&rsquo;m a marketing specialist with 8 years in content, video and photography, and the founder of YKS Productions. I&rsquo;ve created for brands including <strong>Vaseline (Unilever)</strong>, <strong>Marriott</strong>, <strong>KL Rahul</strong> and <strong>Cindrebay School of Design</strong>, and worked as still photographer on the Malayalam films <strong>Soothravakyam</strong> and <strong>Baby Girl</strong>. One campaign reel I made reached <strong>3.3M views</strong>, and my Instagram <a href="https://www.instagram.com/yks_photoworks/" target="_blank" rel="noopener">@yks_photoworks</a> has passed <strong>1.4M profile views</strong>.</p>
-        <p>I work with brands in Dubai, Abu Dhabi, Bangalore, Mumbai and Delhi NCR. Email <a href="mailto:yksproductions893@gmail.com">yksproductions893@gmail.com</a> or WhatsApp {phone}.</p>
+        <p>I work independently, with no office or staff, and travel to clients in Dubai, Abu Dhabi, Bangalore, Mumbai and Delhi NCR. Email <a href="mailto:yksproductions893@gmail.com">yksproductions893@gmail.com</a> or WhatsApp {phone}.</p>
       </div>
     </div>
   </div>

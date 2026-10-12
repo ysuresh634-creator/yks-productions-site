@@ -26,13 +26,13 @@ P['marketing'] = dict(
   ('Digital','Digital marketing','Website, search, social, ads and email working towards one goal instead of five separate ones.'),
   ('Search','SEO services','Service pages, local SEO, Google Business Profile, technical basics and helpful articles.'),
   ('Ads','Performance marketing','Meta, Google and LinkedIn campaigns with creative built for each platform.'),
-  ('Content','Content production','Photo, video and reels shot in-house on a Sony A7 IV, so the content matches the strategy.'),
+  ('Content','Content production','Photo, video and reels shot by me on a Sony A7 IV, so the content matches the strategy.'),
   ('Reporting','Monthly review','A short, readable report: what ran, what worked, what we change next month.')],
  steps=[('Discover','A working session on your business, buyers, competitors and current numbers.'),
   ('Plan','Positioning, channel mix, a 90-day roadmap and a monthly content plan.'),
   ('Produce & launch','Shoot days, pages, campaigns and posts go live in a planned order.'),
   ('Review','Monthly review of results and a clear list of changes for the next cycle.')],
- faqs=[('Are you a marketing agency or a consultant?','Both, depending on what you need. Some clients want strategy and direction for their in-house team; others want YKS Productions to plan, produce and run the work. Either way you deal with me directly rather than an account manager.'),
+ faqs=[('Are you a marketing agency or a consultant?','I&rsquo;m an independent marketing consultant and creator. I work alone, with no office or staff, and travel to clients. Some clients want strategy and direction for their in-house team; others want me to plan, produce and run the work, an agency-level service from one specialist. Either way you deal with me directly rather than an account manager.'),
   ('Which cities do you work in?','Brands across the UAE (Dubai and Abu Dhabi) and India (Bangalore, Mumbai and Delhi NCR). Strategy, SEO and ads run remotely; shoots happen on location.'),
   ('Do you offer SEO on its own?','Yes, for service businesses that want their website to work harder. It usually pairs naturally with content, because good pages need good photos and video.'),
   ('How is pricing worked out?','By scope: how many channels, how much content per month and whether you want strategy only or full execution. You get one written monthly or project quote before anything starts.'),
@@ -43,7 +43,7 @@ P['marketing'] = dict(
 P['performance'] = dict(
  slug='performance-marketing.html', key='Performance Marketing',
  title='Performance Marketing: Meta, Google & LinkedIn Ads',
- desc='Performance marketing for UAE and India brands: Meta ads, Google ads and LinkedIn ads, planned, built and run with ad creative shot in-house.',
+ desc='Performance marketing for UAE and India brands: Meta ads, Google ads and LinkedIn ads, planned, built and run with ad creative I shoot myself.',
  h1='Performance Marketing', h1em='Meta, Google & LinkedIn Ads',
  eyebrow='Paid ads · Lead generation',
  lede='Paid campaigns on Meta, Google and LinkedIn, set up properly, tracked honestly and fed with ad creative I shoot myself. Built for brands in Dubai, Abu Dhabi, Bangalore, Mumbai and Delhi that want enquiries and sales, not just impressions.',
@@ -243,7 +243,7 @@ P['video'] = dict(
   ('Brand films & commercial video', [
    'A brand film tells the story behind a business: why it exists, who it serves and what makes it different. Commercial video is more direct: a product, an offer, a launch. I plan both from the message backwards, write a shot list, scout locations, and shoot on a Sony A7 IV with 28mm, 50mm and 85mm primes for a consistent cinematic look. Moving shots are stabilised on a DJI RS3 gimbal and dialogue is captured on DJI wireless mics.']),
   ('Corporate video', [
-   'Company profiles, leadership messages, recruitment videos, training content, testimonials and office or factory walkthroughs. Corporate video has to look professional without feeling stiff. I keep crews small so people relax on camera, and plan interviews so they produce clear, usable answers. For local detail see <a href="/corporate-video-dubai.html">corporate video in Dubai</a> and <a href="/corporate-video-bangalore.html">Bangalore</a>.']),
+   'Company profiles, leadership messages, recruitment videos, training content, testimonials and office or factory walkthroughs. Corporate video has to look professional without feeling stiff. I work as a one-person crew, so people relax on camera, and plan interviews so they produce clear, usable answers. For local detail see <a href="/corporate-video-dubai.html">corporate video in Dubai</a> and <a href="/corporate-video-bangalore.html">Bangalore</a>.']),
   ('Event, hospitality & real estate video', [
    'Event highlights and conference coverage, hotel and restaurant films, and property walkthroughs. Real estate video is a specialty: see <a href="/real-estate-videographer-dubai.html">real estate videographer in Dubai</a>. I don&rsquo;t fly drones, so aerial shots are arranged with a licensed operator if a project needs them.']),
   ('How delivery works', [
@@ -257,7 +257,7 @@ P['video'] = dict(
   ('Property','Real estate video','Walkthroughs and lifestyle films for listings.')],
  steps=[('Brief','Message, audience, where the video will live and the budget.'),
   ('Pre-production','Script or outline, shot list, locations and schedule.'),
-  ('Shoot','Small, efficient crew; cinematic look; clean audio.'),
+  ('Shoot','One-person crew; cinematic look; clean audio.'),
   ('Deliver','Masters and platform versions shot and delivered as agreed.')],
  faqs=[('What does a brand video cost?','It depends on the shoot days, locations, talent and versions needed. I quote one fixed project price after the brief. Here&rsquo;s a guide to what drives it: <a href="/blog/brand-video-cost-bangalore.html">cost of a brand video in Bangalore</a>.'),
   ('What camera do you use?','Sony A7 IV with Sony 28mm, 50mm and 85mm lenses, a DJI RS3 gimbal and DJI wireless mic.'),
@@ -296,7 +296,7 @@ P['photo'] = dict(
   ('Plan','Shot list, schedule, locations or set and styling notes.'),
   ('Shoot','Controlled light, consistent framing, quick review on set.'),
   ('Deliver','Selected, colour-corrected images in the sizes you need.')],
- faqs=[('Do you photograph products in a studio?','Yes, in a studio or on location. Small products can be shot with a portable setup at your office or warehouse.'),
+ faqs=[('Do you photograph products in a studio?','I don&rsquo;t run a studio of my own. I shoot on location or in a rented studio when the brief needs one, and small products can be shot with a portable setup at your office or warehouse.'),
   ('Can you shoot for Amazon, Noon or Flipkart listings?','Yes. I shoot to the marketplace&rsquo;s image requirements and deliver files organised by SKU.'),
   ('Do you cover events with both photo and video?','Yes, either one or both, depending on the event size and what you need afterwards.'),
   ('Which cities?','Dubai, Abu Dhabi, Bangalore, Mumbai and Delhi NCR, plus other cities on request.')],
