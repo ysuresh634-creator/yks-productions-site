@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>YKS Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&display=swap" rel="stylesheet">
 <meta name="robots" content="noindex,nofollow">
 <style>
 :root{
@@ -255,6 +257,98 @@ table.dp-table tr:nth-child(odd) td{background:#FAF7F3;-webkit-print-color-adjus
   #screen-preview{display:block!important}
   .doc-preview{margin:0;border-radius:0;box-shadow:none}
 }
+
+
+/* ══════════ QUOTATION (standard YKS quote style, Oct 2026) ══════════
+   Scoped under .qx so invoices / agreements / editor are untouched.
+   Prints on its own named page (A4, no UA margin) so the dark bands bleed. */
+@page quote{size:A4;margin:0}
+.qx-wrap{overflow-x:auto;padding:12px 0}
+.qx{--ink:#0D0B11;--ink2:#2B2731;--qsub:#6E6872;--mute:#9A939C;--qgold:#C9A96E;--gold-d:#A8864A;--cream:#FAF7F2;--line:#E7E1D8;--m:16mm;
+  page:quote;font-family:"Archivo",-apple-system,"Segoe UI",sans-serif;color:var(--ink2);font-size:8.2pt;line-height:1.5;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;font-variant-numeric:lining-nums tabular-nums;width:210mm;margin:0 auto}
+.qx *{box-sizing:border-box;margin:0;padding:0}
+.qx b{font-weight:700;color:var(--ink)}
+.qx-page{width:210mm;min-height:297mm;position:relative;background:#fff;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,.35);margin-bottom:14px}
+.qx-page+.qx-page{break-before:page}
+.qx .band{background:var(--ink);color:#F8F4EF;padding:10mm var(--m) 7.5mm}
+.qx .band .row{display:flex;justify-content:space-between;align-items:flex-start;gap:8mm}
+.qx .brand{font-size:20pt;font-weight:800;letter-spacing:-.2pt;line-height:1;color:#fff}
+.qx .tag{margin-top:6pt;font-size:6.5pt;letter-spacing:2.6pt;color:var(--qgold);font-weight:600;text-transform:uppercase}
+.qx .contact{margin-top:10pt;font-size:7.2pt;color:#CFC8C0;letter-spacing:.2pt}
+.qx .contact span{color:var(--qgold);padding:0 5pt}
+.qx .pill{border:1px solid var(--qgold);color:var(--qgold);font-size:7pt;letter-spacing:3.2pt;font-weight:600;padding:6pt 10pt 6pt 13pt;text-transform:uppercase;white-space:nowrap}
+.qx .band.slim{padding:8mm var(--m) 6mm}.qx .band.slim .brand{font-size:15pt}
+.qx .goldrule{height:2.2pt;background:var(--qgold)}
+.qx .content{padding:0 var(--m)}
+.qx .eyebrow{font-size:6.3pt;letter-spacing:2.4pt;text-transform:uppercase;color:var(--gold-d);font-weight:700}
+.qx .party{display:flex;justify-content:space-between;gap:8mm;padding:6mm 0 5mm;border-bottom:1px solid var(--line)}
+.qx .party h1{font-size:17pt;font-weight:800;color:var(--ink);letter-spacing:-.3pt;line-height:1.1;margin-top:4pt}
+.qx .party .att{margin-top:5pt;font-size:8.8pt;color:var(--ink);font-weight:600}
+.qx .party .addr{margin-top:4pt;font-size:7.4pt;color:var(--qsub);line-height:1.5;white-space:pre-line}
+.qx .party .proj{margin-top:6pt;font-size:7.8pt;color:var(--ink2);font-weight:500}
+.qx .meta{text-align:right;min-width:40mm;flex-shrink:0}
+.qx .meta>div{margin-bottom:6pt}
+.qx .meta .k{font-size:6pt;letter-spacing:2.2pt;text-transform:uppercase;color:var(--mute);font-weight:600}
+.qx .meta .v{font-size:9.6pt;font-weight:700;color:var(--ink);margin-top:1pt}
+.qx .meta .v.g{color:var(--gold-d)}
+.qx .intro{padding:4.5mm 0 0;font-size:8.6pt;line-height:1.62;color:var(--ink2);white-space:pre-line}
+.qx .ps{margin-top:3.6mm;border:1px solid var(--line);break-inside:avoid}
+.qx .ps-h{background:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:6mm;padding:6pt 11pt}
+.qx .ps-h h2{font-size:7.2pt;letter-spacing:2.3pt;text-transform:uppercase;color:#fff;font-weight:700}
+.qx .ps-h h2 i{font-style:normal;color:var(--qgold)}
+.qx .ps-h .p{font-size:11.5pt;font-weight:800;color:var(--qgold);white-space:nowrap;text-align:right}
+.qx .ps-h .p small{font-size:6.8pt;font-weight:500;color:#CFC8C0;margin-left:3pt}
+.qx .ps-b{padding:5.5pt 11pt 6.5pt}
+.qx ul.bl{list-style:none}
+.qx ul.bl li{position:relative;padding:1.1pt 0 1.1pt 12pt;font-size:8pt;line-height:1.5}
+.qx ul.bl li::before{content:"";position:absolute;left:1pt;top:5.1pt;width:4pt;height:4pt;background:var(--qgold)}
+.qx .ps-n{margin-top:4.5pt;padding-top:4.5pt;border-top:1px dashed var(--line);font-size:7.3pt;line-height:1.55;color:var(--qsub);font-style:italic}
+.qx .ps-b>.ps-n:first-child{margin-top:0;padding-top:0;border-top:0}
+.qx .spacer{flex:1 0 6mm}
+.qx .total{background:var(--ink);padding:6.5mm var(--m) 6mm;break-inside:avoid}
+.qx .total .row{display:flex;justify-content:space-between;align-items:center;gap:8mm}
+.qx .total .k{font-size:7pt;letter-spacing:2.6pt;text-transform:uppercase;color:#fff;font-weight:700}
+.qx .total .k small{display:block;margin-top:4pt;font-size:6.8pt;letter-spacing:.2pt;text-transform:none;color:#A89F98;font-weight:400}
+.qx .total .v{font-size:19pt;font-weight:800;color:var(--qgold);white-space:nowrap;text-align:right}
+.qx .total .v .to{font-size:9.5pt;color:#CFC8C0;font-weight:500;padding:0 5pt;position:relative;top:-2pt}
+.qx .total .cur{margin-top:6pt;font-size:6.6pt;color:#8F8790;font-style:italic}
+.qx .sh{font-size:6.6pt;letter-spacing:2.4pt;text-transform:uppercase;color:var(--ink);font-weight:800;margin:5.5mm 0 2.5mm}
+.qx table.r{width:100%;border-collapse:collapse}
+.qx table.r th{background:var(--ink);color:var(--qgold);font-size:6.2pt;letter-spacing:2pt;text-transform:uppercase;font-weight:700;text-align:left;padding:6pt 8pt}
+.qx table.r td{padding:5.5pt 8pt;border-bottom:1px solid var(--line);font-size:8pt;vertical-align:top}
+.qx table.r .n{width:9mm;color:var(--mute)}
+.qx table.r .bs{width:34mm;color:var(--qsub)}
+.qx table.r .a{text-align:right;white-space:nowrap;width:34mm;font-weight:700;color:var(--ink)}
+.qx .calc{background:var(--cream);border-left:2pt solid var(--qgold);margin-top:3.5mm;padding:8pt 11pt}
+.qx .calc .ttl{font-size:6.2pt;letter-spacing:2pt;text-transform:uppercase;color:var(--qsub);font-weight:600;margin-bottom:4pt}
+.qx .calc .l{display:flex;justify-content:space-between;gap:6mm;font-size:8pt;padding:1.8pt 0}
+.qx .calc .l span:last-child{white-space:nowrap;text-align:right}
+.qx .calc .l.big{border-top:1px solid #DDD4C6;margin-top:5pt;padding-top:6pt;font-size:10pt;font-weight:800;color:var(--ink)}
+.qx .calc .l.sm{color:var(--qsub)}
+.qx .how{border:1px solid var(--line);padding:6pt 11pt}
+.qx .terms{background:var(--ink);margin:5.5mm calc(-1 * var(--m)) 0;padding:5mm var(--m)}
+.qx .terms h3{font-size:6.6pt;letter-spacing:2.4pt;text-transform:uppercase;color:var(--qgold);font-weight:700;margin-bottom:3pt}
+.qx .terms li{list-style:none;position:relative;padding:1.9pt 0 1.9pt 11pt;font-size:7.1pt;line-height:1.5;color:#D8D1C9}
+.qx .terms li::before{content:"—";position:absolute;left:0;color:var(--qgold)}
+.qx .close{margin-top:5mm;font-size:8.4pt;line-height:1.6;white-space:pre-line}
+.qx .signame{margin-top:5pt;font-weight:800;color:var(--ink);font-size:9.2pt}
+.qx .sigsub{font-size:7.1pt;color:var(--qsub)}
+.qx .sign{display:grid;grid-template-columns:1fr 1fr;column-gap:12mm;margin:3mm 0 12mm}
+.qx .sb .line{height:11mm;border-bottom:1px solid var(--qgold)}
+.qx .sb .cap{margin-top:4pt;font-size:7pt;color:var(--qsub)}
+@media screen and (max-width:820px){.qx{zoom:.46}}
+@media print{
+  .qx-wrap{padding:0;overflow:visible}
+  .qx{zoom:1!important}
+  .qx-page{box-shadow:none;margin:0;min-height:297mm}
+  .qx-page:last-child{min-height:0}
+}
+/* item extras (quote sections) */
+.item-more{grid-column:1/-1;margin:-2px 0 4px}
+.item-more summary{font-size:11px;color:var(--sub);cursor:pointer;padding:2px}
+.item-more .form-row{margin-top:6px}
+.item-more textarea{width:100%;margin-top:6px;resize:vertical;line-height:1.5;font-size:12px}
 
 /* ══════════ SITE EDITOR (merged in) ══════════ */
 
@@ -663,6 +757,14 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
       its own set. Changing the numbers below rewrites the list — until you edit the list by hand, after which it
       is left alone.</p>
 
+      <div class="form-field"><label class="form-label">Kind attention (name, role)</label>
+        <input class="form-input" id="q-attn" type="text" placeholder="Dr Narendra K Shetty, CWO, Kshemavana"></div>
+      <div class="form-field"><label class="form-label">Client address</label>
+        <textarea class="form-input" id="q-addr" rows="2" style="resize:vertical;line-height:1.5" placeholder="Street, area, city, PIN"></textarea></div>
+      <div class="form-field"><label class="form-label">Intro paragraph (first person, printed under the client block)</label>
+        <textarea class="form-input" id="q-intro" rows="4" style="resize:vertical;line-height:1.5" placeholder="Thank you for sending the brief across…"></textarea></div>
+      <div class="form-field"><label class="form-label">Closing note (printed above the signatures)</label>
+        <textarea class="form-input" id="q-close" rows="2" style="resize:vertical;line-height:1.5" placeholder="Happy to walk through any part of this over a call."></textarea></div>
       <div class="form-row">
         <div><label class="form-label">Quote valid for (days)</label><input class="form-input" id="q-valid" type="number" min="1" value="30" oninput="qValidChanged()"></div>
         <div><label class="form-label">Delivery (working days)</label><input class="form-input" id="q-deliv" type="number" min="1" value="10" oninput="syncQuoteTerms()"></div>
@@ -707,7 +809,8 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
         </div>
         <div>
           <label class="form-label">Balance due within</label>
-          <select class="form-input" id="ag-days">
+          <select class="form-input" id="ag-days" onchange="syncQuoteTerms()">
+            <option value="shoot" selected>On completion of the shoot</option>
             <option value="7">7 days of the shoot</option>
             <option value="15">15 days of delivery</option>
             <option value="30">30 days of delivery</option>
@@ -1133,11 +1236,9 @@ textarea.inp{resize:vertical;line-height:1.6;min-height:110px}
       <div class="form-field"><label class="form-label">UAE Phone</label><input class="form-input" id="s-phone-ae" type="tel" placeholder="+971 XX XXX XXXX"></div>
       <div class="form-field"><label class="form-label">Website</label><input class="form-input" id="s-web" type="text" placeholder="yksproductions.com"></div>
       <div class="form-field"><label class="form-label">Instagram</label><input class="form-input" id="s-ig" type="text" placeholder="@yks_photoworks"></div>
-      <div class="form-field"><label class="form-label">Udyam registration no.</label>
-        <input class="form-input" id="s-udyam" type="text" placeholder="UDYAM-KL-01-0041092">
-        <p class="field-note">Printed on every document. It is what makes the MSMED Act 45-day payment cap
-        bite on a corporate buyer — they can only claim the expense once they have actually paid you
-        (Income Tax s.43B(h)). Leave blank to print nothing.</p>
+      <div class="form-field"><label class="form-label">Contact email</label>
+        <input class="form-input" id="s-email" type="email" placeholder="yksproductions893@gmail.com">
+        <p class="field-note">Printed in the header of every quotation and invoice.</p>
       </div>
     </div>
     <div class="form-section">
@@ -1686,7 +1787,7 @@ let currentType='INVOICE';
 const DEFAULTS={name:'Yedukrishna S',company:'YKS Productions',
   phoneIn:'+91 XXXXX XXXXX',phoneAe:'+971 XX XXX XXXX',
   web:'yksproductions.com',ig:'@yks_photoworks',
-  udyam:'UDYAM-KL-01-0041092'};
+  email:'yksproductions893@gmail.com'};
 function getSettings(){
   const st=JSON.parse(localStorage.getItem('yks_settings')||'null');
   // merge, so settings saved before a field existed still pick that field's
@@ -1698,7 +1799,7 @@ function loadSettingsForm(){
   const s=getSettings(); const c=getCounters();
   set('s-name',s.name); set('s-company',s.company);
   set('s-phone-in',s.phoneIn); set('s-phone-ae',s.phoneAe);
-  set('s-web',s.web); set('s-ig',s.ig); set('s-udyam',s.udyam||'');
+  set('s-web',s.web); set('s-ig',s.ig); set('s-email',s.email||DEFAULTS.email);
   set('s-inv-num',c.inv); set('s-quo-num',c.quo);
   if(localStorage.getItem('yks_ghtoken')) document.getElementById('s-ghtoken').value=localStorage.getItem('yks_ghtoken');
 }
@@ -1718,7 +1819,7 @@ function saveSettings(){
   const s={name:v('s-name')||DEFAULTS.name,company:v('s-company')||DEFAULTS.company,
     phoneIn:v('s-phone-in')||DEFAULTS.phoneIn,phoneAe:v('s-phone-ae')||DEFAULTS.phoneAe,
     web:v('s-web')||DEFAULTS.web,ig:v('s-ig')||DEFAULTS.ig,
-    udyam:v('s-udyam').trim()};
+    email:v('s-email').trim()||DEFAULTS.email};
   localStorage.setItem('yks_settings',JSON.stringify(s));
   const c=getCounters();
   c.inv=parseInt(v('s-inv-num'))||c.inv;
@@ -1957,14 +2058,24 @@ function setType(t){
 }
 
 // ── Items ──────────────────────────────────────────────────────────────────
-function addItem(desc='',rate=''){
+// inputs [0]=desc and [1]=rate keep their positions (the AI assistant edits them by index);
+// the optional quote extras sit after them: [2]=basis, [3]=rate max (estimate range, at actuals).
+function addItem(desc='',rate='',x){
+  x=x||{};
   const id='i'+Date.now()+Math.floor(Math.random()*999);
   const div=document.createElement('div');
   div.className='item-row'; div.id=id;
   div.innerHTML=`
     <input class="form-input" placeholder="Service description" value="${esc(desc)}" oninput="calcTotals()">
     <input class="form-input" placeholder="0" type="number" value="${rate||''}" min="0" style="text-align:right" oninput="calcTotals()">
-    <button class="item-remove" onclick="removeItem('${id}')">×</button>`;
+    <button class="item-remove" onclick="removeItem('${id}')">×</button>
+    <details class="item-more"${(x.basis||x.rateMax||x.details)?' open':''}><summary>Details for the quote — basis, range at actuals, what's included</summary>
+      <div class="form-row">
+        <div><input class="form-input" placeholder="Basis, e.g. for 2 days" value="${esc(x.basis||'')}"></div>
+        <div><input class="form-input" type="number" min="0" placeholder="Up to ₹ (range, at actuals)" value="${x.rateMax||''}" style="text-align:right" oninput="calcTotals()"></div>
+      </div>
+      <textarea class="form-input" rows="3" placeholder="What's included — one bullet per line. Start a line with Note: for the italic note.">${esc(x.details||'')}</textarea>
+    </details>`;
   document.getElementById('items-container').appendChild(div);
   calcTotals();
 }
@@ -1988,19 +2099,30 @@ function quickAdd(desc){
 function removeItem(id){ const el=document.getElementById(id); if(el){el.remove();calcTotals();} }
 function getItems(){
   return Array.from(document.querySelectorAll('#items-container .item-row')).map(row=>{
-    const ins=row.querySelectorAll('input');
-    return{desc:ins[0].value.trim(),rate:parseFloat(ins[1].value)||0};
+    const ins=row.querySelectorAll('input'), ta=row.querySelector('textarea');
+    const it={desc:ins[0].value.trim(),rate:parseFloat(ins[1].value)||0};
+    const basis=ins[2]?ins[2].value.trim():'', mx=ins[3]?parseFloat(ins[3].value)||0:0, det=ta?ta.value.trim():'';
+    if(basis) it.basis=basis;
+    if(mx>it.rate) it.rateMax=mx;        // a range only when "up to" is above the rate
+    if(det) it.details=det;
+    return it;
   }).filter(r=>r.desc||r.rate);
 }
 function calcTotals(){
-  let sub=0;
+  let sub=0, subMax=0, fixed=0;
   document.querySelectorAll('#items-container .item-row').forEach(row=>{
-    const ins=row.querySelectorAll('input'); sub+=parseFloat(ins[1].value)||0;
+    const ins=row.querySelectorAll('input'); const r=parseFloat(ins[1].value)||0;
+    const mx=ins[3]?parseFloat(ins[3].value)||0:0;
+    sub+=r; subMax+=Math.max(r,mx); if(!(mx>r)) fixed+=r;
   });
   const adv=parseFloat(document.getElementById('f-adv').value)||0;
-  document.getElementById('t-sub').textContent='₹'+sub.toLocaleString('en-IN');
-  document.getElementById('t-adv').textContent='= ₹'+Math.round(sub*adv/100).toLocaleString('en-IN');
-  document.getElementById('t-total').textContent='₹'+sub.toLocaleString('en-IN');
+  const f=n=>'₹'+n.toLocaleString('en-IN');
+  const range=subMax>sub;
+  const tot=range?f(sub)+' – '+f(subMax):f(sub);
+  document.getElementById('t-sub').textContent=tot;
+  // with an at-actuals range in play the advance is taken on the fixed fees only
+  document.getElementById('t-adv').textContent='= '+f(Math.round((range?fixed:sub)*adv/100));
+  document.getElementById('t-total').textContent=tot;
   syncQuoteTerms();
 }
 
@@ -2014,13 +2136,25 @@ function calcTotals(){
 const QUOTE_DEFAULTS = { valid:30, deliv:10 };
 let qTermsDirty = false;
 
-function quoteTermsFor(advPct, valid, deliv){
+// Balance-due wording, shared by the terms, the payment breakdown and the timeline.
+// 'shoot' (default) = on completion of the shoot; numbers are the older day options.
+function balDueText(bd){
+  bd = String(bd||'shoot');
+  if(bd==='shoot') return 'on completion of the shoot';
+  const n = Number(bd)||7;
+  return n>=15 ? `within ${n} days of delivery` : `within ${n} days of the shoot`;
+}
+function quoteTermsFor(advPct, valid, deliv, balDue){
+  const bd = balDue || v('ag-days') || 'shoot';
+  const rest = Math.max(0, 100-(Number(advPct)||0));
   return [
     `This quotation is valid for ${valid} days from the date of issue.`,
-    `${advPct}% advance confirms the booking. The balance is due on completion of the shoot, before final delivery.`,
-    'Cancellation within 48 hours of the shoot date: the advance is non-refundable.',
-    `Edited photos & films are delivered within ${deliv} working days of the shoot.`,
-    'On payment in full you receive a licence to use the delivered work for the agreed purpose. Copyright remains with YKS Productions.'
+    `${advPct}% advance is payable before the shoot to confirm the dates. The remaining ${rest}%, plus any miscellaneous / equipment costs at actuals, is due ${balDueText(bd)}.`,
+    `Edited photos & films are delivered within ${deliv} working days of the shoot. Any delay on the client side (approvals, feedback) moves the date by the same margin.`,
+    'Equipment rental, props and travel outside Bangalore city limits are billed at actuals against receipts, approved by you in writing beforehand.',
+    'Cancellation or rescheduling within 48 hours of a confirmed shoot date: the advance is retained against the booked dates.',
+    'On payment in full you receive a licence to use the delivered work for the agreed purpose. Copyright remains with YKS Productions, who may show the work in its portfolio.',
+    'Not registered for GST. No GST is charged or collectable on this quotation.'
   ];
 }
 function qValid(){ return parseInt(v('q-valid')) || QUOTE_DEFAULTS.valid; }
@@ -2046,7 +2180,7 @@ function qValidChanged(){
 
 function getQuoteTerms(){
   const lines = v('q-terms').split('\n').map(t=>t.trim()).filter(Boolean);
-  return lines.length ? lines : quoteTermsFor(qAdv(), qValid(), qDeliv());
+  return lines.length ? lines : quoteTermsFor(qAdv(), qValid(), qDeliv(), v('ag-days'));
 }
 
 // ── Licensed purpose ───────────────────────────────────────────────────────
@@ -2070,7 +2204,7 @@ const AGREEMENT_URL = 'https://yksproductions.com/agreement.html';
 
 function agTypeChanged(){
   const corp = v('ag-type')==='corp';
-  set('ag-days', corp ? '30' : '7');
+  set('ag-days', corp ? '30' : 'shoot');
 }
 
 function agBuild(){
@@ -2081,7 +2215,7 @@ function agBuild(){
     org : v('ag-org').trim(),
     proj: v('f-event').trim(),
     adv : parseInt(v('f-adv')) || 50,
-    days: v('ag-days') || '7'
+    days: v('ag-days') || 'shoot'
   };
   if(v('ag-hrs')) cfg.hrs = v('ag-hrs');
   if(v('ag-ot'))  cfg.ot  = v('ag-ot');
@@ -2651,6 +2785,12 @@ function generateDoc(){
   if(purpose) doc.purpose=purpose;
   if(currentType==='QUOTATION'){
     doc.terms=getQuoteTerms(); doc.validDays=qValid(); doc.delivDays=qDeliv();
+    doc.balDue=v('ag-days')||'shoot';
+    const attn=v('q-attn').trim(), addr=v('q-addr').trim(), intro=v('q-intro').trim(), closing=v('q-close').trim();
+    if(attn) doc.client.attn=attn;
+    if(addr) doc.client.addr=addr;
+    if(intro) doc.intro=intro;
+    if(closing) doc.closing=closing;
   }
   saveDoc(doc); previewDoc(doc);
 }
@@ -2661,15 +2801,13 @@ function previewDoc(doc){
   showScreen('preview');
 }
 function buildDocHTML(doc){
+  if(doc.type==='QUOTATION') return buildQuoteHTML(doc);
   const s=getSettings();
   const sub=doc.items.reduce((a,i)=>a+i.rate,0);
   const adv=Math.round(sub*(doc.advPct/100));
   const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
   const fmtD=d=>{if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});};
   const isInv=doc.type==='INVOICE';
-  // Udyam is read off settings, not off the doc: it is a fact about the business,
-  // not about the job, and a re-print of an old doc should carry today's status.
-  const udyam=(s.udyam||'').trim();
   const terms=isInv?[
     'Payment is due on or before the date mentioned above.',
     'Images remain property of YKS Productions until full payment is received.',
@@ -2679,10 +2817,6 @@ function buildDocHTML(doc){
   // Not back-filled from a default: a document already issued without a stated
   // purpose must not silently acquire one when it is re-printed.
   if(doc.purpose) terms.push(`Licensed purpose: ${doc.purpose}.`);
-  // MSMED Act s.15 caps a buyer's payment to a registered micro supplier at 45 days,
-  // but only once the buyer knows of the registration — which is the point of printing it.
-  // Nothing above may therefore set a payment term longer than 45 days.
-  if(udyam) terms.push(`YKS Productions is a Micro Enterprise registered under the MSMED Act, 2006 (Udyam ${udyam}). The payment terms above are set within the limit prescribed by Section 15 of that Act.`);
   const rows=doc.items.map((it,i)=>`<tr><td>${i+1}</td><td>${esc(it.desc)}</td><td style="text-align:right">${fmt(it.rate)}</td><td style="text-align:right">${fmt(it.rate)}</td></tr>`).join('');
   return`<div class="doc-preview">
     <div class="dp-header">
@@ -2690,8 +2824,7 @@ function buildDocHTML(doc){
         <div><div class="dp-brand">${esc(s.company)}</div><div class="dp-tagline">Cinematography · Film Stills · Brand Films</div></div>
         <div class="dp-badge ${isInv?'inv':''}">${doc.type}</div>
       </div>
-      <div class="dp-contact">${esc(s.web)} · ${esc(s.ig)} · ${esc(s.phoneIn)}</div>
-      ${udyam?`<div class="dp-contact" style="margin-top:4px">Udyam Reg. No. ${esc(udyam)} · Registered Micro Enterprise, Ministry of MSME, Govt. of India</div>`:''}
+      <div class="dp-contact">${[s.web,s.email,s.ig,s.phoneIn].filter(Boolean).map(esc).join(' · ')}</div>
     </div>
     <div class="dp-gold-line"></div>
     <div class="dp-body">
@@ -2726,6 +2859,122 @@ function buildDocHTML(doc){
     <div class="dp-footer">Currency: INR (₹) · All amounts are inclusive · Not registered for GST — no GST is charged or collectable on this ${isInv?'invoice':'quotation'}</div>
     <div class="dp-terms"><div class="dp-terms-title">Terms & Conditions</div>${terms.map(t=>`<div class="dp-term">${esc(t)}</div>`).join('')}</div>
   </div>`;
+}
+
+
+// ── Quotation (standard YKS quote style) ──────────────────────────────────
+// Two A4 pages: (1) header band, client block, intro, one priced section per
+// line item, estimated-total band; (2) summary of rates, payment breakdown,
+// how it runs, terms, closing and acceptance lines. Line items may carry a
+// range (rate … rateMax) billed at actuals; totals then show a range and the
+// advance is taken on the fixed fees only.
+function buildQuoteHTML(doc){
+  const s=getSettings();
+  const fmt=n=>'₹'+Number(n||0).toLocaleString('en-IN');
+  const fmtD=d=>{if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});};
+  const items=(doc.items||[]).map(i=>Object.assign({},i,{rate:Number(i.rate)||0,rateMax:Number(i.rateMax)>Number(i.rate)?Number(i.rateMax):0}));
+  const isR=i=>i.rateMax>0;
+  const amt=i=>isR(i)?`${fmt(i.rate)} – ${fmt(i.rateMax)}`:fmt(i.rate);
+  const lo=items.reduce((a,i)=>a+i.rate,0), hi=items.reduce((a,i)=>a+(isR(i)?i.rateMax:i.rate),0);
+  const ranged=items.filter(isR), fixedItems=items.filter(i=>!isR(i));
+  const fixed=fixedItems.reduce((a,i)=>a+i.rate,0);
+  const advPct=Number(doc.advPct)||0;
+  const base=ranged.length?fixed:lo;
+  const advAmt=Math.round(base*advPct/100), balAmt=base-advAmt;
+  const balTxt=balDueText(doc.balDue||'shoot');
+  const deliv=doc.delivDays||QUOTE_DEFAULTS.deliv;
+  const terms=(Array.isArray(doc.terms)&&doc.terms.length ? doc.terms.slice()
+     : quoteTermsFor(advPct||50, doc.validDays||QUOTE_DEFAULTS.valid, deliv, doc.balDue||'shoot'));
+  if(doc.purpose) terms.push(`Licensed purpose: ${doc.purpose}.`);
+  const c=doc.client||{};
+  const contact=[s.web,s.email,s.ig,s.phoneIn].filter(Boolean).map(esc).join('<span>·</span>');
+  const totalV=ranged.length?`${fmt(lo)}<span class="to">to</span>${fmt(hi)}`:fmt(lo);
+  const totalBreak=items.map(i=>amt(i)+' '+esc(i.desc.split(/\s+[—–-]\s+/)[0].toLowerCase())+(isR(i)?' at actuals':'')).join(' + ');
+  const sections=items.map((it,ix)=>{
+    const lines=String(it.details||'').split('\n').map(t=>t.trim()).filter(Boolean);
+    const notes=lines.filter(l=>/^note\s*:/i.test(l)).map(l=>l.replace(/^note\s*:\s*/i,''));
+    const bul=lines.filter(l=>!/^note\s*:/i.test(l)).map(l=>l.replace(/^[-•·*]\s*/,''));
+    const small=it.basis||(isR(it)?'at actuals':'');
+    const body=(bul.length||notes.length)?`<div class="ps-b">${bul.length?`<ul class="bl">${bul.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>`:''}${notes.map(n=>`<p class="ps-n">${esc(n)}</p>`).join('')}</div>`:'';
+    return `<div class="ps"><div class="ps-h"><h2><i>${ix+1} ·</i> ${esc(it.desc)}</h2><div class="p">${amt(it)}${small?`<small>${esc(small)}</small>`:''}</div></div>${body}</div>`;
+  }).join('');
+  const rows=items.map((it,ix)=>`<tr><td class="n">${ix+1}</td><td>${esc(it.desc)}</td><td class="bs">${esc(it.basis||(isR(it)?'At actuals (estimate)':'—'))}${isR(it)&&it.basis?' · at actuals':''}</td><td class="a">${amt(it)}</td></tr>`).join('');
+  const calc=`<div class="calc"><div class="ttl">How the numbers add up</div>
+      ${ranged.length?`<div class="l"><span>Fixed fees</span><span>${fmt(fixed)}</span></div>`
+        + ranged.map(i=>`<div class="l"><span>${esc(i.desc)} — estimate, at actuals</span><span>${amt(i)}</span></div>`).join('')
+        : ''}
+      <div class="l big"><span>${ranged.length?'Estimated total':'Total'}</span><span>${ranged.length?`${fmt(lo)} – ${fmt(hi)}`:fmt(lo)}</span></div>
+      ${advPct?`<div class="l sm" style="margin-top:3pt"><span>Before the shoot — ${advPct}% advance to confirm the dates</span><span>${fmt(advAmt)}</span></div>`:''}
+      <div class="l sm"><span>${balTxt.charAt(0).toUpperCase()+balTxt.slice(1)} — remaining ${100-advPct}%${ranged.length?', plus items at actuals':''}</span><span>${fmt(balAmt)}${ranged.length?' + actuals':''}</span></div>
+    </div>`;
+  const how=[
+    advPct?`<li><b>Before the shoot</b> — the ${advPct}% advance (${fmt(advAmt)}) confirms the booking and locks the shoot dates.</li>`:'',
+    `<li><b>Shoot day${c.event?'':'(s)'}</b> — ${c.event?esc(c.event):'on location, as agreed'}.</li>`,
+    `<li><b>${balTxt.charAt(0).toUpperCase()+balTxt.slice(1)}</b> — ${ranged.length?'items at actuals are confirmed with receipts; ':''}the remaining ${100-advPct}% (${fmt(balAmt)})${ranged.length?' plus actuals':''} is due.</li>`,
+    `<li><b>Within ${deliv} working days</b> — final files delivered via download link.</li>`
+  ].join('');
+  const sig=[s.company,s.phoneIn,s.email,s.web,s.ig].filter(Boolean).map(esc).join(' · ');
+  const brand=esc(s.company||'YKS Productions');
+  return `<div class="qx-wrap"><div class="qx">
+  <section class="qx-page">
+    <div class="band"><div class="row">
+      <div><div class="brand">${brand}</div><div class="tag">Photography · Cinematography · Brand Films</div>
+        <div class="contact">${contact}</div></div>
+      <div class="pill">Quotation</div>
+    </div></div>
+    <div class="goldrule"></div>
+    <div class="content">
+      <div class="party">
+        <div>
+          <div class="eyebrow">Quotation for</div>
+          <h1>${esc(c.name)}</h1>
+          ${c.attn?`<div class="att">Kind attention: ${esc(c.attn)}</div>`:''}
+          ${c.addr?`<div class="addr">${esc(c.addr)}</div>`:''}
+          ${c.phone?`<div class="addr">Ph: ${esc(c.phone)}</div>`:''}
+          ${c.event?`<div class="proj">${esc(c.event)}</div>`:''}
+        </div>
+        <div class="meta">
+          <div><div class="k">Quote No.</div><div class="v g">${esc(doc.id)}</div></div>
+          <div><div class="k">Date</div><div class="v">${fmtD(doc.date)}</div></div>
+          <div style="margin-bottom:0"><div class="k">Valid until</div><div class="v">${fmtD(doc.date2)}</div></div>
+        </div>
+      </div>
+      ${doc.intro?`<p class="intro">${esc(doc.intro)}</p>`:''}
+      ${sections}
+      ${doc.notes?`<p class="intro" style="font-style:italic;color:#6E6872">${esc(doc.notes)}</p>`:''}
+    </div>
+    <div class="spacer"></div>
+    <div class="total">
+      <div class="row">
+        <div class="k">${ranged.length?'Estimated total':'Total'}${items.length>1?`<small>${totalBreak}</small>`:''}</div>
+        <div class="v">${totalV}</div>
+      </div>
+      <div class="cur">Currency: INR (₹)${ranged.length?' · Items at actuals confirmed after the shoot':''} · Not registered for GST — no GST is charged or collectable on this quotation</div>
+    </div>
+  </section>
+  <section class="qx-page">
+    <div class="band slim"><div class="row" style="align-items:center">
+      <div><div class="brand">${brand}</div><div class="tag">Quotation ${esc(doc.id)} · ${esc(c.name)}</div></div>
+      <div class="pill">Page 2</div>
+    </div></div>
+    <div class="goldrule"></div>
+    <div class="content">
+      <div class="sh">Summary of rates</div>
+      <table class="r"><thead><tr><th>#</th><th>Item</th><th>Basis</th><th style="text-align:right">Rate</th></tr></thead><tbody>${rows}</tbody></table>
+      ${calc}
+      <div class="sh">How it runs, start to finish</div>
+      <div class="how"><ul class="bl">${how}</ul></div>
+      <div class="terms"><h3>Terms &amp; conditions</h3><ul>${terms.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>
+      ${doc.closing?`<p class="close">${esc(doc.closing)}</p>`:'<div style="height:5mm"></div>'}
+      <div class="signame">${esc(s.name||'')}</div>
+      <div class="sigsub">${sig}</div>
+      <div class="sign">
+        <div class="sb"><div class="line"></div><div class="cap">Accepted for ${esc(c.name)}${c.attn?' — '+esc(c.attn):''} · signature &amp; date</div></div>
+        <div class="sb"><div class="line"></div><div class="cap">For ${brand} — ${esc(s.name||'')}</div></div>
+      </div>
+    </div>
+  </section>
+  </div></div>`;
 }
 
 // ── History ────────────────────────────────────────────────────────────────
