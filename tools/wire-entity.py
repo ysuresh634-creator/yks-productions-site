@@ -85,16 +85,32 @@ block = (A + '\n<script type="application/ld+json">\n'
 pages = [f for f in sorted(glob.glob('*.html') + glob.glob('*/*.html'))
          if not f.replace(os.sep, '/').startswith(SKIP_PREFIX) and f != 'index.html']
 
+def block_for(page_src):
+    # Country guard: a page that pins its line with <body data-wa> gets ONLY
+    # that country's contactPoint (UAE pages never carry the India number and
+    # vice versa). Pages without data-wa serve both markets and keep both.
+    m = re.search(r'<body[^>]*\bdata-wa="(\d+)"', page_src)
+    cc = None if not m else ('AE' if m.group(1).startswith('971') else 'IN' if m.group(1).startswith('91') else None)
+    if not cc:
+        return block
+    c = json.loads(json.dumps(compact))
+    for n in c['@graph']:
+        if isinstance(n.get('contactPoint'), list):
+            n['contactPoint'] = [p for p in n['contactPoint'] if p.get('areaServed') == cc]
+    return (A + '\n<script type="application/ld+json">\n' + json.dumps(c, indent=2, ensure_ascii=False)
+            + '\n</script>\n' + B)
+
 added = refreshed = 0
 for f in pages:
     s = io.open(P(f), encoding='utf-8').read()
     if '</head>' not in s:
         continue
+    blk = block_for(s)
     if A in s:
-        s = re.sub(re.escape(A) + r'.*?' + re.escape(B), lambda _: block, s, flags=re.S)
+        s = re.sub(re.escape(A) + r'.*?' + re.escape(B), lambda _: blk, s, flags=re.S)
         refreshed += 1
     else:
-        s = s.replace('</head>', block + '\n</head>', 1)
+        s = s.replace('</head>', blk + '\n</head>', 1)
         added += 1
     io.open(P(f), 'w', encoding='utf-8').write(s)
 

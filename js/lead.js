@@ -81,21 +81,17 @@
     var mount = document.querySelector('[data-quote]');
     if (!mount) return;
 
-    /* AED ranges — same figures published in the /blog/ cost guides */
+    /* No published prices or ranges anywhere (owner rule) — this only builds
+       a brief and routes it to WhatsApp for a fixed quote. */
     var SERVICES = {
-      wedding:   { label: 'Wedding',            scales: { 'Half day / one event': [2500, 5000], 'Full day': [5000, 12000], 'Multi-day': [12000, 30000] } },
-      realestate:{ label: 'Real estate',        scales: { 'Social reel': [1500, 3500], 'Cinematic film': [3500, 8000], 'Launch / villa': [8000, 25000] } },
-      corporate: { label: 'Corporate / brand',  scales: { 'Testimonial': [3000, 6000], 'Brand film': [8000, 20000], 'Campaign': [20000, 50000] } },
-      social:    { label: 'Social content',     scales: { 'Reels only': [2000, 5000], 'Content-led': [5000, 12000], 'Full management': [12000, 25000] } },
-      event:     { label: 'Event',              scales: { 'A few hours': [1500, 3000], 'Full day': [3000, 7000], 'Multi-day': [7000, 18000] } },
-      portrait:  { label: 'Portraits / headshots', scales: { 'One person': [800, 2000], 'Small team': [2000, 5000], 'Large team': [5000, 12000] } }
+      wedding:   { label: 'Wedding',            scales: ['Half day / one event', 'Full day', 'Multi-day'] },
+      realestate:{ label: 'Real estate',        scales: ['Social reel', 'Cinematic film', 'Launch / villa'] },
+      corporate: { label: 'Corporate / brand',  scales: ['Testimonial', 'Brand film', 'Campaign'] },
+      social:    { label: 'Social content',     scales: ['Reels only', 'Content-led', 'Full management'] },
+      event:     { label: 'Event',              scales: ['A few hours', 'Full day', 'Multi-day'] },
+      portrait:  { label: 'Portraits / headshots', scales: ['One person', 'Small team', 'Large team'] }
     };
-    var EXTRAS = {
-      'Add film + photo': 0.45,
-      'Same-day edit': 0.18,
-      'Twilight / golden hour': 0.10,
-      'Rush delivery': 0.15
-    };
+    var EXTRAS = { 'Add film + photo': 1, 'Same-day edit': 1, 'Twilight / golden hour': 1, 'Rush delivery': 1 };
 
     var state = { svc: 'realestate', scale: null, extras: {}, city: 'Dubai' };
 
@@ -107,7 +103,7 @@
         '<div class="q-row"><span class="q-lab">04 — Where?</span><div class="q-opts" data-g="city"></div></div>' +
         '<div class="q-out">' +
           '<div class="q-num" id="qNum">—</div>' +
-          '<div class="q-note" id="qNote">typical range · all-in</div>' +
+          '<div class="q-note" id="qNote">on request · all-in</div>' +
           '<p class="q-sub" id="qSub"></p>' +
           '<div class="q-cta"><a class="btn btn-fill" id="qGo" href="#" target="_blank" rel="noopener">Get my exact quote →</a></div>' +
         '</div>' +
@@ -131,7 +127,7 @@
     }
     function paintScale() {
       var box = g('scale'); box.innerHTML = '';
-      var scales = Object.keys(SERVICES[state.svc].scales);
+      var scales = SERVICES[state.svc].scales;
       if (!state.scale) state.scale = scales[1] || scales[0];
       scales.forEach(function (s) {
         var b = chip(s, s === state.scale);
@@ -169,26 +165,10 @@
                 ' (' + state.scale + ')' + (picked.length ? ', plus ' + picked.join(' + ').toLowerCase() : '') +
                 ', in ' + state.city + '. Could you send me an exact quote?';
 
-      if (india) {
-        /* No published ₹ ranges — never invent numbers. Route to a real conversation. */
-        num.textContent = '₹ on request';
-        note.textContent = 'India · quoted per shoot';
-        sub.textContent = 'My India pricing is quoted per shoot rather than from a table — tell me the dates and what you need and I\'ll send an all-in number, usually the same day.';
-        go.href = 'https://wa.me/' + WA_IN + '?text=' + encodeURIComponent(msg);
-        return;
-      }
-
-      var r = SERVICES[state.svc].scales[state.scale];
-      var mult = 1;
-      picked.forEach(function (k) { mult += EXTRAS[k]; });
-      var lo = Math.round(r[0] * mult / 100) * 100;
-      var hi = Math.round(r[1] * mult / 100) * 100;
-
-      num.textContent = 'AED ' + lo.toLocaleString() + ' – ' + hi.toLocaleString();
-      note.textContent = 'typical range · all-in, no hidden extras';
-      sub.textContent = 'That\'s the honest market range for ' + svcLabel.toLowerCase() + ' at this scale in ' + state.city +
-        '. Your exact number depends on the day itself — send me the details and I\'ll confirm a fixed all-in price.';
-      go.href = 'https://wa.me/' + WA_AE + '?text=' + encodeURIComponent(msg);
+      num.textContent = 'Fixed quote';
+      note.textContent = 'on request · all-in, no hidden extras';
+      sub.textContent = 'Every shoot is different, so I don\'t publish rates. Send me these details and I\'ll reply with one fixed, all-in quote for ' + svcLabel.toLowerCase() + ' in ' + state.city + '.';
+      go.href = 'https://wa.me/' + (india ? WA_IN : WA_AE) + '?text=' + encodeURIComponent(msg);
     }
 
     paintSvc(); paintScale(); paintExtras(); paintCity(); calc();
