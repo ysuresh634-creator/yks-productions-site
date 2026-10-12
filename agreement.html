@@ -612,7 +612,10 @@ function applyConfig(){
   }
 
   if(CFG.adv){ set('t-adv', CFG.adv + '%'); set('t-bal', (100 - Number(CFG.adv)) + '%'); }
-  if(CFG.days){
+  if(CFG.days==='shoot'){
+    const bc=document.getElementById('t-days'); const td=bc&&bc.closest('td');
+    if(td) td.innerHTML='<strong>On completion of the shoot</strong>.';
+  } else if(CFG.days){
     set('t-days', CFG.days);
     set('t-from', Number(CFG.days) >= 15 ? 'delivery' : 'the shoot completing');
   }
