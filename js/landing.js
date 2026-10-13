@@ -1,11 +1,23 @@
 /* YKS landing-page enquiry forms → Web3Forms (email capture) */
 (function () {
   var KEY = 'fbf5d037-af64-46a1-8ddc-5777379ec179';
+  var APPLY = '/talents/apply.html';
+  // talent / model intent → the application page, not the client enquiry inbox
+  var TALENT_RE = /\b(i\s*(am|'m)\s*(a\s*)?model|aspiring\s+model|want\s+to\s+(be\s+a\s+)?model|modell?ing\s+(career|opportunit|work\s+for\s+me)|become\s+a\s+model|join\s+(the\s+|your\s+)?(talent|roster|board|agency)|talent\s+board|apply\s+(as|to\s+be)\s+(a\s+)?model|casting\s+for\s+me|my\s+(own\s+)?(model(l?ing)?\s+)?portfolio|portfolio\s+(photo|shoot)s?\s+(for\s+)?(me|myself)|portfolio\s+photo\s+in)\b/i;
+  var onApply = /\/talents\//.test(location.pathname);
   document.querySelectorAll('form.l-form').forEach(function (form) {
+    if (!onApply && !form.parentNode.querySelector('.l-form-talent')) {
+      var p = document.createElement('p');
+      p.className = 'l-form-talent';
+      p.style.cssText = 'margin:.9em 0 0;font-size:.9em;opacity:.85';
+      p.innerHTML = 'Looking to model or join the talent board? <a href="' + APPLY + '">Apply here →</a>';
+      form.insertAdjacentElement('afterend', p);
+    }
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var get = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; };
       if (!get('name') || !get('contact')) return;
+      if (!onApply && TALENT_RE.test(get('message'))) { location.href = APPLY + '?from=enquiry'; return; }
       var btn = form.querySelector('button');
       var orig = btn.textContent;
       btn.textContent = 'Sending…';

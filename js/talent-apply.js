@@ -2096,7 +2096,7 @@
     e.preventDefault();
     if (!form.checkValidity()) { form.reportValidity(); return; }
     // the board only takes applications the gender field offers; anything else is quietly not sent
-    if (form.gender && form.gender.value !== 'Woman') { say('Sorry, this application can\'t be submitted right now.'); return; }
+    if (!form.gender || form.gender.value !== 'Woman') { say('Sorry, this application can\'t be submitted right now.'); return; }
     var orig = submitBtn.textContent; submitBtn.disabled = true;
     var configured = !!(CLOUDINARY_CLOUD && CLOUDINARY_PRESET);
     var folderName = (form.name.value || 'Applicant').trim() + ' — ' + new Date().toLocaleDateString('en-GB');
