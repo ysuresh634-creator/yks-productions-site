@@ -18,6 +18,8 @@
       var get = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; };
       if (!get('name') || !get('contact')) return;
       if (!onApply && TALENT_RE.test(get('message'))) { location.href = APPLY + '?from=enquiry'; return; }
+      var minMsg = +(form.dataset.minmsg || 0), mEl = form.querySelector('[name="message"]');
+      if (minMsg && get('message').length < minMsg) { if (mEl) { mEl.setCustomValidity('Tell me a little more — at least ' + minMsg + ' characters.'); mEl.reportValidity(); mEl.addEventListener('input', function () { mEl.setCustomValidity(''); }, { once: true }); } return; }
       var btn = form.querySelector('button');
       var orig = btn.textContent;
       btn.textContent = 'Sending…';

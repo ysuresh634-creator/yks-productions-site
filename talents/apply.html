@@ -634,13 +634,22 @@
          furthest an automated check can go, so the final tick is on trust.) -->
     <div class="ap-gate" id="apGate">
       <ol class="ap-gate-steps">
-        <li class="ap-gate-step is-active" id="apGateS1"><span class="ap-gate-n">1</span> <b>Tap Follow</b> above &mdash; it opens my Instagram in a new tab.</li>
-        <li class="ap-gate-step" id="apGateS2"><span class="ap-gate-n">2</span> <b>Follow @yks_photoworks</b> over there &mdash; then come back to this tab.</li>
+        <li class="ap-gate-step is-active" id="apGateS1"><span class="ap-gate-n">1</span> <b>Tap Follow</b> above &mdash; it opens @yks_photoworks in a new tab. Follow, then come back here.</li>
+        <li class="ap-gate-step" id="apGateS2"><span class="ap-gate-n">2</span> <b>DM your code</b> below to @yks_photoworks from the account you follow with.</li>
         <li class="ap-gate-step" id="apGateS3"><span class="ap-gate-n">3</span> <b>Confirm below</b> &mdash; the form and comp-card builder open.</li>
       </ol>
+      <div class="ap-fcode" id="apFcode" style="margin:1em 0;padding:1em 1.1em;border:1px solid rgba(201,162,74,.5);border-radius:8px">
+        <p style="margin:0 0 .5em;font-size:.9em;opacity:.85">Your follow code</p>
+        <p style="margin:0 0 .8em;display:flex;gap:.6em;align-items:center;flex-wrap:wrap">
+          <b id="apFcodeVal" style="font-size:1.5em;letter-spacing:.12em;font-family:ui-monospace,monospace">YKS-····</b>
+          <button type="button" class="btn" id="apFcodeCopy">Copy code</button>
+          <a class="btn btn-fill" id="apFcodeDm" href="https://ig.me/m/yks_photoworks" target="_blank" rel="noopener">DM this code to @yks_photoworks &rarr;</a>
+        </p>
+        <p class="ap-mini" id="apFcodeMsg" style="margin:0;font-size:.85em;opacity:.8">Applications are reviewed only after this code arrives by DM from an account that follows @yks_photoworks.</p>
+      </div>
       <label class="ap-gate-confirm" id="apGateConfirmWrap">
         <input type="checkbox" id="apGateConfirm" disabled />
-        <span>I followed <b>@yks_photoworks</b> &mdash; open my application.</span>
+        <span>I followed <b>@yks_photoworks</b> and sent the code &mdash; open my application.</span>
       </label>
       <p class="ap-gate-locked" id="apGateLocked">🔒 Locked until you follow. Start with step 1 above.</p>
     </div>
@@ -824,6 +833,7 @@
             <label>Full name<input type="text" name="name" placeholder="Your name" required /></label>
             <label>Phone / WhatsApp<input type="tel" name="contact" placeholder="+91 / +971 …" required /></label>
           </div>
+          <label class="ap-full">Email<input type="email" name="email" placeholder="you@example.com" required /></label>
           <div class="row2">
             <label>I am a…
               <select name="category" required>
@@ -1472,8 +1482,8 @@
   </div>
 </footer>
 
-<script src="/js/landing.js?v=18"></script>
-<script src="/js/talent-apply.js?v=79"></script>
+<script src="/js/landing.js?v=19"></script>
+<script src="/js/talent-apply.js?v=80"></script>
 <script src="/js/talent-apply-flow.js?v=7"></script>
 <script src="/js/talent-apply-live.js?v=4"></script>
 <script src="/js/talent-apply-taste.js?v=2"></script>
@@ -1481,7 +1491,8 @@
 <script src="/js/talent-apply-strength.js?v=1"></script>
 <script src="/js/talent-apply-assist.js?v=1"></script>
 <script src="/js/keep.js?v=1"></script>
-<script src="/js/talent-apply-follow.js?v=2"></script>
+<script src="/js/talent-apply-code.js?v=1"></script>
+<script src="/js/talent-apply-follow.js?v=3"></script>
 <script src="/js/talent-apply-gender.js?v=2"></script>
 <script src="/js/talent-apply-reveal.js?v=2"></script>
   <script src="/js/search.js?v=11" defer></script>

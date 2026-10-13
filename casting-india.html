@@ -451,13 +451,14 @@
     <h2>Tell me the <em>brief</em></h2>
     <p>The look, the city, the dates. I'll come back with a shortlist and one number.</p>
     <div class="l-form-wrap">
-      <form class="l-form" data-source="Casting India" data-subject="New casting brief — India">
+      <p class="l-form-apply" style="margin:0 0 1.2em"><a class="btn" href="/talents/apply.html">Talent? Apply to the board here →</a> <span style="opacity:.75;font-size:.9em">This form is for brands and productions casting a shoot.</span></p>
+      <form class="l-form" data-source="Casting India" data-subject="New casting brief — India" data-minmsg="20">
         <div class="row2">
           <input type="text" name="name" placeholder="Your name" required />
           <input type="tel" name="contact" placeholder="Phone / WhatsApp" required />
         </div>
         <input type="email" name="email" placeholder="Email (optional)" />
-        <textarea name="message" placeholder="The look you need, the city, the dates, and what it's for…"></textarea>
+        <textarea name="message" required minlength="20" placeholder="The look you need, the city, the dates, and what it's for…"></textarea>
         <button type="submit" class="btn btn-fill">Send the brief →</button>
       </form>
       <p class="l-form-ok">✓ Thank you — your brief is in. I'll come back today.</p>
@@ -512,7 +513,7 @@
   </div>
 </footer>
 
-<script src="/js/landing.js?v=18"></script>
+<script src="/js/landing.js?v=19"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=9"></script>
   <script src="/js/search.js?v=11" defer></script>

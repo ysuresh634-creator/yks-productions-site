@@ -2117,6 +2117,33 @@
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    /* every key detail is required — per-field messages, first problem scrolled into view */
+    var errs = [];
+    [].forEach.call(form.querySelectorAll('.ap-ferr'), function (n) { n.remove(); });
+    function fv(n) { return (form[n] && form[n].value || '').trim(); }
+    function bad(n, m, el) { el = el || form[n]; errs.push({ el: el, m: m }); }
+    if (fv('name').length < 2) bad('name', 'Add your full name.');
+    if (fv('contact').replace(/\D/g, '').length < 8) bad('contact', 'Add a phone / WhatsApp number we can reach.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(fv('email'))) bad('email', 'Add a valid email address.');
+    if (!fv('category')) bad('category', 'Choose what you are applying as.');
+    if (form.region && !fv('region')) bad('region', 'Choose where you are based.');
+    if (fv('city').length < 2) bad('city', 'Add your city.');
+    var ig = fv('socials').replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/[/?#].*$/, '').replace(/^@/, '');
+    if (!/^(?!.*\.\.)(?!\.)[A-Za-z0-9._]{2,30}$/.test(ig) || /^(na|n\/a|none|nil)$/i.test(ig)) bad('socials', 'Add your Instagram handle, e.g. @yourname.');
+    var dobv = fv('dob'), age = -1;
+    if (dobv) { var d = new Date(dobv), nw = new Date(); age = nw.getFullYear() - d.getFullYear() - ((nw.getMonth() < d.getMonth() || (nw.getMonth() === d.getMonth() && nw.getDate() < d.getDate())) ? 1 : 0); }
+    if (!dobv || isNaN(age)) bad('dob', 'Add your date of birth.'); else if (age < 18 || age > 90) bad('dob', 'Applicants must be 18 or older.');
+    if (!fv('stat_height')) bad('stat_height', 'Add your height.');
+    if (fv('about').length < 60) bad('about', 'Write a short intro — at least 60 characters (' + fv('about').length + ' so far).');
+    if (!photos.length && !pdf) errs.push({ el: document.querySelector('.ap-photos, #apPhotos, input[type="file"]'), m: 'Add at least one photo (or your portfolio PDF).' });
+    var gc = document.getElementById('apGateConfirm');
+    if (!gc || !gc.checked || !(window.YKS_FOLLOW_CODE_SENT && window.YKS_FOLLOW_CODE_SENT())) errs.push({ el: document.getElementById('apGate'), m: 'Follow @yks_photoworks, DM your follow code, then tick the confirm box.' });
+    if (errs.length) {
+      errs.forEach(function (x) { if (!x.el) return; var sp = document.createElement('span'); sp.className = 'ap-ferr'; sp.setAttribute('role', 'alert'); sp.style.cssText = 'display:block;color:#e24a2a;font-size:.82em;margin-top:.3em'; sp.textContent = x.m; (x.el.closest && x.el.closest('label') || x.el).insertAdjacentElement('afterend', sp); });
+      say('Please fix ' + errs.length + ' thing' + (errs.length > 1 ? 's' : '') + ' marked in red.');
+      if (errs[0].el && errs[0].el.scrollIntoView) errs[0].el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     if (!form.checkValidity()) { form.reportValidity(); return; }
     // the board only takes applications the gender field offers; anything else is quietly not sent
     if (!form.gender || form.gender.value !== 'Woman') { say('Sorry, this application can\'t be submitted right now.'); return; }
@@ -2182,7 +2209,10 @@
         based_in: form.region.value === 'Somewhere else'
           ? ((form.country_other && form.country_other.value.trim()) || 'Somewhere else')
           : form.region.value,
+        email: (form.email && form.email.value) || '(none)', replyto: (form.email && form.email.value) || undefined,
         city: form.city.value, instagram_social: form.socials.value,
+        instagram_profile: 'https://instagram.com/' + String(form.socials.value || '').trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/[/?#].*$/, '').replace(/^@/, ''),
+        follow_code: (window.YKS_FOLLOW_CODE || '(none)') + ' — check the @yks_photoworks DMs for this code from ' + String(form.socials.value || '').trim(),
         signature_line: (form.tagline && form.tagline.value) || '(none)',
         about: form.about.value,
         // ── private personal data (only YKS ever sees this — never rendered publicly) ──
@@ -2232,7 +2262,7 @@
           var g = function (n) { return (form[n] && form[n].value) || ''; };
           var ephotos = photos.map(function (p, i) { return { url: (up.photos && up.photos[i]) || '', cat: p.cat || '' }; }).filter(function (x) { return x.url; });
           var submission = {
-            name: g('name'), contact: g('contact'), category: g('category'), based_in: g('region'), city: g('city'),
+            name: g('name'), contact: g('contact'), email: g('email'), follow_code: window.YKS_FOLLOW_CODE || '', category: g('category'), based_in: g('region'), city: g('city'),
             socials: g('socials'), about: g('about'), tagline: g('tagline'), work_preferences: g('preferences'),
             stat_height: g('stat_height'), stat_bust: g('stat_bust'), stat_waist: g('stat_waist'), stat_hips: g('stat_hips'),
             stat_shoe: g('stat_shoe'), stat_hair: g('stat_hair'), stat_eyes: g('stat_eyes'), stat_skin: g('stat_skin'),
