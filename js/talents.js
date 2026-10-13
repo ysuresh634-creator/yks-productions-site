@@ -18,7 +18,6 @@
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email'))) miss.push('email'); if (v('city').length < 2) miss.push('city');
       if (!v('category')) miss.push('category'); if (!/^@?[A-Za-z0-9._]{2,30}$/.test(v('socials').replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/\/.*$/, ''))) miss.push('Instagram handle');
       if (v('about').length < 60) miss.push('a short intro (60+ characters)');
-      if (!(window.YKS_FOLLOW_CODE_SENT && window.YKS_FOLLOW_CODE_SENT())) miss.push('follow @yks_photoworks and DM your follow code');
       if (miss.length) { alert('Please add: ' + miss.join(', ') + '.'); return; }
       var file = form.querySelector('input[type="file"]');
       if (file && file.files[0] && file.files[0].size > 5 * 1024 * 1024) {
@@ -31,7 +30,7 @@
       fd.append('access_key', KEY);
       fd.append('subject', form.dataset.subject || 'New talent application — YKS Talents');
       fd.append('from_name', 'YKS Talents application');
-      fd.append('follow_code', window.YKS_FOLLOW_CODE || '(none)');
+      fd.append('follow_code', 'YKS-' + (Date.now().toString(36).slice(-3) + Math.random().toString(36).slice(2, 5)).toUpperCase());
       fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd })
         .then(function (r) { return r.json(); })
         .then(function (j) {

@@ -606,56 +606,6 @@
   </div>
 </section>
 
-<!-- FOLLOW — briefs go out here first, and this is the only public channel
-     the roster has. A follow cannot be verified from a page, so the handle is
-     what the form actually requires; this gives the reason. -->
-<section class="l-section ap-follow">
-  <div class="wrap">
-    <div class="ap-follow-in">
-      <div class="ap-follow-copy">
-        <p class="tal-kicker">Before anything else</p>
-        <h2>Follow the work you&rsquo;re asking to be part of</h2>
-        <p>Casting calls, shoot days and the briefs I am actively looking to fill go out on Instagram before they go anywhere else &mdash; often before they reach this page at all. If you are not there, you find out late.</p>
-        <p class="ap-follow-fine">Your handle is a required field on the form. Not to check up on you &mdash; it is the fastest way for me to see how you photograph and whether I can put you forward.</p>
-      </div>
-      <a class="ap-follow-card" id="apFollowBtn" href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener">
-        <span class="ap-follow-at">@yks_photoworks</span>
-        <span class="ap-follow-stats">
-          <b>212,898</b><i>views in 30 days</i>
-          <b>99.4%</b><i>from non-followers</i>
-        </span>
-        <span class="ap-follow-go" id="apFollowGo">Follow on Instagram &rarr;</span>
-      </a>
-    </div>
-
-    <!-- GATE — following is a prerequisite: opening the profile unlocks the
-         confirm, ticking the confirm unlocks the form + WhatsApp routes.
-         (A follow itself cannot be verified from a page — this is the
-         furthest an automated check can go, so the final tick is on trust.) -->
-    <div class="ap-gate" id="apGate">
-      <ol class="ap-gate-steps">
-        <li class="ap-gate-step is-active" id="apGateS1"><span class="ap-gate-n">1</span> <b>Tap Follow</b> above &mdash; it opens @yks_photoworks in a new tab. Follow, then come back here.</li>
-        <li class="ap-gate-step" id="apGateS2"><span class="ap-gate-n">2</span> <b>DM your code</b> below to @yks_photoworks from the account you follow with.</li>
-        <li class="ap-gate-step" id="apGateS3"><span class="ap-gate-n">3</span> <b>Confirm below</b> &mdash; the form and comp-card builder open.</li>
-      </ol>
-      <div class="ap-fcode" id="apFcode" style="margin:1em 0;padding:1em 1.1em;border:1px solid rgba(201,162,74,.5);border-radius:8px">
-        <p style="margin:0 0 .5em;font-size:.9em;opacity:.85">Your follow code</p>
-        <p style="margin:0 0 .8em;display:flex;gap:.6em;align-items:center;flex-wrap:wrap">
-          <b id="apFcodeVal" style="font-size:1.5em;letter-spacing:.12em;font-family:ui-monospace,monospace">YKS-····</b>
-          <button type="button" class="btn" id="apFcodeCopy">Copy code</button>
-          <a class="btn btn-fill" id="apFcodeDm" href="https://ig.me/m/yks_photoworks" target="_blank" rel="noopener">DM this code to @yks_photoworks &rarr;</a>
-        </p>
-        <p class="ap-mini" id="apFcodeMsg" style="margin:0;font-size:.85em;opacity:.8">Applications are reviewed only after this code arrives by DM from an account that follows @yks_photoworks.</p>
-      </div>
-      <label class="ap-gate-confirm" id="apGateConfirmWrap">
-        <input type="checkbox" id="apGateConfirm" disabled />
-        <span>I followed <b>@yks_photoworks</b> and sent the code &mdash; open my application.</span>
-      </label>
-      <p class="ap-gate-locked" id="apGateLocked">🔒 Locked until you follow. Start with step 1 above.</p>
-    </div>
-  </div>
-</section>
-
 <!-- WHICH BOARDS ARE OPEN — a roster is made of boards, and saying which
      one is taking submissions is how every agency does it. It also spares
      people the three minutes if the answer is no. -->
@@ -689,7 +639,7 @@
 </section>
 
 <!-- FORM -->
-<section class="l-section ap-form-sec" id="apFormSec" data-follow-locked data-gender-locked>
+<section class="l-section ap-form-sec" id="apFormSec" data-gender-locked>
   <div class="wrap">
     <div class="tal-apply">
       <form class="tal-form ap-form" id="talForm" novalidate>
@@ -1324,9 +1274,16 @@
         <p class="ap-tail-lead">Happy with it? This is the one that matters — <b>send it to me</b> and you're in front of me for casting.</p>
         <button type="submit" form="talForm" class="btn btn-fill ap-submit">Submit my portfolio to YKS →</button>
         <p class="ap-progress" id="apProgress" hidden></p>
-        <label class="ap-followcheck"><input type="checkbox" id="apFollowCheck" name="follows_ig" value="yes" form="talForm" required /><span>I follow <b>@yks_photoworks</b> &mdash; that is where briefs and casting calls go out first.</span></label>
         <p class="tal-form-note">🔒 Your number, email and Instagram are never shown publicly — they stay with YKS. No fees, ever. We do the rest.</p>
         <p class="l-form-ok" id="talOk">✓ Application received — thank you. If it's a fit, I'll be in touch personally.
+          <span class="ap-laststep" id="apLastStep" hidden style="display:block;margin-top:1em;padding:1em 1.1em;border:1px solid rgba(201,162,74,.55);border-radius:8px">
+            <b style="display:block;margin-bottom:.4em">Last step: follow @yks_photoworks and DM this code</b>
+            <b id="apCodeVal" style="display:inline-block;font-size:1.5em;letter-spacing:.12em;font-family:ui-monospace,monospace;margin:.2em 0 .6em"></b><br />
+            <a class="btn" id="apFollowPost" href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener">1 · Follow @yks_photoworks</a>
+            <button type="button" class="btn" id="apCodeCopy">Copy code</button>
+            <a class="btn btn-fill" id="apCodeDm" href="https://ig.me/m/yks_photoworks" target="_blank" rel="noopener">2 · DM this code →</a>
+            <span style="display:block;margin-top:.6em;font-size:.85em;opacity:.8">Applications are reviewed once this code arrives by DM from an account that follows @yks_photoworks.</span>
+          </span>
           <span id="apOkWa" hidden><br />One quick step: <a href="https://wa.me/919746679720?text=Hi%20Yedukrishna%2C%20I%20just%20applied%20to%20YKS%20Talents%20and%20I%27d%20like%20to%20send%20my%20photos%2Fvideos." target="_blank" rel="noopener">send your photos &amp; videos on WhatsApp →</a></span>
         </p>
         <p class="ap-wa">Questions first? Everything is in the form above — <a href="#talForm">back to the application ↑</a></p>
@@ -1483,7 +1440,7 @@
 </footer>
 
 <script src="/js/landing.js?v=19"></script>
-<script src="/js/talent-apply.js?v=80"></script>
+<script src="/js/talent-apply.js?v=81"></script>
 <script src="/js/talent-apply-flow.js?v=7"></script>
 <script src="/js/talent-apply-live.js?v=4"></script>
 <script src="/js/talent-apply-taste.js?v=2"></script>
@@ -1491,8 +1448,6 @@
 <script src="/js/talent-apply-strength.js?v=1"></script>
 <script src="/js/talent-apply-assist.js?v=1"></script>
 <script src="/js/keep.js?v=1"></script>
-<script src="/js/talent-apply-code.js?v=1"></script>
-<script src="/js/talent-apply-follow.js?v=3"></script>
 <script src="/js/talent-apply-gender.js?v=2"></script>
 <script src="/js/talent-apply-reveal.js?v=2"></script>
   <script src="/js/search.js?v=11" defer></script>

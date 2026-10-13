@@ -47,6 +47,7 @@
   if (!form) return;
 
   var photos = [];   // { file, id, url }
+  try { ['yks_follow_code', 'yks_follow_code_sent'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
   var pdf = null;    // File
   var uid = 0;
 
@@ -2136,8 +2137,6 @@
     if (!fv('stat_height')) bad('stat_height', 'Add your height.');
     if (fv('about').length < 60) bad('about', 'Write a short intro — at least 60 characters (' + fv('about').length + ' so far).');
     if (!photos.length && !pdf) errs.push({ el: document.querySelector('.ap-photos, #apPhotos, input[type="file"]'), m: 'Add at least one photo (or your portfolio PDF).' });
-    var gc = document.getElementById('apGateConfirm');
-    if (!gc || !gc.checked || !(window.YKS_FOLLOW_CODE_SENT && window.YKS_FOLLOW_CODE_SENT())) errs.push({ el: document.getElementById('apGate'), m: 'Follow @yks_photoworks, DM your follow code, then tick the confirm box.' });
     if (errs.length) {
       errs.forEach(function (x) { if (!x.el) return; var sp = document.createElement('span'); sp.className = 'ap-ferr'; sp.setAttribute('role', 'alert'); sp.style.cssText = 'display:block;color:#e24a2a;font-size:.82em;margin-top:.3em'; sp.textContent = x.m; (x.el.closest && x.el.closest('label') || x.el).insertAdjacentElement('afterend', sp); });
       say('Please fix ' + errs.length + ' thing' + (errs.length > 1 ? 's' : '') + ' marked in red.');
@@ -2148,6 +2147,11 @@
     // the board only takes applications the gender field offers; anything else is quietly not sent
     if (!form.gender || form.gender.value !== 'Woman') { say('Sorry, this application can\'t be submitted right now.'); return; }
     var orig = submitBtn.textContent; submitBtn.disabled = true;
+    // follow code: minted only now, after every check has passed, from the submit time + randomness; never stored
+    var FOLLOW_CODE = (function () { var A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', b = new Uint32Array(3), t = Date.now(), r = '';
+      try { crypto.getRandomValues(b); } catch (er) { b[0] = Math.random() * 4e9; b[1] = Math.random() * 4e9; b[2] = Math.random() * 4e9; }
+      var n = (t ^ b[0]) >>> 0; for (var q = 0; q < 3; q++) { r += A[n % 32]; n = Math.floor(n / 32); }
+      r += A[b[1] % 32] + A[b[2] % 32] + A[(t >>> 7) % 32]; return 'YKS-' + r; })();
     var configured = !!(CLOUDINARY_CLOUD && CLOUDINARY_PRESET);
     var folderName = (form.name.value || 'Applicant').trim() + ' — ' + new Date().toLocaleDateString('en-GB');
 
@@ -2212,7 +2216,7 @@
         email: (form.email && form.email.value) || '(none)', replyto: (form.email && form.email.value) || undefined,
         city: form.city.value, instagram_social: form.socials.value,
         instagram_profile: 'https://instagram.com/' + String(form.socials.value || '').trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/[/?#].*$/, '').replace(/^@/, ''),
-        follow_code: (window.YKS_FOLLOW_CODE || '(none)') + ' — check the @yks_photoworks DMs for this code from ' + String(form.socials.value || '').trim(),
+        follow_code: FOLLOW_CODE + ' — sent ' + new Date().toISOString() + '; check the @yks_photoworks DMs for this code from ' + String(form.socials.value || '').trim(),
         signature_line: (form.tagline && form.tagline.value) || '(none)',
         about: form.about.value,
         // ── private personal data (only YKS ever sees this — never rendered publicly) ──
@@ -2262,7 +2266,7 @@
           var g = function (n) { return (form[n] && form[n].value) || ''; };
           var ephotos = photos.map(function (p, i) { return { url: (up.photos && up.photos[i]) || '', cat: p.cat || '' }; }).filter(function (x) { return x.url; });
           var submission = {
-            name: g('name'), contact: g('contact'), email: g('email'), follow_code: window.YKS_FOLLOW_CODE || '', category: g('category'), based_in: g('region'), city: g('city'),
+            name: g('name'), contact: g('contact'), email: g('email'), follow_code: FOLLOW_CODE, category: g('category'), based_in: g('region'), city: g('city'),
             socials: g('socials'), about: g('about'), tagline: g('tagline'), work_preferences: g('preferences'),
             stat_height: g('stat_height'), stat_bust: g('stat_bust'), stat_waist: g('stat_waist'), stat_hips: g('stat_hips'),
             stat_shoe: g('stat_shoe'), stat_hair: g('stat_hair'), stat_eyes: g('stat_eyes'), stat_skin: g('stat_skin'),
@@ -2303,6 +2307,10 @@
         say('');
         form.style.display = 'none';
         var ok = $('#talOk'); if (ok) ok.style.display = 'block';
+        var ls = $('#apLastStep'), cv = $('#apCodeVal'), cc = $('#apCodeCopy');
+        if (ls && cv) { cv.textContent = FOLLOW_CODE; ls.hidden = false;
+          var cpy = function () { if (navigator.clipboard) navigator.clipboard.writeText(FOLLOW_CODE).then(function () { if (cc) cc.textContent = 'Copied ✓'; }, function () {}); };
+          if (cc) cc.onclick = cpy; var dmb = $('#apCodeDm'); if (dmb) dmb.addEventListener('click', cpy); }
         unlockDownload();   // they submitted → their free portfolio download is now unlocked
         if (window.gtag) gtag('event', 'talent_apply');
         // anything that couldn't upload (not configured yet, or a clip too big/rejected) → hand to WhatsApp so nothing is lost
