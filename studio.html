@@ -1888,12 +1888,10 @@ function saveSettings(){
 // QUO-2526-261017-K7QM. The old per-browser counter handed the same number to
 // two devices; random codes cannot collide that way (32^4 ≈ 1M per day) and are
 // still checked against the local archive and regenerated on a clash.
-// The series rolls over every 1 April (Indian financial year, Apr–Mar), keeping
-// the studio's existing labelling: Apr 2026–Mar 2027 prints 2526 (as on the
-// documents already issued), and from 1 Apr 2027 it prints 2627.
-// Strict FY naming would call Apr 2026–Mar 2027 "2627"; to switch to that,
-// set FY_LABEL_OFFSET to 0.
-const FY_LABEL_OFFSET=-1;
+// The series follows the Indian financial year (Apr–Mar) and rolls over every
+// 1 April: Apr 2026–Mar 2027 prints 2627, from 1 Apr 2027 it prints 2728.
+// (FY_LABEL_OFFSET=-1 would restore the older labelling one year behind.)
+const FY_LABEL_OFFSET=0;
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // no 0/O, 1/I
 function fySeries(d){
   const y=d.getFullYear(), m=d.getMonth();            // m: 0=Jan … 3=Apr
