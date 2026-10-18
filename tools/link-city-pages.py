@@ -22,10 +22,9 @@ links = '\n'.join(
     f'        <a href="/models-in-{c["slug"]}.html">{c["city"]}</a>' for c in cities)
 
 
-# YKS Talents targets Bangalore, Mumbai and Dubai only. talents.html links just
-# those three (Dubai has a hand-built page outside cities.json); the other city
-# pages are kept but noindex, and stay linked only from the casting/apply grids.
-TALENT_CITIES = [('bangalore', 'Bangalore'), ('mumbai', 'Mumbai'), ('dubai', 'Dubai')]
+# YKS Talents works across India and the Middle East. talents.html links every
+# India city page in cities.json plus Dubai (a hand-built page outside cities.json).
+TALENT_CITIES = [(c['slug'], c['city']) for c in cities] + [('dubai', 'Dubai')]
 talent_links = '\n'.join(
     f'        <a href="/models-in-{slug}.html">{name}</a>' for slug, name in TALENT_CITIES)
 
@@ -52,8 +51,8 @@ TARGETS = {
     'talents.html': (
         block('Cities',
               'The roster works <em>city by city</em>',
-              'YKS Talents is focused on Bangalore, Mumbai and Dubai. Open a city to see how casting works there.',
-              'Based in Bangalore, Mumbai or Dubai? <a href="/talents/apply.html">Build your portfolio — free →</a>',
+              'YKS Talents works across India and the Middle East. Open a city to see how casting works there.',
+              'Based in India or the Middle East? <a href="/talents/apply.html">Build your portfolio — free →</a>',
               links=talent_links),
         '<section class="l-cta">'),
     'casting-india.html': (
