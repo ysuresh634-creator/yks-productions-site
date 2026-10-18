@@ -7,3 +7,8 @@ contact-sheet.html
 
 # QA engine output (reports, screenshots, logs)
 tools/qa/out/
+
+# dependencies / caches (never deploy)
+node_modules/
+__pycache__/
+*.pyc
