@@ -172,7 +172,7 @@ Every project is quoted as one all-in number covering the shoot and the edit —
 yksproductions.com
 ```
 
-**Service area:** Dubai · Abu Dhabi · Bangalore · Mumbai · Kochi — not a
+**Service area:** Dubai · Abu Dhabi · Bangalore · Mumbai — not a
 street address. You're a service-area business; a fake address is what
 gets a page flagged.
 
