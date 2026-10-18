@@ -357,7 +357,7 @@
     + '<div class="l-who-copy">'
     + '<p class="l-eyebrow">The eye behind the lens</p>'
     + '<h2>Why a frame is worth <em>slowing down for</em></h2>'
-    + '<p>I grew up in Alappuzha — the backwater town on the Kerala coast where the light moves slow across the water and an ordinary afternoon already looks like a film. Kerala hands you cinema early.</p>'
+    + '<p>I grew up somewhere the light moves slow across the water and an ordinary afternoon already looks like a film. Cinema found me early.</p>'
     + '<p>That pull carried me onto film sets. I shoot stills and cinematography for Malayalam features, and on a set the still is the film\'s first trailer — your job is catching the one frame that makes someone feel the whole story. That\'s the eye I bring to your shoot.</p>'
     + '<p class="l-who-honest"><strong>And the honest part:</strong> I\'m not the cheapest camera in the city. If the lowest quote is the only thing that matters, I\'m genuinely not your guy — and I\'d rather say that now than after. I\'m for people who care how they\'re remembered.</p>'
     + '<p class="l-who-sign">— Yedukrishna Suresh<span>Founder, YKS Productions · FEFKA member</span></p>'
