@@ -64,7 +64,7 @@ def nav(city):
     <span class="l-cats-div" aria-hidden="true"></span>
     <a href="/talents.html">The roster</a>
     <a href="/talents/apply.html">Join as talent</a>
-    <a href="/casting-india.html">Cast for a shoot</a>
+    <a href="/find-models.html">Cast for a shoot</a>
     <span class="l-cats-div" aria-hidden="true"></span>
     <a href="/india/">India</a>
     <a href="/blog/">Journal</a>
@@ -85,7 +85,7 @@ def foot(c):
       <div class="l-foot-links">
         <a href="/talents.html">The roster</a>
         <a href="/talents/apply.html">Talent — apply</a>
-        <a href="/casting-india.html">Casting · India</a>
+        <a href="/find-models.html">Find models</a>
         <a href="/index.html">Portfolio</a>
         <a href="/faq.html">FAQ</a>
       </div>
@@ -182,7 +182,7 @@ def page(c):
                                 f'working models and actors, booked only through YKS Productions.'),
                 'isPartOf': {'@id': f'{BASE}/#website'},
                 'about': {'@id': url + '#service'},
-                'significantLink': [f'{BASE}/talents/apply.html', f'{BASE}/casting-india.html'],
+                'significantLink': [f'{BASE}/talents/apply.html', f'{BASE}/find-models.html'],
             },
             {
                 '@type': 'Service', '@id': url + '#service',
@@ -202,7 +202,7 @@ def page(c):
                 ],
                 'availableChannel': [
                     {'@type': 'ServiceChannel', 'name': 'Casting brief',
-                     'serviceUrl': f'{BASE}/casting-india.html#brief'},
+                     'serviceUrl': f'{BASE}/find-models.html#brief'},
                     {'@type': 'ServiceChannel', 'name': 'Talent application',
                      'serviceUrl': f'{BASE}/talents/apply.html'},
                 ],
@@ -280,7 +280,7 @@ def page(c):
     <p class="tal-h1sub">Commercial and fashion casting in {e(c['city'])} — a curated roster of working talent, and the brands that book it.</p>
     <p class="l-lede">{e(c['market'])}</p>
     <div class="l-cta-row">
-      <a class="btn btn-fill" href="/casting-india.html#brief">I&rsquo;m casting — send a brief</a>
+      <a class="btn btn-fill" href="/find-models.html#brief">I&rsquo;m casting — send a brief</a>
       <a class="btn btn-ghost" href="/talents/apply.html">I&rsquo;m talent — apply to the board →</a>
     </div>
   </div>
@@ -316,9 +316,9 @@ def page(c):
         <p class="l-prose">Dates, the look and how you intend to use the images — that is the
         whole brief. Back comes a shortlist built against it and one all-in number, rather than a
         directory to sift through. Contact details are never shared in either direction.
-        <a href="/casting-india.html">How a casting runs &rarr;</a></p>
+        <a href="/find-models.html">How a casting runs &rarr;</a></p>
         <div class="l-cta-row">
-          <a class="btn btn-fill" href="/casting-india.html#brief">Send a {e(c['city'])} brief →</a>
+          <a class="btn btn-fill" href="/find-models.html#brief">Send a {e(c['city'])} brief →</a>
         </div>
       </div>
 
@@ -357,7 +357,7 @@ def page(c):
     <p>If you're talent, join it. If you're casting, brief it. Either takes a couple of minutes.</p>
     <div class="l-cta-row center">
       <a class="btn btn-fill" href="/talents/apply.html">Join the roster</a>
-      <a class="btn btn-ghost" href="/casting-india.html#brief">Send a casting brief</a>
+      <a class="btn btn-ghost" href="/find-models.html#brief">Send a casting brief</a>
     </div>
   </div>
 </section>

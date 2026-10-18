@@ -47,7 +47,7 @@ graph = [
             'details are never published.'),
         'isPartOf': {'@id': f'{BASE}/#website'},
         'about': {'@id': f'{BASE}/talents.html#service'},
-        'significantLink': [f'{BASE}/casting-india.html',
+        'significantLink': [f'{BASE}/find-models.html',
                             f'{BASE}/talents/apply.html'],
     },
     {
@@ -71,7 +71,7 @@ graph = [
         'availableChannel': [
             {'@type': 'ServiceChannel',
              'name': 'Casting brief',
-             'serviceUrl': f'{BASE}/casting-india.html#brief'},
+             'serviceUrl': f'{BASE}/find-models.html#brief'},
             {'@type': 'ServiceChannel',
              'name': 'Talent application',
              'serviceUrl': f'{BASE}/talents/apply.html'},

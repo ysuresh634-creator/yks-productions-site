@@ -19,7 +19,7 @@
       var p = document.createElement('p');
       p.className = 'l-form-talent';
       p.style.cssText = 'margin:.9em 0 0;font-size:.9em;opacity:.85';
-      p.innerHTML = 'Looking to model or join the talent board? <a href="' + APPLY + '">Apply here →</a>';
+      p.innerHTML = 'Looking to model? <a href="' + APPLY + '">Create your free portfolio →</a>';
       form.insertAdjacentElement('afterend', p);
     }
     // a "book this talent" link from the roster arrives as ?talent=CODE — seed the brief with it
@@ -96,7 +96,7 @@
   // one-tap line to Yedukrishna's phone — this FAB (WhatsApp + Call) is what
   // turned applicants' questions into casting DMs and cold calls. Iris
   // (chat.js) still helps on these pages; only the direct line is withheld.
-  if (/\/talents|\/models-in-|\/casting-india/.test(location.pathname)) return;
+  if (/\/talents|\/models-in-|\/casting-india|\/find-models/.test(location.pathname)) return;
   var waLink = document.querySelector('a[href*="wa.me/"]');
   var num = (document.body && document.body.getAttribute('data-wa')) || (waLink && (waLink.href.match(/wa\.me\/(\d+)/) || [])[1]) || '971501955122';
   /* The opening line depends on which page you are standing on. This button

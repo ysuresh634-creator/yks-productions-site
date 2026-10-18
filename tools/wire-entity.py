@@ -25,7 +25,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 P = lambda *a: os.path.join(ROOT, *a)
 A, B = '<!-- ENTITY:START -->', '<!-- ENTITY:END -->'
 
-SKIP_PREFIX = ('contact-sheet', 'cs-', 'ruk-', 'review', 'edit', 'labs', 'studio',
+SKIP_PREFIX = ('casting-india', 'contact-sheet', 'cs-', 'ruk-', 'review', 'edit', 'labs', 'studio',
                'work-preview', 'hero-', '_fonts', 'google', 'yks-productions-onepage',
                'talents/id/')
 
@@ -85,7 +85,7 @@ block = (A + '\n<script type="application/ld+json">\n'
 pages = [f for f in sorted(glob.glob('*.html') + glob.glob('*/*.html'))
          if not f.replace(os.sep, '/').startswith(SKIP_PREFIX) and f != 'index.html']
 
-FUNNEL = re.compile(r'^(talents|talent-|models-in-|casting-|become-a-model)')
+FUNNEL = re.compile(r'^(talents|talent-|models-in-|casting-|find-models|become-a-model)')
 
 def block_for(page_src, fname=''):
     # Talent / casting funnel pages carry NO phone in JSON-LD: the form is the only way in.

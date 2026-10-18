@@ -335,7 +335,7 @@ def profile(t, plate):
     <p>Tell me the dates, the city and what you're shooting — I'll confirm availability and come back with one all-in number.</p>
     <div class="l-cta-row center">
       <a class="btn btn-fill" data-tbook="{t['code']}" href="#book">Enquire to book <span data-tfirst="{t['code']}">this talent</span> →</a>
-      <a class="btn btn-ghost" href="/casting-india.html#brief">Send a casting brief</a>
+      <a class="btn btn-ghost" href="/find-models.html#brief">Send a casting brief</a>
     </div>
   </div>
 </section>
@@ -348,7 +348,7 @@ def profile(t, plate):
       <div class="l-foot-brand">YKS<span>.</span>Productions</div>
       <div class="l-foot-links">
         <a href="/talents.html">The roster</a>
-        <a href="/casting-india.html">Casting · India</a>
+        <a href="/find-models.html">Find models</a>
         <a href="/talents/apply.html">Talent — apply</a>
         <a href="/index.html">Portfolio</a>
         <a href="/quote.html">Get a quote</a>
@@ -359,7 +359,7 @@ def profile(t, plate):
 
 <script src="/js/rail.js?v=6"></script>
 <script src="/js/talent-names.js?v=2"></script>
-<script src="/js/talent-profile.js?v=5"></script>
+<script src="/js/talent-profile.js?v=6"></script>
 <script src="/js/talent-book.js?v=4"></script>
 <script src="/js/keep.js?v=1"></script>
 <script src="/js/landing.js?v=20"></script>

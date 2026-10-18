@@ -37,7 +37,7 @@ def category(path):
         return "Home"
     if p.startswith("blog/"):
         return "Journal"
-    if p.startswith("models-in-") or p in ("talents.html", "casting-india.html") or p.startswith("talents/"):
+    if p.startswith("models-in-") or p in ("talents.html", "casting-india.html", "find-models.html") or p.startswith("talents/"):
         return "Talent"
     if p in ("dubai/", "india/", "dubai/index.html", "india/index.html"):
         return "Market"

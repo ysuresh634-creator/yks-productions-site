@@ -2,7 +2,7 @@
 """Wire the city pages into the pages that should point at them.
 
 A page nobody links to is a page Google crawls late and trusts little.
-These ten only earn their keep if the roster, the casting page and the
+These only earn their keep if the roster, the find-models page and the
 application page all hand authority to them — and if each of those three
 frames the link for its own audience, because a brand and a model are not
 looking for the same thing when they see a list of cities.
@@ -55,13 +55,13 @@ TARGETS = {
               'Based in India or the Middle East? <a href="/talents/apply.html">Build your portfolio — free →</a>',
               links=talent_links),
         '<section class="l-cta">'),
-    'casting-india.html': (
-        block('Casting by city',
-              'Cast a shoot <em>where you are shooting</em>',
-              'What a shortlist should be built around changes by city — catalogue stamina in '
-              'NCR, availability in Bangalore, costume patience in Jaipur. Each page says what '
-              'actually matters there.',
-              'Shooting somewhere else in India? <a href="/casting-india.html#brief">Send the brief anyway →</a>'),
+    'find-models.html': (
+        block('Female models by city',
+              'Find models <em>where you are shooting</em>',
+              'What clients look for changes by city — catalogue stamina in NCR, availability in '
+              'Bangalore, costume patience in Jaipur. Each page says what actually matters there.',
+              'Shooting somewhere else in India or the Middle East? <a href="/find-models.html#brief">Send the brief anyway →</a>',
+              links=talent_links),
         '<footer class="l-foot">'),
     'talents/apply.html': (
         block('Where you are',

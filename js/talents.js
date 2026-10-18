@@ -177,7 +177,7 @@
         img.loading = 'lazy'; mGallery.appendChild(img);
       });
       // bookings come in as a client brief (company + project type), never a direct line
-      mBook.href = '/casting-india.html?talent=' + encodeURIComponent(String(d.code || '').toUpperCase()) + '#brief';
+      mBook.href = '/find-models.html?talent=' + encodeURIComponent(String(d.code || '').toUpperCase()) + '#brief';
       mBook.removeAttribute('target');
       mBook.textContent = 'Enquire to book ' + who + ' →';
       modal.classList.add('on'); modal.setAttribute('aria-hidden', 'false');
@@ -251,7 +251,7 @@
       ? n + ' shortlisted' + (viewingShared ? ' · shared list' : '')
       : '';
     var go = bar.querySelector('.tal-sl-go');
-    go.href = '/casting-india.html?talent=' + encodeURIComponent(picked.map(function (c) { return c.toUpperCase(); }).join(',')) + '#brief';
+    go.href = '/find-models.html?talent=' + encodeURIComponent(picked.map(function (c) { return c.toUpperCase(); }).join(',')) + '#brief';
     go.removeAttribute('target');
   }
 
@@ -343,7 +343,7 @@
         if (p.questions && p.questions.length) html += '<div><h4>What I\'d need to know</h4><ul>' + ul(p.questions) + '</ul></div>';
         html += '</div>';
         html += '<div class="tal-plan-actions">'
-             +  '<a class="tal-plan-send" href="/casting-india.html' + (p.codes && p.codes.length ? '?talent=' + encodeURIComponent(p.codes.join(',').toUpperCase()) : '') + '#brief">Send this brief to YKS →</a>'
+             +  '<a class="tal-plan-send" href="/find-models.html' + (p.codes && p.codes.length ? '?talent=' + encodeURIComponent(p.codes.join(',').toUpperCase()) : '') + '#brief">Send this brief to YKS →</a>'
              +  (p.codes && p.codes.length ? '<button type="button" class="tal-plan-show" data-codes="' + esc(p.codes.join(',')) + '">Show the ' + p.codes.length + ' who fit</button>' : '')
              +  '</div>';
         html += '<p class="tal-plan-note">A plan, not a quote — I\'ll confirm availability and come back with one all-in number.</p>';
@@ -602,7 +602,7 @@
       .catch(function () {
         btn.disabled = false; btn.textContent = orig;
         msgEl.className = 'tal-hold-msg warn';
-        msgEl.innerHTML = 'Couldn’t send that just now — please use the <a href="/casting-india.html?talent=' + encodeURIComponent(codes.join(',')) + '#brief">brief form</a> instead.';
+        msgEl.innerHTML = 'Couldn’t send that just now — please use the <a href="/find-models.html?talent=' + encodeURIComponent(codes.join(',')) + '#brief">brief form</a> instead.';
       });
   });
 })();

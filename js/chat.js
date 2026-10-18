@@ -51,7 +51,7 @@
      cautious one is exactly who needs her), but the WhatsApp and Call
      affordances are withheld: they are what turned "how do I apply" into
      casting DMs and cold calls, because the button wrote the message for them. */
-  var TALENT_FUNNEL = /\/talents|\/models-in-|\/casting-india/.test(location.pathname);
+  var TALENT_FUNNEL = /\/talents|\/models-in-|\/casting-india|\/find-models/.test(location.pathname);
 
   /* ── languages ─────────────────────────────────────────────────
      Iris answers in whatever the visitor writes. These just decide

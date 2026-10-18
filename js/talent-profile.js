@@ -49,7 +49,7 @@
     go.addEventListener('click', function (e) {
       var desk = document.getElementById('book');
       if (!desk) {                       // no desk on this page — the client brief form
-        go.href = '/casting-india.html?talent=' + encodeURIComponent(CODE) + '#brief';
+        go.href = '/find-models.html?talent=' + encodeURIComponent(CODE) + '#brief';
         return;
       }
       e.preventDefault();

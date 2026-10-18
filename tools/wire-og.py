@@ -23,16 +23,16 @@ P = lambda *a: os.path.join(ROOT, *a)
 BASE = 'https://yksproductions.com'
 W, H = 1200, 630
 
-SKIP = {'contact-sheet.html', 'cs-couple.html', 'cs-rukmini.html', 'cs-wedding.html',
+SKIP = {'casting-india.html', 'contact-sheet.html', 'cs-couple.html', 'cs-rukmini.html', 'cs-wedding.html',
         'ruk-choose.html', 'review.html', 'edit.html', 'labs.html', 'studio.html',
         'work-preview.html', 'hero-motion-preview.html', '_fonts-preview.html',
         'yks-productions-onepage.html'}
 
 # Pages that must never carry a talent's face into a public forum.
 TALENT_CARD = {
-    'talents.html': ('og-talents.jpg', 'The YKS Talents roster — models, actors and creators across India'),
-    'talents/apply.html': ('og-talent-apply.jpg', 'Join the YKS Talents roster — free, no registration fee, open across India'),
-    'casting-india.html': ('og-casting.jpg', 'Send a casting brief and get a shortlist — models, actors and creators in India'),
+    'talents.html': ('og-talents.jpg', 'YKS Talents — editorial portfolios of talent across India and the Middle East'),
+    'talents/apply.html': ('og-talent-apply.jpg', 'Create your free modelling portfolio on YKS Talents — no fees, women 18–34'),
+    'find-models.html': ('og-talents.jpg', 'YKS Talents — find models for your shoot in India and the Middle East'),
 }
 for c in json.load(io.open(P('_data', 'cities.json'), encoding='utf-8'))['cities']:
     TALENT_CARD[f'models-in-{c["slug"]}.html'] = (
