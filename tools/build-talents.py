@@ -422,7 +422,8 @@ io.open(tp, 'w', encoding='utf-8').write(th)
 sm_path = P('sitemap.xml')
 sm = io.open(sm_path, encoding='utf-8').read()
 before = sm
-sm = re.sub(r'  <url>\s*<loc>[^<]*/talents/(?!apply\.html)[^<]*</loc>.*?</url>\n',
+# only the noindex profile pages under /talents/id/ — never the apply page or /talents/guides/
+sm = re.sub(r'  <url>\s*<loc>[^<]*/talents/id/[^<]*</loc>.*?</url>\n',
             '', sm, flags=re.S)
 removed = before.count('<loc>') - sm.count('<loc>')
 if removed:
