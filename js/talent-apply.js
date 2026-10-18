@@ -57,10 +57,58 @@
   }
   photoInput.addEventListener('change', function () {
     [].slice.call(photoInput.files || []).forEach(function (f) {
-      if (photos.length < 3 && (/^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif|avif)$/i.test(f.name))) photos.push(f);
+      if (photos.length < 3 && (/^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif|avif)$/i.test(f.name))) { photos.push(f); measure(f); }
     });
     photoInput.value = ''; renderThumbs();
   });
+
+  // pixel size of each photo, read quietly for the review score (HEIC can't be read here → unknown, not flagged)
+  var dims = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function measure(f) {
+    if (!dims) return; var u = URL.createObjectURL(f), im = new Image();
+    im.onload = function () { dims.set(f, [im.naturalWidth, im.naturalHeight]); URL.revokeObjectURL(u); };
+    im.onerror = function () { URL.revokeObjectURL(u); }; im.src = u;
+  }
+
+  /* ── review score: never blocks, only marks the email for a closer look ── */
+  var FIRST = ('sajitha anjali priya pooja neha riya divya kavya sneha anu ammu aswathy aiswarya athira lakshmi meera nisha rahul arjun amal akhil vishnu rohit amit ankit rajesh suresh ramesh manu jithin vineeth abhi adarsh anand arun ajay vijay sanjay deepak pradeep punit rohan karan varun nikhil sachin kiran sunil anil ravi raj ali faisal ahmed mohammed muhammad salman shahid irfan imran fatima ayesha sara sana zara aisha aditi isha shreya shruti swathi swati simran preeti pinky kajal komal ritu jyoti monika pallavi rekha sonia tanvi tanya diya gauri radha sita gita').split(' ');
+  var MALE = /(^|[^a-z])(mr|mister|sir|bro|bhai|bhaiya|king|boy|boyz|guy|dude|man|hunk|prince|raja|sher|gentleman|bad ?boy|alpha|macho)([^a-z]|$)|^(mr|king|boy)|(boy|boyz|dude|hunk|gentleman|mister)|prince(?!ss)/i;
+  function cm(v) {
+    v = String(v).toLowerCase(); var m;
+    if ((m = /(\d+(?:\.\d+)?)\s*cm/.exec(v))) return +m[1];
+    if ((m = /(\d)\s*(?:'|ft|feet|foot|\u2019)\s*(\d{1,2})?/.exec(v))) return Math.round((+m[1] * 12 + (+(m[2] || 0))) * 2.54);
+    if ((m = /^(\d+)(?:\.(\d{1,2}))?$/.exec(v.trim()))) {
+      var n = +(m[1] + '.' + (m[2] || '0'));
+      if (n > 100) return n;
+      if (n < 3) return Math.round(n * 100);                                     // 1.68 (m)
+      if (n < 8) return Math.round((+m[1] * 12 + (+(m[2] || 0))) * 2.54);       // 5.4 / 5.11 = feet.inches
+      return 0;
+    }
+    return 0;
+  }
+  function letters(x) { return String(x || '').toLowerCase().replace(/[^a-z]/g, ''); }
+  function reviewFlags(D, seconds) {
+    var F = [], h = D.handle.toLowerCase(), hl = letters(h);
+    if (h.length < 6) F.push('Instagram handle shorter than 6 characters');
+    else if (FIRST.indexOf(hl) > -1 && hl === h.replace(/[._]/g, '')) F.push('Instagram handle is a single common first name');
+    var c = cm(D.height);
+    if (c && c > 180) F.push('Height above 180 cm (' + D.height + ')');
+    else if (c && c < 145) F.push('Height below 145 cm (' + D.height + ')');
+    else if (!c) F.push('Height not readable (' + D.height + ')');
+    var local = D.email.split('@')[0].toLowerCase();
+    [['name', D.name], ['email', local], ['Instagram handle', h]].forEach(function (p) { if (MALE.test(String(p[1]).toLowerCase().replace(/[._\d-]+/g, ' '))) F.push('Male marker in ' + p[0]); });
+    var ll = letters(local), tokens = D.name.toLowerCase().split(/[^a-z]+/).filter(function (t) { return t.length >= 3; });
+    var match = tokens.some(function (t) { return ll.indexOf(t) > -1 || (t.length >= 4 && ll.indexOf(t.slice(0, 4)) > -1); })
+      || (hl.length >= 4 && (ll.indexOf(hl) > -1 || hl.indexOf(ll) > -1 || ll.indexOf(hl.slice(0, 4)) > -1 || hl.indexOf(ll.slice(0, 4)) > -1));
+    if (ll.length >= 3 && !match) F.push('Email doesn\u2019t match name or handle');
+    if (seconds < 20) F.push('Form filled in ' + seconds + ' s');
+    if (!photos.length) F.push('No photos');
+    else photos.forEach(function (f, i) {
+      var d = dims && dims.get(f);
+      if (f.size < 25 * 1024 || (d && Math.min(d[0], d[1]) < 400)) F.push('Photo ' + (i + 1) + ' very small (' + Math.round(f.size / 1024) + ' KB' + (d ? ', ' + d[0] + '\u00d7' + d[1] : '') + ')');
+    });
+    return F;
+  }
 
   /* ── Instagram: one shape ── */
   function igHandle(raw) {
@@ -129,6 +177,7 @@
     if (!photos.length) { setErr(photoInput, 'Add 1 to 3 photos \u2014 a clear face shot and a full-length are ideal.'); first = first || $('#taAddPhoto'); }
     if (first) { say('Please fix the fields marked in red.'); first.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (first.focus) first.focus({ preventScroll: true }); return; }
     if (!boardGate()) { say(BLOCKED); return; }   // silent: no upload, no email, no link
+    var yrs = age(form.dob.value); if (yrs < 18 || yrs > 35) { say(BLOCKED); return; }   // board window, never named on the page
     // backstops for bots and scripted posts: honeypots must stay empty, and the form can't be instant
     var hpBox = form.querySelector('[name=botcheck]'), hpTxt = form.querySelector('[name=website]');
     if ((hpBox && hpBox.checked) || (hpTxt && hpTxt.value) || Date.now() - T0 < MIN_MS) { say(BLOCKED); return; }
@@ -139,6 +188,7 @@
       dob: form.dob.value, height: form.height.value.trim(), gender: form.gender.value, about: (form.about.value || '').trim().slice(0, 300)
     };
     D.profile = 'https://instagram.com/' + D.handle;
+    var secs = Math.round((Date.now() - T0) / 1000), FLAGS = reviewFlags(D, secs);
     busy = true; sync(); submitBtn.textContent = 'Sending\u2026';
     var done = 0; say('Uploading your photos\u2026 0 / ' + photos.length);
     Promise.all(photos.map(function (f) { return upload(f).then(function (u) { done++; say('Uploading your photos\u2026 ' + done + ' / ' + photos.length); return u; }); }))
@@ -146,14 +196,15 @@
         say('Sending your application\u2026');
         var payload = {
           access_key: WEB3FORMS_KEY,
-          subject: 'New talent application \u2014 ' + D.name + ' (@' + D.handle + ')',
+          subject: (FLAGS.length ? '[REVIEW] ' : '[TALENT] ') + D.name + ' \u00b7 ' + D.city + ' \u00b7 ' + D.category + ' \u00b7 @' + D.handle,
           from_name: 'YKS Talents application',
           name: D.name, phone: D.phone, email: D.email, replyto: D.email,
           instagram_profile: D.profile, instagram_handle: '@' + D.handle,
           followed_yks_photoworks: 'Tapped Follow @yks_photoworks before submitting (check ' + D.profile + ' in your followers)',
           city: D.city, category: D.category, date_of_birth: D.dob, height: D.height, gender: D.gender,
           intro: D.about || '(none)', photos: urls.filter(Boolean).join('\n'), found_via: source(),
-          seconds_on_form: Math.round((Date.now() - T0) / 1000),
+          seconds_on_form: secs,
+          Flags: FLAGS.length ? FLAGS.join('; ') : undefined,
           botcheck: false   // Web3Forms' own honeypot: a checked/true value is rejected server-side
         };
         try {
