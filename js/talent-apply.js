@@ -245,7 +245,7 @@
     var done = 0; say('Uploading your photos\u2026 0 / ' + photos.length);
     Promise.all(photos.map(function (f) { return upload(f).then(function (u) { done++; say('Uploading your photos\u2026 ' + done + ' / ' + photos.length); return u; }); }))
       .then(function (urls) {
-        say('Building your portfolio\u2026');
+        say('Preparing your portfolio link\u2026');
         return builtPortfolio(D).then(function (pdfUrl) { return { urls: urls, pdf: pdfUrl }; });
       })
       .then(function (up) {
@@ -274,9 +274,9 @@
         } catch (er) {}
         return fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) })
           .then(function (r) { return r.json(); })
-          .then(function (j) { if (!j || !j.success) throw new Error('send'); });
+          .then(function (j) { if (!j || !j.success) throw new Error('send'); return up.pdf || ''; });
       })
-      .then(function () { if (window.gtag) gtag('event', 'talent_apply'); success(D); })
+      .then(function (pdfUrl) { if (window.gtag) gtag('event', 'talent_apply'); success(D, Promise.resolve(pdfUrl)); })
       .catch(function () {
         busy = false; sync(); submitBtn.textContent = 'Submit application';
         say('Something went wrong sending that \u2014 please check your connection and try again.');
@@ -290,16 +290,30 @@
     var IN = ['91', '97466', '79720'], AE = ['971', '50195', '5122'];   // same rule as geo-wa.js / chat.js
     return (/Kolkata|Calcutta|Colombo|Kathmandu|Dhaka/i.test(tz) ? IN : AE).join('');
   }
-  function success(D) {
+  // pdfReady resolves with the Cloudinary portfolio link ('' if the build/upload failed);
+  // the WhatsApp button stays in its waiting state until it settles
+  function success(D, pdfReady) {
     form.hidden = true; say('');
     var box = $('#taDone'); box.hidden = false;
-    var msg = 'Hi Yedukrishna, I\u2019ve applied to the YKS Talent Board and followed @yks_photoworks.\nName: ' + D.name +
-      '\nInstagram: https://instagram.com/' + D.handle + '\nCity: ' + D.city;
     var a = document.createElement('a');
-    a.className = 'ta-wa'; a.id = 'taWa'; a.target = '_blank'; a.rel = 'noopener';
-    a.href = 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(msg);
-    a.innerHTML = '<span>Send me a WhatsApp</span>';
+    a.className = 'ta-wa wait'; a.id = 'taWa'; a.target = '_blank'; a.rel = 'noopener';
+    a.setAttribute('aria-disabled', 'true'); a.removeAttribute('href');
+    a.innerHTML = '<span>Preparing your portfolio link\u2026</span>';
+    a.addEventListener('click', function (ev) { if (a.classList.contains('wait')) ev.preventDefault(); });
     $('#taWaSlot').appendChild(a);
+    (pdfReady || Promise.resolve('')).then(null, function () { return ''; }).then(function (pdfUrl) {
+      var msg = 'Hi Yedukrishna, I\u2019ve applied to YKS Talents and followed @yks_photoworks.\nName: ' + D.name +
+        '\nInstagram: https://instagram.com/' + D.handle + '\nCity: ' + D.city +
+        '\nPortfolio: ' + (pdfUrl || '(the upload didn\u2019t go through \u2014 I\u2019ll send my PDF here)');
+      a.href = 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(msg);
+      a.classList.remove('wait'); a.removeAttribute('aria-disabled');
+      a.innerHTML = '<span>Send me a WhatsApp</span>';
+      if (!pdfUrl) {
+        var n = document.createElement('p'); n.className = 'ta-wa-note'; n.id = 'taWaNote';
+        n.textContent = 'Your portfolio link couldn\u2019t be prepared just now. Send the message anyway, then download your portfolio below and attach the PDF in the same chat.';
+        a.parentNode.insertBefore(n, a.nextSibling);
+      }
+    });
     var dl = $('#taDl'), hint = $('#taDlHint'), tapped = false, unlocked = false;
     function unlock() {
       if (!tapped || unlocked) return; unlocked = true;

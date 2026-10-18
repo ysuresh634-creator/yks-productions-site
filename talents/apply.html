@@ -353,6 +353,8 @@
 .ta-done h2{font-family:var(--serif);font-size:30px;margin:0 0 8px}
 .ta-done p{color:var(--paper-dim);line-height:1.5}
 .ta-wa{display:flex;align-items:center;justify-content:center;min-height:60px;border-radius:14px;background:#25D366;color:#06210f;font-weight:700;font-size:18px;text-decoration:none;margin:14px 0 22px}
+.ta-wa.wait{background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);cursor:progress;pointer-events:none}
+.ta-wa-note{margin:-12px 0 22px;font-size:14px;opacity:.8}
 .ta-dlbox{border-top:1px solid var(--line);padding-top:18px}
 .ta-dl{width:100%;min-height:52px;border-radius:12px;border:1px solid var(--amber);background:transparent;color:var(--amber);font:inherit;font-weight:600;font-size:16px}
 .ta-dl:disabled{opacity:.45;border-color:var(--line);color:var(--paper-dim)}
@@ -406,7 +408,7 @@
 
   <div class="ta-done" id="taDone" hidden>
     <h2>Application received ✓</h2>
-    <p><b>Last step: send me a WhatsApp.</b> It already has your name, Instagram and city in it, just tap send.</p>
+    <p><b>Last step: send me a WhatsApp.</b> It already has your name, Instagram, city and your portfolio link in it, just tap send.</p>
     <div id="taWaSlot"></div>
     <div class="ta-dlbox">
       <button type="button" class="ta-dl" id="taDl" disabled>Download your portfolio</button>
@@ -477,6 +479,6 @@
   </div>
 </footer>
 
-<script src="/js/talent-apply.js?v=85"></script>
+<script src="/js/talent-apply.js?v=86"></script>
 </body>
 </html>
