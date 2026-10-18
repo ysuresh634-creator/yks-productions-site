@@ -58,8 +58,6 @@ CITY_GEO = {
     'bangalore': ('India', 'IN', 'IN-KA'), 'bengaluru': ('India', 'IN', 'IN-KA'),
     'mysore': ('India', 'IN', 'IN-KA'),
     'hyderabad': ('India', 'IN', 'IN-TG'), 'chennai': ('India', 'IN', 'IN-TN'),
-    'kochi': ('India', 'IN', 'IN-KL'), 'cochin': ('India', 'IN', 'IN-KL'),
-    'kozhikode': ('India', 'IN', 'IN-KL'), 'thiruvananthapuram': ('India', 'IN', 'IN-KL'),
     'kolkata': ('India', 'IN', 'IN-WB'), 'ahmedabad': ('India', 'IN', 'IN-GJ'),
     'jaipur': ('India', 'IN', 'IN-RJ'), 'chandigarh': ('India', 'IN', 'IN-CH'),
     'goa': ('India', 'IN', 'IN-GA'), 'lucknow': ('India', 'IN', 'IN-UP'),

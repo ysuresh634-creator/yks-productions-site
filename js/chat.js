@@ -55,7 +55,7 @@
 
   /* ── languages ─────────────────────────────────────────────────
      Iris answers in whatever the visitor writes. These just decide
-     how she OPENS — worth getting right, since a Gulf or Kerala
+     how she OPENS — worth getting right, since a Gulf or Malayali
      visitor landing on a Malayalam or Arabic hello converts very
      differently to one landing on English. */
   var L10N = {
@@ -128,7 +128,7 @@
       c: ['Same-day highlights?', 'How many hours?', '→ Get a quote'] },
     { k: /film|movie|soothravakyam|baby girl|cinema|bts|stills/i,
       c: ['What did he shoot on set?', 'See his work', '→ Get a quote'] },
-    { k: /bangalore|bengaluru|india|kerala|coorg/i,
+    { k: /bangalore|bengaluru|mumbai|india|coorg/i,
       c: ['Does he travel in India?', 'What does he shoot there?', '→ Get a quote'] }
   ];
   var DEFAULT_FOLLOWUPS = ['How does a shoot work?', 'See his work', '→ Get a quote'];

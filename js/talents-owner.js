@@ -479,7 +479,7 @@
   var ATTACH_ANDROID = /^(.+?\.(?:jpe?g|png|webp|heic|mp4|pdf))\s*\(file attached\)/i;
   /* The two export formats have to be matched separately. One pattern loose
      enough for both reads the Android line
-       08/09/2026, 12:12 - +91 98765 43210: Kavya Nair, Kochi
+       08/09/2026, 12:12 - +91 98765 43210: Kavya Nair, Bangalore
      and hands back "0" as the sender — the last digit of the number, because
      the greedy half eats everything up to the final colon. */
   var CHAT_IOS = /^\[(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}),\s*[^\]]+\]\s*([^:]{1,48}?):\s?([\s\S]*)$/;

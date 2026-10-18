@@ -308,7 +308,7 @@
 /* ═══════════════════════════════════════════════════════════════
    TRUST LAYER — the three promises + the human behind the lens.
    The homepage already carries "Booking me is the safe call" and the
-   Alappuzha story; the 57 service pages carried neither. Injected here
+   origin story; the 57 service pages carried neither. Injected here
    once so every page gets the same reassurance right where people decide.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
