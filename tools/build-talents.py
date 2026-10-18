@@ -262,7 +262,7 @@ def profile(t, plate):
 <link rel="stylesheet" href="/css/landing.css?v=23" />
 <link rel="stylesheet" href="/css/talents.css?v=90" />
 </head>
-<body data-wa="{wa}">
+<body>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -287,7 +287,7 @@ def profile(t, plate):
         <h1 class="pf-name" data-tname="{t['code']}" data-nosnippet>{cat} {code}</h1>
         <p class="pf-disc">{e(' · '.join(t.get('tags', [])))}</p>
 {video_html}        <div class="pf-cta">
-          <a class="btn btn-fill" data-tbook="{t['code']}" href="https://wa.me/{wa}?text={msg}" target="_blank" rel="noopener">Enquire to book <span data-tfirst="{t['code']}">this talent</span> →</a>
+          <a class="btn btn-fill" data-tbook="{t['code']}" href="#book">Enquire to book <span data-tfirst="{t['code']}">this talent</span> →</a>
         </div>
         <p class="pf-priv"><b>Every booking goes through me.</b> No client contacts talent directly — not before a shoot, not after one. Contact details are never shared, this profile is not indexed, and I handle availability, rates and the day itself.</p>
       </div>
@@ -334,7 +334,7 @@ def profile(t, plate):
     <h2>Book <span data-tfirst="{t['code']}" data-nosnippet>this talent</span> <em>for your shoot</em></h2>
     <p>Tell me the dates, the city and what you're shooting — I'll confirm availability and come back with one all-in number.</p>
     <div class="l-cta-row center">
-      <a class="btn btn-fill" data-tbook="{t['code']}" href="https://wa.me/{wa}?text={msg}" target="_blank" rel="noopener">Enquire to book <span data-tfirst="{t['code']}">this talent</span> →</a>
+      <a class="btn btn-fill" data-tbook="{t['code']}" href="#book">Enquire to book <span data-tfirst="{t['code']}">this talent</span> →</a>
       <a class="btn btn-ghost" href="/casting-india.html#brief">Send a casting brief</a>
     </div>
   </div>
@@ -359,12 +359,10 @@ def profile(t, plate):
 
 <script src="/js/rail.js?v=6"></script>
 <script src="/js/talent-names.js?v=2"></script>
-<script src="/js/talent-profile.js?v=4"></script>
-<script src="/js/talent-book.js?v=3"></script>
+<script src="/js/talent-profile.js?v=5"></script>
+<script src="/js/talent-book.js?v=4"></script>
 <script src="/js/keep.js?v=1"></script>
-<script src="/js/landing.js?v=13"></script>
-<script src="/js/chat-config.js"></script>
-<script src="/js/chat.js?v=4"></script>
+<script src="/js/landing.js?v=20"></script>
 </body>
 </html>
 '''

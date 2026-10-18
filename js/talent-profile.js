@@ -6,11 +6,6 @@
   var hero = document.querySelector('.pf-hero'); if (!hero) return;
   var nameEl = document.querySelector('.pf-name');
   var CODE = ((nameEl && nameEl.dataset.tname) || '').toUpperCase();
-  var WA = (function () {
-    var a = document.querySelector('a[href*="wa.me/"]');
-    var m = a && a.getAttribute('href').match(/wa\.me\/(\d+)/);
-    return m ? m[1] : '919746679720';
-  })();
   function esc(s) { return String(s == null ? '' : s); }
   function meta() {
     var kick = document.querySelector('.tal-kicker');
@@ -35,7 +30,7 @@
 
   /* ── 1. Sticky book bar — the CTA scrolls away on a long profile ── */
   (function stickyBar() {
-    var cta = document.querySelector('.pf-cta a[href*="wa.me/"]'); if (!cta) return;
+    var cta = document.querySelector('.pf-cta a[data-tbook]'); if (!cta) return;
     var bar = document.createElement('div');
     bar.className = 'pf-stick';
     bar.innerHTML = '<span class="pf-stick-who"><b>' + esc(CODE) + '</b><i>' + esc(meta().cat + (meta().where ? ' · ' + meta().where : '')) + '</i></span>' +
@@ -53,9 +48,8 @@
     var go = bar.querySelector('.pf-stick-go');
     go.addEventListener('click', function (e) {
       var desk = document.getElementById('book');
-      if (!desk) {                       // no desk on this page — use WhatsApp
-        go.href = cta.getAttribute('href');
-        go.target = '_blank';
+      if (!desk) {                       // no desk on this page — the client brief form
+        go.href = '/casting-india.html?talent=' + encodeURIComponent(CODE) + '#brief';
         return;
       }
       e.preventDefault();
@@ -203,7 +197,7 @@
     tk('TO BOOK — QUOTE ' + CODE, M, H - 84, 9, GOLD, { bold: true, ls: 1.6 });
     logoBox(W - M - 72, H - 106, 72, INK);
     hair(M, H - 56, W - M, INK, 1.1);
-    tk('+91 ' + WA.slice(2, 7) + ' ' + WA.slice(7), M, H - 40, 7.5, INKSUB, { ls: 1.1 });
+    tk('YKSPRODUCTIONS.COM', M, H - 40, 7.5, INKSUB, { ls: 1.1 });
     tk('YKSPRODUCTIONS893@GMAIL.COM', W - M, H - 40, 7.5, INKSUB, { ls: 1.1, align: 'right' });
 
     doc.save('YKS-' + CODE + '-comp-card.pdf');

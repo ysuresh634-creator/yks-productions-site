@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/landing.css?v=25" />
+<link rel="stylesheet" href="/css/landing.css?v=26" />
 
 <script type="application/ld+json">
 {
@@ -261,31 +261,6 @@
           }
         }
       ],
-      "contactPoint": [
-        {
-          "@type": "ContactPoint",
-          "telephone": "+971-50-195-5122",
-          "contactType": "customer service",
-          "areaServed": "AE",
-          "availableLanguage": [
-            "English",
-            "Hindi",
-            "Malayalam"
-          ]
-        },
-        {
-          "@type": "ContactPoint",
-          "telephone": "+91-9746679720",
-          "contactType": "customer service",
-          "areaServed": "IN",
-          "availableLanguage": [
-            "English",
-            "Hindi",
-            "Malayalam",
-            "Kannada"
-          ]
-        }
-      ],
       "founder": {
         "@id": "https://yksproductions.com/#yedukrishna"
       }
@@ -349,7 +324,7 @@
 <!-- ENTITY:END -->
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
 </head>
-<body data-wa="919746679720">
+<body>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -457,6 +432,17 @@
           <input type="text" name="name" placeholder="Your name" required />
           <input type="tel" name="contact" placeholder="Phone / WhatsApp" required />
         </div>
+        <div class="row2">
+          <input type="text" name="company" placeholder="Company / brand name" autocomplete="organization" required minlength="2" />
+          <select name="project_type" required aria-label="Project type">
+            <option value="">Project type</option>
+            <option>Ad film</option>
+            <option>Fashion shoot</option>
+            <option>E-commerce</option>
+            <option>Event</option>
+            <option>Other</option>
+          </select>
+        </div>
         <input type="email" name="email" placeholder="Email (optional)" />
         <textarea name="message" required minlength="20" placeholder="The look you need, the city, the dates, and what it's for…"></textarea>
         <button type="submit" class="btn btn-fill">Send the brief →</button>
@@ -513,10 +499,8 @@
   </div>
 </footer>
 
-<script src="/js/landing.js?v=19"></script>
-<script src="/js/chat-config.js"></script>
-<script src="/js/chat.js?v=9"></script>
-  <script src="/js/search.js?v=11" defer></script>
+<script src="/js/landing.js?v=20"></script>
+  <script src="/js/search.js?v=12" defer></script>
 <script src="/js/source.js?v=1"></script>
 <script src="/js/preferred-source.js?v=1" defer></script>
 <script src="/js/rail.js?v=6"></script>

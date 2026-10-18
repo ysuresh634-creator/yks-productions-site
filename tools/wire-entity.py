@@ -85,7 +85,16 @@ block = (A + '\n<script type="application/ld+json">\n'
 pages = [f for f in sorted(glob.glob('*.html') + glob.glob('*/*.html'))
          if not f.replace(os.sep, '/').startswith(SKIP_PREFIX) and f != 'index.html']
 
-def block_for(page_src):
+FUNNEL = re.compile(r'^(talents|talent-|models-in-|casting-|become-a-model)')
+
+def block_for(page_src, fname=''):
+    # Talent / casting funnel pages carry NO phone in JSON-LD: the form is the only way in.
+    if FUNNEL.match(os.path.basename(fname)) or fname.replace(os.sep, '/').startswith('talents/'):
+        c = json.loads(json.dumps(compact))
+        for n in c['@graph']:
+            n.pop('contactPoint', None); n.pop('telephone', None)
+        return (A + '\n<script type="application/ld+json">\n' + json.dumps(c, indent=2, ensure_ascii=False)
+                + '\n</script>\n' + B)
     # Country guard: a page that pins its line with <body data-wa> gets ONLY
     # that country's contactPoint (UAE pages never carry the India number and
     # vice versa). Pages without data-wa serve both markets and keep both.
@@ -105,7 +114,7 @@ for f in pages:
     s = io.open(P(f), encoding='utf-8').read()
     if '</head>' not in s:
         continue
-    blk = block_for(s)
+    blk = block_for(s, f)
     if A in s:
         s = re.sub(re.escape(A) + r'.*?' + re.escape(B), lambda _: blk, s, flags=re.S)
         refreshed += 1

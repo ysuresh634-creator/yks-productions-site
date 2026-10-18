@@ -50,7 +50,6 @@
   var cards = $$('.tal', grid);
 
   /* YKS booking numbers — India vs UAE talent */
-  var WA = { india: '919746679720', uae: '971501955122' };
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var byCat = function (k) { return cards.filter(function (c) { return c.dataset.cat === k; }).length; };
   var byRegion = function (k) { return cards.filter(function (c) { return c.dataset.region === k; }).length; };
@@ -214,10 +213,9 @@
         var img = new Image(); img.src = src; img.alt = (CAT_LABEL[d.cat] || 'Talent') + ' · ' + (d.city || '') + ' — YKS Talents roster';
         img.loading = 'lazy'; mGallery.appendChild(img);
       });
-      var num = WA[d.region] || WA.india;
-      var msg = 'Hi Yedukrishna, I\'d like to book ' + who + ' (' + (CAT_LABEL[d.cat] || d.cat) +
-                (d.city ? ', ' + d.city : '') + ') from your talent pool. Are they available?';
-      mBook.href = 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
+      // bookings come in as a client brief (company + project type), never a direct line
+      mBook.href = '/casting-india.html?talent=' + encodeURIComponent(String(d.code || '').toUpperCase()) + '#brief';
+      mBook.removeAttribute('target');
       mBook.textContent = 'Enquire to book ' + who + ' →';
       modal.classList.add('on'); modal.setAttribute('aria-hidden', 'false');
       document.documentElement.style.overflow = 'hidden';
@@ -246,7 +244,7 @@
   if (!grid) return;
   var cards = Array.prototype.slice.call(grid.querySelectorAll('.tal'));
   if (!cards.length) return;
-  var KEY = 'yks_shortlist', WA = '919746679720';
+  var KEY = 'yks_shortlist';
   var picked = [];
   try { picked = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { picked = []; }
 
@@ -289,10 +287,9 @@
     bar.querySelector('.tal-sl-count').textContent = n
       ? n + ' shortlisted' + (viewingShared ? ' · shared list' : '')
       : '';
-    var msg = 'Hi Yedukrishna, I\'d like to enquire about these talents from your roster: '
-      + picked.map(function (c) { return c.toUpperCase(); }).join(', ')
-      + '. Here\'s the shortlist: ' + shareURL();
-    bar.querySelector('.tal-sl-go').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(msg);
+    var go = bar.querySelector('.tal-sl-go');
+    go.href = '/casting-india.html?talent=' + encodeURIComponent(picked.map(function (c) { return c.toUpperCase(); }).join(',')) + '#brief';
+    go.removeAttribute('target');
   }
 
   // a pick button on every card
@@ -349,7 +346,7 @@
   var box = document.getElementById('talPlanIn'), go = document.getElementById('talPlanGo'),
       out = document.getElementById('talPlanOut'), grid = document.getElementById('talGrid');
   if (!box || !go || !out) return;
-  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev', WA = '919746679720';
+  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev';
   var cards = grid ? Array.prototype.slice.call(grid.querySelectorAll('.tal')) : [];
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function payload() {
@@ -383,7 +380,7 @@
         if (p.questions && p.questions.length) html += '<div><h4>What I\'d need to know</h4><ul>' + ul(p.questions) + '</ul></div>';
         html += '</div>';
         html += '<div class="tal-plan-actions">'
-             +  '<a class="tal-plan-send" target="_blank" rel="noopener" href="https://wa.me/' + WA + '?text=' + encodeURIComponent(waMsg) + '">Send this brief to YKS →</a>'
+             +  '<a class="tal-plan-send" href="/casting-india.html' + (p.codes && p.codes.length ? '?talent=' + encodeURIComponent(p.codes.join(',').toUpperCase()) : '') + '#brief">Send this brief to YKS →</a>'
              +  (p.codes && p.codes.length ? '<button type="button" class="tal-plan-show" data-codes="' + esc(p.codes.join(',')) + '">Show the ' + p.codes.length + ' who fit</button>' : '')
              +  '</div>';
         html += '<p class="tal-plan-note">A plan, not a quote — I\'ll confirm availability and come back with one all-in number.</p>';
@@ -499,7 +496,7 @@
         tk('PREPARED BY YKS PRODUCTIONS', M, 486, 9, MUTE, { ls: 2 });
         doc.setFont(HF, 'normal'); doc.setFontSize(10.5); ct(MUTE);
         doc.text(doc.splitTextToSize('Every face here is booked through YKS. Reply with the codes you want and I’ll confirm availability and come back with one all-in number.', CW * 0.72), M, H - 150, { lineHeightFactor: 1.5 });
-        tk('+91 97466 79720   ·   YKSPRODUCTIONS893@GMAIL.COM', M, H - 60, 8, GOLD, { ls: 1.4 });
+        tk('YKSPRODUCTIONS.COM   ·   YKSPRODUCTIONS893@GMAIL.COM', M, H - 60, 8, GOLD, { ls: 1.4 });
 
         /* ── one page per face ── */
         items.forEach(function (it, i) {
@@ -530,7 +527,7 @@
           }
           tk('BOOK THIS FACE — QUOTE ' + code, M, H - 96, 9, GOLD, { bold: true, ls: 1.6 });
           hair(M, H - 56, W - M, INK, 1.1);
-          tk('+91 97466 79720', M, H - 40, 7.5, INKSUB, { ls: 1.1 });
+          tk('YKSPRODUCTIONS.COM', M, H - 40, 7.5, INKSUB, { ls: 1.1 });
           tk('YKSPRODUCTIONS893@GMAIL.COM', W - M, H - 40, 7.5, INKSUB, { ls: 1.1, align: 'right' });
         });
 
@@ -548,7 +545,7 @@
 (function () {
   var grid = document.getElementById('talGrid');
   if (!grid) return;
-  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev', WA = '919746679720';
+  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev';
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function cardFor(code) { return grid.querySelector('.tal[data-code="' + code + '"]'); }
   function statsOf(c) {
@@ -636,16 +633,13 @@
         btn.disabled = false; btn.textContent = orig;
         if (j && j.ok) {
           msgEl.className = 'tal-hold-msg ok';
-          msgEl.innerHTML = '✓ Held. I’ve got ' + esc(codes.join(', ')) + ' down for ' + esc(dates) + ' and I’ll come back to confirm. ' +
-            '<a target="_blank" rel="noopener" href="https://wa.me/' + WA + '?text=' +
-            encodeURIComponent('Hi Yedukrishna, I just put a hold on ' + codes.join(', ') + ' for ' + dates + '. — ' + who) + '">Tell me on WhatsApp too →</a>';
+          msgEl.innerHTML = '✓ Held. I’ve got ' + esc(codes.join(', ')) + ' down for ' + esc(dates) + ' and I’ll come back to confirm.';
         } else { throw new Error('bad'); }
       })
       .catch(function () {
         btn.disabled = false; btn.textContent = orig;
         msgEl.className = 'tal-hold-msg warn';
-        msgEl.innerHTML = 'Couldn’t send that just now — <a target="_blank" rel="noopener" href="https://wa.me/' + WA + '?text=' +
-          encodeURIComponent('Hi Yedukrishna, I\'d like to hold ' + codes.join(', ') + ' for ' + dates + '. — ' + who) + '">send it on WhatsApp instead →</a>';
+        msgEl.innerHTML = 'Couldn’t send that just now — please use the <a href="/casting-india.html?talent=' + encodeURIComponent(codes.join(',')) + '#brief">brief form</a> instead.';
       });
   });
 })();

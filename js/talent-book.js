@@ -31,7 +31,6 @@
 
   var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev';
   var CODE = (cta.getAttribute('data-tbook') || '').toUpperCase();
-  var WA = (cta.getAttribute('href') || '').replace(/^https:\/\/wa\.me\//, '').split('?')[0] || '919746679720';
 
   /* The three things that actually move a usage quote. Deliberately no
      numbers anywhere — what they pick changes the shape of the answer,
@@ -103,7 +102,6 @@
             '<div class="bk-meter"><span class="bk-meter-fill"></span></div>' +
             '<p class="bk-meter-say">Answer the three and I can quote it properly.</p>' +
             '<button type="button" class="bk-send" disabled>Send this brief &rarr;</button>' +
-            '<a class="bk-wa" href="https://wa.me/' + WA + '" target="_blank" rel="noopener">or send it on WhatsApp</a>' +
             '<p class="bk-fine">Every booking runs through me. Clients don&rsquo;t contact talent directly, and I don&rsquo;t share anyone&rsquo;s details.</p>' +
             '<p class="bk-ok" hidden></p>' +
           '</div>' +
@@ -184,7 +182,6 @@
 
     var ready = state.from && state.name && state.contact;
     $('.bk-send').disabled = !ready;
-    $('.bk-wa').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(summary());
   }
   function summary() {
     var L = ['Hi Yedukrishna, I\'d like to book ' + CODE + '.'];

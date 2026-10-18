@@ -471,7 +471,7 @@
     if (a.text === '__ERR__') {
       return '<div class="yks-ans"><div class="yks-ans-h"><u>✦</u><b>Iris</b></div>' +
         '<div class="yks-ans-t">I can’t reach my brain right now — but the pages below should cover it, ' +
-        'or message Yedukrishna on <a href="https://wa.me/971501955122" target="_blank" rel="noopener">WhatsApp</a>.' +
+        (/\/talents|\/models-in-|\/casting-|\/become-a-model/.test(location.pathname) ? 'or use the form on this page.' : 'or message Yedukrishna on <a href="https://wa.me/971501955122" target="_blank" rel="noopener">WhatsApp</a>.') +
         '</div></div>';
     }
     var h = '<div class="yks-ans"><div class="yks-ans-h"><u>✦</u><b>Iris</b></div>' +
