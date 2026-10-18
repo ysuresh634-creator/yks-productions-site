@@ -26,23 +26,23 @@ DESC = ('Find female models for your photoshoot in India and Dubai. Browse curat
 
 FAQ = [
  ('How do I find models for a photoshoot in India?',
-  'Browse the portfolios on <a href="/talents.html">YKS Talents</a>, or send a short brief on this page — the look, the city, the dates and what the images are for. I come back with suitable profiles from the platform, usually within a day. From there you can deal with the talent directly once she has agreed, or keep it running through the brief.'),
+  'Browse the portfolios on <a href="/talents.html">YKS Talents</a>, or send a short brief on this page — the look, the city, the dates and what the images are for. I come back with suitable profiles from the platform, usually within a day, and arrange everything with the talent for you. All contact goes through me.'),
  ('How do I hire a model for a photoshoot?',
   'Start with a clear brief: the look, the city, the dates, the usage (where and for how long the images will run) and your budget range. Shortlist from portfolios, check availability, agree the fee and usage in writing, and sign a model release before the shoot.'),
  ('How much does it cost to hire a model in India?',
   'There isn&rsquo;t one rate. Model fees are agreed per project and depend mostly on usage — how long the images run, where, and on which channels — plus shoot length, travel and any exclusivity. A one-day social content shoot and a long outdoor campaign can use the same face and cost very differently. Browsing YKS Talents and sending a brief are free.'),
  ('Is YKS Talents a model agency?',
   'No. YKS Talents is a free, curated portfolio platform run by one person — me, Yedukrishna Suresh, the photographer and filmmaker behind YKS Productions. Talent join free, with no fees, and the platform doesn&rsquo;t offer them jobs; clients come here to find them. I also cast my own YKS shoots from it.'),
- ('Can I deal with the talent directly?',
-  'Yes, once she has agreed. Names and contact details aren&rsquo;t published, to protect the talent, so the first contact comes through a brief. After that, you and the talent can work directly, or keep the arrangement running through the brief if you prefer.'),
+ ('Can I contact the talent directly?',
+  'No. All contact between clients and talent goes through me, Yedukrishna, from the first enquiry to the shoot day and after. Talent names and contact details are never published or shared. It protects the talent, and it means you have one accountable person handling availability, terms and paperwork.'),
  ('What kind of models are on YKS Talents?',
   'Women aged 18 to 34, based in or regularly working in India or the Middle East — polished, camera-ready faces suited to fashion, beauty, lifestyle, ethnic and bridal, jewellery and premium brand work. Everyone on the platform is over 18.'),
  ('Which cities can I find female models in?',
   'Across India and the Middle East, including Mumbai, Delhi NCR, Bangalore, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad, Jaipur, Chandigarh and Dubai. Each city page explains what clients there tend to look for.'),
  ('Can you shoot it as well?',
-  'Yes. If you want the shoot handled too, I direct and photograph it under YKS Productions and quote the production as one clear number. If you already have a photographer, you can find talent here without booking me.'),
+  'Yes. If you want the shoot handled too, I direct and photograph it under YKS Productions and quote the production as one clear number. If you already have a photographer, you can still find and book talent here through me without booking me to shoot.'),
  ('What about model releases and usage rights?',
-  'Agree them in writing before the shoot: territory, term, channels and any exclusivity, with a signed model release. When I&rsquo;m shooting, I handle that paperwork. If you work with the talent directly, I&rsquo;d still strongly recommend it.'),
+  'Agree them in writing before the shoot: territory, term, channels and any exclusivity, with a signed model release. I arrange the release and usage terms with the talent for every booking, so they&rsquo;re settled before anyone arrives on set.'),
 ]
 
 def strip(s):
@@ -159,7 +159,7 @@ page = f'''<!DOCTYPE html>
     <nav class="l-crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/talents.html">YKS Talents</a> / <span aria-current="page">Find models</span></nav>
     <p class="l-eyebrow">For brands, photographers &amp; productions</p>
     <h1>Find models for <em>your shoot</em></h1>
-    <p class="l-lede">Curated portfolios of women models aged 18–34, across India and the Middle East. Browse the platform yourself, or tell me what you&rsquo;re making and I&rsquo;ll point you to the faces that fit. Free to browse, free to brief.</p>
+    <p class="l-lede">Curated portfolios of women models aged 18–34, across India and the Middle East. Browse the platform yourself, or tell me what you&rsquo;re making and I&rsquo;ll point you to the faces that fit — and arrange everything with the talent for you. Free to browse, free to brief.</p>
     <div class="l-cta-row">
       <a class="btn btn-fill" href="#brief">Send a brief</a>
       <a class="btn btn-ghost" href="/talents.html#roster">Browse portfolios</a>
@@ -171,12 +171,12 @@ page = f'''<!DOCTYPE html>
   <div class="wrap">
     <div class="l-head">
       <h2>How finding a model <em>works here</em></h2>
-      <p>YKS Talents is a platform, not an agency. Clients come to it to find talent; talent are on it for free. Here is the whole process.</p>
+      <p>YKS Talents is a platform, not an agency. Clients come to it to find talent; talent are on it for free. Every enquiry and booking runs through me. Here is the whole process.</p>
     </div>
     <div class="l-steps">
       <div class="l-step"><div class="n">01</div><h3>Browse or brief</h3><p>Look through the portfolios yourself, or send a short brief: the look, the city, the dates and what the images are for.</p></div>
       <div class="l-step"><div class="n">02</div><h3>Profiles that fit</h3><p>I come back with suitable profiles from the platform, with the work behind each face. If nothing fits, I&rsquo;ll say so.</p></div>
-      <div class="l-step"><div class="n">03</div><h3>Agree the terms</h3><p>Once the talent has agreed, you deal with her directly or keep it running through the brief — fee, usage and release in writing.</p></div>
+      <div class="l-step"><div class="n">03</div><h3>Agree the terms</h3><p>I confirm availability with the talent and agree fee, usage and release in writing. All contact goes through me.</p></div>
       <div class="l-step"><div class="n">04</div><h3>The shoot</h3><p>Shoot with your own team, or have me direct and photograph it under YKS Productions as one production.</p></div>
     </div>
   </div>
@@ -193,7 +193,7 @@ page = f'''<!DOCTYPE html>
         <li><strong>Women aged 18 to 34</strong>, based in or regularly working in India or the Middle East. Everyone is over 18.</li>
         <li><strong>Free for talent, forever.</strong> No joining fee, no registration fee and no paid tiers, so the people on it are there because they&rsquo;re serious, not because they paid.</li>
         <li><strong>Not a jobs board.</strong> YKS Talents doesn&rsquo;t offer jobs to talent; it gives clients a considered place to find them.</li>
-        <li><strong>Privacy first.</strong> Names and contact details aren&rsquo;t published. The first contact comes through a brief, and details are shared once the talent agrees.</li>
+        <li><strong>Privacy first.</strong> Talent names and contact details are never published or shared. All contact between clients and talent goes through me.</li>
       </ul>
     </div>
   </div>
@@ -240,7 +240,7 @@ page = f'''<!DOCTYPE html>
     </div>
     <div class="l-prose">
       <p>You&rsquo;re not just paying for photographs; you&rsquo;re paying for permission to use someone&rsquo;s face for a defined purpose, in defined places, for a defined time. Put the term, territory, channels and any exclusivity in writing, with a signed model release, before anyone arrives on set. It&rsquo;s the step most shoots skip and regret when a campaign wants a renewal.</p>
-      <p>When I&rsquo;m shooting, I handle that paperwork as part of the production. If you work with the talent directly, I&rsquo;d still strongly recommend it — it protects both of you.</p>
+      <p>I arrange that paperwork with the talent for every booking, whether I&rsquo;m shooting or your own team is. It protects both sides.</p>
     </div>
   </div>
 </section>
