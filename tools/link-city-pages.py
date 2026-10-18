@@ -65,10 +65,11 @@ TARGETS = {
         '<footer class="l-foot">'),
     'talents/apply.html': (
         block('Where you are',
-              'Modelling work, <em>city by city</em>',
-              'What the work looks like where you live, what gets cast there, and what tends to '
-              'separate the people who stay booked. Applying is the same free form wherever you are.',
-              'Anywhere else in India counts too — <a href="/talents.html">see the roster →</a>'),
+              'YKS Talents, <em>city by city</em>',
+              'Your free portfolio works the same wherever you are. Open your city to see how '
+              'YKS Talents works there and what clients look for.',
+              'Anywhere else in India or the Middle East counts too — <a href="/talents.html">about YKS Talents →</a>',
+              links=talent_links),
         '<footer class="l-foot">'),
 }
 
