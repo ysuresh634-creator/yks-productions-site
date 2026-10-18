@@ -95,10 +95,14 @@ if have:
         ],
     })
 
-block = (MARK_A + '\n<script type="application/ld+json">\n'
-         + json.dumps({'@context': 'https://schema.org', '@graph': graph},
-                      indent=2, ensure_ascii=False)
-         + '\n</script>\n' + MARK_B)
+# The page's schema (WebPage, YKS Talents, FAQ) now lives in a hand-kept
+# PAGE-SCHEMA block on talents.html. The generated roster schema it replaced
+# described an India-wide "paid work" service, which the page no longer offers,
+# so this block is kept as an empty placeholder. Roster cards and profiles are
+# still built by tools/build-talents.py.
+graph = []
+block = (MARK_A + '\n<!-- intentionally empty: page schema lives in PAGE-SCHEMA above. '
+         'tools/build-talent-schema.py keeps this block empty. -->\n' + MARK_B)
 
 s = io.open(PAGE, encoding='utf-8').read()
 if MARK_A not in s or MARK_B not in s:
