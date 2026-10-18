@@ -1,0 +1,13 @@
+name = "yks-follow-check"
+main = "src/worker.js"
+compatibility_date = "2024-09-23"
+workers_dev = true
+
+# Secrets (set with `wrangler secret put`, never committed):
+#   IG_SESSIONID   — sessionid cookie of the logged-in @yks_photoworks web session (required)
+#   IG_DS_USER_ID  — ds_user_id cookie of that session (optional; saves one lookup)
+#   IG_CSRFTOKEN   — csrftoken cookie (optional)
+[vars]
+TARGET = "yks_photoworks"
+ALLOW_ORIGIN = "https://yksproductions.com"
+RATE_PER_MIN = "8"

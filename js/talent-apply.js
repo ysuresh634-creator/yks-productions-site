@@ -18,6 +18,21 @@
   // this cloud. Used only for the applicant's 1–3 photos, after a passed submit.
   var CLOUD = 'sn15r86h', PRESET = 'yks_talents';
   var BLOCKED = 'Sorry, this application can\u2019t be submitted right now.';
+  // live follower check (workers/follow-check). Unreachable / slow / unsure → null → the
+  // application still goes in, marked [REVIEW] "Follow check unavailable".
+  var FOLLOW_CHECK_URL = 'https://yks-follow-check.ysuresh634.workers.dev/check', FOLLOW_TIMEOUT = 5000;
+  function followCheck(handle) {
+    return new Promise(function (resolve) {
+      var settled = false, ctl = typeof AbortController === 'function' ? new AbortController() : null;
+      var t = setTimeout(function () { if (ctl) ctl.abort(); finish(null); }, FOLLOW_TIMEOUT);
+      function finish(v) { if (settled) return; settled = true; clearTimeout(t); resolve(v); }
+      try {
+        fetch(FOLLOW_CHECK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ handle: handle }), signal: ctl ? ctl.signal : undefined, credentials: 'omit' })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (j) { finish(j && typeof j.follows === 'boolean' ? j.follows : null); }, function () { finish(null); });
+      } catch (e) { finish(null); }
+    });
+  }
 
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var form = $('#talForm'); if (!form) return;
@@ -114,7 +129,7 @@
   function igHandle(raw) {
     raw = String(raw || '').trim();
     var m = /instagram\.com\/([A-Za-z0-9._]{1,30})/i.exec(raw) || /^@?([A-Za-z0-9._]{1,30})$/.exec(raw);
-    return m ? m[1].replace(/\.+$/, '') : '';
+    return m ? m[1].replace(/\.+$/, '').toLowerCase() : '';   // handles are case-insensitive: one shape everywhere
   }
   form.instagram.addEventListener('blur', function () { var h = igHandle(form.instagram.value); if (h) form.instagram.value = '@' + h; });
 
@@ -189,7 +204,23 @@
     };
     D.profile = 'https://instagram.com/' + D.handle;
     var secs = Math.round((Date.now() - T0) / 1000), FLAGS = reviewFlags(D, secs);
-    busy = true; sync(); submitBtn.textContent = 'Sending\u2026';
+    busy = true; sync(); submitBtn.textContent = 'Checking\u2026';
+    var refollow = $('#taRefollow'); if (refollow) refollow.hidden = true;
+    var followVerified = '';
+    say('Checking your follow\u2026');
+    followCheck(D.handle).then(function (f) {
+      if (f === false) {   // stop here: nothing uploaded or sent, everything typed stays put
+        busy = false; sync(); submitBtn.textContent = 'Submit application';
+        say('Please follow @yks_photoworks first, then tap Submit again.');
+        if (refollow) refollow.hidden = false;
+        if (statusEl.scrollIntoView) statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      if (f === true) followVerified = 'yes'; else FLAGS.push('Follow check unavailable');
+      submitBtn.textContent = 'Sending\u2026';
+      send();
+    });
+    function send() {
     var done = 0; say('Uploading your photos\u2026 0 / ' + photos.length);
     Promise.all(photos.map(function (f) { return upload(f).then(function (u) { done++; say('Uploading your photos\u2026 ' + done + ' / ' + photos.length); return u; }); }))
       .then(function (urls) {
@@ -200,7 +231,7 @@
           from_name: 'YKS Talents application',
           name: D.name, phone: D.phone, email: D.email, replyto: D.email,
           instagram_profile: D.profile, instagram_handle: '@' + D.handle,
-          followed_yks_photoworks: 'Tapped Follow @yks_photoworks before submitting (check ' + D.profile + ' in your followers)',
+          'Follow verified': followVerified || 'not checked (check ' + D.profile + ' in your followers)',
           city: D.city, category: D.category, date_of_birth: D.dob, height: D.height, gender: D.gender,
           intro: D.about || '(none)', photos: urls.filter(Boolean).join('\n'), found_via: source(),
           seconds_on_form: secs,
@@ -223,6 +254,7 @@
         busy = false; sync(); submitBtn.textContent = 'Submit application';
         say('Something went wrong sending that \u2014 please check your connection and try again.');
       });
+    }
   });
 
   /* ── 3 · last step (built only here) ── */
