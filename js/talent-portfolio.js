@@ -331,8 +331,9 @@
     deliver(doc, SAVE, cfg);
   }
 
-  window.YKSPortfolio = {
-    download: function (data) {
+  // build(data, onDoc): onDoc(doc) gets the finished jsPDF doc instead of a save (used to upload the
+  // applicant's book with the application); without it the PDF downloads as before.
+  function build(data, onDoc) {
       return Promise.all([
         load('/js/vendor/jspdf.umd.min.js', function () { return !!(window.jspdf && window.jspdf.jsPDF); }),
         load('/js/vendor/qrcode.min.js', function () { return !!window.qrcode; }),
@@ -344,8 +345,16 @@
         if (!imgs.length) throw new Error('photos');
         buildPortfolio(window.jspdf.jsPDF, imgs, data.name || 'YKS', {
           bg: hexRgb('#14111a'), text: hexRgb('#f4ede2'), sub: hexRgb('#b0a892'), accent: hexRgb('#d47a3a'),
-          font: window.YKS_FONTS ? 'Playfair' : 'helvetica', template: 'editorial', data: data
+          font: window.YKS_FONTS ? 'Playfair' : 'helvetica', template: 'editorial', data: data, onDoc: onDoc
         });
+      });
+  }
+  window.YKSPortfolio = {
+    download: function (data) { return build(data); },
+    blob: function (data) {
+      var out = null;
+      return build(data, function (doc) { out = doc.output('blob'); }).then(function () {
+        if (!out) throw new Error('pdf'); return out;
       });
     }
   };

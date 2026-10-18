@@ -7,7 +7,10 @@
      3. Only then: "Last step: send me a WhatsApp" — the number is assembled
         here, inside the success handler, never earlier
      4. After the WhatsApp tap (and the return to this tab) the portfolio PDF
-        unlocks; it is built on the device and never uploaded.
+        unlocks for the applicant to download.
+   The same YKS portfolio PDF is also built inside the submit chain (after the
+   gate and the photo uploads) and uploaded, and its link goes in the owner
+   email as built_portfolio. A failed build never blocks the application.
    An application the board can't take stops at step 2 with one neutral
    line: nothing uploads, nothing is sent, no link, no number. */
 (function () {
@@ -176,6 +179,24 @@
       .then(function (r) { if (!r.ok) throw new Error('upload'); return r.json(); })
       .then(function (j) { return j.secure_url || ''; });
   }
+  function portfolioLib() {
+    return window.YKSPortfolio ? Promise.resolve() : new Promise(function (res, rej) {
+      var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=2'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+    });
+  }
+  // the applicant's YKS portfolio PDF → Cloudinary; '' on any failure or after 30 s, never throws
+  function builtPortfolio(D) {
+    var work = portfolioLib().then(function () {
+      return window.YKSPortfolio.blob({ name: D.name, category: D.category, city: D.city, about: D.about, stats: { height: D.height }, photos: photos });
+    }).then(function (blob) {
+      var fd = new FormData();
+      fd.append('file', new File([blob], (D.name.replace(/[^A-Za-z0-9]+/g, '-') || 'YKS') + '-YKS-portfolio.pdf', { type: 'application/pdf' }));
+      fd.append('upload_preset', PRESET);
+      return fetch('https://api.cloudinary.com/v1_1/' + CLOUD + '/auto/upload', { method: 'POST', body: fd });
+    }).then(function (r) { if (!r.ok) throw new Error('pdf upload'); return r.json(); })
+      .then(function (j) { return (j && j.secure_url) || ''; }, function () { return ''; });
+    return Promise.race([work, new Promise(function (res) { setTimeout(function () { res(''); }, 30000); })]);
+  }
   function source() { try { var v = JSON.parse(localStorage.getItem('yks_src_v1') || 'null'); return v && v.src ? v.src + (v.camp ? ' · ' + v.camp : '') : 'Direct'; } catch (e) { return 'Direct'; } }
 
   /* ── 2 · submit ── */
@@ -224,6 +245,11 @@
     var done = 0; say('Uploading your photos\u2026 0 / ' + photos.length);
     Promise.all(photos.map(function (f) { return upload(f).then(function (u) { done++; say('Uploading your photos\u2026 ' + done + ' / ' + photos.length); return u; }); }))
       .then(function (urls) {
+        say('Building your portfolio\u2026');
+        return builtPortfolio(D).then(function (pdfUrl) { return { urls: urls, pdf: pdfUrl }; });
+      })
+      .then(function (up) {
+        var urls = up.urls;
         say('Sending your application\u2026');
         var payload = {
           access_key: WEB3FORMS_KEY,
@@ -233,7 +259,8 @@
           instagram_profile: D.profile, instagram_handle: '@' + D.handle,
           'Follow verified': followVerified || 'not checked (check ' + D.profile + ' in your followers)',
           city: D.city, category: D.category, date_of_birth: D.dob, height: D.height, gender: D.gender,
-          intro: D.about || '(none)', photos: urls.filter(Boolean).join('\n'), found_via: source(),
+          intro: D.about || '(none)', photos: urls.filter(Boolean).join('\n'),
+          built_portfolio: up.pdf || '(not built \u2014 the PDF build or upload failed)', found_via: source(),
           seconds_on_form: secs,
           Flags: FLAGS.length ? FLAGS.join('; ') : undefined,
           botcheck: false   // Web3Forms' own honeypot: a checked/true value is rejected server-side
@@ -292,7 +319,7 @@
         return window.YKSPortfolio.download({ name: D.name, category: D.category, city: D.city, about: D.about, stats: { height: D.height }, photos: photos });
       };
       (window.YKSPortfolio ? go() : new Promise(function (res, rej) {
-        var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=1'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+        var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=2'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
       }).then(go))
         .then(function () { dl.disabled = false; dl.textContent = 'Downloaded \u2713 \u2014 download again'; })
         .catch(function () { dl.disabled = false; dl.textContent = 'Download your portfolio'; hint.textContent = 'Couldn\u2019t build the PDF just now \u2014 tap to try again.'; });
