@@ -1,48 +1,11 @@
-/* Talents at YKS — apply form (runs on both the roster page and the standalone
-   /talents/apply page) + roster filters, counts and profile links.
+/* Talents at YKS — roster filters, counts and profile links.
    No talent contact/handle/link is ever rendered: every booking route goes to YKS. */
 (function () {
   'use strict';
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
 
-  /* ── apply form → Web3Forms — present on the roster page AND the standalone apply page ── */
-  var form = $('#talForm');
-  if (form) {
-    var KEY = 'fbf5d037-af64-46a1-8ddc-5777379ec179';
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (!form.gender || form.gender.value !== 'Woman') { alert('Sorry, this application can\u2019t be submitted right now.'); return; }
-      var v = function (n) { return (form[n] && form[n].value || '').trim(); }, miss = [];
-      if (v('name').length < 2) miss.push('full name'); if (v('contact').replace(/\D/g, '').length < 8) miss.push('phone / WhatsApp');
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email'))) miss.push('email'); if (v('city').length < 2) miss.push('city');
-      if (!v('category')) miss.push('category'); if (!/^@?[A-Za-z0-9._]{2,30}$/.test(v('socials').replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/\/.*$/, ''))) miss.push('Instagram handle');
-      if (v('about').length < 60) miss.push('a short intro (60+ characters)');
-      if (miss.length) { alert('Please add: ' + miss.join(', ') + '.'); return; }
-      var file = form.querySelector('input[type="file"]');
-      if (file && file.files[0] && file.files[0].size > 5 * 1024 * 1024) {
-        alert('That file is over 5 MB. Please submit without it and WhatsApp the portfolio to YKS instead.');
-        return;
-      }
-      var sbtn = form.querySelector('button[type="submit"]');
-      var orig = sbtn.textContent; sbtn.textContent = 'Sending…'; sbtn.disabled = true;
-      var fd = new FormData(form);
-      fd.append('access_key', KEY);
-      fd.append('subject', form.dataset.subject || 'New talent application — YKS Talents');
-      fd.append('from_name', 'YKS Talents application');
-      fd.append('follow_code', 'YKS-' + (Date.now().toString(36).slice(-3) + Math.random().toString(36).slice(2, 5)).toUpperCase());
-      fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd })
-        .then(function (r) { return r.json(); })
-        .then(function (j) {
-          if (j.success) {
-            form.style.display = 'none';
-            var ok = $('#talOk'); if (ok) ok.style.display = 'block';
-            if (window.gtag) gtag('event', 'talent_apply');
-          } else { sbtn.textContent = orig; sbtn.disabled = false; alert('Something went wrong — please try again or WhatsApp your details.'); }
-        })
-        .catch(function () { sbtn.textContent = orig; sbtn.disabled = false; alert('Network error — please try again or WhatsApp your details.'); });
-    });
-  }
+  /* Applications are taken ONLY by /talents/apply.html (talent-apply.js). */
 
   /* ── roster: everything below runs only on the page that has the grid ── */
   var grid = $('#talGrid');
