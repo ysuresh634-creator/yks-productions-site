@@ -26,7 +26,7 @@ to be wrong, both noted below.
 
 | Target | State | Whose move |
 |---|---|---|
-| **Behance — ysuresh634f0a1** | ✅ **Already correct.** Real name, headline "Photographer & Videographer — Real Estate, Brand & Film", Reportage Properties, Dubai, website → `yksproductions.com`. This is a live citation and it is doing its job. | done |
+| **Behance — ysuresh634f0a1** | ✅ **Already correct.** Real name, headline "Photographer & Videographer — Real Estate, Brand & Film", Dubai, website → `yksproductions.com`. This is a live citation and it is doing its job. | done |
 | **Behance — yedusuresha14c** | ❌ Still points at `linktr.ee/yksproductions`. Signed-in session is the *other* account, so this needs its own login. | **his** |
 | **Vimeo** | ❌ Not signed in on this machine. Name, bio and website all still to set. | **his** |
 | **Instagram name field** | ❌ Still open from Aug 5. Biggest asset, and his name is nowhere on it. | **his** |
@@ -68,7 +68,7 @@ scattered descriptions into one person.
 A credit line on a client's own site outranks every directory on this
 page, because it is a third party stating a fact about work he did.
 
-Real, nameable clients: **Reportage Properties**, **Storeys Real Estate**.
+Real, nameable clients: **Storeys Real Estate**.
 
 Ask for one line on the project or about page, worded plainly:
 
