@@ -52,7 +52,16 @@
       "serviceType": "Fashion Photography",
       "name": "Fashion Photographer in Bangalore",
       "provider": { "@type": "LocalBusiness", "@id": "https://yksproductions.com/#business", "name": "YKS Productions", "url": "https://yksproductions.com/" },
-      "areaServed": { "@type": "City", "name": "Bangalore", "containedInPlace": { "@type": "Country", "name": "India" } },
+      "areaServed": [
+        { "@type": "City", "name": "Bangalore", "alternateName": "Bengaluru", "containedInPlace": { "@type": "State", "name": "Karnataka", "containedInPlace": { "@type": "Country", "name": "India" } } },
+        { "@type": "Country", "name": "India" }
+      ],
+      "audience": { "@type": "BusinessAudience", "name": "Fashion labels, D2C brands, designers and boutiques" },
+      "hasOfferCatalog": { "@type": "OfferCatalog", "name": "Fashion photography in Bangalore", "itemListElement": [
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Catalogue and e-commerce fashion photography" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Campaign and lookbook photography" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Fashion content days: stills and reels" } }
+      ] },
       "description": "Editorial, lookbook, actor and model portfolio fashion photography in Bangalore by Yedukrishna Suresh — cinematic stills with a film-set sensibility.",
       "url": "https://yksproductions.com/fashion-photographer-bangalore.html"
     },
@@ -303,6 +312,7 @@
     <a class="l-home" href="/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.2 12 3l9 7.2V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
     <span class="l-cats-div" aria-hidden="true"></span>
     <a href="/talents.html">Talents</a>
+    <a href="/find-models.html">For brands</a>
     <a href="/dubai/">Dubai &amp; UAE</a>
     <a href="/india/">India</a>
     <span class="l-cats-div" aria-hidden="true"></span>
@@ -565,10 +575,37 @@
   </div>
 </section>
 
+<!-- FOR BRANDS -->
+<section class="l-section alt" id="for-brands">
+  <div class="wrap">
+    <div class="l-head"><p class="l-eyebrow">For brands</p>
+      <h2>Fashion shoots for <em>Bangalore labels</em></h2>
+      <p>If you run a label, a D2C brand or a boutique and need a fashion photographer in Bangalore who thinks about sell-through as much as style, this is the part for you.</p>
+    </div>
+    <div class="l-prose">
+      <p>I am one person, not a production house, which means the photographer you brief is the photographer on set and the one who signs off the edit. Eight years in, the brand work has included <a href="/marriott.html">Marriott</a> and Vaseline (Unilever), and a <a href="https://www.instagram.com/reel/DYYl0i7zet7/" target="_blank" rel="noopener">3.3M-view campaign reel</a>.</p>
+      <p>For a label that usually means one of three briefs: a <strong>catalogue day</strong> for the website and marketplaces, a <strong>campaign or lookbook</strong> for a launch, or a <strong>content day</strong> that delivers stills and vertical reels together. Tell me which one you have, how many pieces, and when it needs to go live, and I will come back with a plan and one all-in figure.</p>
+      <p>Need faces as well as a photographer? I can cast for you from the <a href="/models-in-bangalore.html">models available in Bangalore</a>, or you can send a <a href="/find-models.html">casting brief for your shoot</a>. Either way, everything runs through me, so you are dealing with one person from brief to delivery.</p>
+    </div>
+    <div class="l-cta-row" style="margin-top:1.4em">
+      <a class="btn btn-fill" href="/quote.html">Get a quote for a fashion shoot</a>
+      <a class="btn btn-ghost" href="#enquire">Send the brief below</a>
+    </div>
+    <div class="l-places" style="margin-top:1.6em">
+      <a href="/photographer-bangalore.html"><b>Photographer in Bangalore</b><small>Product, food, events and brand work</small></a>
+      <a href="/videographer-bangalore.html"><b>Videographer in Bangalore</b><small>Brand films and reels</small></a>
+      <a href="/content-creator-bangalore.html"><b>Content creator in Bangalore</b><small>Stills and reels in one day</small></a>
+      <a href="/portrait-photographer-bangalore.html"><b>Portrait photographer in Bangalore</b><small>Founders, actors and models</small></a>
+      <a href="/fashion.html"><b>Fashion portfolio</b><small>Editorial and campaign work</small></a>
+      <a href="/fashion-photographer-dubai.html"><b>Fashion photographer in Dubai</b><small>For brands shooting in the UAE</small></a>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <!-- CTA -->
-<section class="l-cta">
+<section class="l-cta" id="enquire">
   <div class="wrap">
     <h2>Let's make something <em>that gets noticed</em></h2>
     <p>Designer, brand, actor or model — if you want Bangalore fashion images with a cinematic edge, tell me the brief and I'll take it from there.</p>

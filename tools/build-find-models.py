@@ -266,7 +266,7 @@ page = f'''<!DOCTYPE html>
       <li><span><b>Straight answers.</b> If nothing fits, I&rsquo;ll tell you.</span></li>
     </ul>
     <div class="l-form-wrap">
-      <p class="l-form-apply" style="margin:0 0 1.2em"><a class="btn" href="/talents/apply.html">Talent? Create your free portfolio here →</a> <span style="opacity:.75;font-size:.9em">This form is for brands and productions looking for models.</span></p>
+      <p class="l-form-apply" style="margin:0 0 1.2em"><a class="btn" href="/talents/apply.html">Looking to be cast? Create your free portfolio here →</a> <span style="opacity:.75;font-size:.9em">This form is for brands and productions looking for models.</span></p>
       <form class="l-form" data-source="Casting India" data-subject="New casting brief — India" data-minmsg="20">
         <div class="row2">
           <input type="text" name="name" placeholder="Your name" required />
@@ -283,7 +283,10 @@ page = f'''<!DOCTYPE html>
             <option>Other</option>
           </select>
         </div>
-        <input type="email" name="email" placeholder="Email (optional)" />
+        <div class="row2">
+          <input type="text" name="brand_link" placeholder="Brand / company website or Instagram" aria-label="Brand / company website or Instagram" autocomplete="url" required minlength="3" />
+          <input type="email" name="email" placeholder="Email (optional)" />
+        </div>
         <textarea name="message" required minlength="20" placeholder="The look you need, the city, the dates, and what it's for…"></textarea>
         <button type="submit" class="btn btn-fill">Send the brief →</button>
       </form>
@@ -310,12 +313,12 @@ page = f'''<!DOCTYPE html>
     </div>
     <p class="l-related">Female models by city: {city_inline}</p>
     <p class="l-related">
-      Shooting in a particular city? <a href="/photographer-mumbai.html">Mumbai</a> · <a href="/photographer-delhi.html">Delhi NCR</a> · <a href="/photographer-hyderabad.html">Hyderabad</a> · <a href="/photographer-chennai.html">Chennai</a> · <a href="/photographer-goa.html">Goa</a> · <a href="/fashion-photographer-bangalore.html">Fashion · Bangalore</a>
+      Shooting in a particular city? <a href="/photographer-mumbai.html">Mumbai</a> · <a href="/photographer-delhi.html">Delhi NCR</a> · <a href="/photographer-hyderabad.html">Hyderabad</a> · <a href="/photographer-chennai.html">Chennai</a> · <a href="/photographer-goa.html">Goa</a> · <a href="/fashion-photographer-bangalore.html">Fashion photographer in Bangalore</a>
     </p>
   </div>
 </footer>
 
-<script src="/js/landing.js?v=21"></script>
+<script src="/js/landing.js?v=22"></script>
 <script src="/js/search.js?v=12" defer></script>
 <script src="/js/source.js?v=1"></script>
 <script src="/js/preferred-source.js?v=1" defer></script>

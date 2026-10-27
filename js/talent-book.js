@@ -44,7 +44,7 @@
       ['India only', 'India + Gulf', 'Worldwide', 'Not sure yet'] }
   ];
 
-  var state = { from: '', to: '', channels: [], term: '', territory: '', brief: '', name: '', contact: '' };
+  var state = { from: '', to: '', channels: [], term: '', territory: '', brief: '', name: '', contact: '', brand: '' };
 
   /* ── markup ─────────────────────────────────────────────────── */
   var sec = document.createElement('section');
@@ -56,6 +56,7 @@
         '<p class="tal-kicker">Book this face</p>' +
         '<h2>Three questions. <em>One number back.</em></h2>' +
         '<p>Tell me when, what the pictures are for, and who you are. I&rsquo;ll check she&rsquo;s free and come back with one all-in number covering the talent and the shoot. Nothing&rsquo;s charged here, and you&rsquo;re not committed to anything until you say so.</p>' +
+        '<p class="bk-cast" style="margin:.8em 0 0;font-size:.92em;opacity:.85">Looking to be cast? <a href="/talents/apply.html">Create your free portfolio here</a>. This desk is for brands booking talent.</p>' +
       '</div>' +
       '<div class="bk-grid">' +
         '<div class="bk-form">' +
@@ -84,6 +85,7 @@
             '<div class="bk-who">' +
               '<label>Your name<input type="text" class="bk-name" autocomplete="name" /></label>' +
               '<label>Phone or email<input type="text" class="bk-contact" autocomplete="email" /></label>' +
+              '<label>Brand / company website or Instagram<input type="text" class="bk-brand" autocomplete="url" placeholder="yourbrand.com or @yourbrand" required /></label>' +
             '</div>' +
           '</div>' +
 
@@ -169,7 +171,7 @@
     set('.bk-r-territory', state.territory);
 
     var done = [!!state.from, !!state.channels.length, !!(state.term && state.territory),
-                !!(state.name && state.contact)].filter(Boolean).length;
+                !!(state.name && state.contact && brandOk())].filter(Boolean).length;
     $('.bk-meter-fill').style.width = Math.max(6, (done / 4) * 100) + '%';
     $('.bk-meter-fill').className = 'bk-meter-fill' + (done >= 3 ? ' is-good' : done >= 2 ? ' is-mid' : '');
 
@@ -180,15 +182,18 @@
                'Ready. Send it and you\u2019ll hear from me today.'][done];
     $('.bk-meter-say').textContent = say;
 
-    var ready = state.from && state.name && state.contact;
+    var ready = state.from && state.name && state.contact && brandOk();
     $('.bk-send').disabled = !ready;
   }
+  /* A brief needs a brand behind it: a website or an Instagram handle. */
+  function brandOk() { var b = state.brand || ''; return b.replace(/[^A-Za-z0-9]/g, '').length >= 3 && (/\./.test(b) || /^@/.test(b) || /instagram/i.test(b)); }
   function summary() {
     var L = ['Hi Yedukrishna, I\'d like to book ' + CODE + '.'];
     if (dateLabel()) L.push('Dates: ' + dateLabel() + '.');
     if (state.channels.length) L.push('Running on: ' + state.channels.join(', ') + '.');
     if (state.term) L.push('For: ' + state.term + '.');
     if (state.territory) L.push('Territory: ' + state.territory + '.');
+    if (state.brand) L.push('Brand: ' + state.brand + '.');
     if (state.brief) L.push('The shoot: ' + state.brief);
     return L.join(' ');
   }
@@ -196,7 +201,7 @@
   ['from', 'to'].forEach(function (k) {
     $('.bk-' + k).addEventListener('change', function (e) { state[k] = e.target.value; paint(); });
   });
-  ['name', 'contact'].forEach(function (k) {
+  ['name', 'contact', 'brand'].forEach(function (k) {
     $('.bk-' + k).addEventListener('input', function (e) { state[k] = e.target.value.trim(); paint(); });
   });
 
@@ -269,7 +274,7 @@
     fetch(ENGINE + '/bookings/new', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        client_name: state.name, client_contact: state.contact,
+        client_name: state.name, client_contact: state.contact, client_brand: state.brand,
         brief: summary(), city: '', shoot_dates: dateLabel(), budget: '',
         talent_code: CODE
       })

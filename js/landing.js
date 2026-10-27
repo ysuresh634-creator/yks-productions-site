@@ -43,6 +43,9 @@
          project type: no company name, no brief. */
       var coEl = form.querySelector('[name="company"]'), ptEl = form.querySelector('[name="project_type"]');
       if (coEl && get('company').replace(/[^A-Za-z0-9]/g, '').length < 2) { coEl.setCustomValidity('Add your company or brand name.'); coEl.reportValidity(); coEl.addEventListener('input', function () { coEl.setCustomValidity(''); }, { once: true }); return; }
+      /* …and something to check them by: a website or an Instagram handle. */
+      var blEl = form.querySelector('[name="brand_link"]'), bl = get('brand_link');
+      if (blEl && (bl.replace(/[^A-Za-z0-9]/g, '').length < 3 || !(/\./.test(bl) || /^@/.test(bl) || /instagram/i.test(bl)))) { blEl.setCustomValidity('Add your brand website (yourbrand.com) or Instagram (@yourbrand).'); blEl.reportValidity(); blEl.addEventListener('input', function () { blEl.setCustomValidity(''); }, { once: true }); return; }
       if (ptEl && !get('project_type')) { ptEl.setCustomValidity('Choose the project type.'); ptEl.reportValidity(); ptEl.addEventListener('change', function () { ptEl.setCustomValidity(''); }, { once: true }); return; }
       var minMsg = +(form.dataset.minmsg || 0), mEl = form.querySelector('[name="message"]');
       if (minMsg && get('message').length < minMsg) { if (mEl) { mEl.setCustomValidity('Tell me a little more — at least ' + minMsg + ' characters.'); mEl.reportValidity(); mEl.addEventListener('input', function () { mEl.setCustomValidity(''); }, { once: true }); } return; }
@@ -63,6 +66,7 @@
           Contact: get('contact'),
           Email: get('email') || '—',
           Company: coEl ? get('company') : undefined,
+          "Brand website / Instagram": blEl ? bl : undefined,
           "Project type": ptEl ? get('project_type') : undefined,
           Message: get('message') || '—'
         })
