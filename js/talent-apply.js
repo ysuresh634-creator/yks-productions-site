@@ -3,23 +3,26 @@
    Order is strict and every step lives in ONE handler chain:
      1. Follow @yks_photoworks (tap) → submit unlocks
      2. Submit → every field validated → board gate (the select's own value)
-        → photos upload → email + engine
+        → photos + PDF → Apps Script (Drive + owner email) → engine
      3. Only then: "Last step: send me a WhatsApp" — the number is assembled
         here, inside the success handler, never earlier
      4. After the WhatsApp tap (and the return to this tab) the portfolio PDF
         unlocks for the applicant to download.
    The same YKS portfolio PDF is also built inside the submit chain (after the
-   gate and the photo uploads) and uploaded, and its link goes in the owner
-   email as built_portfolio. A failed build never blocks the application.
+   gate) and sent with the photos in ONE post to the YKS Apps Script web app,
+   which saves everything to Google Drive, emails the owner and answers with
+   the Drive link of the PDF — that link goes in the WhatsApp message.
+   A failed PDF build never blocks the application.
    An application the board can't take stops at step 2 with one neutral
    line: nothing uploads, nothing is sent, no link, no number. */
 (function () {
   'use strict';
-  var WEB3FORMS_KEY = 'fbf5d037-af64-46a1-8ddc-5777379ec179';
+  // YKS Talents intake (Google Apps Script web app on the owner's Google account).
+  // It re-checks every rule server-side, saves to Drive and emails the owner.
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/REPLACE_WITH_DEPLOYMENT_ID/exec';
+  var SEND_TIMEOUT = 150000;   // 8 photos + the PDF can take a minute on a slow phone
   var ENGINE_URL = 'https://yks-talents-engine.ysuresh634.workers.dev';
-  // Cloudinary UNSIGNED preset: anyone holding these two values can upload to
-  // this cloud. Used only for the applicant's photos (5–8), after a passed submit.
-  var CLOUD = 'sn15r86h', PRESET = 'yks_talents';
+  var MAX_EDGE = 2000, JPEG_Q = 0.85, MAX_RAW = 12 * 1024 * 1024;   // photo prep before sending
   var BLOCKED = 'Sorry, this application can\u2019t be submitted right now.';
   // live follower check (workers/follow-check). Unreachable / slow / unsure → null → the
   // application still goes in, marked [REVIEW] "Follow check unavailable".
@@ -109,6 +112,7 @@
       pending--; sync();
       var e = { file: f, sha: r[0], w: r[1].w, h: r[1].h, d: r[1].d };
       if (dims && e.w) dims.set(f, [e.w, e.h]);
+      if (!e.w && f.size > MAX_RAW) return { ok: false, msg: 'This photo is too large to send (' + Math.round(f.size / 1048576) + ' MB). Pick a JPG version of it, or a smaller copy.' };
       if (e.w && Math.min(e.w, e.h) < MIN_SIDE) return { ok: false, msg: 'This photo is too small (' + e.w + '\u00d7' + e.h + '). Use the original from your camera roll, at least ' + MIN_SIDE + ' px on the short side.' };
       var d = dupOf(e);
       if (d) return { ok: false, msg: 'That\u2019s the same photo as ' + (d.cap ? '\u201c' + d.cap + '\u201d' : 'one you already added') + '. Each slot needs a different photo.' };
@@ -270,29 +274,59 @@
     return g.tagName === 'SELECT' && opts.length === 1 && opts[0].value === 'Woman' && g.value === 'Woman' && g.selectedIndex > 0;
   }
 
-  function upload(file) {
-    var fd = new FormData(); fd.append('file', file); fd.append('upload_preset', PRESET);
-    return fetch('https://api.cloudinary.com/v1_1/' + CLOUD + '/image/upload', { method: 'POST', body: fd })
-      .then(function (r) { if (!r.ok) throw new Error('upload'); return r.json(); })
-      .then(function (j) { return j.secure_url || ''; });
+  // one photo → {mime, data(base64)}: re-encoded as JPEG, max 2000 px on the long side
+  // (keeps the post small and strips location data); a format this browser can't decode
+  // (often HEIC) goes as-is if it's under 12 MB
+  function b64(blob) {
+    return new Promise(function (res, rej) {
+      var r = new FileReader(); r.onload = function () { res(String(r.result).replace(/^data:[^,]*,/, '')); }; r.onerror = rej; r.readAsDataURL(blob);
+    });
+  }
+  function rawMime(f) {
+    if (f.type) return f.type.toLowerCase();
+    var m = /\.([a-z0-9]+)$/i.exec(f.name || ''), x = m ? m[1].toLowerCase() : '';
+    return { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif', avif: 'image/avif' }[x] || 'image/jpeg';
+  }
+  function prep(f) {
+    return new Promise(function (res) {
+      var u = URL.createObjectURL(f), im = new Image();
+      im.onload = function () {
+        var w = im.naturalWidth, h = im.naturalHeight, k = Math.min(1, MAX_EDGE / Math.max(w, h));
+        try {
+          var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+          var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(u);
+          c.toBlob(function (bl) { res(bl ? { blob: bl, mime: 'image/jpeg', ext: 'jpg' } : null); }, 'image/jpeg', JPEG_Q);
+        } catch (e) { URL.revokeObjectURL(u); res(null); }
+      };
+      im.onerror = function () { URL.revokeObjectURL(u); res(null); };
+      im.src = u;
+    }).then(function (r) {
+      if (r) return r;
+      if (f.size > MAX_RAW) throw new Error('raw too large');
+      var m = rawMime(f); return { blob: f, mime: m, ext: (f.name.split('.').pop() || 'jpg').toLowerCase() };
+    }).then(function (r) { return b64(r.blob).then(function (d) { return { mime: r.mime, ext: r.ext, data: d }; }); });
+  }
+  // POST as text/plain: Apps Script can't answer a CORS preflight, and a simple request needs none.
+  // fetch follows the 302 to script.googleusercontent.com and reads the JSON.
+  function postIntake(body) {
+    var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    var t = setTimeout(function () { if (ctl) ctl.abort(); }, SEND_TIMEOUT);
+    return fetch(APPS_SCRIPT_URL, { method: 'POST', redirect: 'follow', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body, signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('http ' + r.status); return r.json(); }, function (e) { clearTimeout(t); throw e; });
   }
   function portfolioLib() {
     return window.YKSPortfolio ? Promise.resolve() : new Promise(function (res, rej) {
       var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=4'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
     });
   }
-  // the applicant's YKS portfolio PDF → Cloudinary; '' on any failure or after 30 s, never throws
+  // the applicant's YKS portfolio PDF as base64; null on any failure or after 30 s, never throws
   function builtPortfolio(D) {
     var work = portfolioLib().then(function () {
       return window.YKSPortfolio.blob({ name: D.name, category: D.category, city: D.city, about: D.about, stats: { height: D.height }, photos: pdfOrder() });
-    }).then(function (blob) {
-      var fd = new FormData();
-      fd.append('file', new File([blob], (D.name.replace(/[^A-Za-z0-9]+/g, '-') || 'YKS') + '-YKS-portfolio.pdf', { type: 'application/pdf' }));
-      fd.append('upload_preset', PRESET);
-      return fetch('https://api.cloudinary.com/v1_1/' + CLOUD + '/auto/upload', { method: 'POST', body: fd });
-    }).then(function (r) { if (!r.ok) throw new Error('pdf upload'); return r.json(); })
-      .then(function (j) { return (j && j.secure_url) || ''; }, function () { return ''; });
-    return Promise.race([work, new Promise(function (res) { setTimeout(function () { res(''); }, 30000); })]);
+    }).then(function (blob) { return b64(blob); })
+      .then(function (d) { return { name: (D.name.replace(/[^A-Za-z0-9]+/g, '-') || 'YKS') + '-YKS-portfolio.pdf', mime: 'application/pdf', data: d }; }, function () { return null; });
+    return Promise.race([work, new Promise(function (res) { setTimeout(function () { res(null); }, 30000); })]);
   }
   function source() { try { var v = JSON.parse(localStorage.getItem('yks_src_v1') || 'null'); return v && v.src ? v.src + (v.camp ? ' · ' + v.camp : '') : 'Direct'; } catch (e) { return 'Direct'; } }
 
@@ -340,45 +374,62 @@
       send();
     });
     function send() {
-    var CAPS = entries().map(function (e) { return e.cap; }), KEYS = SLOTS.map(function (x) { return x.k; });
-    var done = 0; say('Uploading your photos\u2026 0 / ' + photos.length);
-    Promise.all(photos.map(function (f) { return upload(f).then(function (u) { done++; say('Uploading your photos\u2026 ' + done + ' / ' + photos.length); return u; }); }))
-      .then(function (urls) {
-        say('Preparing your portfolio link\u2026');
-        return builtPortfolio(D).then(function (pdfUrl) { return { urls: urls, pdf: pdfUrl }; });
+    var list = entries(), KEYS = SLOTS.map(function (x) { return x.k; }), done = 0;
+    say('Preparing your photos\u2026 0 / ' + list.length);
+    Promise.all(list.map(function (en, i) {
+      return prep(en.file).then(function (r) {
+        done++; say('Preparing your photos\u2026 ' + done + ' / ' + list.length);
+        var key = KEYS.filter(function (k) { return slotState[k] === en; })[0] || 'extra';
+        return { slot: key, label: en.cap, name: ('0' + (i + 1)).slice(-2) + '-' + en.cap.replace(/[^A-Za-z0-9]+/g, '-') + '.' + r.ext, mime: r.mime, data: r.data };
+      });
+    }))
+      .then(function (ph) {
+        say('Preparing your portfolio\u2026');
+        return builtPortfolio(D).then(function (pdf) { return { photos: ph, pdf: pdf }; });
       })
       .then(function (up) {
-        var urls = up.urls;
-        say('Sending your application\u2026');
-        var payload = {
-          access_key: WEB3FORMS_KEY,
-          subject: (FLAGS.length ? '[REVIEW] ' : '[TALENT] ') + D.name + ' \u00b7 ' + D.city + ' \u00b7 ' + D.category + ' \u00b7 @' + D.handle,
-          from_name: 'YKS Talents application',
-          name: D.name, phone: D.phone, email: D.email, replyto: D.email,
-          instagram_profile: D.profile, instagram_handle: '@' + D.handle,
-          'Follow verified': followVerified || 'not checked (check ' + D.profile + ' in your followers)',
-          city: D.city, category: D.category, date_of_birth: D.dob, height: D.height, gender: D.gender,
-          intro: D.about || '(none)', photos: urls.map(function (u, i) { return u ? (CAPS[i] || 'Extra') + ': ' + u : ''; }).filter(Boolean).join('\n'),
-          built_portfolio: up.pdf || '(not built \u2014 the PDF build or upload failed)', found_via: source(),
-          seconds_on_form: secs,
-          Flags: FLAGS.length ? FLAGS.join('; ') : undefined,
-          botcheck: false   // Web3Forms' own honeypot: a checked/true value is rejected server-side
-        };
+        say('Sending your application\u2026 this can take up to a minute, keep this page open.');
+        var hp = form.querySelector('[name=website]');
+        var body = JSON.stringify({
+          fields: {
+            name: D.name, phone: D.phone, email: D.email, city: D.city, instagram: D.handle, category: D.category,
+            dob: D.dob, height: D.height, gender: D.gender, about: D.about,
+            follow_verified: followVerified || '', flags: FLAGS.join('; '), source: source(), seconds_on_form: secs,
+            website: hp ? hp.value : '', botcheck: ''
+          },
+          photos: up.photos, pdf: up.pdf
+        });
+        var tries = 0;
+        function attempt() {
+          tries++;
+          return postIntake(body).then(null, function (er) {   // one quiet retry for a dropped connection; the script de-duplicates
+            if (tries < 2) { say('Still sending\u2026'); return attempt(); }
+            throw er;
+          });
+        }
+        return attempt();
+      })
+      .then(function (j) {
+        if (!j || !j.ok) {
+          if (j && j.error === 'blocked') { busy = false; sync(); submitBtn.textContent = 'Submit application'; say(BLOCKED); return; }
+          var e = new Error('rejected'); e.msg = j && j.message; throw e;
+        }
+        var direct = (j.photos || []).map(function (p) { return { url: p.url, cat: p.slot || 'extra' }; }).filter(function (p) { return p.url; });
         try {
           fetch(ENGINE_URL + '/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
             name: D.name, contact: D.phone, email: D.email, category: D.category, city: D.city, socials: '@' + D.handle,
             instagram_profile: D.profile, about: D.about, stat_height: D.height, dob: D.dob, gender: D.gender,
-            photos: urls.map(function (u, i) { return { url: u, cat: (KEYS[i] || 'extra') }; }).filter(function (p) { return p.url; }), cover_url: urls[0] || ''
+            photos: direct, cover_url: direct[0] ? direct[0].url : ''
           }) }).catch(function () {});
         } catch (er) {}
-        return fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) })
-          .then(function (r) { return r.json(); })
-          .then(function (j) { if (!j || !j.success) throw new Error('send'); return up.pdf || ''; });
+        if (window.gtag) gtag('event', 'talent_apply');
+        success(D, Promise.resolve(j.pdfUrl || ''));
       })
-      .then(function (pdfUrl) { if (window.gtag) gtag('event', 'talent_apply'); success(D, Promise.resolve(pdfUrl)); })
-      .catch(function () {
+      .catch(function (er) {
         busy = false; sync(); submitBtn.textContent = 'Submit application';
-        say('Something went wrong sending that \u2014 please check your connection and try again.');
+        say(er && er.msg ? 'That didn\u2019t go through: ' + er.msg
+          : 'Your application didn\u2019t send \u2014 nothing was lost, everything you added is still here. Check your connection and tap Submit again.');
+        if (statusEl.scrollIntoView) statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     }
   });
@@ -389,7 +440,7 @@
     var IN = ['91', '97466', '79720'], AE = ['971', '50195', '5122'];   // same rule as geo-wa.js / chat.js
     return (/Kolkata|Calcutta|Colombo|Kathmandu|Dhaka/i.test(tz) ? IN : AE).join('');
   }
-  // pdfReady resolves with the Cloudinary portfolio link ('' if the build/upload failed);
+  // pdfReady resolves with the Drive portfolio link ('' if the build/upload failed);
   // the WhatsApp button stays in its waiting state until it settles
   function success(D, pdfReady) {
     form.hidden = true; say('');
