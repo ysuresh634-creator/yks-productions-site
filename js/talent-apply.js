@@ -19,7 +19,7 @@
   'use strict';
   // YKS Talents intake (Google Apps Script web app on the owner's Google account).
   // It re-checks every rule server-side, saves to Drive and emails the owner.
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/REPLACE_WITH_DEPLOYMENT_ID/exec';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_36FeQLa2AsN-GzlYZWhT-VgqQ9UabIogrysT_5eHl-tZWbpNAkZhg26S3E2l3QRp/exec';
   var SEND_TIMEOUT = 150000;   // 8 photos + the PDF can take a minute on a slow phone
   var ENGINE_URL = 'https://yks-talents-engine.ysuresh634.workers.dev';
   var MAX_EDGE = 2000, JPEG_Q = 0.85, MAX_RAW = 12 * 1024 * 1024;   // photo prep before sending
