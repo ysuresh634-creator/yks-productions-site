@@ -240,7 +240,7 @@
         doc.setFont(HF, 'bold'); doc.setFontSize(9); ct(INK); doc.text(r[1], x + colW, y, { align: 'right' });
       });
       htk('REPRESENTED BY YKS PRODUCTIONS', M, H - 84, 8, INKSUB, { ls: 1.4 });
-      hlogoBox(W - M - 72, H - 106, 72, INK);
+      hlogoBox(W - M - 72, H - 114, 72, INK);
       hPaperFoot();
     }
     /* contact sheet — shows range at a glance */
@@ -274,7 +274,7 @@
       shade(H - 74, 74, 0.42);
       hPlateFoot(cap || 'DIPTYCH');
     }
-    function hsClosing(firstName) { hnp(HFA); var onA = hlum(HFA) > 0.62 ? INK : [255, 255, 255], onAsub = hlum(HFA) > 0.62 ? [80, 70, 60] : [255, 255, 255]; htk('BOOKING', M, 60, 8, onA, { bold: true, ls: 1.6 }); htk(NM_SHORT + '  /  ' + ('0' + hsPg).slice(-2), W - M, 60, 8, onA, { bold: true, align: 'right', ls: 1.6 }); hhair(M, 72, W - M, onA, 1.1); var cs2 = hFit(firstName, HF, 'bold', 58, 18, CW); doc.setFont(HF, 'bold'); doc.setFontSize(cs2); ct(onA); doc.text('BOOK', M, 400); doc.text(firstName, M, 400 + cs2 * 1.08); htk('PHONE', M, 512, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('+91 97466 79720', M + 110, 512); htk('EMAIL', M, 540, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('yksproductions893@gmail.com', M + 110, 540, { charSpace: 0 }); hhair(M, H - 96, W - M, onA, 1.1); doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(onA); doc.text(doc.splitTextToSize('Represented exclusively by YKS Productions. Rates, availability and full-resolution files on request.', 320), M, H - 76, { lineHeightFactor: 1.4 }); hlogoBox(W - M - 100, H - 108, 100, onA); }
+    function hsClosing(firstName) { hnp(HFA); var onA = hlum(HFA) > 0.62 ? INK : [255, 255, 255], onAsub = hlum(HFA) > 0.62 ? [80, 70, 60] : [255, 255, 255]; htk('BOOKING', M, 60, 8, onA, { bold: true, ls: 1.6 }); htk(NM_SHORT + '  /  ' + ('0' + hsPg).slice(-2), W - M, 60, 8, onA, { bold: true, align: 'right', ls: 1.6 }); hhair(M, 72, W - M, onA, 1.1); var cs2 = hFit(firstName, HF, 'bold', 58, 18, CW); doc.setFont(HF, 'bold'); doc.setFontSize(cs2); ct(onA); doc.text('BOOK', M, 400); doc.text(firstName, M, 400 + cs2 * 1.08); htk('PHONE', M, 512, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('+91 97466 79720', M + 110, 512); htk('EMAIL', M, 540, 8.5, onAsub, { ls: 1.6 }); doc.setFont(HF, 'bold'); doc.setFontSize(13); ct(onA); doc.text('yksproductions893@gmail.com', M + 110, 540, { charSpace: 0 }); hhair(M, H - 96, W - M - 100 - 12, onA, 1.1); doc.setFont(HF, 'normal'); doc.setFontSize(8.5); ct(onA); doc.text(doc.splitTextToSize('Represented exclusively by YKS Productions. Rates, availability and full-resolution files on request.', 320), M, H - 76, { lineHeightFactor: 1.4 }); hlogoBox(W - M - 100, H - 108, 100, onA); }
 
     /* ── TEMPLATE: Lookbook (fashion, photo-forward — full-bleed plates) ── */
     function tplLookbook() { var fn = hsCover(imgs[0]); var n = 1; imgs.slice(1, 8).forEach(function (im) { hsPlate(im, 'LOOK ' + ('0' + (n++)).slice(-2) + ' — ' + ((im.cat || 'EDITORIAL'))); }); hsProfile(); hsClosing(fn); }

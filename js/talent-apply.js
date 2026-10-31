@@ -278,7 +278,7 @@
   }
   function portfolioLib() {
     return window.YKSPortfolio ? Promise.resolve() : new Promise(function (res, rej) {
-      var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=3'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+      var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=4'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
     });
   }
   // the applicant's YKS portfolio PDF → Cloudinary; '' on any failure or after 30 s, never throws
@@ -432,7 +432,7 @@
         return window.YKSPortfolio.download({ name: D.name, category: D.category, city: D.city, about: D.about, stats: { height: D.height }, photos: pdfOrder() });
       };
       (window.YKSPortfolio ? go() : new Promise(function (res, rej) {
-        var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=3'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+        var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=4'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
       }).then(go))
         .then(function () { dl.disabled = false; dl.textContent = 'Downloaded \u2713 \u2014 download again'; })
         .catch(function () { dl.disabled = false; dl.textContent = 'Download your portfolio'; hint.textContent = 'Couldn\u2019t build the PDF just now \u2014 tap to try again.'; });
