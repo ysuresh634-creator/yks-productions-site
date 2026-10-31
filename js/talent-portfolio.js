@@ -340,7 +340,7 @@
         load('/js/vendor/fonts.js', function () { return !!window.YKS_FONTS; })
       ]).then(function (ok) {
         if (!ok[0]) throw new Error('lib');
-        return Promise.all((data.photos || []).slice(0, 3).map(function (f) { return toRenderable(f).then(function (r) { return prepImg(r, 0.8, 1000); }); }));
+        return Promise.all((data.photos || []).slice(0, 8).map(function (f) { return toRenderable(f).then(function (r) { return prepImg(r, 0.8, 1000); }); }));
       }).then(function (imgs) {
         if (!imgs.length) throw new Error('photos');
         buildPortfolio(window.jspdf.jsPDF, imgs, data.name || 'YKS', {

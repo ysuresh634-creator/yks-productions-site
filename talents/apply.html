@@ -90,8 +90,8 @@
         {
           "@type": "HowToStep",
           "position": 1,
-          "name": "Send a few photos",
-          "text": "Straight from your phone — any size, any format. A clear face shot and a full-length in natural light is enough."
+          "name": "Send minimum 5 photos",
+          "text": "Minimum 5 different photos, including 2 clear face close-ups, plus a full-length, a mid-shot and one more. Phone photos are fine: clear, well-lit, no heavy filters."
         },
         {
           "@type": "HowToStep",
@@ -123,7 +123,7 @@
           "name": "Do I need professional photos to apply?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. Phone photos are fine — a clear face shot and a full-length in natural light is enough to see what I need to see."
+            "text": "No. Phone photos are fine. You need minimum 5 photos, including 2 clear face close-ups, plus a full-length, a mid-shot and one more, in good light with no heavy filters."
           }
         },
         {
@@ -336,7 +336,7 @@
 .ta-f.half{grid-column:span 1}
 .ta-f input,.ta-f select,.ta-f textarea{font:inherit;font-size:16px;color:var(--paper,#f4f0e8);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:10px;padding:12px;min-height:48px;width:100%;box-sizing:border-box}
 .ta-f select option{color:#111}
-.ta-f.bad input,.ta-f.bad select,.ta-f.bad .ta-add{border-color:#e24a2a}
+.ta-f.bad input,.ta-f.bad select,.ta-f.bad .ta-add.req{border-color:#e24a2a}
 .ta-err{color:#ff7a5c;font-size:12.5px}
 .ta-opt{opacity:.6}
 .ta-photos{display:flex;gap:10px;flex-wrap:wrap}
@@ -345,6 +345,14 @@
 .ta-thumb button{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.7);color:#fff;font-size:16px;line-height:1}
 .ta-add{width:88px;height:110px;border:1px dashed var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;color:var(--paper-dim);cursor:pointer;background:rgba(255,255,255,.03)}
 .ta-add b{display:block;font-size:24px;color:var(--amber)}
+.ta-add em{display:block;font-style:normal;color:var(--paper,#f4f0e8);font-weight:600}
+.ta-add i{display:block;font-style:normal;font-size:11px;opacity:.75;line-height:1.25;margin-top:2px}
+.ta-add.req{border-style:solid}
+.ta-add span{padding:0 6px}
+.ta-slotwrap{display:flex}
+.ta-slot-cap{position:absolute;left:0;right:0;bottom:0;padding:3px 4px;background:rgba(0,0,0,.65);color:#fff;font-size:10.5px;text-align:center}
+.ta-thumb.noprev::before{content:attr(data-name);position:absolute;inset:8px 6px 22px;font-size:10.5px;color:var(--paper-dim);word-break:break-all;overflow:hidden}
+.ta-rules{margin:2px 0 6px;padding-left:18px;font-size:12.5px;line-height:1.5;color:var(--paper-dim)}
 .ta-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .ta-submit{grid-column:span 2;min-height:54px;border-radius:12px;border:0;font:inherit;font-weight:600;font-size:16px;background:var(--amber);color:var(--black);margin-top:6px}
 .ta-submit:disabled{opacity:.45}
@@ -392,10 +400,15 @@
     </label>
     <label class="ta-f half">Date of birth<input type="date" name="dob" required /></label>
     <label class="ta-f half">Height<input type="text" name="height" placeholder="5&#39;6&quot; or 168 cm" required /></label>
-    <div class="ta-f">Photos <span class="ta-opt">1–3 · a clear face shot and a full-length, phone photos are fine</span>
-      <div class="ta-photos"><div id="taThumbs" class="ta-photos"></div>
-        <label class="ta-add" id="taAddPhoto" tabindex="0"><span><b>+</b>Add photo</span><input type="file" id="taPhotos" accept="image/*,.heic,.heif" multiple hidden /></label>
-      </div>
+    <div class="ta-f" id="taPhotoField">Photos <span class="ta-opt">minimum 5 different photos, including 2 clear face close-ups</span>
+      <ul class="ta-rules">
+        <li>Clear and well-lit, phone photos are fine</li>
+        <li>No heavy filters or face-editing apps</li>
+        <li>Close-ups: your face clearly visible, no sunglasses or masks</li>
+        <li>Just you, no group photos</li>
+        <li>5 different photos, not the same photo repeated</li>
+      </ul>
+      <div id="taSlots" class="ta-photos" aria-live="polite"></div>
       <span class="ta-opt" id="taPhotoCount"></span>
     </div>
     <label class="ta-f">Short intro <span class="ta-opt">optional</span><textarea name="about" rows="2" maxlength="300" placeholder="One or two lines about you"></textarea></label>
@@ -424,7 +437,7 @@
     </div>
     <div class="l-faq">
       <details><summary>Do I have to pay anything to join?</summary><p>No. Joining costs nothing, now or ever — no joining fee, no registration fee, no portfolio fee, no paid tiers. If anyone in this industry asks you for money to be registered, walk away. More on that in <a href="/talents/guides/modelling-agency-fees-scams-india.html">modelling agency fees &amp; scams</a>.</p></details>
-      <details><summary>Do I need professional photos to apply?</summary><p>No. Phone photos are fine — a clear face shot and a full-length in natural light is enough. Here&rsquo;s <a href="/talents/guides/model-digitals.html">how to shoot good digitals on your phone</a>.</p></details>
+      <details><summary>Do I need professional photos to apply?</summary><p>No. Phone photos are fine. You need minimum 5 photos, including 2 clear face close-ups, plus a full-length, a mid-shot and one more, in good light with no heavy filters. Here&rsquo;s <a href="/talents/guides/model-digitals.html">how to shoot good digitals on your phone</a>.</p></details>
       <details><summary>Do I need experience?</summary><p>No. I look at how someone photographs and how they take direction, not at how long their CV is. New to this? Start with <a href="/talents/guides/how-to-make-a-modelling-portfolio.html">how to make a modelling portfolio</a>.</p></details>
       <details><summary>Will my phone number or Instagram be public?</summary><p>Never. Your contact details are never published on the site. Clients who find you on YKS Talents contact me first.</p></details>
       <details><summary>Is YKS Talents a jobs board?</summary><p>No. YKS Talents doesn&rsquo;t offer or promise jobs. It&rsquo;s a free portfolio platform where clients find talent — and where I cast my own YKS shoots from.</p></details>
@@ -479,6 +492,6 @@
   </div>
 </footer>
 
-<script src="/js/talent-apply.js?v=86"></script>
+<script src="/js/talent-apply.js?v=87"></script>
 </body>
 </html>
