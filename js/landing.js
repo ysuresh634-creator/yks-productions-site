@@ -59,6 +59,9 @@
         page: location.href.slice(0, 500),
         found_via: (window.YKSSource && window.YKSSource.label && window.YKSSource.label()) || '',
         talent: !!meta.talent,
+        category: meta.category || '',
+        ai: meta.ai || null,
+        confirmed: meta.confirmed || '',
         seconds_on_page: Math.round((Date.now() - t0) / 1000),
         website: hp ? hp.value : ''
       }
@@ -104,24 +107,131 @@
   function clearFail(anchor) { var x = anchor.parentNode.querySelector('.yks-fail'); if (x) x.style.display = 'none'; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
-  window.YKSEnquiry = { url: URL_, send: send, failBox: failBox, clearFail: clearFail, honeypot: honeypot, waUrl: waUrl, pageNum: pageNum, geoNum: geoNum };
+  /* ── Client or talent? ──────────────────────────────────────────────────────
+     Before sending, the message goes to the yks-chat worker (/classify): an AI read plus
+     keyword rules. Only a confident "talent" verdict changes anything for the visitor — they
+     see the free YKS Talents application, with a one-tap "No, I'm a client". The enquiry is
+     ALWAYS saved either way, and the Apps Script re-checks the verdict itself. Any doubt,
+     error or timeout → it's sent as a client enquiry, exactly as before. */
+  var CLS_URL = ((window.YKS_CHAT_ENDPOINT || 'https://yks-chat.ysuresh634.workers.dev').replace(/\/+$/, '')) + '/classify';
+  // same rules as the worker and the Apps Script (keep the three in step)
+  var R_TALENT = /\b(i\s*(am|'m)\s*(a\s*)?model|aspiring\s+(model|actor|actress)|wann?a\s+(be\s+a\s+)?model|want\s+to\s+(be\s+a\s+|become\s+a\s+)?(model|act)|tryna\s+get\s+into\s+model|get\s+into\s+(modell?ing|acting)|modell?ing\s+(career|opportunit|work\s+for\s+me)|acting\s+(opportunit|chance|career|role)|become\s+a\s+(model|actor|actress)|join\s+(the\s+|your\s+)?(talent|roster|board)|talent\s+board|apply\s+(as|to\s+be)\s+(a\s+)?model|casting\s+for\s+me|my\s+(own\s+)?(model(l?ing)?\s+)?portfolio|portfolio\s+(photo|shoot)s?\s+(for\s+)?(me|myself)|intern(ship)?|assist\s+you|work\s+(with|for|under)\s+you|model\s+(aakanam|aakan|aagan|aaganum|banna|banana|banni)|modell?ing\s+(karni|karna|cheyyan|pannanum)|kaam\s+chahiye|chance\s+(venam|venum|chahiye|do|kodukkumo)|nadikk?an|nadikka\s+(chance|vaaipu))\b/i;
+  var R_SEEKER = /\b(runway|ramp\s*walk|fresher|freshers|men'?s\s+fashion\s+model|male\s+model\s+here|as\s+a\s+model|be\s+a\s+model|a\s+model\s+(here|for\s+you|with\s+you)|(i\s*am|i'?m|myself|me\s+as)\b[^.!?]{0,30}\b(model|actor|actress))\b/i;
+  var R_BRAND = /\b(brand|company|client|campaign|product|catalog(ue)?|e-?com(merce)?|agency|production|label|store|shop|cafe|restaurant|startup|business|our|we|us|team|launch|drop|ad\s*film|tvc|hotel|event|wedding|property|villa|apne|ente|enga|namma)\b/i;
+  var R_INJECT = /\b(ignore|disregard|forget)\b[^.]{0,40}\b(instruction|prompt|rule|above|previous)|\b(classify|label|mark|categori[sz]e)\b[^.]{0,30}\bas\b|\bsystem\s*prompt\b|\byou\s+are\s+now\b|"type"\s*:/i;
+  function rules(text) {
+    if (!text) return 'none';
+    if (R_TALENT.test(text) || R_SEEKER.test(text)) return 'talent';
+    if (/\bportfolio\b/i.test(text) && !R_BRAND.test(text)) return 'talent';
+    return R_BRAND.test(text) ? 'client' : 'none';
+  }
+  function ruleText(f) { return [f.message, f.company, f.service, f.needs].filter(Boolean).join(' '); }
+
+  /* classify(fields, meta) → Promise that never rejects:
+     { route: 'talent'|'client', category: 'talent'|'client'|'other', rules, ai: {status, type, confidence, reason, model, unsure} } */
+  function classify(fields, meta) {
+    var text = ruleText(fields), r = rules(text), brand = R_BRAND.test(text), injected = R_INJECT.test(fields.message || '');
+    var fallback = function (status) { return { route: 'client', category: 'client', rules: r, ai: { status: status, unsure: true } }; };
+    if (!window.fetch || !String(fields.message || '').trim()) return Promise.resolve(fallback('skipped'));
+    var ctl = window.AbortController ? new AbortController() : null, done = false;
+    return new Promise(function (resolve) {
+      var timer = setTimeout(function () { if (done) return; done = true; if (ctl) ctl.abort(); resolve(fallback('timeout')); }, 6000);
+      fetch(CLS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl ? ctl.signal : undefined,
+        body: JSON.stringify({ message: String(fields.message || '').slice(0, 1500), page: location.pathname, form: (meta && meta.form) || '',
+          fields: { name: fields.name || '', service: fields.service || fields.project_type || '', company: fields.company || '', needs: fields.needs || '' } }) })
+        .then(function (res) { return res.json().then(function (j) { j._http = res.status; return j; }); })
+        .then(function (j) {
+          if (done) return; done = true; clearTimeout(timer);
+          var ok = j && j.ok === true && /^(client|talent|other)$/.test(j.type) && typeof j.confidence === 'number' && j.confidence >= 0 && j.confidence <= 1;
+          if (!ok) return resolve(fallback(j && j._http === 429 ? 'rate_limited' : (j && j.error === 'timeout' ? 'timeout' : 'failed')));
+          var c = j.confidence, cat = 'client', unsure = true;
+          // the same gate as the worker and the Apps Script — the browser re-checks rather than trusting a "route" field
+          if (j.type === 'talent') {
+            if (!injected && !(brand && r !== 'talent') && c >= (r === 'talent' ? 0.7 : 0.85)) { cat = 'talent'; unsure = false; }
+          } else if (j.type === 'other') { if (c >= 0.8) { cat = 'other'; unsure = false; } }
+          else unsure = c < 0.6 || r === 'talent';
+          if (j.route === 'client' && cat === 'talent') { cat = 'client'; unsure = true; }  // the worker was stricter — go with it
+          resolve({ route: cat === 'talent' ? 'talent' : 'client', category: cat, rules: r,
+            ai: { status: 'ok', type: j.type, confidence: c, reason: String(j.reason || '').slice(0, 120), model: String(j.model || '').slice(0, 40), unsure: unsure } });
+        })
+        .catch(function () { if (done) return; done = true; clearTimeout(timer); resolve(fallback('failed')); });
+    });
+  }
+
+  var panelCss = false;
+  function talentPanel(anchor) {
+    if (!panelCss) {
+      panelCss = true;
+      var st = document.createElement('style');
+      st.textContent = '.yks-tp{margin:16px 0 0;padding:18px 18px 16px;border:1px solid rgba(201,168,106,.55);border-radius:14px;background:rgba(201,168,106,.08);color:var(--paper,#f4ede2);text-align:left;line-height:1.5}'
+        + '.yks-tp h3{margin:0 0 6px;font-size:1.1rem;line-height:1.35;color:inherit}.yks-tp p{margin:0 0 12px;font-size:.93rem;opacity:.88}'
+        + '.yks-tp .yks-tp-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}'
+        + '.yks-tp a.yks-tp-apply{display:inline-flex;align-items:center;padding:12px 20px;border-radius:999px;background:#c9a86a;color:#07060a;font-weight:600;text-decoration:none}'
+        + '.yks-tp button.yks-tp-client{padding:11px 16px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;font-size:.92rem;cursor:pointer;opacity:.9}'
+        + '.yks-tp button.yks-tp-client[disabled]{opacity:.5;cursor:default}.yks-tp small{display:block;margin-top:10px;opacity:.7;font-size:.82rem}';
+      document.head.appendChild(st);
+    }
+    var box = document.createElement('div');
+    box.className = 'yks-tp'; box.setAttribute('role', 'status');
+    box.innerHTML = '<h3>Looks like you’d like to join YKS Talents as talent — apply here (free, no fees)</h3>'
+      + '<p>YKS Talents is a free portfolio platform for women aged 18–34. Clients browse it to find talent, and I cast my own shoots from it too. There are no fees, and no jobs are offered or promised.</p>'
+      + '<div class="yks-tp-row"><a class="yks-tp-apply" href="/talents/apply.html?from=enquiry">Apply to YKS Talents →</a>'
+      + '<button type="button" class="yks-tp-client">No, I’m a client — send my enquiry</button></div>'
+      + '<small>Your message has been saved either way.</small>';
+    anchor.insertAdjacentElement('afterend', box);
+    return box;
+  }
+
+  /* submit(fields, meta, ui) — classify, then send. ui: {
+       anchor   element the talent panel goes after,
+       hide     [elements] to hide while the panel shows (restored if they say they're a client),
+       brief, num  for the WhatsApp failure box,
+       onSent(json, {possibleTalent}), onFail(err), onPanel() } */
+  function submit(fields, meta, ui) {
+    meta = meta || {}; ui = ui || {};
+    var noop = function () {};
+    var onSent = ui.onSent || noop, onFail = ui.onFail || noop;
+    var skip = /\/talents\/apply/.test(location.pathname) || meta.form === 'waitlist';
+    (skip ? Promise.resolve({ route: 'client', category: 'client', rules: 'none', ai: { status: 'skipped' } }) : classify(fields, meta)).then(function (v) {
+      var withMeta = function (extra) { var m = {}, k; for (k in meta) m[k] = meta[k]; for (k in extra) m[k] = extra[k]; return m; };
+      var keywordTalent = v.rules === 'talent' && v.route !== 'talent';
+      if (v.route !== 'talent' || !ui.anchor) {
+        return send(fields, withMeta({ category: v.category, ai: v.ai, talent: keywordTalent || (v.route === 'talent') }))
+          .then(function (j) { onSent(j, { possibleTalent: keywordTalent || v.route === 'talent' }); }, onFail);
+      }
+      // talent: save it now (as Talent) and offer the application, with the client override
+      var bg = send(fields, withMeta({ category: 'talent', ai: v.ai, talent: true }));
+      var hidden = (ui.hide || []).filter(Boolean);
+      hidden.forEach(function (el) { el.setAttribute('data-yks-tp-hidden', el.style.display || ''); el.style.display = 'none'; });
+      var panel = talentPanel(ui.anchor);
+      (ui.onPanel || noop)();
+      if (window.gtag) gtag('event', 'enquiry_routed_talent', { form: meta.form || '' });
+      bg.catch(function (err) { failBox(panel, ui.brief || '', ui.num, err && err.userMessage); });
+      var btn = panel.querySelector('.yks-tp-client');
+      btn.addEventListener('click', function () {
+        btn.disabled = true; btn.textContent = 'Sending…';
+        var again = function () { return send(fields, withMeta({ category: 'client', confirmed: 'client', ai: v.ai, talent: true })); };
+        bg.then(again, again).then(function (j) {
+          panel.remove();
+          hidden.forEach(function (el) { el.style.display = el.getAttribute('data-yks-tp-hidden'); el.removeAttribute('data-yks-tp-hidden'); });
+          onSent(j, { possibleTalent: false, confirmed: true });
+        }, function (err) {
+          panel.remove();
+          hidden.forEach(function (el) { el.style.display = el.getAttribute('data-yks-tp-hidden'); el.removeAttribute('data-yks-tp-hidden'); });
+          onFail(err);
+        });
+      });
+    });
+  }
+
+  window.YKSEnquiry = { url: URL_, send: send, submit: submit, classify: classify, rules: rules, failBox: failBox, clearFail: clearFail, honeypot: honeypot, waUrl: waUrl, pageNum: pageNum, geoNum: geoNum };
 })();
 
 /* Landing-page forms (form.l-form) */
 (function () {
   var APPLY = '/talents/apply.html';
-  /* Talent / model intent. These used to redirect the visitor to the application page,
-     which silently dropped real client briefs that happened to match. Now every message
-     is sent; a likely job-seeker is only TAGGED ('[Possible talent]' in the email subject)
-     and shown a link to the application page after it's sent. */
-  var TALENT_RE = /\b(i\s*(am|'m)\s*(a\s*)?model|aspiring\s+model|want\s+to\s+(be\s+a\s+)?model|modell?ing\s+(career|opportunit|work\s+for\s+me)|become\s+a\s+model|join\s+(the\s+|your\s+)?(talent|roster|board|agency)|talent\s+board|apply\s+(as|to\s+be)\s+(a\s+)?model|casting\s+for\s+me|my\s+(own\s+)?(model(l?ing)?\s+)?portfolio|portfolio\s+(photo|shoot)s?\s+(for\s+)?(me|myself)|portfolio\s+photo\s+in)\b/i;
-  var SEEKER_RE = /\b(runway|ramp\s*walk|model{1,2}ing|model{1,2}ed|fresher|freshers|auditions?|opportunit(y|ies)|men'?s\s+fashion|male\s+model|as\s+a\s+model|be\s+a\s+model|a\s+model\s+(here|for\s+you|with\s+you)|(i\s*am|i'?m|myself|me\s+as)\b[^.!?]{0,30}\bmodel)\b/i;
-  var BRAND_RE = /\b(brand|company|client|campaign|product|catalog(ue)?|e-?com(merce)?|agency|production|label|store|startup|business|our|we|team|launch|ad\s*film|tvc)\b/i;
-  function seeker(msg) {
-    if (!msg) return false;
-    if (TALENT_RE.test(msg) || SEEKER_RE.test(msg)) return true;
-    return /\bportfolio\b/i.test(msg) && !BRAND_RE.test(msg);
-  }
+  /* Every message is sent. Client or talent is decided by YKSEnquiry.submit (AI + rules, above);
+     a confident "talent" sees the free application with a "No, I'm a client" button. */
   var onApply = /\/talents\//.test(location.pathname);
   var E = window.YKSEnquiry;
   document.querySelectorAll('form.l-form').forEach(function (form) {
@@ -150,7 +260,6 @@
       if (minMsg && get('message').length < minMsg) { if (mEl) { mEl.setCustomValidity('Tell me a little more — at least ' + minMsg + ' characters.'); mEl.reportValidity(); mEl.addEventListener('input', function () { mEl.setCustomValidity(''); }, { once: true }); } return; }
       if (get('message').length > 5000 && mEl) { mEl.setCustomValidity('Please keep it under 5000 characters.'); mEl.reportValidity(); mEl.addEventListener('input', function () { mEl.setCustomValidity(''); }, { once: true }); return; }
 
-      var talent = !onApply && seeker(get('message') + ' ' + get('company'));
       var fields = { name: get('name'), contact: get('contact'), email: get('email'), message: get('message') };
       if (coEl) fields.company = get('company');
       if (blEl) fields.brand_link = bl;
@@ -165,23 +274,29 @@
       btn.textContent = 'Sending…';
       btn.disabled = true;
       E.clearFail(form);
-      E.send(fields, { form: 'landing', source: form.dataset.source || 'Landing page', subject: form.dataset.subject || '', talent: talent, form_el: form })
-        .then(function () {
+      var reset = function () { btn.textContent = orig; btn.disabled = false; };
+      var hint = form.parentNode.querySelector('.l-form-talent');
+      E.submit(fields, { form: 'landing', source: form.dataset.source || 'Landing page', subject: form.dataset.subject || '', form_el: form }, {
+        anchor: form, hide: [form, hint], brief: brief, num: E.pageNum(),
+        onPanel: reset,
+        onSent: function (j, info) {
+          reset();
           form.style.display = 'none';
           var ok = form.parentNode.querySelector('.l-form-ok');
           if (ok) ok.style.display = 'block';
-          if (talent) {
+          if (info.possibleTalent && !onApply) {
             var n = document.createElement('p');
             n.className = 'l-form-talent-after';
             n.style.cssText = 'margin:.8em 0 0;font-size:.92em;opacity:.9';
             n.innerHTML = 'If you’re looking for modelling work rather than booking a shoot, the application is here: <a href="' + APPLY + '?from=enquiry">Apply to YKS Talents →</a>';
             (ok || form).insertAdjacentElement('afterend', n);
           }
-        })
-        .catch(function (err) {
-          btn.textContent = orig; btn.disabled = false;
+        },
+        onFail: function (err) {
+          reset();
           E.failBox(form, brief, E.pageNum(), err && err.userMessage);
-        });
+        }
+      });
     });
   });
 })();

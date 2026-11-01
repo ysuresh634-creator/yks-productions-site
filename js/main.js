@@ -485,10 +485,15 @@
     if (note) { note.textContent = 'Sending your details…'; note.style.color = ''; }
     if (window.YKSEnquiry) window.YKSEnquiry.clearFail(bookForm);
 
-    sendEnquiry(
-      { name: v('f-name'), phone: v('f-phone'), date: when, service: v('f-type'), city: region, message: v('f-msg') },
-      { form: 'homepage-booking', source: 'Homepage booking form', form_el: bookForm }
-    ).then(() => {
+    // classify (client or talent) then send — see YKSEnquiry.submit in landing.js
+    const fieldsB = { name: v('f-name'), phone: v('f-phone'), date: when, service: v('f-type'), city: region, message: v('f-msg') };
+    const metaB = { form: 'homepage-booking', source: 'Homepage booking form', form_el: bookForm };
+    const viaSubmit = () => new Promise((resolve, reject) => window.YKSEnquiry.submit(fieldsB, metaB, {
+      anchor: bookForm, hide: [bookForm], brief: msg, num,
+      onPanel: () => { if (btn) { btn.disabled = false; btn.innerHTML = label; } if (note) note.textContent = ''; },
+      onSent: resolve, onFail: reject
+    }));
+    (window.YKSEnquiry && window.YKSEnquiry.submit ? viaSubmit() : sendEnquiry(fieldsB, metaB)).then(() => {
       if (btn) { btn.disabled = false; btn.innerHTML = label; }
       if (note) {
         note.innerHTML = '✓ Sent — Yedukrishna has your details and will reply soon. '

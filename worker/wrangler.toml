@@ -9,3 +9,9 @@ binding = "AI"
 
 [observability]
 enabled = true
+
+# Per-IP limit for POST /classify (the enquiry-form sorter). Free Workers rate-limiting API.
+[[ratelimits]]
+name = "CLASSIFY_RL"
+namespace_id = "1701"
+simple = { limit = 12, period = 60 }

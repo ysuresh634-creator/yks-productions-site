@@ -566,12 +566,16 @@
       var b = document.getElementById('sGo'); b.textContent = 'Sending…'; b.disabled = true;
       var waText = "Hi Yedukrishna, I tried to send this brief from your quote page:\n\n" + txt + "\nName: " + A.name + "\nContact: " + A.phone + (A.email ? "\nEmail: " + A.email : '');
       var E = window.YKSEnquiry;
-      (E ? E.send({
+      var qf = {
           name: A.name, phone: A.phone, email: A.email || '',
           service: A.type || '', city: A.where || '', date: A.when || '',
           needs: A.need || '', scale: A.scale || '', deliverables: A.deliver || '', message: A.detail || ''
-        }, { form: 'quote', source: 'Quote assistant', subject: 'QUOTE REQUEST — ' + (A.type || 'Shoot') + ' · ' + (A.where || '') })
-        : Promise.reject(new Error('helper missing'))
+        }, qm = { form: 'quote', source: 'Quote assistant', subject: 'QUOTE REQUEST — ' + (A.type || 'Shoot') + ' · ' + (A.where || '') };
+      // classify (client or talent) then send — see YKSEnquiry.submit in landing.js
+      (E && E.submit ? new Promise(function (ok, no) {
+          E.submit(qf, qm, { anchor: b.parentNode, hide: [b.parentNode], brief: waText, num: waNum,
+            onPanel: function () { b.textContent = 'Send my brief →'; b.disabled = false; }, onSent: ok, onFail: no });
+        }) : E ? E.send(qf, qm) : Promise.reject(new Error('helper missing'))
       ).then(function () {
           if (window.gtag) gtag('event', 'generate_lead', { method: 'quote_assistant' });
           now.innerHTML = '<div class="q-done"><div class="tick">✓</div>'
@@ -593,7 +597,7 @@
   step();
 })();
 </script>
-<script src="/js/landing.js?v=23"></script>
+<script src="/js/landing.js?v=24"></script>
 <script src="/js/fx.js?v=6"></script>
 <script src="/js/lead.js?v=3"></script>
 <script src="/js/bokeh.js?v=2"></script>
