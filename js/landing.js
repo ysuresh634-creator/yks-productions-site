@@ -1,19 +1,129 @@
-/* YKS landing-page enquiry forms → Web3Forms (email capture) */
+/* YKS enquiry forms → the YKS Apps Script web app (sheet + email to Yedukrishna).
+   Shared by every landing-page form here, the homepage booking form and waitlist (main.js)
+   and the quote assistant (quote.html) via window.YKSEnquiry.
+   A form only says "sent" when the server answers {ok:true}; anything else — an error,
+   a timeout, an old deployment — shows the failure and a WhatsApp button with the brief
+   already written, so nothing a client types is ever silently lost. */
 (function () {
-  var KEY = 'fbf5d037-af64-46a1-8ddc-5777379ec179';
+  var URL_ = 'https://script.google.com/macros/s/AKfycbz_36FeQLa2AsN-GzlYZWhT-VgqQ9UabIogrysT_5eHl-tZWbpNAkZhg26S3E2l3QRp/exec';
+  var WA_AE = '971501955122', WA_IN = '919746679720';
+  var t0 = Date.now() - ((window.performance && performance.now && performance.now()) || 0);
+
+  /* Pages marked <body data-wa-geo> pick the WhatsApp line by where the visitor is,
+     the same rule chat.js uses: India / South Asia → the India number, Gulf → Dubai.
+     The static HTML keeps the Dubai number, so without JS nothing changes. */
+  function geoNum() {
+    var tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    if (/Kolkata|Calcutta|Colombo|Kathmandu|Dhaka/i.test(tz)) return WA_IN;
+    if (/Dubai|Muscat|Qatar|Riyadh|Bahrain|Kuwait/i.test(tz)) return WA_AE;
+    return '';
+  }
+  // A single link can opt in too (<a data-wa-geo>), e.g. the homepage hero button.
+  var b = document.body, g = geoNum();
+  if (g && b) {
+    var whole = b.hasAttribute('data-wa-geo');
+    if (whole) b.setAttribute('data-wa', g);
+    document.querySelectorAll(whole ? 'a[href*="wa.me/' + WA_AE + '"], a[href*="wa.me/' + WA_IN + '"]' : 'a[data-wa-geo]').forEach(function (a) {
+      a.href = a.href.replace(/wa\.me\/(971501955122|919746679720)/, 'wa.me/' + g);
+    });
+  }
+  function pageNum() {
+    var a = document.querySelector('a[href*="wa.me/"]');
+    return (b && b.getAttribute('data-wa')) || (a && (a.href.match(/wa\.me\/(\d+)/) || [])[1]) || WA_AE;
+  }
+  function waUrl(num, text) { return 'https://wa.me/' + (num || pageNum()) + '?text=' + encodeURIComponent(String(text || '').slice(0, 1800)); }
+
+  // an invisible field people never fill — bots do
+  function honeypot(form) {
+    if (!form || form.querySelector('input[name="website"]')) return;
+    var w = document.createElement('div');
+    w.setAttribute('aria-hidden', 'true');
+    w.style.cssText = 'position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden';
+    w.innerHTML = '<label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label>';
+    form.appendChild(w);
+  }
+
+  /* send(fields, meta) → Promise that resolves with the server's JSON only on {ok:true};
+     rejects with an Error whose .userMessage is safe to show (or empty). */
+  function send(fields, meta) {
+    meta = meta || {};
+    var hp = meta.form_el && meta.form_el.querySelector('input[name="website"]');
+    var body = {
+      kind: 'enquiry',
+      fields: fields,
+      meta: {
+        form: meta.form || 'landing',
+        source: meta.source || '',
+        subject: meta.subject || '',
+        page: location.href.slice(0, 500),
+        found_via: (window.YKSSource && window.YKSSource.label && window.YKSSource.label()) || '',
+        talent: !!meta.talent,
+        seconds_on_page: Math.round((Date.now() - t0) / 1000),
+        website: hp ? hp.value : ''
+      }
+    };
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 25000);
+    // text/plain keeps this a "simple" request (no CORS preflight, which Apps Script can't answer)
+    return fetch(URL_, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        clearTimeout(timer);
+        if (j && j.ok === true) return j;
+        var err = new Error((j && j.error) || 'failed');
+        // only trust the wording when the enquiry branch wrote it (an old deployment speaks about applications)
+        err.userMessage = (j && j.kind === 'enquiry' && j.message) || '';
+        throw err;
+      }, function (e) { clearTimeout(timer); throw e; });
+  }
+
+  /* The failure panel: says plainly it did NOT arrive, and hands over WhatsApp with the brief typed. */
+  var cssDone = false;
+  function failBox(anchor, text, num, why) {
+    if (!cssDone) {
+      cssDone = true;
+      var st = document.createElement('style');
+      st.textContent = '.yks-fail{margin:16px 0 0;padding:14px 16px;border:1px solid rgba(255,140,59,.55);border-radius:12px;background:rgba(255,140,59,.08);color:var(--paper,#f4ede2);font-size:.95rem;line-height:1.5;text-align:left}'
+        + '.yks-fail b{color:#ff8c3b}.yks-fail a.yks-fail-wa{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:11px 18px;border-radius:999px;background:#25D366;color:#07060a;font-weight:600;text-decoration:none}'
+        + '.yks-fail a.yks-fail-wa:hover{filter:brightness(1.06)}';
+      document.head.appendChild(st);
+    }
+    var box = anchor.parentNode.querySelector('.yks-fail[data-for="' + (anchor.id || anchor.className) + '"]');
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'yks-fail'; box.setAttribute('role', 'alert'); box.setAttribute('data-for', anchor.id || anchor.className);
+      anchor.insertAdjacentElement('afterend', box);
+    }
+    box.innerHTML = '<b>Your message didn’t reach me.</b> ' + (why ? esc(why) + ' ' : '')
+      + 'Nothing went through, so please send it on WhatsApp instead — it’s already written for you.<br>'
+      + '<a class="yks-fail-wa" target="_blank" rel="noopener" href="' + waUrl(num, text) + '">Send on WhatsApp →</a>';
+    box.style.display = 'block';
+    return box;
+  }
+  function clearFail(anchor) { var x = anchor.parentNode.querySelector('.yks-fail'); if (x) x.style.display = 'none'; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  window.YKSEnquiry = { url: URL_, send: send, failBox: failBox, clearFail: clearFail, honeypot: honeypot, waUrl: waUrl, pageNum: pageNum, geoNum: geoNum };
+})();
+
+/* Landing-page forms (form.l-form) */
+(function () {
   var APPLY = '/talents/apply.html';
-  // talent / model intent → the application page, not the client enquiry inbox
+  /* Talent / model intent. These used to redirect the visitor to the application page,
+     which silently dropped real client briefs that happened to match. Now every message
+     is sent; a likely job-seeker is only TAGGED ('[Possible talent]' in the email subject)
+     and shown a link to the application page after it's sent. */
   var TALENT_RE = /\b(i\s*(am|'m)\s*(a\s*)?model|aspiring\s+model|want\s+to\s+(be\s+a\s+)?model|modell?ing\s+(career|opportunit|work\s+for\s+me)|become\s+a\s+model|join\s+(the\s+|your\s+)?(talent|roster|board|agency)|talent\s+board|apply\s+(as|to\s+be)\s+(a\s+)?model|casting\s+for\s+me|my\s+(own\s+)?(model(l?ing)?\s+)?portfolio|portfolio\s+(photo|shoot)s?\s+(for\s+)?(me|myself)|portfolio\s+photo\s+in)\b/i;
-  /* Wider net (Oct 2026): applicants kept writing briefs in the client form.
-     Any of these reads as someone looking for work, not someone hiring. */
   var SEEKER_RE = /\b(runway|ramp\s*walk|model{1,2}ing|model{1,2}ed|fresher|freshers|auditions?|opportunit(y|ies)|men'?s\s+fashion|male\s+model|as\s+a\s+model|be\s+a\s+model|a\s+model\s+(here|for\s+you|with\s+you)|(i\s*am|i'?m|myself|me\s+as)\b[^.!?]{0,30}\bmodel)\b/i;
   var BRAND_RE = /\b(brand|company|client|campaign|product|catalog(ue)?|e-?com(merce)?|agency|production|label|store|startup|business|our|we|team|launch|ad\s*film|tvc)\b/i;
   function seeker(msg) {
     if (!msg) return false;
     if (TALENT_RE.test(msg) || SEEKER_RE.test(msg)) return true;
-    return /\bportfolio\b/i.test(msg) && !BRAND_RE.test(msg);   // "portfolio" with no brand/company words is a talent asking
+    return /\bportfolio\b/i.test(msg) && !BRAND_RE.test(msg);
   }
   var onApply = /\/talents\//.test(location.pathname);
+  var E = window.YKSEnquiry;
   document.querySelectorAll('form.l-form').forEach(function (form) {
     if (!onApply && !form.parentNode.querySelector('.l-form-talent')) {
       var p = document.createElement('p');
@@ -22,66 +132,56 @@
       p.innerHTML = 'Looking to model? <a href="' + APPLY + '">Create your free portfolio →</a>';
       form.insertAdjacentElement('afterend', p);
     }
-    // a "book this talent" link from the roster arrives as ?talent=CODE — seed the brief with it
+    E.honeypot(form);
     try {
       var tq = new URLSearchParams(location.search).get('talent'), mt = form.querySelector('[name="message"]');
       if (tq && mt && !mt.value && form.querySelector('[name="company"]')) mt.value = 'Talent from your roster: ' + tq.replace(/[^A-Za-z0-9,\s-]/g, '').slice(0, 80) + '. ';
     } catch (er) {}
-    // check intent on the button tap too, so a job-seeker is routed even before the browser's
-    // required-field prompts (company, project type) would stop the submit
-    var sb = form.querySelector('button[type="submit"], button:not([type])');
-    if (sb && !onApply) sb.addEventListener('click', function (e) {
-      var m = form.querySelector('[name="message"]'), c = form.querySelector('[name="company"]');
-      if (seeker(((m && m.value) || '') + ' ' + ((c && c.value) || ''))) { e.preventDefault(); location.href = APPLY + '?from=enquiry'; }
-    });
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var get = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; };
       if (!get('name') || !get('contact')) return;
-      if (!onApply && seeker(get('message') + ' ' + get('company'))) { location.href = APPLY + '?from=enquiry'; return; }
-      /* Client-brief forms (casting pages) carry a Company/Brand field and a
-         project type: no company name, no brief. */
       var coEl = form.querySelector('[name="company"]'), ptEl = form.querySelector('[name="project_type"]');
       if (coEl && get('company').replace(/[^A-Za-z0-9]/g, '').length < 2) { coEl.setCustomValidity('Add your company or brand name.'); coEl.reportValidity(); coEl.addEventListener('input', function () { coEl.setCustomValidity(''); }, { once: true }); return; }
-      /* …and something to check them by: a website or an Instagram handle. */
       var blEl = form.querySelector('[name="brand_link"]'), bl = get('brand_link');
       if (blEl && (bl.replace(/[^A-Za-z0-9]/g, '').length < 3 || !(/\./.test(bl) || /^@/.test(bl) || /instagram/i.test(bl)))) { blEl.setCustomValidity('Add your brand website (yourbrand.com) or Instagram (@yourbrand).'); blEl.reportValidity(); blEl.addEventListener('input', function () { blEl.setCustomValidity(''); }, { once: true }); return; }
       if (ptEl && !get('project_type')) { ptEl.setCustomValidity('Choose the project type.'); ptEl.reportValidity(); ptEl.addEventListener('change', function () { ptEl.setCustomValidity(''); }, { once: true }); return; }
       var minMsg = +(form.dataset.minmsg || 0), mEl = form.querySelector('[name="message"]');
       if (minMsg && get('message').length < minMsg) { if (mEl) { mEl.setCustomValidity('Tell me a little more — at least ' + minMsg + ' characters.'); mEl.reportValidity(); mEl.addEventListener('input', function () { mEl.setCustomValidity(''); }, { once: true }); } return; }
-      var btn = form.querySelector('button');
+      if (get('message').length > 5000 && mEl) { mEl.setCustomValidity('Please keep it under 5000 characters.'); mEl.reportValidity(); mEl.addEventListener('input', function () { mEl.setCustomValidity(''); }, { once: true }); return; }
+
+      var talent = !onApply && seeker(get('message') + ' ' + get('company'));
+      var fields = { name: get('name'), contact: get('contact'), email: get('email'), message: get('message') };
+      if (coEl) fields.company = get('company');
+      if (blEl) fields.brand_link = bl;
+      if (ptEl) fields.project_type = get('project_type');
+      var brief = 'Hi Yedukrishna, I tried the form on your site (' + (form.dataset.source || document.title) + ').\n'
+        + 'Name: ' + fields.name + '\nContact: ' + fields.contact + (fields.email ? '\nEmail: ' + fields.email : '')
+        + (fields.company ? '\nCompany: ' + fields.company : '') + (fields.brand_link ? '\nBrand: ' + fields.brand_link : '')
+        + (fields.project_type ? '\nProject: ' + fields.project_type : '') + (fields.message ? '\n\n' + fields.message : '');
+
+      var btn = form.querySelector('button[type="submit"]') || form.querySelector('button');
       var orig = btn.textContent;
       btn.textContent = 'Sending…';
       btn.disabled = true;
-      fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          access_key: KEY,
-          subject: form.dataset.subject || 'New enquiry — YKS Productions',
-          from_name: 'YKS Productions website',
-          Source: form.dataset.source || 'Landing page',
-          "Found via": (window.YKSSource && window.YKSSource.label()) || '\u2014',
-          Name: get('name'),
-          Contact: get('contact'),
-          Email: get('email') || '—',
-          Company: coEl ? get('company') : undefined,
-          "Brand website / Instagram": blEl ? bl : undefined,
-          "Project type": ptEl ? get('project_type') : undefined,
-          Message: get('message') || '—'
-        })
-      })
-        .then(function (r) { return r.json(); })
-        .then(function (j) {
-          if (j.success) {
-            form.style.display = 'none';
-            var ok = form.parentNode.querySelector('.l-form-ok');
-            if (ok) ok.style.display = 'block';
-          } else {
-            btn.textContent = orig; btn.disabled = false;
+      E.clearFail(form);
+      E.send(fields, { form: 'landing', source: form.dataset.source || 'Landing page', subject: form.dataset.subject || '', talent: talent, form_el: form })
+        .then(function () {
+          form.style.display = 'none';
+          var ok = form.parentNode.querySelector('.l-form-ok');
+          if (ok) ok.style.display = 'block';
+          if (talent) {
+            var n = document.createElement('p');
+            n.className = 'l-form-talent-after';
+            n.style.cssText = 'margin:.8em 0 0;font-size:.92em;opacity:.9';
+            n.innerHTML = 'If you’re looking for modelling work rather than booking a shoot, the application is here: <a href="' + APPLY + '?from=enquiry">Apply to YKS Talents →</a>';
+            (ok || form).insertAdjacentElement('afterend', n);
           }
         })
-        .catch(function () { btn.textContent = orig; btn.disabled = false; });
+        .catch(function (err) {
+          btn.textContent = orig; btn.disabled = false;
+          E.failBox(form, brief, E.pageNum(), err && err.userMessage);
+        });
     });
   });
 })();

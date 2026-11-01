@@ -46,7 +46,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&amp;family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@300;400;500&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=72">
+<link rel="stylesheet" href="css/style.css?v=73">
 <style>
 /* credibility stat band */
 .stat-band{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:0 0 56px;padding:0 0 46px;border-bottom:1px solid rgba(244,237,226,.12)}
@@ -443,6 +443,10 @@
         </p>
         <p class="hero-name" data-split="chars">Yedukrishna</p>
         <h1 class="hero-roles" data-split="words">Photographer &amp; Videographer in Dubai, Bangalore &amp; Mumbai</h1>
+        <div class="hero-cta">
+          <a class="btn fill" href="/quote.html">Get a quote</a>
+          <a class="btn ghost hero-cta-wa" data-wa-geo href="https://wa.me/971501955122?text=Hi%20Yedukrishna%2C%20I%E2%80%99d%20like%20a%20quote%20for%20a%20shoot." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.413c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>WhatsApp me</a>
+        </div>
         <div class="hero-meta">
           <div><b>Known for</b><span>Dubai real estate · Fashion · Film stills</span></div>
           <div><b>Featured</b><span>Marriott · Soothravakyam</span></div>
@@ -739,7 +743,7 @@
                 <input type="email" id="wl-email" placeholder="your@email.com" required="" autocomplete="email">
                 <button type="submit" class="btn fill">Join waitlist</button>
               </form>
-              <p class="wl-success mono" id="wlSuccess" style="display:none;color:var(--teal)">✓ You're on the list — we'll reach out when seats open.</p>
+              <p class="wl-success mono" id="wlSuccess" style="display:none;color:var(--teal)">✓ You're on the list — I'll email you when seats open.</p>
               <p class="wl-note mono">No spam. One email when seats open.</p>
             </div>
           </div>
@@ -911,8 +915,8 @@
           </label>
         </div>
         <label>About the project<textarea id="f-msg" placeholder="Location, vibe, references, budget range…"></textarea></label>
-        <button type="submit" class="btn fill">Send via WhatsApp →</button>
-        <p class="form-note">Opens WhatsApp with your details pre-filled. Nothing sends until you press send there.</p>
+        <button type="submit" class="btn fill">Send my enquiry →</button>
+        <p class="form-note">Goes straight to Yedukrishna. If it can’t send, you’ll get a WhatsApp button with your details already filled in.</p>
       </form>
     </div>
   </section>
@@ -1013,27 +1017,10 @@
 <script src="/js/lib/ScrollTrigger.min.js"></script>
 <script src="/js/lib/lenis.min.js"></script>
 <script src="js/cinema.js?v=37"></script>
-<script src="js/main.js?v=50"></script>
-<script src="js/landing.js?v=20"></script>
+<script src="js/main.js?v=51"></script>
+<script src="js/landing.js?v=23"></script>
 <script src="/js/fx.js?v=6"></script>
 <script src="/js/lead.js?v=3"></script>
-<script>
-(function(){
-  var form = document.getElementById('waitlistForm');
-  if(!form) return;
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    var email = document.getElementById('wl-email').value.trim();
-    if(!email) return;
-    var wa = 'https://wa.me/919746679720?text=' + encodeURIComponent(
-      'Hi Yedukrishna, please add me to the YKS Masterclass waitlist.\nMy email: ' + email
-    );
-    window.open(wa, '_blank');
-    form.style.display = 'none';
-    document.getElementById('wlSuccess').style.display = 'block';
-  });
-})();
-</script>
 <script>
 /* homepage express booking — pre-fill a location-routed WhatsApp message */
 (function(){

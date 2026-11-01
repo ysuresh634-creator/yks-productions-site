@@ -188,7 +188,8 @@
       .from('.hero-title .char', { yPercent: 130, opacity: 0, rotateX: -50, stagger: .03, duration: 1.25 }, '-=.55')
       .from('.hero-name .char', { yPercent: 120, opacity: 0, stagger: .04, duration: .9 }, '-=.75')
       .from('.hero-roles .word', { y: 26, opacity: 0, stagger: .05, duration: .8 }, '-=.7')
-      .from('.hero-meta > div', { y: 30, opacity: 0, stagger: .1, duration: .7 }, '-=.55')
+      .from('.hero-cta > a', { y: 22, opacity: 0, stagger: .08, duration: .7 }, '-=.55')
+      .from('.hero-meta > div', { y: 30, opacity: 0, stagger: .1, duration: .7 }, '-=.5')
       .from('.hero-scrollcue, .hero-frameinfo', { opacity: 0, duration: .8 }, '-=.4');
   }
 
@@ -450,8 +451,16 @@
     });
   });
 
-  /* ─────────── booking → save lead (Web3Forms) + WhatsApp ─────────── */
-  $('#bookForm').addEventListener('submit', e => {
+  /* ─────────── booking → YKS enquiry endpoint (window.YKSEnquiry, landing.js) ───────────
+     "Sent" only appears once the server confirms it saved the enquiry. Any failure says
+     so plainly and hands over a WhatsApp button with the brief already written. */
+  const sendEnquiry = (fields, meta) => (window.YKSEnquiry
+    ? window.YKSEnquiry.send(fields, meta)
+    : Promise.reject(new Error('enquiry helper missing')));
+  const bookForm = $('#bookForm');
+  if (window.YKSEnquiry) window.YKSEnquiry.honeypot(bookForm);
+  else addEventListener('load', () => window.YKSEnquiry && window.YKSEnquiry.honeypot(bookForm));
+  bookForm.addEventListener('submit', e => {
     e.preventDefault();
     const v = id => ($('#' + id).value || '').trim();
     if (!v('f-name') || !v('f-phone') || !v('f-date')) {
@@ -460,55 +469,48 @@
     }
     const num = $('#f-region').value;
     const region = num === '971501955122' ? 'UAE / Dubai' : 'India';
-
-    /* 1) Save the lead to email — captured even if WhatsApp isn't completed */
-    fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        access_key: 'fbf5d037-af64-46a1-8ddc-5777379ec179',
-        "Found via": (window.YKSSource && window.YKSSource.label()) || '\u2014',
-        subject: 'New shoot enquiry — ' + v('f-type') + ' — ' + v('f-name'),
-        from_name: 'YKS Productions website',
-        Name: v('f-name'),
-        Contact: v('f-phone'),
-        Preferred_date: v('f-date') + (v('f-time') ? ' at ' + v('f-time') : ''),
-        Shoot_type: v('f-type'),
-        Region: region,
-        Project: v('f-msg') || '—',
-        Source: 'Homepage booking form'
-      })
-    })
-      .then(r => { if (!r.ok) throw new Error('web3forms ' + r.status); })
-      .catch(() => {
-        /* the email hop failed — say so instead of a false "Sent", WhatsApp
-           still opens below so the enquiry isn't lost */
-        const n = document.querySelector('#bookForm .form-note');
-        if (n) {
-          n.textContent = 'Couldn’t email your details — please send the WhatsApp message that just opened, or call +91 97466 79720.';
-          n.style.color = 'var(--amber)';
-        }
-      });
-
-    /* 2) Still open a pre-filled WhatsApp for those who prefer to chat */
+    const when = v('f-date') + (v('f-time') ? ' at ' + v('f-time') : '');
     const msg =
       'Hi Yedukrishna! I’d like to book a shoot.\n' +
       '• Name: ' + v('f-name') + '\n' +
       '• Contact: ' + v('f-phone') + '\n' +
-      '• Date: ' + v('f-date') + (v('f-time') ? ' at ' + v('f-time') : '') + '\n' +
+      '• Date: ' + when + '\n' +
       '• Type: ' + v('f-type') + '\n' +
       (v('f-msg') ? '• Project: ' + v('f-msg') + '\n' : '') +
       '— sent from the YKS Productions site';
-    open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+    const note = bookForm.querySelector('.form-note');
+    const btn = bookForm.querySelector('button[type="submit"], button:not([type])');
+    const label = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+    if (note) { note.textContent = 'Sending your details…'; note.style.color = ''; }
+    if (window.YKSEnquiry) window.YKSEnquiry.clearFail(bookForm);
 
-    /* 3) Confirm to the visitor */
-    const note = document.querySelector('#bookForm .form-note');
-    if (note) { note.textContent = '✓ Sent — your details are with Yedukrishna. WhatsApp opened too.'; note.style.color = 'var(--teal)'; }
+    sendEnquiry(
+      { name: v('f-name'), phone: v('f-phone'), date: when, service: v('f-type'), city: region, message: v('f-msg') },
+      { form: 'homepage-booking', source: 'Homepage booking form', form_el: bookForm }
+    ).then(() => {
+      if (btn) { btn.disabled = false; btn.innerHTML = label; }
+      if (note) {
+        note.innerHTML = '✓ Sent — Yedukrishna has your details and will reply soon. '
+          + '<a href="https://wa.me/' + num + '?text=' + encodeURIComponent(msg) + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Prefer WhatsApp now?</a>';
+        note.style.color = 'var(--teal)';
+      }
+    }).catch(err => {
+      if (btn) { btn.disabled = false; btn.innerHTML = label; }
+      if (note) { note.textContent = ''; }
+      if (window.YKSEnquiry) window.YKSEnquiry.failBox(bookForm, msg, num, err && err.userMessage);
+      else if (note) {
+        note.innerHTML = 'Your message didn’t reach me. Please <a href="https://wa.me/' + num + '?text=' + encodeURIComponent(msg) + '" target="_blank" rel="noopener">send it on WhatsApp</a> instead.';
+        note.style.color = 'var(--amber)';
+      }
+    });
   });
 
-  /* ── Masterclass waitlist — capture the email instead of reloading the page ── */
+  /* ── Masterclass waitlist — same endpoint; failure offers WhatsApp ── */
   const wlForm = $('#waitlistForm');
   if (wlForm) {
+    if (window.YKSEnquiry) window.YKSEnquiry.honeypot(wlForm);
+    else addEventListener('load', () => window.YKSEnquiry && window.YKSEnquiry.honeypot(wlForm));
     wlForm.addEventListener('submit', e => {
       e.preventDefault();
       const field = $('#wl-email');
@@ -517,27 +519,17 @@
       const success = $('#wlSuccess');
       const btn = wlForm.querySelector('button[type="submit"]');
       if (btn) { btn.disabled = true; btn.textContent = 'Joining…'; }
-
-      fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          access_key: 'fbf5d037-af64-46a1-8ddc-5777379ec179',
-        "Found via": (window.YKSSource && window.YKSSource.label()) || '\u2014',
-          subject: 'Masterclass waitlist — ' + email,
-          from_name: 'YKS Productions website',
-          Email: email,
-          Source: 'Masterclass waitlist'
-        })
-      })
-        .then(r => { if (!r.ok) throw new Error('web3forms ' + r.status); return r; })
+      if (window.YKSEnquiry) window.YKSEnquiry.clearFail(wlForm);
+      sendEnquiry({ email: email }, { form: 'waitlist', source: 'Masterclass waitlist', form_el: wlForm })
         .then(() => {
           wlForm.style.display = 'none';
           if (success) success.style.display = 'block';
         })
-        .catch(() => {
+        .catch(err => {
           if (btn) { btn.disabled = false; btn.textContent = 'Join waitlist'; }
-          if (success) {
+          const text = 'Hi Yedukrishna, please add me to the masterclass waitlist: ' + email;
+          if (window.YKSEnquiry) window.YKSEnquiry.failBox(wlForm, text, '919746679720', err && err.userMessage);
+          else if (success) {
             success.textContent = 'Couldn’t save that — please WhatsApp +91 97466 79720 and I’ll add you.';
             success.style.color = 'var(--amber)';
             success.style.display = 'block';

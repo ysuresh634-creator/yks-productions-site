@@ -423,7 +423,6 @@
   }
 })();
 (function () {
-  var KEY = 'fbf5d037-af64-46a1-8ddc-5777379ec179';
   var log = document.getElementById('qLog'), now = document.getElementById('qNow'), bar = document.getElementById('qBar');
   var A = {}, idx = 0, hist = [];
 
@@ -565,20 +564,15 @@
     };
     document.getElementById('sGo').onclick = function () {
       var b = document.getElementById('sGo'); b.textContent = 'Sending…'; b.disabled = true;
-      fetch('https://api.web3forms.com/submit', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          access_key: KEY,
-          subject: 'QUOTE REQUEST — ' + (A.type || 'Shoot') + ' · ' + (A.where || ''),
-          from_name: 'YKS quote assistant',
-          Source: 'Quote assistant',
-          Name: A.name, Contact: A.phone, Email: A.email || '—',
-          Needs: A.need || '—', Type: A.type || '—', Scale: A.scale || '—',
-          Location: A.where || '—', Timing: A.when || '—',
-          Deliverables: A.deliver || '—', Notes: A.detail || '—'
-        })
-      }).then(function (r) { return r.json(); }).then(function (j) {
-        if (j.success) {
+      var waText = "Hi Yedukrishna, I tried to send this brief from your quote page:\n\n" + txt + "\nName: " + A.name + "\nContact: " + A.phone + (A.email ? "\nEmail: " + A.email : '');
+      var E = window.YKSEnquiry;
+      (E ? E.send({
+          name: A.name, phone: A.phone, email: A.email || '',
+          service: A.type || '', city: A.where || '', date: A.when || '',
+          needs: A.need || '', scale: A.scale || '', deliverables: A.deliver || '', message: A.detail || ''
+        }, { form: 'quote', source: 'Quote assistant', subject: 'QUOTE REQUEST — ' + (A.type || 'Shoot') + ' · ' + (A.where || '') })
+        : Promise.reject(new Error('helper missing'))
+      ).then(function () {
           if (window.gtag) gtag('event', 'generate_lead', { method: 'quote_assistant' });
           now.innerHTML = '<div class="q-done"><div class="tick">✓</div>'
             + '<h2 style="font-size:clamp(24px,3.4vw,36px);margin-bottom:14px">Got it — thank you</h2>'
@@ -586,8 +580,12 @@
             + '<div class="q-actions" style="justify-content:center"><a class="btn btn-ghost" href="/faq.html">Read the FAQ</a>'
             + '<a class="btn btn-ghost" href="/index.html">See the work</a></div></div>';
           now.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else { b.textContent = 'Try again →'; b.disabled = false; }
-      }).catch(function () { b.textContent = 'Try again →'; b.disabled = false; });
+      }).catch(function (err) {
+        b.textContent = 'Try again →'; b.disabled = false;
+        var acts = b.parentNode;
+        if (E) E.failBox(acts, waText, waNum, err && err.userMessage);
+        else acts.insertAdjacentHTML('afterend', '<p class="yks-fail" role="alert">Your brief didn’t reach me. Please <a href="https://wa.me/' + waNum + '?text=' + encodeURIComponent(waText) + '" target="_blank" rel="noopener">send it on WhatsApp</a> instead.</p>');
+      });
     };
     now.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
@@ -595,7 +593,7 @@
   step();
 })();
 </script>
-<script src="/js/landing.js?v=20"></script>
+<script src="/js/landing.js?v=23"></script>
 <script src="/js/fx.js?v=6"></script>
 <script src="/js/lead.js?v=3"></script>
 <script src="/js/bokeh.js?v=2"></script>

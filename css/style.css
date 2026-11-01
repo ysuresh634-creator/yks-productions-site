@@ -159,6 +159,14 @@ img{display:block;max-width:100%;height:auto}
   -webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-roles{margin-top:30px;font-weight:400;line-height:1.6;letter-spacing:normal;font-size:clamp(14px,1.8vw,19px);color:rgba(244,237,226,.88);font-style:italic;font-family:var(--font-d)}
 .hero-meta{display:flex;gap:54px;margin-top:46px;flex-wrap:wrap;justify-content:center}
+/* the ask, right under the headline: quote assistant + WhatsApp */
+.hero-cta{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;justify-content:center}
+.hero-cta .btn{min-width:168px;white-space:nowrap}
+.hero-cta .hero-cta-wa{background:rgba(7,6,10,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.hero-cta svg{flex:none;width:16px;height:16px}
+.hero-cta + .hero-meta{margin-top:36px}
+@media (max-height:760px){.hero-cta{margin-top:2.4vh}.hero-cta + .hero-meta{margin-top:2.6vh}}
+@media (max-width:420px){.hero-cta{gap:10px}.hero-cta .btn{min-width:0;flex:1 1 0;padding-left:14px;padding-right:14px}}
 .hero-meta b{display:block;font-family:var(--font-m);font-weight:400;font-size:9.5px;letter-spacing:.3em;
   text-transform:uppercase;color:rgba(244,237,226,.5);margin-bottom:6px}
 .hero-meta span{font-family:var(--font-d);font-size:17px}
