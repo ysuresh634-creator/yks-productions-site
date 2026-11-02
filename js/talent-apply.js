@@ -308,16 +308,121 @@
   form.height_cm.addEventListener('blur', function () { if (form.height_cm.value.trim()) checkHeight(true); });
   form.height_cm.addEventListener('input', function () { syncHeight(); if (hBox.classList.contains('bad') && !heightProblem()) clearErr(form.height); });
   function inch(v) { var n = num(v); return isNaN(n) ? '' : (Math.round(n * 2) / 2) + '\u2033'; }
-  function focusFor(el) { if (el !== form.height) return el; return hMode === 'cm' ? form.height_cm : (form.height_ft.value === '' ? form.height_ft : form.height_in); }
+  function focusFor(el) { if (el.hidden && el.nextElementSibling) return el.nextElementSibling; if (el !== form.height) return el; return hMode === 'cm' ? form.height_cm : (form.height_ft.value === '' ? form.height_ft : form.height_in); }
+
+  // Portfolios are English only: free text that prints on the PDF must be Latin script (accents fine), no emoji.
+  // Code-point ranges rather than \p{…} escapes so older phone browsers still parse this file.
+  function latinOk(c) {
+    var n = c.codePointAt(0);
+    return n <= 0x2FF || (n >= 0x300 && n <= 0x36F) || (n >= 0x1E00 && n <= 0x1EFF) ||
+      (n >= 0x2000 && n <= 0x206F && n !== 0x200D) || (n >= 0x20A0 && n <= 0x20CF) || n === 0x2116 || n === 0x2122;
+  }
+  function notEnglish(v) { return Array.from(String(v || '')).some(function (c) { return !latinOk(c); }); }
+  /* ── where she lives / is from: state lists follow the chosen country ── */
+  var IN_STATES = ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+    'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim',
+    'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'];
+  var UAE_EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
+  function geo(pre) {
+    var c = form[pre + '_country'], co = form[pre + '_country_other'], st = form[pre + '_state'], stt = form[pre + '_state_text'];
+    var list = c.value === 'India' ? IN_STATES : c.value === 'UAE' ? UAE_EMIRATES : null;
+    return { c: c, co: co, st: st, stt: stt, list: list,
+      country: c.value === 'Other' ? co.value.trim().replace(/\s+/g, ' ') : c.value,
+      state: list ? st.value : stt.value.trim().replace(/\s+/g, ' '),
+      kind: c.value === 'UAE' ? 'emirate' : c.value === 'India' ? 'state' : 'state or region' };
+  }
+  function geoSync(pre) {
+    var g = geo(pre), lab = g.st.parentNode.querySelector('[data-state-label]');
+    g.co.hidden = g.c.value !== 'Other'; g.co.required = !g.co.hidden;
+    if (lab) lab.textContent = (pre === 'home' ? 'Home ' : '') + (g.c.value === 'UAE' ? 'emirate' : g.c.value === 'India' ? 'state' : 'state / region');
+    if (lab && pre !== 'home') lab.textContent = lab.textContent.charAt(0).toUpperCase() + lab.textContent.slice(1);
+    if (g.list) {
+      if (g.st.getAttribute('data-list') !== g.c.value) {
+        g.st.innerHTML = '<option value="">Select</option>' + g.list.map(function (x) { return '<option>' + x + '</option>'; }).join('');
+        g.st.setAttribute('data-list', g.c.value);
+      }
+      g.st.hidden = false; g.st.required = true; g.stt.hidden = true; g.stt.required = false;
+    } else { g.st.hidden = true; g.st.required = false; g.stt.hidden = false; g.stt.required = true; }
+  }
+  function geoCountryProblem(pre) {
+    var g = geo(pre), who = pre === 'home' ? 'your home country' : 'the country you live in';
+    if (!g.country) return 'Add ' + who + '.';
+    if (notEnglish(g.country)) return 'Please write the country in English letters (e.g. Canada).';
+    return /[A-Za-z]{2}/.test(g.country) ? '' : 'Add ' + who + '.';
+  }
+  function geoStateProblem(pre) {
+    var g = geo(pre);
+    if (!g.state) return g.list ? 'Choose your ' + (pre === 'home' ? 'home ' : '') + g.kind + '.' : 'Add your ' + (pre === 'home' ? 'home ' : '') + g.kind + '.';
+    if (notEnglish(g.state)) return 'Please write this in English letters (e.g. Ontario).';
+    return /[A-Za-z]{2}/.test(g.state) ? '' : 'Add your ' + g.kind + '.';
+  }
+  ['live', 'home'].forEach(function (pre) {
+    geoSync(pre);
+    form[pre + '_country'].addEventListener('change', function () { geoSync(pre); clearErr(form[pre + '_state']); });
+    [[pre + '_country_other', geoCountryProblem], [pre + '_state_text', geoStateProblem]].forEach(function (p) {
+      var el = form[p[0]];
+      el.addEventListener('blur', function () { if (el.value.trim()) { var m = p[1](pre); m ? setErr(el, m) : clearErr(el); } });
+      el.addEventListener('input', function () { if (fieldBox(el).classList.contains('bad') && !p[1](pre)) clearErr(el); });
+    });
+  });
+  function eduLine(lv, course) {
+    lv = String(lv || ''); course = String(course || '').trim();
+    if (/pursuing/i.test(lv)) return course ? course + ' (pursuing)' : lv;
+    if (/^Class 12/.test(lv)) return 'Class 12' + (course ? ', ' + course : '');
+    if (/^Diploma/.test(lv)) return /diploma/i.test(course) ? course : 'Diploma' + (course ? ' in ' + course : '');
+    return course || lv;
+  }
+
+  /* ── About me: required, her own words, English letters ── */
+  var ABOUT_MIN = 120, ABOUT_WORDS = 20, ABOUT_MAX = 600;
+  function wordsOf(v) { return String(v || '').toLowerCase().match(/[a-z\u00c0-\u024f']+/g) || []; }
+  function overlap(a, b) {   // share of a's words found in b
+    var wa = wordsOf(a), sb = {}; wordsOf(b).forEach(function (w) { sb[w] = 1; });
+    return wa.length ? wa.filter(function (w) { return sb[w]; }).length / wa.length : 0;
+  }
+  function aboutProblem(v) {
+    v = String(v || '').replace(/\s+/g, ' ').trim();
+    if (!v) return 'Tell us about you in a few sentences (at least ' + ABOUT_MIN + ' characters).';
+    if (notEnglish(v)) return 'Please write this in English letters, without emoji (e.g. I love editorial and dance shoots).';
+    var w = wordsOf(v), low = v.toLowerCase();
+    if (/lorem|ipsum|dolor sit|consectetur|asdf|qwerty|\b(test|abc|xyz|blah)( \1\b)+/.test(low)) return 'Please write about you in your own words.';
+    var ta = form.about, ref = [ta && ta.placeholder || ''].concat([].map.call(document.querySelectorAll('.ta-hints span'), function (x) { return x.textContent; })).join(' ');
+    if (w.length && overlap(v, ref) > 0.7) return 'Please write about you in your own words, not the example text.';
+    if (v.length < ABOUT_MIN || w.length < ABOUT_WORDS) return 'A little more, please: at least ' + ABOUT_MIN + ' characters and ' + ABOUT_WORDS + ' words (now ' + v.length + ' characters).';
+    if (v.length > ABOUT_MAX) return 'Keep it under ' + ABOUT_MAX + ' characters.';
+    var cnt = {}, top = 0, uniq = 0;
+    w.forEach(function (x) { cnt[x] = (cnt[x] || 0) + 1; if (cnt[x] === 1) uniq++; if (cnt[x] > top) top = cnt[x]; });
+    if (uniq / w.length < 0.4 || top / w.length > 0.25 || /(.)\1{4,}/.test(low) || /\b(\w+)(\W+\1\b){2,}/.test(low)) return 'This looks repeated. Please write a few real sentences about you.';
+    return '';
+  }
+  (function () {
+    var ta = form.about, out = $('#taAboutCount'); if (!ta || !out) return;
+    function count() { var n = ta.value.replace(/\s+/g, ' ').trim().length; out.textContent = n + ' / ' + ABOUT_MAX + (n < ABOUT_MIN ? ' \u00b7 at least ' + ABOUT_MIN + ' characters' : ' \u2713'); }
+    ta.addEventListener('input', count); count();
+  })();
 
   var CHECKS = {
-    name: function (v) { return v.replace(/\s+/g, ' ').length >= 2 && /[A-Za-z\u00C0-\u024F\u0900-\u0D7F]/.test(v) ? '' : 'Add your full name.'; },
+    name: function (v) {
+      v = v.replace(/\s+/g, ' ');
+      if (notEnglish(v)) return 'Please write your name in English letters (e.g. Ananya Sharma).';
+      if (!/^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\u0300-\u036F .'\u2019\u2018-]+$/.test(v)) return 'Use letters only in your name (e.g. Ananya Sharma).';
+      return v.length >= 2 && /[A-Za-z\u00C0-\u024F\u1E00-\u1EFF]/.test(v) ? '' : 'Add your full name.';
+    },
+    about: function (v) { return aboutProblem(v); },
     phone: function (v) { var d = v.replace(/\D/g, ''); return /^[+\d\s()\-]+$/.test(v) && d.length >= 8 && d.length <= 15 ? '' : 'Add a phone number with country code, e.g. +91 98xxx xxxxx.'; },
     email: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : 'Add a valid email, e.g. you@gmail.com.'; },
-    city: function (v) { return v.length >= 2 ? '' : 'Add your city.'; },
+    live_country: function () { return geoCountryProblem('live'); },
+    live_state: function () { return geoStateProblem('live'); },
+    city: function (v) { return notEnglish(v) ? 'Please write your town or city in English letters (e.g. Mumbai).' : (v.length >= 2 && /[A-Za-z\u00C0-\u024F]{2}/.test(v) ? '' : 'Add the town or city you live in.'); },
+    home_country: function () { return geoCountryProblem('home'); },
+    home_state: function () { return geoStateProblem('home'); },
+    education: function (v) { return v ? '' : 'Choose your highest education.'; },
+    course: function (v) { return notEnglish(v) ? 'Please write this in English letters (e.g. BBA, B.Des Fashion).' : (/[A-Za-z]{2}/.test(v) ? '' : 'Add your course or field (e.g. BBA, B.Des Fashion).'); },
+    training: function (v) { return notEnglish(v) ? 'Please write this in English letters (e.g. Kathak, acting workshop).' : ''; },
     instagram: function (v) { var h = igHandle(v); return h && /^(?!.*\.\.)(?!\.)[A-Za-z0-9._]{2,30}$/.test(h) && !/^(na|none|nil|no)$/i.test(h) ? '' : 'Add your Instagram handle, e.g. @yourname.'; },
     category: function (v) { return v ? '' : 'Choose one.'; },
-    dob: function (v) { if (!v) return 'Add your date of birth.'; var a = age(v); return a < 0 || a > 90 ? 'Check your date of birth.' : (a < 18 ? 'Applicants must be 18 or older.' : ''); },
+    dob: function (v) { if (!v) return 'Add your date of birth.'; var a = age(v); return a < 0 || a > 90 ? 'Check your date of birth.' : (a < 18 || a > 34 ? 'Sorry, YKS Talents currently accepts talent aged 18\u201334.' : ''); },
     height: function () { return heightProblem(); },
     bust: function (v) { return measureProblem(v, 'bust', 26, 50, 34); },
     waist: function (v) { return measureProblem(v, 'waist', 20, 44, 26); },
@@ -379,11 +484,41 @@
     return fetch(APPS_SCRIPT_URL, { method: 'POST', redirect: 'follow', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body, signal: ctl ? ctl.signal : undefined })
       .then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('http ' + r.status); return r.json(); }, function (e) { clearTimeout(t); throw e; });
   }
-  var PORTFOLIO_JS = '/js/talent-portfolio.js?v=6';
+  var PORTFOLIO_JS = '/js/talent-portfolio.js?v=8';
   // one id per application: seeds the portfolio's art direction (name + id), so the uploaded PDF and a
   // later download are the same book, while two applicants almost never get the same one
   var APP_ID = 'A' + Date.now().toString(36) + Math.floor(Math.random() * 1679616).toString(36);
-  function pdfData(D, q) { var d = { name: D.name, category: D.category, city: D.city, about: D.about, seed: APP_ID, stats: vitals(D), photos: pdfOrder() }; if (q) d._q = q; return d; }
+  function pdfData(D, q) {
+    var d = { name: D.name, category: D.category, city: D.city, based: D.based, about: D.about, bio: D.bio || '', quote: D.quote || '',
+      age: D.age, edu: D.edu, seed: APP_ID, stats: vitals(D), photos: pdfOrder() };
+    if (q) d._q = q; return d;
+  }
+  /* her About, polished by the YKS worker into a short English bio built only from what she gave.
+     ~5 s at most; on any failure the portfolio uses her own cleaned words. Never throws. */
+  var BIO_URL = 'https://yks-chat.ysuresh634.workers.dev/bio', BIO_TIMEOUT = 5000;
+  var EN_STOP = ' i me my the a an and or of to in on at for with is am are was be it this that from as by not but so very also just more like love ';
+  function ownQuote(t) {
+    var best = '';
+    String(t || '').split(/[.!?]+(?:\s+|$)|\n+/).forEach(function (x) {
+      x = x.trim().replace(/[.!?]+$/, ''); var w = wordsOf(x);
+      var en = w.filter(function (y) { return EN_STOP.indexOf(' ' + y + ' ') > -1; }).length / (w.length || 1);
+      if (!best && w.length >= 5 && w.length <= 16 && en >= 0.2 && !/@|https?:|www\.|\d{6,}|instagram|whats\s*app|ignore|instruction/i.test(x)) best = x;
+    });
+    return best;
+  }
+  function polishBio(D) {
+    var own = { about: '', quote: ownQuote(D.about), source: 'own words' };
+    try {
+      var ctl = typeof AbortController === 'function' ? new AbortController() : null, t;
+      var call = fetch(BIO_URL, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' }, signal: ctl ? ctl.signal : undefined,
+        body: JSON.stringify({ about: D.about, seed: APP_ID, fields: { first_name: D.name.split(' ')[0], category: D.category, age: String(D.age),
+          education: D.education, course: D.course, training: D.training, based_in: D.based, home: D.home } }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) { return j && j.ok && j.about && !notEnglish(j.about) ? { about: j.about, quote: j.quote && !notEnglish(j.quote) ? j.quote : own.quote, source: 'ai' + (j.model ? ' (' + j.model + ')' : '') } : own; }, function () { return own; });
+      return Promise.race([call, new Promise(function (res) { t = setTimeout(function () { if (ctl) ctl.abort(); res(own); }, BIO_TIMEOUT); })])
+        .then(function (r) { clearTimeout(t); return r; });
+    } catch (e) { return Promise.resolve(own); }
+  }
   function designName(D) { try { var g = window.YKSPortfolio.design(pdfData(D)); return [g.themeName, g.cover, g.profile, g.back].join(' \u00b7 '); } catch (e) { return ''; } }
   function portfolioLib() {
     return window.YKSPortfolio ? Promise.resolve() : new Promise(function (res, rej) {
@@ -418,7 +553,7 @@
     if (pp) { setErr(slotBox, pp); first = first || slotBox; }
     if (first) { say(first === slotBox && pp ? pp : 'Please fix the fields marked in red.' + (pp ? ' ' + pp : '')); (first === slotBox ? first : fieldBox(first)).scrollIntoView({ behavior: 'smooth', block: 'center' }); if (first.focus) first.focus({ preventScroll: true }); return; }
     if (!boardGate()) { say(BLOCKED); return; }   // silent: no upload, no email, no link
-    var yrs = age(form.dob.value); if (yrs < 18 || yrs > 35) { say(BLOCKED); return; }   // board window, never named on the page
+    var yrs = age(form.dob.value); if (yrs < 18 || yrs > 34) { say('Sorry, YKS Talents currently accepts talent aged 18\u201334.'); return; }
     // backstops for bots and scripted posts: honeypots must stay empty, and the form can't be instant
     var hpBox = form.querySelector('[name=botcheck]'), hpTxt = form.querySelector('[name=website]');
     if ((hpBox && hpBox.checked) || (hpTxt && hpTxt.value) || Date.now() - T0 < MIN_MS) { say(BLOCKED); return; }
@@ -426,8 +561,14 @@
     var D = {
       name: form.name.value.trim().replace(/\s+/g, ' '), phone: form.phone.value.trim(), email: form.email.value.trim(),
       city: form.city.value.trim(), handle: igHandle(form.instagram.value), category: form.category.value,
-      dob: form.dob.value, gender: form.gender.value, about: (form.about.value || '').trim().slice(0, 300)
+      dob: form.dob.value, gender: form.gender.value, about: (form.about.value || '').replace(/[ \t]+/g, ' ').trim().slice(0, ABOUT_MAX)
     };
+    var GL = geo('live'), GH = geo('home');
+    D.age = yrs; D.education = form.education.value; D.course = form.course.value.trim().replace(/\s+/g, ' ').slice(0, 80);
+    D.training = (form.training.value || '').trim().replace(/\s+/g, ' ').slice(0, 160); D.edu = eduLine(D.education, D.course);
+    D.live_country = GL.country; D.live_state = GL.state; D.home_country = GH.country; D.home_state = GH.state;
+    D.based = [D.city].concat(GL.state && GL.state.toLowerCase() !== D.city.toLowerCase() ? [GL.state] : [], GL.country !== 'India' ? [GL.country] : []).join(', ');
+    D.home = [GH.state, GH.country].filter(String).join(', ');
     var HL = heightLabel();
     D.height_cm = HL.cm; D.height_short = HL.short; D.height_full = HL.full;
     D.bust = inch(form.bust.value); D.waist = inch(form.waist.value); D.hips = inch(form.hips.value);
@@ -473,10 +614,14 @@
         return size > PHOTO_BUDGET && step < PREP_STEPS.length - 1 ? prepAll(step + 1) : out;
       });
     }
+    var bioP = polishBio(D);
     prepAll(list.length > 8 ? 1 : 0)
       .then(function (ph) {
         say('Preparing your portfolio\u2026');
-        return builtPortfolio(D).then(function (pdf) { return { photos: ph, pdf: pdf }; });
+        return bioP.then(function (b) {
+          D.bio = b.about; D.quote = b.quote; D.bio_source = b.source;
+          return builtPortfolio(D).then(function (pdf) { return { photos: ph, pdf: pdf }; });
+        });
       })
       .then(function (up) {
         say('Sending your application\u2026 this can take a minute or two, keep this page open.');
@@ -486,6 +631,10 @@
           fields: {
             name: D.name, phone: D.phone, email: D.email, city: D.city, instagram: D.handle, category: D.category,
             dob: D.dob, height: D.height, gender: D.gender, about: D.about,
+            about_polished: D.bio || '', bio_source: D.bio_source || '', pull_quote: D.quote || '', age: String(D.age),
+            education: D.education, course: D.course, training: D.training,
+            current_country: D.live_country, current_state: D.live_state, current_city: D.city, based_in: D.based,
+            home_country: D.home_country, home_state: D.home_state,
             height_cm: String(D.height_cm), height_ft_in: D.height_short, bust: D.bust, waist: D.waist, hips: D.hips, shoe: D.shoe, hair: D.hair, eyes: D.eyes,
             follow_verified: followVerified || '', flags: FLAGS.join('; '), source: source(), seconds_on_form: secs,
             app_id: APP_ID, portfolio_design: design,
@@ -524,7 +673,8 @@
         var direct = (j.photos || []).map(function (p) { return { url: p.url, cat: p.slot || 'extra' }; }).filter(function (p) { return p.url; });
         try {
           fetch(ENGINE_URL + '/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
-            name: D.name, contact: D.phone, email: D.email, category: D.category, city: D.city, socials: '@' + D.handle,
+            name: D.name, contact: D.phone, email: D.email, category: D.category, city: D.based, socials: '@' + D.handle,
+            age: D.age, education: D.education, course: D.course, training: D.training, home: D.home, about_polished: D.bio || '',
             instagram_profile: D.profile, about: D.about, stat_height: D.height_full, stat_bust: D.bust, stat_waist: D.waist, stat_hips: D.hips,
             stat_shoe: D.shoe, stat_hair: D.hair, stat_eyes: D.eyes, dob: D.dob, gender: D.gender,
             photos: direct, cover_url: direct[0] ? direct[0].url : '', portfolio_seed: APP_ID

@@ -358,6 +358,15 @@
 .ta-suffix input{padding-right:38px}
 .ta-f.bad .ta-suffix input{border-color:#e24a2a}
 .ta-opt{opacity:.6}
+.ta-pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ta-pgrid .ta-f{grid-column:auto;min-width:0}
+.ta-pgrid .ta-span2{grid-column:span 2}
+.ta-pgrid input+input,.ta-pgrid select+input{margin-top:6px}
+.ta-f [hidden]{display:none}
+.ta-hints{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0}
+.ta-hints span{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--paper-dim)}
+.ta-count{text-align:right}
+@media(max-width:380px){.ta-pgrid{grid-template-columns:1fr}.ta-pgrid .ta-span2{grid-column:auto}}
 .ta-f input:focus,.ta-f select:focus,.ta-f textarea:focus{outline:none;border-color:rgba(244,240,232,.75)}
 .ta-f.bad input:focus,.ta-f.bad select:focus,.ta-f.bad textarea:focus{border-color:#e24a2a;box-shadow:0 0 0 1px #e24a2a}
 .ta-vgrid select{padding-left:9px;padding-right:2px}
@@ -408,7 +417,6 @@
     <label class="ta-f">Full name<input type="text" name="name" autocomplete="name" placeholder="Your name" required /></label>
     <label class="ta-f">Phone<input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="+91 / +971 …" required /></label>
     <label class="ta-f">Email<input type="email" name="email" autocomplete="email" inputmode="email" placeholder="you@gmail.com" required /></label>
-    <label class="ta-f half">City<input type="text" name="city" autocomplete="address-level2" placeholder="Mumbai, Dubai …" required /></label>
     <label class="ta-f half">Instagram<input type="text" name="instagram" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="@yourhandle" required /></label>
     <label class="ta-f half">Category
       <select name="category" required>
@@ -421,7 +429,32 @@
         <option value="Woman">Woman</option>
       </select>
     </label>
-    <label class="ta-f half">Date of birth<input type="date" name="dob" required /></label>
+    <label class="ta-f half">Date of birth<input type="date" name="dob" required aria-describedby="taDobHelp" /><span class="ta-help ta-help-sm" id="taDobHelp">You must be 18&ndash;34.</span></label>
+    <fieldset class="ta-f ta-vitals" id="taPlace">
+      <legend>Where you live <span class="ta-req">required</span></legend>
+      <p class="ta-help">Castings are booked by location, so tell us where you are now and where you&rsquo;re from.</p>
+      <span class="ta-vl ta-sub">Currently living in</span>
+      <div class="ta-pgrid">
+        <div class="ta-f" data-geo="live"><span class="ta-vl">Country</span><select name="live_country" required aria-label="Country you live in"><option selected>India</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Bahrain</option><option>Kuwait</option><option>Oman</option><option value="Other">Other country</option></select><input type="text" name="live_country_other" placeholder="Country name" autocomplete="country-name" hidden aria-label="Country you live in" /></div>
+        <div class="ta-f" data-geo-state="live"><span class="ta-vl" data-state-label>State</span><select name="live_state" required aria-label="State you live in"></select><input type="text" name="live_state_text" placeholder="State / region" autocomplete="address-level1" hidden aria-label="State or region you live in" /></div>
+        <label class="ta-f ta-span2">Town / city<input type="text" name="city" autocomplete="address-level2" placeholder="e.g. Mumbai" required /></label>
+      </div>
+      <span class="ta-vl ta-sub">Originally from</span>
+      <div class="ta-pgrid">
+        <div class="ta-f" data-geo="home"><span class="ta-vl">Home country</span><select name="home_country" required aria-label="Home country"><option selected>India</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Bahrain</option><option>Kuwait</option><option>Oman</option><option value="Other">Other country</option></select><input type="text" name="home_country_other" placeholder="Country name" hidden aria-label="Home country" /></div>
+        <div class="ta-f" data-geo-state="home"><span class="ta-vl" data-state-label>Home state / region</span><select name="home_state" required aria-label="Home state"></select><input type="text" name="home_state_text" placeholder="State / region" hidden aria-label="Home state or region" /></div>
+      </div>
+    </fieldset>
+    <fieldset class="ta-f ta-vitals" id="taStudy">
+      <legend>Education <span class="ta-req">required</span></legend>
+      <div class="ta-pgrid">
+        <label class="ta-f">Highest education<select name="education" required>
+          <option value="">Select</option><option>Class 12</option><option>Diploma</option><option value="Bachelor’s – pursuing">Bachelor’s &ndash; pursuing</option><option value="Bachelor’s">Bachelor’s</option><option value="Master’s – pursuing">Master’s &ndash; pursuing</option><option value="Master’s">Master’s</option><option>Doctorate</option><option>Other</option>
+        </select></label>
+        <label class="ta-f">Course / field<input type="text" name="course" placeholder="e.g. BBA, B.Des Fashion" required /></label>
+        <label class="ta-f ta-span2">Extra training <span class="ta-opt">optional</span><input type="text" name="training" maxlength="160" placeholder="e.g. Kathak 6 yrs, acting workshop, runway course" /></label>
+      </div>
+    </fieldset>
     <fieldset class="ta-f ta-vitals" id="taVitals">
       <legend>Your vitals <span class="ta-req">required</span></legend>
       <p class="ta-help">Clients filter castings by height and measurements, so we can&#39;t put you forward without them. Measure over light clothing with a soft tape; an honest number is better than a flattering one.</p>
@@ -464,7 +497,12 @@
       <div id="taSlots" class="ta-photos" aria-live="polite"></div>
       <span class="ta-opt" id="taPhotoCount"></span>
     </div>
-    <label class="ta-f">Short intro <span class="ta-opt">optional</span><textarea name="about" rows="2" maxlength="300" placeholder="One or two lines about you"></textarea></label>
+    <label class="ta-f" id="taAboutBox">About me <span class="ta-req">required</span>
+      <span class="ta-help ta-help-sm">In your own words, in English letters. We polish it into the short bio on your portfolio, using only what you write here.</span>
+      <span class="ta-hints" aria-hidden="true"><span>What you love shooting</span><span>Your experience</span><span>Languages you speak</span><span>What makes you different</span></span>
+      <textarea name="about" rows="5" minlength="120" maxlength="600" placeholder="Tell clients about you: the shoots you enjoy, any experience or training, the languages you speak, and what makes you different." required></textarea>
+      <span class="ta-help ta-help-sm ta-count" id="taAboutCount" aria-live="polite">0 / 600 &middot; at least 120 characters</span>
+    </label>
     <div class="ta-hp" aria-hidden="true"><input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" /><input type="text" name="website" tabindex="-1" autocomplete="off" /></div>
     <button type="submit" class="ta-submit" id="taSubmit" disabled>Create my free portfolio</button>
     <p class="ta-hint" id="taFollowHint">Tap Follow above to unlock submit.</p>
@@ -545,6 +583,6 @@
   </div>
 </footer>
 
-<script src="/js/talent-apply.js?v=91"></script>
+<script src="/js/talent-apply.js?v=92"></script>
 </body>
 </html>

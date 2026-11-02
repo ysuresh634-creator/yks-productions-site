@@ -24,7 +24,7 @@
    frames on a canvas (no distortion, never stretched) and released; pass 2 draws the real book. */
 (function () {
   'use strict';
-  var VER = '3.0';
+  var VER = '3.1';
   var W = 595.28, H = 841.89, M = 40, CW = W - 2 * M;
   var DISC = { 'Model': ['Fashion', 'Editorial', 'Runway', 'Commercial'], 'Influencer / Creator': ['Content', 'Campaign', 'Reels', 'Commercial'], 'Actor': ['Film', 'Advertising', 'Editorial', 'Screen'] };
   var PPT = 2.2;              // output pixels per point for photo crops (~158 dpi): full pages stay sharp on phones and in print
@@ -90,7 +90,7 @@
   function stripContact(s) {
     if (!s) return '';
     // a sentence that carries contact details goes entirely (no orphaned "me on or" left behind)
-    s = String(s).split(/(?<=[.!?])\s+|\n+/).filter(function (x) { return !CONTACTY.test(x); }).join(' ');
+    s = String(s).replace(/([.!?])\s+/g, '$1\n').split(/\n+/).filter(function (x) { return !CONTACTY.test(x); }).join(' ');
     return String(s)
       .replace(/\S+@\S+\.\S+/g, '')
       .replace(/\b(?:https?:\/\/|www\.)\S+/gi, '')
@@ -99,6 +99,21 @@
       .replace(/\b[a-z0-9-]+\.(?:com|in|net|co|org|me|link|io|to|xyz|ae)\b(?:\/[^\s]*)?/gi, '')
       .replace(/[+(]?\d[\d\s().\-]{6,}\d/g, '')
       .replace(/\s{2,}/g, ' ').replace(/^[\s·|,\-]+|[\s·|,\-]+$/g, '').trim();
+  }
+  /* Portfolios are English only. Anything outside Latin script (other scripts, emoji, symbols) never
+     reaches the page: characters are dropped, and an intro sentence that is mostly non-Latin goes entirely. */
+  var KEEP = /[\u0020-\u007e\u00a0-\u017f\u2010-\u2014\u2018-\u201e\u2022\u2026\u2032\u2033\u20b9]/;
+  function latin(s) {
+    s = String(s || '').normalize('NFC').replace(/[\u0180-\u024f\u1e00-\u1eff]/g, function (c) { var b = c.normalize('NFD').charAt(0); return b.charCodeAt(0) < 0x180 ? b : ''; });
+    return Array.from(s).filter(function (c) { return KEEP.test(c); }).join('')
+      .replace(/\s{2,}/g, ' ').replace(/\(\s*\)/g, '').replace(/\s+([,.;:!?])/g, '$1').trim();
+  }
+  function letters(s) { return (String(s).match(/[\u0041-\u005a\u0061-\u007a\u00c0-\u024f\u1e00-\u1eff]/g) || []).length; }
+  function others(s) { return Array.from(String(s)).filter(function (c) { var n = c.codePointAt(0); return n > 0x36f && !(n >= 0x1e00 && n <= 0x1eff) && !(n >= 0x2000 && n <= 0x206f) && !(n >= 0x20a0 && n <= 0x20cf); }).length; }
+  function latinProse(s) {
+    return String(s || '').normalize('NFC').replace(/([.!?\u0964\u0965])\s+/g, '$1\n').split(/\n+/).filter(function (x) {
+      var l = letters(x); return l >= 2 && others(x) < l;       // mainly non-Latin (or emoji-only) → whole sentence goes
+    }).map(latin).filter(function (x) { return letters(x) >= 2; }).join(' ');
   }
   function titleCase(s) {
     return String(s || '').replace(/\s+/g, ' ').trim().split(' ').map(function (w) {
@@ -143,17 +158,31 @@
     var PRIMES = FAM === 'PF';                           // only Playfair carries ′ ″
     var DARK = T.mode === 'dark', BG = T.bg, INK = T.ink, SUB = T.sub, RULE = T.rule, NIGHT = T.night;
     var N = P.length, pg = 0;
-    var name = titleCase(D.name || 'YKS Talent'), parts = name.split(' ');
+    var name = titleCase((letters(latin(D.name)) >= 2 && latin(D.name).replace(/[^A-Za-z\u00c0-\u017f .'\u2019-]/g, '').replace(/\s{2,}/g, ' ').trim()) || 'YKS Talent'), parts = name.split(' ');
     var first = parts[0], last = parts.slice(1).join(' ');
     var NAME_UP = name.toUpperCase();
-    var cat = String(D.category || 'Model').trim(), city = titleCase(stripContact(D.city || ''));
+    var cat = latin(D.category || 'Model') || 'Model', city = titleCase(latin(stripContact(D.city || '')));
     var role = cat === 'Influencer / Creator' ? 'Creator' : cat;
     var disc = DISC[cat] || DISC.Model;
-    var about = stripContact(String(D.about || '').trim()).slice(0, 300);
+    var STEER = /\b(ignore|disregard|forget)\b.{0,40}\b(instruction|prompt|rule|above|previous)|\bsystem\s*prompt\b|\byou\s+are\s+now\b/i;
+    function noSteer(t) { return String(t || '').replace(/([.!?])\s+/g, '$1\n').split(/\n+/).filter(function (x) { return !STEER.test(x); }).join(' '); }
+    var about = stripContact(latinProse(noSteer(D.about))).slice(0, 600);
+    // the polished bio (worker) when there is one, else her own cleaned words
+    var bio = D.bio ? stripContact(latinProse(noSteer(D.bio))) : '';
+    if (letters(bio) < 60) bio = about;
+    var quote = latin(stripContact(noSteer(D.quote || ''))).replace(/^["\u201c\u2018']+|["\u201d\u2019'.]+$/g, '').slice(0, 140);
+    if (letters(quote) < 12) quote = '';
+    // "Based in <town>, <state/emirate>[, <country if not India>]"; the cover keeps the short town
+    var based = latin(stripContact(D.based || D.city || '')).split(/\s*,\s*/).filter(String).map(function (x, i) { return i === 0 || x === x.toLowerCase() ? titleCase(x) : x; }).filter(function (x, i, a) { return !i || x.toLowerCase() !== a[i - 1].toLowerCase(); }).join(', ');
+    if (!city && based) city = based.split(', ')[0];
+    var AGE = /^\d{2}$/.test(String(D.age || '')) ? String(D.age) : '';
+    var EDU = latin(D.edu || '').replace(/\s{2,}/g, ' ').slice(0, 42).trim();   // "B.Com" is not a web address
+    if (/@|\d{6,}|https?:|www\.|wa\.me/i.test(EDU)) EDU = '';
+    var WHO = role + (based ? ', based in ' + based : '');
     var st = D.stats || {};
     function vt(v) { v = String(v || ''); return PRIMES ? v : v.replace(/\u2032/g, '\u2019').replace(/\u2033/g, '\u201d'); }
-    function sv(k) { var v = st[k]; return v ? vt(stripContact(String(v)).trim()) : ''; }
-    var VITALS = [['Height', sv('height')], ['Bust', sv('bust')], ['Waist', sv('waist')], ['Hips', sv('hips')], ['Shoe', sv('shoe')], ['Hair', sv('hair')], ['Eyes', sv('eyes')]].filter(function (r) { return r[1]; });
+    function sv(k) { var v = st[k]; return v ? vt(latin(stripContact(String(v)))) : ''; }
+    var VITALS = [['Age', AGE], ['Height', sv('height')], ['Bust', sv('bust')], ['Waist', sv('waist')], ['Hips', sv('hips')], ['Shoe', sv('shoe')], ['Hair', sv('hair')], ['Eyes', sv('eyes')], ['Education', EDU]].filter(function (r) { return r[1]; });
     var HSHORT = sv('heightShort') || sv('height');
     var CORE = VITALS.filter(function (r) { return /Height|Bust|Waist|Hips|Shoe/.test(r[0]); }).map(function (r) { return [r[0], r[0] === 'Height' ? HSHORT : r[1]]; });
 
@@ -163,36 +192,11 @@
       if (f === 'D') { f = FAM; if (s === 'italic' && !HAS_IT) s = 'normal'; if (FAM === 'JS' && s === 'bold') s = 'bold'; }
       doc.setFont(f, s || 'normal'); doc.setFontSize(z);
     }
-    // scripts the embedded faces can't draw (Devanagari, Tamil, Malayalam, Arabic…) are typeset by the
-    // phone's own fonts on a canvas and placed as a crisp transparent image, so a name never turns to gibberish
-    var RX_EMB = /[^\u0000-\u017f\u2010-\u2033\u2116\u2122\u20b9]/, RX_STD = /[^\u0000-\u00ff\u2013\u2014\u2018-\u201e\u2020-\u2022\u2026\u2030\u20ac\u2122]/;
-    var CAN_R = typeof document !== 'undefined' && !!document.createElement, MC = null, RS = 6;
-    function needR(t) { if (!CAN_R) return false; var f = doc.getFont().fontName; return (/^(PF|BD|JS)$/.test(f) ? RX_EMB : RX_STD).test(t); }
-    function cssF(px) {
-      var fi = doc.getFont(), serif = !/^(JS|helvetica)$/i.test(fi.fontName), st = String(fi.fontStyle || '');
-      return (/bold/.test(st) ? '600 ' : '400 ') + px + 'px ' +
-        (serif ? '"Noto Serif", "Noto Serif Devanagari", "Noto Serif Tamil", "Noto Serif Malayalam", Georgia, serif' : '"Noto Sans", system-ui, -apple-system, sans-serif');
-    }
-    function mctx() { if (!MC) MC = document.createElement('canvas').getContext('2d'); return MC; }
-    function rW(t) { var m = mctx(), z = doc.getFontSize(); m.font = cssF(z * RS); return m.measureText(t).width / RS; }
-    function rDraw(t, x, y, angle) {
-      var z = doc.getFontSize(), asc = z * 1.02, des = z * 0.42, w = rW(t) + z * 0.1, tc = doc.getTextColor();
-      var cv = document.createElement('canvas'), cx, vert = angle === 90;
-      cv.width = Math.ceil((vert ? asc + des : w) * RS); cv.height = Math.ceil((vert ? w : asc + des) * RS);
-      cx = cv.getContext('2d'); cx.font = cssF(z * RS); cx.fillStyle = tc; cx.textBaseline = 'alphabetic';
-      if (vert) { cx.translate(asc * RS, w * RS); cx.rotate(-Math.PI / 2); }
-      cx.fillText(t, 0, vert ? 0 : asc * RS);
-      var url = cv.toDataURL('image/png'); cv.width = cv.height = 0;
-      if (vert) doc.addImage(url, 'PNG', x - asc, y - w, asc + des, w); else doc.addImage(url, 'PNG', x, y - asc, w, asc + des);
-    }
-    function tx(t, x, y, op) { if (needR(t)) rDraw(t, x, y, op && op.angle); else doc.text(t, x, y, op); }
-    function tw(t, ls) { return needR(t) ? rW(t) : doc.getTextWidth(t) + Math.max(0, t.length - 1) * (ls || 0); }
-    function split(t, w) {
-      if (!needR(t)) return doc.splitTextToSize(t, w);
-      var out = [], cur = '';
-      String(t).split(/\s+/).forEach(function (wd) { var nx = cur ? cur + ' ' + wd : wd; if (cur && rW(nx) > w) { out.push(cur); cur = wd; } else cur = nx; });
-      if (cur) out.push(cur); return out;
-    }
+    // embedded faces cover Latin-1 + Latin Extended-A; jsPDF's standard faces only Latin-1, so fold accents there
+    function fold(t) { return /^(PF|BD|JS)$/.test(doc.getFont().fontName) ? t : String(t).replace(/[\u0100-\u024f\u1e00-\u1eff]/g, function (c) { var b = c.normalize('NFD').charAt(0); return b.charCodeAt(0) < 0x100 ? b : ''; }); }
+    function tx(t, x, y, op) { doc.text(fold(t), x, y, op); }
+    function tw(t, ls) { t = fold(t); return doc.getTextWidth(t) + Math.max(0, t.length - 1) * (ls || 0); }
+    function split(t, w) { return doc.splitTextToSize(fold(t), w); }
     function cap(t, x, y, z, c, o) {
       o = o || {}; t = String(t).toUpperCase(); setF(LAB, o.bold ? 'bold' : 'normal', z); col(c);
       var ls = o.ls == null ? z * 0.32 : o.ls, w = tw(t, ls);
@@ -259,7 +263,7 @@
         var one = NAME_UP, z1 = fit(one, 'normal', Math.min(zMax * 0.62, 66), 10, maxW, 0.14);
         if (z1 >= 30 || !last) { disp(one, ax, base, z1, c, { ls: z1 * 0.14, align: align }); return base - z1 * 0.8; }
         var fu = first.toUpperCase(), lu = last.toUpperCase();
-        var z = Math.min(fit(fu, 'normal', zMax * 0.62, 18, maxW, 0.14), fit(lu, 'normal', zMax * 0.62, 18, maxW, 0.14));
+        var z = Math.min(fit(fu, 'normal', zMax * 0.62, 12, maxW, 0.14), fit(lu, 'normal', zMax * 0.62, 12, maxW, 0.14));
         disp(lu, ax, base, z, c, { ls: z * 0.14, align: align });
         disp(fu, ax, base - z * 1.05, z, c, { ls: z * 0.14, align: align });
         return base - z * 1.85;
@@ -267,7 +271,7 @@
       if (style === 'italic') {
         var zi = fit(name, 'italic', zMax * 0.7, 20, maxW, -0.01);
         if (zi >= 50 || !last) { var d1 = /[gjpqy]/.test(name) ? zi * 0.2 : 0; disp(name, ax, base - d1, zi, c, { italic: true, align: align, ls: -zi * 0.01 }); return base - d1 - zi * 0.75; }
-        var za = Math.min(fit(first, 'italic', zMax * 0.8, 22, maxW), fit(last, 'italic', zMax * 0.8, 22, maxW));
+        var za = Math.min(fit(first, 'italic', zMax * 0.8, 14, maxW), fit(last, 'italic', zMax * 0.8, 14, maxW));
         var d2 = /[gjpqy]/.test(last) ? za * 0.2 : 0;
         disp(last, ax, base - d2, za, c, { italic: true, align: align });
         disp(first, ax, base - d2 - za * 0.9, za, c, { italic: true, align: align });
@@ -409,28 +413,48 @@
       });
       return y + 8;
     }
+    // a paragraph that must fit a box: shrink a little, then drop closing sentences, then cut with an ellipsis
+    function bioFit(t, w, maxH, zMax, zMin, it) {
+      var st = it ? 'italic' : 'normal', z, L, lh;
+      for (z = zMax; z >= zMin - 0.01; z -= 0.4) { setF('D', st, z); L = split(t, w); lh = z * 1.42; if (L.length * lh <= maxH) return { z: z, lh: lh, L: L, it: it }; }
+      z = zMin; setF('D', st, z); lh = z * 1.42;
+      var n = Math.max(1, Math.floor(maxH / lh)), ss = String(t).replace(/([.!?])\s+/g, '$1\n').split('\n');
+      while (ss.length > 1 && split(ss.join(' '), w).length > n) ss.pop();
+      L = split(ss.join(' '), w);
+      if (L.length > n) { L = L.slice(0, n); L[n - 1] = L[n - 1].replace(/[\s,;.:\u2013\u2014-]+\S*$/, '') + '\u2026'; }
+      return { z: z, lh: lh, L: L, it: it };
+    }
+    function bioDraw(B, x, y, c) { B.L.forEach(function (l, k) { disp(l, x, y + k * B.lh, B.z, c, { italic: B.it }); }); return y + (B.L.length - 1) * B.lh; }
     function profile() {
       var fi = N > 1 ? 1 : 0, v = S.profile;
       if (v === 'band') {
         page(BG);
-        var bh = 232, ph = H - bh;
+        var bh = bio ? 318 : 232, ph = H - bh;
         frame(fi, 0, 0, W, ph, 0.5, 0.3);
         motif(0, 0, W, ph, true);
         cap('The Profile', M, ph + 40, 6, A, { bold: true, ls: 2.6 });
         nameBlock(S.names === 'caps' ? 'caps' : 'stack', M, ph + 108, 250, INK, 'left', 34);
         setF('D', 'italic', 10.5);
-        var who = split(role + (city ? ', based in ' + city : ''), 230).slice(0, 2), yy = ph + 134;
+        var who = split(WHO, 250).slice(0, 2), yy = ph + 134;
         who.forEach(function (l) { disp(l, M, yy, 10.5, SUB, { italic: true }); yy += 14; });
-        // vitals in two columns
-        var x0 = 318, cw2 = W - M - x0, half = Math.ceil(VITALS.length / 2), y0 = ph + 40;
+        if (bio) bioDraw(bioFit(bio, 250, H - 44 - (yy + 6), 9.4, 7.8, false), M, yy + 8, INK);
+        // vitals in two columns; education gets a full-width row underneath
+        var VB = VITALS.filter(function (r) { return r[0] !== 'Education'; });
+        var x0 = 318, cw2 = W - M - x0, half = Math.ceil(VB.length / 2), y0 = ph + 40;
         cap('Vitals', x0, y0, 6, SUB, { bold: true, ls: 2.4 });
         rule(x0, y0 + 8, W - M, INK, 0.8);
-        VITALS.forEach(function (r, k) {
+        VB.forEach(function (r, k) {
           var cxx = k < half ? x0 : x0 + cw2 / 2 + 10, wcol = cw2 / 2 - 10, ry = y0 + 8 + (k % half + 1) * 30;
           cap(r[0], cxx, ry - 3, 5.6, SUB, { ls: 1.8 });
           disp(r[1], cxx + wcol, ry, fit(r[1], 'normal', 13, 7, wcol - 44), INK, { align: 'right' });
           rule(cxx, ry + 8, cxx + wcol, RULE, 0.4);
         });
+        if (EDU) {
+          var ey = y0 + 8 + (half + 1) * 30;
+          cap('Education', x0, ey - 3, 5.6, SUB, { ls: 1.8 });
+          disp(EDU, W - M, ey, fit(EDU, 'normal', 13, 7, cw2 - 70), INK, { align: 'right' });
+          rule(x0, ey + 8, W - M, RULE, 0.4);
+        }
         foot(false, false);
         return;
       }
@@ -440,11 +464,15 @@
         fade(H * 0.4, H, 0, 0.9, NIGHT);
         fade(0, 110, 0.4, 0, NIGHT);
         cap('The Profile', M, 56, 6, IVORY, { bold: true, ls: 2.6 });
-        var cwO = 196, xO = W - M - cwO, yO = H - 72 - 8 - VITALS.length * 26;
+        var cwO = 196, xO = W - M - cwO, yO = H - 72 - 8 - VITALS.length * 26, wL = xO - M - 30;
         vitalsTableC(xO, yO, cwO);
-        nameBlock(S.names, M, H - 92, xO - M - 30, IVORY, 'left', 46);
+        // bottom-left, over the dark fade: name, the "based in" line, then her bio
+        var Bo = bio ? bioFit(bio, wL, 150, 9.2, 7.8, false) : null, hB = Bo ? (Bo.L.length - 1) * Bo.lh : 0;
+        var yWho = H - 66 - (Bo ? hB + 24 : 0);
+        nameBlock(S.names, M, yWho - 26, wL, IVORY, 'left', 46);
         setF('D', 'italic', 10.5);
-        disp(role + (city ? ', ' + city : ''), M, H - 66, fit(role + (city ? ', ' + city : ''), 'italic', 10.5, 7, xO - M - 30), [220, 210, 196], { italic: true });
+        disp(WHO, M, yWho, fit(WHO, 'italic', 10.5, 7, wL), [220, 210, 196], { italic: true });
+        if (Bo) bioDraw(Bo, M, yWho + 22, [236, 228, 216]);
         foot(false, false);
         return;
       }
@@ -467,18 +495,18 @@
       }
       y += 22;
       setF('D', 'italic', 10.5);
-      split(role + (city ? ', based in ' + city : ''), cw).slice(0, 2).forEach(function (l) { disp(l, x0s, y, 10.5, SUB, { italic: true }); y += 14; });
+      split(WHO, cw).slice(0, 2).forEach(function (l) { disp(l, x0s, y, 10.5, SUB, { italic: true }); y += 14; });
       y += 14;
-      if (VITALS.length) y = vitalsTable(x0s, y, cw, VITALS.length > 5 ? 28 : 32, SUB, INK, RULE, INK);
-      if (about) {
+      if (VITALS.length) y = vitalsTable(x0s, y, cw, VITALS.length > 7 ? 24 : VITALS.length > 5 ? 28 : 32, SUB, INK, RULE, INK);
+      var room = H - 104 - y;
+      if (quote && room > 150) {   // this layout carries a pull quote: her own line, set large
         y += 30;
-        disp('\u201c', x0s - 2, y + 14, 40, A);
-        y += 6;
-        setF('D', 'italic', 10);
-        var lines = split(about, cw - 4), roomL = Math.max(2, Math.min(6, Math.floor((H - 130 - y) / 14.5)));
-        if (lines.length > roomL) { lines = lines.slice(0, roomL); lines[roomL - 1] = lines[roomL - 1].replace(/[\s,;.:\u2013\u2014-]+\S*$/, '') + '\u2026'; }
-        lines.forEach(function (l) { y += 14.5; disp(l, x0s + 4, y, 10, INK, { italic: true }); });
+        disp('\u201c', x0s - 2, y + 12, 36, A);
+        var Q = bioFit(quote + '\u201d', cw - 8, 44, 13, 10, true);
+        y = bioDraw(Q, x0s + 8, y + 18, INK) + 8;
+        room = H - 104 - y;
       }
+      if (bio && room > 40) { y += 22; bioDraw(bioFit(bio, cw, room - 24, 9, 7.6, false), x0s, y, SUB); }
       var yb = H - 84;
       cap('Castable for', x0s, yb, 6, SUB, { bold: true, ls: 2.4 });
       rule(x0s, yb + 8, x0s + cw, RULE, 0.4);
