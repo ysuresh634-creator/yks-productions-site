@@ -210,9 +210,9 @@
     var F = [], h = D.handle.toLowerCase(), hl = letters(h);
     if (h.length < 6) F.push('Instagram handle shorter than 6 characters');
     else if (FIRST.indexOf(hl) > -1 && hl === h.replace(/[._]/g, '')) F.push('Instagram handle is a single common first name');
-    var c = cm(D.height);
-    if (c && c > 180) F.push('Height above 180 cm (' + D.height + ')');
-    else if (c && c < 145) F.push('Height below 145 cm (' + D.height + ')');
+    var c = D.height_cm || cm(D.height);
+    if (c && c > 180) F.push('Height above 180 cm (' + (D.height_full || D.height) + ')');
+    else if (c && c < 145) F.push('Height below 145 cm (' + (D.height_full || D.height) + ')');
     else if (!c) F.push('Height not readable (' + D.height + ')');
     var local = D.email.split('@')[0].toLowerCase();
     [['name', D.name], ['email', local], ['Instagram handle', h]].forEach(function (p) { if (MALE.test(String(p[1]).toLowerCase().replace(/[._\d-]+/g, ' '))) F.push('Male marker in ' + p[0]); });
@@ -249,6 +249,62 @@
     var d = new Date(v + 'T00:00:00'), n = new Date(); if (isNaN(d)) return -1;
     return n.getFullYear() - d.getFullYear() - ((n.getMonth() < d.getMonth() || (n.getMonth() === d.getMonth() && n.getDate() < d.getDate())) ? 1 : 0);
   }
+  /* ── vitals: height (ft/in or cm) + bust / waist / hips in inches, all required ── */
+  var hMode = 'ft', hBox = $('#taHeightBox');
+  function num(v) { v = String(v || '').trim().replace(',', '.').replace(/\s*(?:in|inch|inches|"|\u2033)$/i, ''); return /^\d{1,3}(?:\.\d{1,2})?$/.test(v) ? +v : NaN; }
+  function heightCm() {
+    if (hMode === 'cm') { var c = num(String(form.height_cm.value).replace(/\s*cm$/i, '')); return isNaN(c) ? 0 : Math.round(c); }
+    var f = form.height_ft.value, i = form.height_in.value;
+    return f === '' || i === '' ? 0 : Math.round((+f * 12 + +i) * 2.54);
+  }
+  function heightProblem() {
+    if (hMode === 'cm') {
+      var raw = String(form.height_cm.value).trim();
+      if (!raw) return 'Add your height in centimetres, e.g. 168.';
+      var c = heightCm();
+      if (!c) return 'Numbers only, e.g. 168.';
+      if (c < 100 && c >= 4 && c < 8) return 'That looks like feet \u2014 switch to \u201cft / in\u201d, or enter centimetres (e.g. 168).';
+      return c < 140 || c > 200 ? 'Height should be between 140 and 200 cm.' : '';
+    }
+    if (form.height_ft.value === '' || form.height_in.value === '') return 'Choose feet and inches, e.g. 5 ft 6 in.';
+    var cm2 = heightCm(); return cm2 < 140 || cm2 > 200 ? 'Height should be between 4 ft 7 in and 6 ft 6 in.' : '';
+  }
+  function heightLabel() {
+    var c = heightCm(); if (!c) return '';
+    var t = Math.round(c / 2.54), ft = Math.floor(t / 12), inch = t % 12;
+    if (hMode === 'ft') { ft = +form.height_ft.value; inch = +form.height_in.value; }
+    return { short: ft + '\u2032' + inch + '\u2033', full: ft + '\u2032' + inch + '\u2033 \u00b7 ' + c + ' cm', cm: c };
+  }
+  function measureProblem(v, what, lo, hi, eg) {
+    if (!String(v).trim()) return 'Add your ' + what + ' in inches, e.g. ' + eg + '.';
+    var n = num(v);
+    if (isNaN(n)) return 'Numbers only, in inches, e.g. ' + eg + '.';
+    if (n >= 50 && n <= 140 && n / 2.54 >= lo && n / 2.54 <= hi) return 'That looks like centimetres \u2014 in inches that\u2019s about ' + Math.round(n / 2.54) + '.';
+    return n < lo || n > hi ? 'Check your ' + what + ': it should be between ' + lo + ' and ' + hi + ' inches.' : '';
+  }
+  function syncHeight() { form.height.value = heightCm() ? String(heightCm()) : ''; }
+  function checkHeight(show) { syncHeight(); var m = heightProblem(); if (m && show) setErr(form.height, m); else if (!m) clearErr(form.height); return m; }
+  [].forEach.call(document.querySelectorAll('.ta-unit'), function (b) {
+    b.addEventListener('click', function () {
+      var to = b.getAttribute('data-unit'); if (to === hMode) return;
+      var c = heightCm();
+      hMode = to;
+      [].forEach.call(document.querySelectorAll('.ta-unit'), function (x) { var on = x.getAttribute('data-unit') === to; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+      [].forEach.call(hBox.querySelectorAll('.ta-hrow'), function (r) { r.hidden = r.getAttribute('data-mode') !== to; });
+      // carry the value across so nobody types it twice
+      if (c) {
+        if (to === 'cm') form.height_cm.value = c;
+        else { var t = Math.round(c / 2.54), ft = Math.floor(t / 12); if (ft >= 4 && ft <= 6) { form.height_ft.value = String(ft); form.height_in.value = String(t % 12); } }
+      }
+      clearErr(form.height); syncHeight();
+    });
+  });
+  ['height_ft', 'height_in'].forEach(function (n) { form[n].addEventListener('change', function () { if (form.height_ft.value !== '' && form.height_in.value !== '') checkHeight(true); else syncHeight(); }); });
+  form.height_cm.addEventListener('blur', function () { if (form.height_cm.value.trim()) checkHeight(true); });
+  form.height_cm.addEventListener('input', function () { syncHeight(); if (hBox.classList.contains('bad') && !heightProblem()) clearErr(form.height); });
+  function inch(v) { var n = num(v); return isNaN(n) ? '' : (Math.round(n * 2) / 2) + '\u2033'; }
+  function focusFor(el) { if (el !== form.height) return el; return hMode === 'cm' ? form.height_cm : (form.height_ft.value === '' ? form.height_ft : form.height_in); }
+
   var CHECKS = {
     name: function (v) { return v.replace(/\s+/g, ' ').length >= 2 && /[A-Za-z\u00C0-\u024F\u0900-\u0D7F]/.test(v) ? '' : 'Add your full name.'; },
     phone: function (v) { var d = v.replace(/\D/g, ''); return /^[+\d\s()\-]+$/.test(v) && d.length >= 8 && d.length <= 15 ? '' : 'Add a phone number with country code, e.g. +91 98xxx xxxxx.'; },
@@ -257,11 +313,14 @@
     instagram: function (v) { var h = igHandle(v); return h && /^(?!.*\.\.)(?!\.)[A-Za-z0-9._]{2,30}$/.test(h) && !/^(na|none|nil|no)$/i.test(h) ? '' : 'Add your Instagram handle, e.g. @yourname.'; },
     category: function (v) { return v ? '' : 'Choose one.'; },
     dob: function (v) { if (!v) return 'Add your date of birth.'; var a = age(v); return a < 0 || a > 90 ? 'Check your date of birth.' : (a < 18 ? 'Applicants must be 18 or older.' : ''); },
-    height: function (v) { return /\d/.test(v) && v.length <= 20 ? '' : 'Add your height, e.g. 5\'6" or 168 cm.'; },
+    height: function () { return heightProblem(); },
+    bust: function (v) { return measureProblem(v, 'bust', 26, 50, 34); },
+    waist: function (v) { return measureProblem(v, 'waist', 20, 44, 26); },
+    hips: function (v) { return measureProblem(v, 'hips', 28, 54, 36); },
     gender: function (v) { return v ? '' : 'Choose one.'; }
   };
   Object.keys(CHECKS).forEach(function (n) {
-    var el = form[n]; if (!el) return;
+    var el = form[n]; if (!el || n === 'height') return;   // height is wired in the vitals block below
     el.addEventListener('blur', function () { if (el.value.trim()) { var m = CHECKS[n](el.value.trim()); m ? setErr(el, m) : clearErr(el); } });
     el.addEventListener('input', function () { if (fieldBox(el).classList.contains('bad') && !CHECKS[n](el.value.trim())) clearErr(el); });
     el.addEventListener('change', function () { if (!CHECKS[n](el.value.trim())) clearErr(el); });
@@ -317,17 +376,18 @@
   }
   function portfolioLib() {
     return window.YKSPortfolio ? Promise.resolve() : new Promise(function (res, rej) {
-      var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=4'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+      var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=5'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
     });
   }
   // the applicant's YKS portfolio PDF as base64; null on any failure or after 30 s, never throws
   function builtPortfolio(D) {
     var work = portfolioLib().then(function () {
-      return window.YKSPortfolio.blob({ name: D.name, category: D.category, city: D.city, about: D.about, stats: { height: D.height }, photos: pdfOrder() });
+      return window.YKSPortfolio.blob({ name: D.name, category: D.category, city: D.city, about: D.about, stats: vitals(D), photos: pdfOrder() });
     }).then(function (blob) { return b64(blob); })
       .then(function (d) { return { name: (D.name.replace(/[^A-Za-z0-9]+/g, '-') || 'YKS') + '-YKS-portfolio.pdf', mime: 'application/pdf', data: d }; }, function () { return null; });
     return Promise.race([work, new Promise(function (res) { setTimeout(function () { res(null); }, 30000); })]);
   }
+  function vitals(D) { return { height: D.height_full, heightShort: D.height_short, bust: D.bust, waist: D.waist, hips: D.hips, shoe: D.shoe, hair: D.hair, eyes: D.eyes }; }
   function source() { try { var v = JSON.parse(localStorage.getItem('yks_src_v1') || 'null'); return v && v.src ? v.src + (v.camp ? ' · ' + v.camp : '') : 'Direct'; } catch (e) { return 'Direct'; } }
 
   /* ── 2 · submit ── */
@@ -338,12 +398,13 @@
     if (!followed) { say('Tap \u201cFollow @yks_photoworks\u201d first.'); return; }
     var first = null;
     Object.keys(CHECKS).forEach(function (n) {
-      var el = form[n], m = CHECKS[n](String(el.value || '').trim());
-      if (m) { setErr(el, m); first = first || el; } else clearErr(el);
+      var el = form[n]; if (n === 'height') syncHeight();
+      var m = CHECKS[n](String(el.value || '').trim());
+      if (m) { setErr(el, m); first = first || focusFor(el); } else clearErr(el);
     });
     var pp = photoProblem(); photos = ordered();
     if (pp) { setErr(slotBox, pp); first = first || slotBox; }
-    if (first) { say(first === slotBox && pp ? pp : 'Please fix the fields marked in red.' + (pp ? ' ' + pp : '')); first.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (first.focus) first.focus({ preventScroll: true }); return; }
+    if (first) { say(first === slotBox && pp ? pp : 'Please fix the fields marked in red.' + (pp ? ' ' + pp : '')); (first === slotBox ? first : fieldBox(first)).scrollIntoView({ behavior: 'smooth', block: 'center' }); if (first.focus) first.focus({ preventScroll: true }); return; }
     if (!boardGate()) { say(BLOCKED); return; }   // silent: no upload, no email, no link
     var yrs = age(form.dob.value); if (yrs < 18 || yrs > 35) { say(BLOCKED); return; }   // board window, never named on the page
     // backstops for bots and scripted posts: honeypots must stay empty, and the form can't be instant
@@ -353,8 +414,15 @@
     var D = {
       name: form.name.value.trim().replace(/\s+/g, ' '), phone: form.phone.value.trim(), email: form.email.value.trim(),
       city: form.city.value.trim(), handle: igHandle(form.instagram.value), category: form.category.value,
-      dob: form.dob.value, height: form.height.value.trim(), gender: form.gender.value, about: (form.about.value || '').trim().slice(0, 300)
+      dob: form.dob.value, gender: form.gender.value, about: (form.about.value || '').trim().slice(0, 300)
     };
+    var HL = heightLabel();
+    D.height_cm = HL.cm; D.height_short = HL.short; D.height_full = HL.full;
+    D.bust = inch(form.bust.value); D.waist = inch(form.waist.value); D.hips = inch(form.hips.value);
+    D.shoe = form.shoe.value || ''; D.hair = form.hair.value || ''; D.eyes = form.eyes.value || '';
+    // one readable line, so the vitals show in the notification email even before the script reads the new fields
+    D.height = [HL.short + ' / ' + HL.cm + ' cm', 'Bust ' + D.bust, 'Waist ' + D.waist, 'Hips ' + D.hips]
+      .concat(D.shoe ? ['Shoe ' + D.shoe] : [], D.hair ? ['Hair ' + D.hair] : [], D.eyes ? ['Eyes ' + D.eyes] : []).join(' \u00b7 ').slice(0, 200);
     D.profile = 'https://instagram.com/' + D.handle;
     var secs = Math.round((Date.now() - T0) / 1000), FLAGS = reviewFlags(D, secs);
     busy = true; sync(); submitBtn.textContent = 'Checking\u2026';
@@ -394,6 +462,7 @@
           fields: {
             name: D.name, phone: D.phone, email: D.email, city: D.city, instagram: D.handle, category: D.category,
             dob: D.dob, height: D.height, gender: D.gender, about: D.about,
+            height_cm: String(D.height_cm), height_ft_in: D.height_short, bust: D.bust, waist: D.waist, hips: D.hips, shoe: D.shoe, hair: D.hair, eyes: D.eyes,
             follow_verified: followVerified || '', flags: FLAGS.join('; '), source: source(), seconds_on_form: secs,
             website: hp ? hp.value : '', botcheck: ''
           },
@@ -418,7 +487,8 @@
         try {
           fetch(ENGINE_URL + '/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
             name: D.name, contact: D.phone, email: D.email, category: D.category, city: D.city, socials: '@' + D.handle,
-            instagram_profile: D.profile, about: D.about, stat_height: D.height, dob: D.dob, gender: D.gender,
+            instagram_profile: D.profile, about: D.about, stat_height: D.height_full, stat_bust: D.bust, stat_waist: D.waist, stat_hips: D.hips,
+            stat_shoe: D.shoe, stat_hair: D.hair, stat_eyes: D.eyes, dob: D.dob, gender: D.gender,
             photos: direct, cover_url: direct[0] ? direct[0].url : ''
           }) }).catch(function () {});
         } catch (er) {}
@@ -480,10 +550,10 @@
       if (!unlocked) return;
       dl.disabled = true; dl.textContent = 'Building your portfolio\u2026';
       var go = function () {
-        return window.YKSPortfolio.download({ name: D.name, category: D.category, city: D.city, about: D.about, stats: { height: D.height }, photos: pdfOrder() });
+        return window.YKSPortfolio.download({ name: D.name, category: D.category, city: D.city, about: D.about, stats: vitals(D), photos: pdfOrder() });
       };
       (window.YKSPortfolio ? go() : new Promise(function (res, rej) {
-        var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=4'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+        var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=5'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
       }).then(go))
         .then(function () { dl.disabled = false; dl.textContent = 'Downloaded \u2713 \u2014 download again'; })
         .catch(function () { dl.disabled = false; dl.textContent = 'Download your portfolio'; hint.textContent = 'Couldn\u2019t build the PDF just now \u2014 tap to try again.'; });

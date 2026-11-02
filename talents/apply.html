@@ -338,6 +338,25 @@
 .ta-f select option{color:#111}
 .ta-f.bad input,.ta-f.bad select,.ta-f.bad .ta-add.req{border-color:#e24a2a}
 .ta-err{color:#ff7a5c;font-size:12.5px}
+.ta-vitals{border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;margin:4px 0 0;gap:10px;min-width:0}
+.ta-vitals legend{padding:0 6px;font-family:var(--serif);font-size:17px;color:var(--paper,#f4f0e8);letter-spacing:0}
+.ta-req{font-family:inherit;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber,#ff8c3b);margin-left:6px;vertical-align:2px}
+.ta-help{margin:0;font-size:13px;line-height:1.5;color:var(--paper-dim)}
+.ta-help-sm{font-size:12px;opacity:.75;margin-top:-2px}
+.ta-vl{display:block}
+.ta-units{display:inline-flex;gap:0;border:1px solid var(--line);border-radius:999px;padding:3px;align-self:flex-start;margin:2px 0}
+.ta-unit{font:inherit;font-size:13px;color:var(--paper-dim);background:none;border:0;border-radius:999px;padding:7px 14px;min-height:34px;cursor:pointer}
+.ta-unit.on{background:var(--paper,#f4ede2);color:#111;font-weight:600}
+.ta-hrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ta-hrow[data-mode=cm]{grid-template-columns:1fr}
+.ta-hrow[hidden]{display:none}
+.ta-sub{display:block}
+.ta-vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ta-vgrid .ta-f{grid-column:auto;min-width:0}
+.ta-suffix{position:relative;display:block}
+.ta-suffix::after{content:attr(data-suffix);position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--paper-dim);pointer-events:none}
+.ta-suffix input{padding-right:38px}
+.ta-f.bad .ta-suffix input{border-color:#e24a2a}
 .ta-opt{opacity:.6}
 .ta-photos{display:flex;gap:10px;flex-wrap:wrap}
 .ta-thumb{position:relative;width:88px;height:110px;border-radius:10px;overflow:hidden;background:#222}
@@ -399,7 +418,36 @@
       </select>
     </label>
     <label class="ta-f half">Date of birth<input type="date" name="dob" required /></label>
-    <label class="ta-f half">Height<input type="text" name="height" placeholder="5&#39;6&quot; or 168 cm" required /></label>
+    <fieldset class="ta-f ta-vitals" id="taVitals">
+      <legend>Your vitals <span class="ta-req">required</span></legend>
+      <p class="ta-help">Clients filter castings by height and measurements, so we can&#39;t put you forward without them. Measure over light clothing with a soft tape; an honest number is better than a flattering one.</p>
+      <div class="ta-f" id="taHeightBox">
+        <span class="ta-vl">Height</span>
+        <div class="ta-units" role="group" aria-label="Height unit">
+          <button type="button" class="ta-unit on" data-unit="ft" aria-pressed="true">ft / in</button>
+          <button type="button" class="ta-unit" data-unit="cm" aria-pressed="false">cm</button>
+        </div>
+        <div class="ta-hrow" data-mode="ft">
+          <label class="ta-sub"><select name="height_ft" aria-label="Height, feet"><option value="">ft</option><option value="4">4 ft</option><option value="5">5 ft</option><option value="6">6 ft</option></select></label>
+          <label class="ta-sub"><select name="height_in" aria-label="Height, inches"><option value="">in</option><option value="0">0 in</option><option value="1">1 in</option><option value="2">2 in</option><option value="3">3 in</option><option value="4">4 in</option><option value="5">5 in</option><option value="6">6 in</option><option value="7">7 in</option><option value="8">8 in</option><option value="9">9 in</option><option value="10">10 in</option><option value="11">11 in</option></select></label>
+        </div>
+        <div class="ta-hrow" data-mode="cm" hidden>
+          <label class="ta-sub ta-suffix" data-suffix="cm"><input type="text" name="height_cm" inputmode="numeric" maxlength="5" placeholder="e.g. 168" aria-label="Height in centimetres" autocomplete="off" /></label>
+        </div>
+        <input type="hidden" name="height" />
+      </div>
+      <div class="ta-vgrid">
+        <label class="ta-f">Bust<span class="ta-suffix" data-suffix="in"><input type="text" name="bust" inputmode="decimal" maxlength="5" placeholder="34" autocomplete="off" required /></span></label>
+        <label class="ta-f">Waist<span class="ta-suffix" data-suffix="in"><input type="text" name="waist" inputmode="decimal" maxlength="5" placeholder="26" autocomplete="off" required /></span></label>
+        <label class="ta-f">Hips<span class="ta-suffix" data-suffix="in"><input type="text" name="hips" inputmode="decimal" maxlength="5" placeholder="36" autocomplete="off" required /></span></label>
+      </div>
+      <p class="ta-help ta-help-sm">Measurements in inches. Bust: fullest part of the chest. Waist: narrowest part. Hips: fullest part of the hips.</p>
+      <div class="ta-vgrid">
+        <label class="ta-f">Shoe <span class="ta-opt">optional</span><select name="shoe"><option value="">UK size</option><option>UK 3</option><option>UK 4</option><option>UK 5</option><option>UK 6</option><option>UK 7</option><option>UK 8</option><option>UK 9</option><option>UK 10</option></select></label>
+        <label class="ta-f">Hair <span class="ta-opt">optional</span><select name="hair"><option value="">Colour</option><option>Black</option><option>Dark brown</option><option>Brown</option><option>Light brown</option><option>Blonde</option><option>Red</option><option>Grey</option></select></label>
+        <label class="ta-f">Eyes <span class="ta-opt">optional</span><select name="eyes"><option value="">Colour</option><option>Black</option><option>Dark brown</option><option>Brown</option><option>Hazel</option><option>Green</option><option>Blue</option><option>Grey</option></select></label>
+      </div>
+    </fieldset>
     <div class="ta-f" id="taPhotoField">Photos <span class="ta-opt">minimum 5 different photos, including 2 clear face close-ups</span>
       <ul class="ta-rules">
         <li>Clear and well-lit, phone photos are fine</li>
@@ -492,6 +540,6 @@
   </div>
 </footer>
 
-<script src="/js/talent-apply.js?v=89"></script>
+<script src="/js/talent-apply.js?v=90"></script>
 </body>
 </html>
