@@ -123,7 +123,7 @@
           "name": "Do I need professional photos to apply?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. Phone photos are fine. You need minimum 5 photos, including 2 clear face close-ups, plus a full-length, a mid-shot and one more, in good light with no heavy filters."
+            "text": "No. Phone photos are fine. You need minimum 5 photos, including 2 clear face close-ups, plus a full-length, a mid-shot and one more, in good light with no heavy filters. You can add up to 12 photos in total."
           }
         },
         {
@@ -358,6 +358,10 @@
 .ta-suffix input{padding-right:38px}
 .ta-f.bad .ta-suffix input{border-color:#e24a2a}
 .ta-opt{opacity:.6}
+.ta-f input:focus,.ta-f select:focus,.ta-f textarea:focus{outline:none;border-color:rgba(244,240,232,.75)}
+.ta-f.bad input:focus,.ta-f.bad select:focus,.ta-f.bad textarea:focus{border-color:#e24a2a;box-shadow:0 0 0 1px #e24a2a}
+.ta-vgrid select{padding-left:9px;padding-right:2px}
+.ta-optnote{margin:6px 0 -4px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim);opacity:.75}
 .ta-photos{display:flex;gap:10px;flex-wrap:wrap}
 .ta-thumb{position:relative;width:88px;height:110px;border-radius:10px;overflow:hidden;background:#222}
 .ta-thumb img{width:100%;height:100%;object-fit:cover;display:block}
@@ -442,13 +446,14 @@
         <label class="ta-f">Hips<span class="ta-suffix" data-suffix="in"><input type="text" name="hips" inputmode="decimal" maxlength="5" placeholder="36" autocomplete="off" required /></span></label>
       </div>
       <p class="ta-help ta-help-sm">Measurements in inches. Bust: fullest part of the chest. Waist: narrowest part. Hips: fullest part of the hips.</p>
+      <p class="ta-optnote">Optional: shoe, hair, eyes</p>
       <div class="ta-vgrid">
-        <label class="ta-f">Shoe <span class="ta-opt">optional</span><select name="shoe"><option value="">UK size</option><option>UK 3</option><option>UK 4</option><option>UK 5</option><option>UK 6</option><option>UK 7</option><option>UK 8</option><option>UK 9</option><option>UK 10</option></select></label>
-        <label class="ta-f">Hair <span class="ta-opt">optional</span><select name="hair"><option value="">Colour</option><option>Black</option><option>Dark brown</option><option>Brown</option><option>Light brown</option><option>Blonde</option><option>Red</option><option>Grey</option></select></label>
-        <label class="ta-f">Eyes <span class="ta-opt">optional</span><select name="eyes"><option value="">Colour</option><option>Black</option><option>Dark brown</option><option>Brown</option><option>Hazel</option><option>Green</option><option>Blue</option><option>Grey</option></select></label>
+        <label class="ta-f">Shoe<select name="shoe"><option value="">Size</option><option>UK 3</option><option>UK 4</option><option>UK 5</option><option>UK 6</option><option>UK 7</option><option>UK 8</option><option>UK 9</option><option>UK 10</option></select></label>
+        <label class="ta-f">Hair<select name="hair"><option value="">Pick</option><option>Black</option><option>Dark brown</option><option>Brown</option><option>Light brown</option><option>Blonde</option><option>Red</option><option>Grey</option></select></label>
+        <label class="ta-f">Eyes<select name="eyes"><option value="">Pick</option><option>Black</option><option>Dark brown</option><option>Brown</option><option>Hazel</option><option>Green</option><option>Blue</option><option>Grey</option></select></label>
       </div>
     </fieldset>
-    <div class="ta-f" id="taPhotoField">Photos <span class="ta-opt">minimum 5 different photos, including 2 clear face close-ups</span>
+    <div class="ta-f" id="taPhotoField">Photos <span class="ta-opt">minimum 5 different photos, up to 12, including 2 clear face close-ups</span>
       <ul class="ta-rules">
         <li>Clear and well-lit, phone photos are fine</li>
         <li>No heavy filters or face-editing apps</li>
@@ -485,7 +490,7 @@
     </div>
     <div class="l-faq">
       <details><summary>Do I have to pay anything to join?</summary><p>No. Joining costs nothing, now or ever — no joining fee, no registration fee, no portfolio fee, no paid tiers. If anyone in this industry asks you for money to be registered, walk away. More on that in <a href="/talents/guides/modelling-agency-fees-scams-india.html">modelling agency fees &amp; scams</a>.</p></details>
-      <details><summary>Do I need professional photos to apply?</summary><p>No. Phone photos are fine. You need minimum 5 photos, including 2 clear face close-ups, plus a full-length, a mid-shot and one more, in good light with no heavy filters. Here&rsquo;s <a href="/talents/guides/model-digitals.html">how to shoot good digitals on your phone</a>.</p></details>
+      <details><summary>Do I need professional photos to apply?</summary><p>No. Phone photos are fine. You need minimum 5 photos, including 2 clear face close-ups, plus a full-length, a mid-shot and one more, in good light with no heavy filters. You can add up to 12 photos in total. Here&rsquo;s <a href="/talents/guides/model-digitals.html">how to shoot good digitals on your phone</a>.</p></details>
       <details><summary>Do I need experience?</summary><p>No. I look at how someone photographs and how they take direction, not at how long their CV is. New to this? Start with <a href="/talents/guides/how-to-make-a-modelling-portfolio.html">how to make a modelling portfolio</a>.</p></details>
       <details><summary>Will my phone number or Instagram be public?</summary><p>Never. Your contact details are never published on the site. Clients who find you on YKS Talents contact me first.</p></details>
       <details><summary>Is YKS Talents a jobs board?</summary><p>No. YKS Talents doesn&rsquo;t offer or promise jobs. It&rsquo;s a free portfolio platform where clients find talent — and where I cast my own YKS shoots from.</p></details>
@@ -540,6 +545,6 @@
   </div>
 </footer>
 
-<script src="/js/talent-apply.js?v=90"></script>
+<script src="/js/talent-apply.js?v=91"></script>
 </body>
 </html>

@@ -20,9 +20,14 @@
   // YKS Talents intake (Google Apps Script web app on the owner's Google account).
   // It re-checks every rule server-side, saves to Drive and emails the owner.
   var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_36FeQLa2AsN-GzlYZWhT-VgqQ9UabIogrysT_5eHl-tZWbpNAkZhg26S3E2l3QRp/exec';
-  var SEND_TIMEOUT = 150000;   // 8 photos + the PDF can take a minute on a slow phone
+  var SEND_TIMEOUT = 180000;   // up to 12 photos + the PDF can take a couple of minutes on a slow phone
   var ENGINE_URL = 'https://yks-talents-engine.ysuresh634.workers.dev';
-  var MAX_EDGE = 2000, JPEG_Q = 0.85, MAX_RAW = 12 * 1024 * 1024;   // photo prep before sending
+  var MAX_RAW = 12 * 1024 * 1024;   // a photo the phone can't re-encode is sent as-is up to this size
+  // photo prep before sending, sharper for short sets; each step down is used only if the set is over budget.
+  // Apps Script has no published cap on a web-app POST (reports put failures around ~24 MB+), so the
+  // whole body is kept under ~14 MB of base64: photos ≤ ~9.5 MB, the PDF ≤ ~4 MB.
+  var PREP_STEPS = [[2000, 0.85], [1800, 0.82], [1600, 0.78], [1400, 0.74]];
+  var PHOTO_BUDGET = 9.5e6, PDF_BUDGET = 4.2e6, BODY_CAP = 16e6;   // base64 characters
   var BLOCKED = 'Sorry, this application can\u2019t be submitted right now.';
   // live follower check (workers/follow-check). Unreachable / slow / unsure → null → the
   // application still goes in, marked [REVIEW] "Follow check unavailable".
@@ -72,7 +77,7 @@
     { k: 'mid', label: 'Mid-shot', sub: 'waist up', cap: 'Mid-shot' },
     { k: 'other', label: 'One more', sub: 'any other angle or look', cap: 'Other' }
   ];
-  var MIN_PHOTOS = 5, MAX_EXTRA = 3, MIN_SIDE = 800;
+  var MIN_PHOTOS = 5, MAX_EXTRA = 7, MIN_SIDE = 800;   // 5 required + up to 7 extras = 12
   var slotBox = $('#taSlots'), slotState = {}, extras = [], pending = 0;
   function isImg(f) { return /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif|avif)$/i.test(f.name); }
   function hex(buf) { return [].map.call(new Uint8Array(buf), function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); }
@@ -158,7 +163,7 @@
     });
     if (extras.length < MAX_EXTRA) {
       var w2 = document.createElement('div'); w2.className = 'ta-slotwrap';
-      w2.appendChild(picker('More', 'optional, up to ' + MAX_EXTRA, true, function (fs) {
+      w2.appendChild(picker('More', 'optional, up to ' + (MAX_EXTRA - extras.length), true, function (fs) {
         fs.reduce(function (p, f) { return p.then(function () {
           if (extras.length >= MAX_EXTRA) return;
           return check(f).then(function (r) { if (!r.ok) { slotErr(r.msg); return; } r.e.cap = 'Extra ' + (extras.length + 1); extras.push(r.e); slotErr(''); });
@@ -346,16 +351,16 @@
     var m = /\.([a-z0-9]+)$/i.exec(f.name || ''), x = m ? m[1].toLowerCase() : '';
     return { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif', avif: 'image/avif' }[x] || 'image/jpeg';
   }
-  function prep(f) {
+  function prep(f, edge, q) {
     return new Promise(function (res) {
       var u = URL.createObjectURL(f), im = new Image();
       im.onload = function () {
-        var w = im.naturalWidth, h = im.naturalHeight, k = Math.min(1, MAX_EDGE / Math.max(w, h));
+        var w = im.naturalWidth, h = im.naturalHeight, k = Math.min(1, edge / Math.max(w, h));
         try {
           var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
           var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
           URL.revokeObjectURL(u);
-          c.toBlob(function (bl) { res(bl ? { blob: bl, mime: 'image/jpeg', ext: 'jpg' } : null); }, 'image/jpeg', JPEG_Q);
+          c.toBlob(function (bl) { res(bl ? { blob: bl, mime: 'image/jpeg', ext: 'jpg' } : null); }, 'image/jpeg', q);
         } catch (e) { URL.revokeObjectURL(u); res(null); }
       };
       im.onerror = function () { URL.revokeObjectURL(u); res(null); };
@@ -374,18 +379,25 @@
     return fetch(APPS_SCRIPT_URL, { method: 'POST', redirect: 'follow', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body, signal: ctl ? ctl.signal : undefined })
       .then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('http ' + r.status); return r.json(); }, function (e) { clearTimeout(t); throw e; });
   }
+  var PORTFOLIO_JS = '/js/talent-portfolio.js?v=6';
+  // one id per application: seeds the portfolio's art direction (name + id), so the uploaded PDF and a
+  // later download are the same book, while two applicants almost never get the same one
+  var APP_ID = 'A' + Date.now().toString(36) + Math.floor(Math.random() * 1679616).toString(36);
+  function pdfData(D, q) { var d = { name: D.name, category: D.category, city: D.city, about: D.about, seed: APP_ID, stats: vitals(D), photos: pdfOrder() }; if (q) d._q = q; return d; }
+  function designName(D) { try { var g = window.YKSPortfolio.design(pdfData(D)); return [g.themeName, g.cover, g.profile, g.back].join(' \u00b7 '); } catch (e) { return ''; } }
   function portfolioLib() {
     return window.YKSPortfolio ? Promise.resolve() : new Promise(function (res, rej) {
-      var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=5'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+      var s = document.createElement('script'); s.src = PORTFOLIO_JS; s.onload = res; s.onerror = rej; document.head.appendChild(s);
     });
   }
-  // the applicant's YKS portfolio PDF as base64; null on any failure or after 30 s, never throws
+  // the applicant's YKS portfolio PDF as base64; null on any failure or after 75 s, never throws.
+  // A book over budget is rebuilt once a little lighter (still full-page sharp).
   function builtPortfolio(D) {
-    var work = portfolioLib().then(function () {
-      return window.YKSPortfolio.blob({ name: D.name, category: D.category, city: D.city, about: D.about, stats: vitals(D), photos: pdfOrder() });
-    }).then(function (blob) { return b64(blob); })
+    function one(q) { return window.YKSPortfolio.blob(pdfData(D, q)).then(function (blob) { return b64(blob); }); }
+    var work = portfolioLib().then(function () { return one(0); })
+      .then(function (d) { return d.length > PDF_BUDGET ? one(0.8).then(function (d2) { return d2.length < d.length ? d2 : d; }, function () { return d; }) : d; })
       .then(function (d) { return { name: (D.name.replace(/[^A-Za-z0-9]+/g, '-') || 'YKS') + '-YKS-portfolio.pdf', mime: 'application/pdf', data: d }; }, function () { return null; });
-    return Promise.race([work, new Promise(function (res) { setTimeout(function () { res(null); }, 30000); })]);
+    return Promise.race([work, new Promise(function (res) { setTimeout(function () { res(null); }, 75000); })]);
   }
   function vitals(D) { return { height: D.height_full, heightShort: D.height_short, bust: D.bust, waist: D.waist, hips: D.hips, shoe: D.shoe, hair: D.hair, eyes: D.eyes }; }
   function source() { try { var v = JSON.parse(localStorage.getItem('yks_src_v1') || 'null'); return v && v.src ? v.src + (v.camp ? ' · ' + v.camp : '') : 'Direct'; } catch (e) { return 'Direct'; } }
@@ -442,36 +454,62 @@
       send();
     });
     function send() {
-    var list = entries(), KEYS = SLOTS.map(function (x) { return x.k; }), done = 0;
-    say('Preparing your photos\u2026 0 / ' + list.length);
-    Promise.all(list.map(function (en, i) {
-      return prep(en.file).then(function (r) {
-        done++; say('Preparing your photos\u2026 ' + done + ' / ' + list.length);
-        var key = KEYS.filter(function (k) { return slotState[k] === en; })[0] || 'extra';
-        return { slot: key, label: en.cap, name: ('0' + (i + 1)).slice(-2) + '-' + en.cap.replace(/[^A-Za-z0-9]+/g, '-') + '.' + r.ext, mime: r.mime, data: r.data };
+    var list = entries(), KEYS = SLOTS.map(function (x) { return x.k; });
+    // one photo at a time (12 full-size decodes at once can run a phone out of memory); a set that's
+    // over the upload budget is re-encoded one step smaller until it fits
+    function prepAll(step) {
+      var st = PREP_STEPS[step], done = 0, out = [];
+      say('Preparing your photos\u2026 0 / ' + list.length);
+      return list.reduce(function (p, en, i) {
+        return p.then(function () {
+          return prep(en.file, st[0], st[1]).then(function (r) {
+            done++; say('Preparing your photos\u2026 ' + done + ' / ' + list.length);
+            var key = KEYS.filter(function (k) { return slotState[k] === en; })[0] || 'extra';
+            out.push({ slot: key, label: en.cap, name: ('0' + (i + 1)).slice(-2) + '-' + en.cap.replace(/[^A-Za-z0-9]+/g, '-') + '.' + r.ext, mime: r.mime, data: r.data });
+          });
+        });
+      }, Promise.resolve()).then(function () {
+        var size = out.reduce(function (a, x) { return a + x.data.length; }, 0);
+        return size > PHOTO_BUDGET && step < PREP_STEPS.length - 1 ? prepAll(step + 1) : out;
       });
-    }))
+    }
+    prepAll(list.length > 8 ? 1 : 0)
       .then(function (ph) {
         say('Preparing your portfolio\u2026');
         return builtPortfolio(D).then(function (pdf) { return { photos: ph, pdf: pdf }; });
       })
       .then(function (up) {
-        say('Sending your application\u2026 this can take up to a minute, keep this page open.');
+        say('Sending your application\u2026 this can take a minute or two, keep this page open.');
         var hp = form.querySelector('[name=website]');
-        var body = JSON.stringify({
+        var design = designName(D);
+        function bodyFor(ph, pdf) { return JSON.stringify({
           fields: {
             name: D.name, phone: D.phone, email: D.email, city: D.city, instagram: D.handle, category: D.category,
             dob: D.dob, height: D.height, gender: D.gender, about: D.about,
             height_cm: String(D.height_cm), height_ft_in: D.height_short, bust: D.bust, waist: D.waist, hips: D.hips, shoe: D.shoe, hair: D.hair, eyes: D.eyes,
             follow_verified: followVerified || '', flags: FLAGS.join('; '), source: source(), seconds_on_form: secs,
+            app_id: APP_ID, portfolio_design: design,
             website: hp ? hp.value : '', botcheck: ''
           },
-          photos: up.photos, pdf: up.pdf
-        });
-        var tries = 0;
+          photos: ph, pdf: pdf
+        }); }
+        var body = bodyFor(up.photos, up.pdf);
+        // never risk the whole application on the PDF: past the cap it goes without (she can still download it)
+        if (body.length > BODY_CAP && up.pdf) body = bodyFor(up.photos, null);
+        var tries = 0, trimmed = false;
         function attempt() {
           tries++;
-          return postIntake(body).then(null, function (er) {   // one quiet retry for a dropped connection; the script de-duplicates
+          return postIntake(body).then(function (j) {
+            // an older script that still takes fewer photos: resend once with the 5 required + the first extras
+            // (the PDF already shows every photo). Nothing was saved by the rejected try.
+            var m = j && !j.ok && j.error === 'photos' && /At most (\d+)/.exec(j.message || '');
+            if (m && !trimmed && +m[1] >= MIN_PHOTOS && +m[1] < up.photos.length) {
+              trimmed = true; body = bodyFor(up.photos.slice(0, +m[1]), up.pdf);
+              if (body.length > BODY_CAP && up.pdf) body = bodyFor(up.photos.slice(0, +m[1]), null);
+              return postIntake(body);
+            }
+            return j;
+          }, function (er) {   // one quiet retry for a dropped connection; the script de-duplicates
             if (tries < 2) { say('Still sending\u2026'); return attempt(); }
             throw er;
           });
@@ -489,7 +527,7 @@
             name: D.name, contact: D.phone, email: D.email, category: D.category, city: D.city, socials: '@' + D.handle,
             instagram_profile: D.profile, about: D.about, stat_height: D.height_full, stat_bust: D.bust, stat_waist: D.waist, stat_hips: D.hips,
             stat_shoe: D.shoe, stat_hair: D.hair, stat_eyes: D.eyes, dob: D.dob, gender: D.gender,
-            photos: direct, cover_url: direct[0] ? direct[0].url : ''
+            photos: direct, cover_url: direct[0] ? direct[0].url : '', portfolio_seed: APP_ID
           }) }).catch(function () {});
         } catch (er) {}
         if (window.gtag) gtag('event', 'talent_apply');
@@ -550,10 +588,10 @@
       if (!unlocked) return;
       dl.disabled = true; dl.textContent = 'Building your portfolio\u2026';
       var go = function () {
-        return window.YKSPortfolio.download({ name: D.name, category: D.category, city: D.city, about: D.about, stats: vitals(D), photos: pdfOrder() });
+        return window.YKSPortfolio.download(pdfData(D));
       };
       (window.YKSPortfolio ? go() : new Promise(function (res, rej) {
-        var s = document.createElement('script'); s.src = '/js/talent-portfolio.js?v=5'; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+        var s = document.createElement('script'); s.src = PORTFOLIO_JS; s.onload = res; s.onerror = rej; document.head.appendChild(s);
       }).then(go))
         .then(function () { dl.disabled = false; dl.textContent = 'Downloaded \u2713 \u2014 download again'; })
         .catch(function () { dl.disabled = false; dl.textContent = 'Download your portfolio'; hint.textContent = 'Couldn\u2019t build the PDF just now \u2014 tap to try again.'; });
