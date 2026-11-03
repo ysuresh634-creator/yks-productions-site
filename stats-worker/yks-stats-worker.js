@@ -221,7 +221,7 @@ main{max-width:1180px;margin:0 auto;padding:14px}
 .grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
 .c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;grid-column:span 12;min-width:0}
 @media(min-width:760px){.s6{grid-column:span 6}.s4{grid-column:span 4}.s8{grid-column:span 8}.s3{grid-column:span 3}}
-@media(max-width:759px){.s3{grid-column:span 6}}
+@media(min-width:520px) and (max-width:759px){.s3{grid-column:span 6}}
 h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:0 0 10px;font-weight:600}
 .big{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.1}.big small{font-size:13px;font-weight:500;color:var(--mut);margin-left:4px}
 .kv{display:flex;gap:18px;flex-wrap:wrap}
