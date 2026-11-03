@@ -269,7 +269,7 @@ def page(c):
 </script>
 </head>
 <body data-page="casting">
-<script src="/js/contact.js?v=2"></script>
+<script src="/js/contact.js?v=3"></script>
 
 {nav(c)}
 

@@ -156,7 +156,7 @@ def head(path, title, desc, ogtitle, schema, region=None, placename=None, ogtype
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
 </head>
 <body{(' data-wa="' + NUM[CUR['cc']][0] + '"') if CUR['cc'] else ''}>
-<script src="/js/contact.js?v=2"></script>
+<script src="/js/contact.js?v=3"></script>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -293,14 +293,14 @@ def tail(source, watext, related_line=''):
 </footer>
 
 {geo}<script src="/js/landing.js?v=25"></script>
-<script src="/js/fx.js?v=6"></script>
+<script src="/js/fx.js?v=7"></script>
 <script src="/js/lead.js?v=5"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=9"></script>
 <script src="/js/search.js?v=13" defer></script>
-<script src="/js/smart.js?v=3" defer></script>
-<script src="/js/source.js?v=1"></script>
-<script src="/js/preferred-source.js?v=1" defer></script>
+<script src="/js/smart.js?v=4" defer></script>
+<script src="/js/source.js?v=2"></script>
+<script src="/js/preferred-source.js?v=2" defer></script>
 <script src="/js/rail.js?v=6"></script>
 </body>
 </html>

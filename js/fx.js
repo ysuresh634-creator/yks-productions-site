@@ -180,6 +180,20 @@
 
     vids.forEach(function (v) { v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); });
 
+    /* slow / data-saver connection (js/contact.js sets html[data-yks-net=slow]):
+       nothing downloads until the visitor taps a clip; the first tap loads and
+       plays it, later taps toggle sound */
+    if (document.documentElement.getAttribute('data-yks-net') === 'slow') {
+      vids.forEach(function (v) {
+        if (v.src || !v.dataset.src) return;
+        v.addEventListener('click', function () {
+          if (!v.getAttribute('src')) { v.src = v.dataset.src; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+          else v.muted = !v.muted;
+        });
+      });
+      return;
+    }
+
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         var v = e.target;

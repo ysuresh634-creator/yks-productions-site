@@ -123,7 +123,7 @@
     var dnt = navigator.doNotTrack === '1' || window.doNotTrack === '1' || navigator.globalPrivacyControl === true;
     var returning = false, sessions = 1;
     try {
-      if (!dnt) {
+      if (!dnt && localStorage.getItem('yks_smart_off') !== '1') {
         var seen = JSON.parse(localStorage.getItem('yks_seen_v1') || 'null') || { n: 0, t: 0 };
         if (!sessionStorage.getItem('yks_sess')) { sessionStorage.setItem('yks_sess', '1'); seen.prev = seen.t; seen.n = (seen.n || 0) + 1; seen.t = Date.now(); localStorage.setItem('yks_seen_v1', JSON.stringify(seen)); }
         returning = (seen.n || 0) > 1; sessions = seen.n || 1;

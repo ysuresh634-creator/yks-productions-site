@@ -345,13 +345,13 @@ def page(d):
 </footer>
 
 <script src="/js/landing.js?v=20"></script>
-<script src="/js/fx.js?v=6"></script>
+<script src="/js/fx.js?v=7"></script>
 <script src="/js/lead.js?v=3"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=9"></script>
   <script src="/js/search.js?v=12" defer></script>
-<script src="/js/source.js?v=1"></script>
-<script src="/js/preferred-source.js?v=1" defer></script>
+<script src="/js/source.js?v=2"></script>
+<script src="/js/preferred-source.js?v=2" defer></script>
 <script src="/js/rail.js?v=6"></script>
 </body>
 </html>

@@ -238,7 +238,7 @@
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
 </head>
 <body>
-<script src="/js/contact.js?v=2"></script>
+<script src="/js/contact.js?v=3"></script>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -513,7 +513,7 @@
 </footer>
 
 <script src="/js/landing.js?v=25"></script>
-<script src="/js/fx.js?v=6"></script>
+<script src="/js/fx.js?v=7"></script>
 <script src="/js/lead.js?v=5"></script>
 <script>
 (function(){
@@ -535,7 +535,7 @@
   if(!vids.length) return;
   /* slow or data-saver connection (js/contact.js sets this): hold the reels until tapped */
   if(document.documentElement.getAttribute('data-yks-net') === 'slow'){
-    vids.forEach(function(v){ v.addEventListener('click', function(){ if(!v.src){ v.src = v.dataset.src; v.play().catch(function(){}); } else { v.muted = !v.muted; } }); });
+    /* js/fx.js holds them and plays one on tap */
     var hint = vids[0].parentNode.parentNode.querySelector('.l-form-alt');
     if(hint) hint.textContent = 'Your connection looks slow, so the reels wait for you: tap one to play it';
     return;
@@ -558,9 +558,9 @@
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=9"></script>
   <script src="/js/search.js?v=13" defer></script>
-<script src="/js/smart.js?v=3" defer></script>
-<script src="/js/source.js?v=1"></script>
-<script src="/js/preferred-source.js?v=1" defer></script>
+<script src="/js/smart.js?v=4" defer></script>
+<script src="/js/source.js?v=2"></script>
+<script src="/js/preferred-source.js?v=2" defer></script>
 <script src="/js/rail.js?v=6"></script>
 </body>
 </html>

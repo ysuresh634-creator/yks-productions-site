@@ -215,8 +215,10 @@
     return blank();
   }
   var P = load();
+  function offNow() { try { return ls.getItem(OFF) === '1'; } catch (e) { return true; } }
   function save() {
     if (off) return;
+    if (offNow()) { off = true; return; }        // turned off in another tab / on the privacy page
     P.intent = intent();
     try { ls.setItem(KEY, JSON.stringify(P)); } catch (e) {}
   }
@@ -758,7 +760,7 @@
     var prevY = scrollY, prevT = Date.now(), startY = scrollY, startT = prevT;
     function up() {   // a quick flick back up: >0.9 screen within 700 ms
       var y = scrollY, t = Date.now();
-      if (t - prevT > 250 || y > prevY) { startY = prevY; startT = prevT; }   // a new gesture starts here
+      if (t - prevT > 250 || y > prevY) { startY = prevY; startT = t; }   // a new gesture starts here
       prevY = y; prevT = t;
       if (startY - y > innerHeight * 0.9 && t - startT < 700 && maxScroll >= 0.45) show('scroll-up');
     }
@@ -796,7 +798,7 @@
           var v = String(el.value || '').trim().slice(0, 80);
           if (k === 'email' && v && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) return;
           if (v) F[k] = v; else delete F[k];
-          try { if (!off) ls.setItem(FORM_KEY, JSON.stringify(F)); } catch (er) {}
+          try { if (!off && !offNow()) ls.setItem(FORM_KEY, JSON.stringify(F)); } catch (er) {}
         }
       });
     }, true);

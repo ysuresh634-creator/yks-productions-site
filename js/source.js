@@ -86,7 +86,8 @@
         land: location.pathname.replace(/^\/|\.html$/g, '') || 'home',
         t: Date.now()
       };
-      try { localStorage.setItem(STORE, JSON.stringify(stored)); } catch (e) {}
+      // not when the visitor turned personalisation off (yksproductions.com/privacy.html)
+      try { if (localStorage.getItem('yks_smart_off') !== '1') localStorage.setItem(STORE, JSON.stringify(stored)); } catch (e) {}
     }
   }
 
