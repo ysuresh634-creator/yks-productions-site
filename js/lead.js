@@ -289,7 +289,7 @@
       form.appendChild(nav);
 
       var at = 0;
-      function paint() {
+      function paint(focus) {
         stepEls.forEach(function (s, i) { s.classList.toggle('on', i === at); });
         Array.prototype.slice.call(bar.children).forEach(function (d, i) { d.classList.toggle('on', i <= at); });
         var last = at === steps.length - 1;
@@ -297,7 +297,7 @@
         submit.style.display = last ? '' : 'none';
         back.style.visibility = at === 0 ? 'hidden' : 'visible';
         var f = stepEls[at].querySelector('input,textarea');
-        if (f) setTimeout(function () { f.focus({ preventScroll: true }); }, 60);
+        if (f && focus !== false) setTimeout(function () { f.focus({ preventScroll: true }); }, 60);
       }
       function valid() {
         var req = stepEls[at].querySelectorAll('[required]');
@@ -313,7 +313,7 @@
           e.preventDefault(); if (valid()) { at++; paint(); }
         }
       });
-      paint();
+      paint(false);   // first paint: never steal focus on page load
     });
   })();
 

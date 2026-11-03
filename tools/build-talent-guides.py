@@ -260,7 +260,7 @@ def page(g):
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
 </head>
 <body data-page="casting">
-<script src="/js/contact.js?v=1"></script>
+<script src="/js/contact.js?v=2"></script>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -351,6 +351,7 @@ def page(g):
         <a href="/find-models.html">Find models</a>
         <a href="/index.html">Portfolio</a>
         <a href="/faq.html">FAQ</a>
+        <a href="/privacy.html">Privacy</a>
         <a href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener">Instagram</a>
       </div>
     </div>
@@ -360,7 +361,7 @@ def page(g):
 </footer>
 
 <script src="/js/landing.js?v=25"></script>
-<script src="/js/smart.js?v=2" defer></script>
+<script src="/js/smart.js?v=3" defer></script>
 {scripts}</body>
 </html>
 """

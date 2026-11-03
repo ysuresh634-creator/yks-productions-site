@@ -11,6 +11,5 @@
   document.body.setAttribute('data-wa', num); // so chat.js + landing.js FAB agree
   var links = document.querySelectorAll('a[href*="wa.me/' + WA_AE + '"]');
   for (var i = 0; i < links.length; i++) links[i].href = links[i].href.replace(WA_AE, WA_IN);
-  var shown = document.querySelectorAll('[data-geo-phone]');
-  for (var j = 0; j < shown.length; j++) shown[j].textContent = '+91 97466 79720';
+  // numbers are never printed on the page (owner's rule), only linked
 })();

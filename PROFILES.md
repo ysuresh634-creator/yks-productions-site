@@ -1,3 +1,6 @@
+---
+published: false
+---
 # Profile copy — make every platform say the same thing
 
 The reason nothing corroborates you is that four sources describe four

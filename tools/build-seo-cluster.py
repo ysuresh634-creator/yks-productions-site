@@ -83,7 +83,7 @@ AUTHOR = '''<section class="l-section l-author">
       <img src="/assets/yedu-portrait.jpg" width="{w}" height="{h}" alt="Yedukrishna Suresh, marketing specialist, photographer and videographer" loading="lazy" decoding="async" />
       <div class="l-prose">
         <p>I&rsquo;m a marketing specialist with 8 years in content, video and photography, and the founder of YKS Productions. I&rsquo;ve created for brands including <strong>Vaseline (Unilever)</strong>, <strong>Marriott</strong>, <strong>KL Rahul</strong> and <strong>Cindrebay School of Design</strong>, and worked as still photographer on the Malayalam films <strong>Soothravakyam</strong> and <strong>Baby Girl</strong>. One campaign reel I made reached <strong>3.3M views</strong>, and my Instagram <a href="https://www.instagram.com/yks_photoworks/" target="_blank" rel="noopener">@yks_photoworks</a> has passed <strong>1.4M profile views</strong>.</p>
-        <p>I work independently, with no office or staff, and travel to clients in Dubai, Abu Dhabi, Bangalore, Mumbai and Delhi NCR. Email <a href="mailto:yksproductions893@gmail.com">yksproductions893@gmail.com</a> or WhatsApp {phone}.</p>
+        <p>I work independently, with no office or staff, and travel to clients in Dubai, Abu Dhabi, Bangalore, Mumbai and Delhi NCR. Email <a href="mailto:yksproductions893@gmail.com">yksproductions893@gmail.com</a> or {phone}.</p>
       </div>
     </div>
   </div>
@@ -156,7 +156,7 @@ def head(path, title, desc, ogtitle, schema, region=None, placename=None, ogtype
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
 </head>
 <body{(' data-wa="' + NUM[CUR['cc']][0] + '"') if CUR['cc'] else ''}>
-<script src="/js/contact.js?v=1"></script>
+<script src="/js/contact.js?v=2"></script>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -247,8 +247,9 @@ def places(links):
 def tail(source, watext, related_line=''):
     aw, ah = Image.open(os.path.join(ROOT, 'assets/yedu-portrait.jpg')).size
     cc = CUR['cc']
-    phone = f'<a href="https://wa.me/{NUM[cc][0]}">{NUM[cc][1]}</a>' if cc else '<a href="https://wa.me/971501955122" data-geo-phone>+971 50 195 5122</a>'
-    geo = '' if cc else '<script src="/js/geo-wa.js?v=1"></script>\n'
+    # numbers are linked, never printed (owner's rule)
+    phone = f'<a href="https://wa.me/{NUM[cc][0]}">message me on WhatsApp</a>' if cc else '<a href="https://wa.me/971501955122">message me on WhatsApp</a>'
+    geo = '' if cc else '<script src="/js/geo-wa.js?v=2"></script>\n'
     return AUTHOR.replace('{w}', str(aw)).replace('{h}', str(ah)).replace('{phone}', phone) + f'''
 
 </main>
@@ -282,6 +283,7 @@ def tail(source, watext, related_line=''):
         <a href="/marketing.html">Marketing</a>
         <a href="/blog/">Journal</a>
         <a href="/faq.html">FAQ</a>
+        <a href="/privacy.html">Privacy</a>
         <a href="/quote.html">Get a quote</a>
         <a href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener">Instagram</a>
       </div>
@@ -292,11 +294,11 @@ def tail(source, watext, related_line=''):
 
 {geo}<script src="/js/landing.js?v=25"></script>
 <script src="/js/fx.js?v=6"></script>
-<script src="/js/lead.js?v=4"></script>
+<script src="/js/lead.js?v=5"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=9"></script>
 <script src="/js/search.js?v=13" defer></script>
-<script src="/js/smart.js?v=2" defer></script>
+<script src="/js/smart.js?v=3" defer></script>
 <script src="/js/source.js?v=1"></script>
 <script src="/js/preferred-source.js?v=1" defer></script>
 <script src="/js/rail.js?v=6"></script>

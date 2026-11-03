@@ -88,6 +88,7 @@ def foot(c):
         <a href="/find-models.html">Find models</a>
         <a href="/index.html">Portfolio</a>
         <a href="/faq.html">FAQ</a>
+        <a href="/privacy.html">Privacy</a>
       </div>
     </div>
     <p class="l-related">Talent and casting in other cities: {links}{pair}</p>
@@ -268,7 +269,7 @@ def page(c):
 </script>
 </head>
 <body data-page="casting">
-<script src="/js/contact.js?v=1"></script>
+<script src="/js/contact.js?v=2"></script>
 
 {nav(c)}
 

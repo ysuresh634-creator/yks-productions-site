@@ -278,6 +278,19 @@
     return { tz: tz, lang: lang, market: market };
   }
 
+  /* ---------- device / visit context (js/contact.js) ---------- */
+  function ctx() {
+    try { if (window.YKS && YKS.context) return YKS.context(); } catch (e) {}
+    var h = new Date().getHours();
+    return { device: (innerWidth || 1200) < 700 ? 'mobile' : 'desktop', os: 'other', net: { slow: false },
+      hour: h, daypart: h < 5 ? 'night' : h < 12 ? 'morning' : h < 17 ? 'afternoon' : h < 22 ? 'evening' : 'night',
+      from: 'direct', returning: (P && P.visits > 1), reducedMotion: false };
+  }
+  function greet() {
+    var c = ctx(), g = { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening' }[c.daypart] || 'Hello';
+    return g + (c.returning || (P.visits || 1) > 1 ? ', welcome back' : '');
+  }
+
   /* ---------- intent ---------- */
   var SERVICES = ['adfilm', 'product', 'corporate', 'events', 'realestate', 'fashion', 'wedding', 'reels', 'hospitality', 'portrait', 'marketing'];
   function intent() {
@@ -316,6 +329,9 @@
     add(viewBase, 1);
     if (hereCity) addCity(hereCity, 1.5);
     log('view', path);
+    try {
+      if (!sessionStorage.getItem('yks_from')) { var cf = ctx(); sessionStorage.setItem('yks_from', cf.from); log('from', cf.from + ' ' + cf.device); P.from = cf.from; }
+    } catch (e) {}
 
     // first-touch context — UTM tags and the landing page (source.js)
     try {
@@ -362,6 +378,12 @@
     log('dwell', path + ' ' + Math.round(sec) + 's ' + Math.round(maxScroll * 100) + '%');
     save();
   }
+  /* live engagement for this page: active seconds, deepest scroll, 0-1 score */
+  function engagement() {
+    var sec = (active + (document.visibilityState === 'hidden' ? 0 : Date.now() - tick)) / 1000;
+    return { sec: Math.round(sec), depth: +maxScroll.toFixed(2), score: +Math.min(1, Math.min(sec / 60, 1) * 0.5 + maxScroll * 0.5).toFixed(2) };
+  }
+  var contacted = false;
   if (!off) {
     addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('visibilitychange', onVis);
@@ -372,7 +394,8 @@
       var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
       if (!a) return;
       var href = a.getAttribute('href') || '';
-      if (/wa\.me|whatsapp|^tel:/.test(href)) { add({ _brand: 1 }, 1); log('contact', path); save(); return; }
+      if (/wa\.me|whatsapp|^tel:/.test(href)) { contacted = true; add({ _brand: 1 }, 1); log('contact', path); save(); return; }
+      if (/quote|talents\/apply|find-models/.test(href)) contacted = true;
       try {
         var u = new URL(href, location.href);
         if (u.origin !== location.origin) return;
@@ -469,12 +492,13 @@
     return (map[it.service] || []).slice(0, 3);
   }
 
+  var EXTRA_KEYS = ['yks_form_v1', 'yks_seen_v1', 'yks_src_v1'];
   function reset() {
-    try { ls && ls.removeItem(KEY); } catch (e) {}
+    try { ls && ls.removeItem(KEY); EXTRA_KEYS.forEach(function (k) { ls.removeItem(k); }); sessionStorage.removeItem('yks_exit'); sessionStorage.removeItem('yks_sc_x'); sessionStorage.removeItem('yks_from'); sessionStorage.removeItem('yks_arr'); } catch (e) {}
     P = blank(); announce();
   }
   function setOff(v) {
-    try { if (v) { ls.setItem(OFF, '1'); ls.removeItem(KEY); } else ls.removeItem(OFF); } catch (e) {}
+    try { if (v) { ls.setItem(OFF, '1'); ls.removeItem(KEY); EXTRA_KEYS.forEach(function (k) { ls.removeItem(k); }); } else ls.removeItem(OFF); } catch (e) {}
     off = !!v || dnt || bot || !ls;
   }
 
@@ -503,7 +527,7 @@
     '.yks-fy-r a:hover{border-color:#ff8c3b;color:#ff8c3b}',
     '.yks-fy-n{margin-top:16px;font-size:.74rem;color:rgba(244,237,226,.42);line-height:1.5}',
     '.yks-fy-n button{background:none;border:0;padding:0;font:inherit;color:rgba(255,140,59,.85);cursor:pointer;text-decoration:underline;text-underline-offset:2px}',
-    '.yks-fy-n button:hover{color:#ff8c3b}',
+    '.yks-fy-n button:hover{color:#ff8c3b}.yks-fy-n a{color:rgba(244,237,226,.6)}',
     /* sticky CTA — bottom left on phones (chat owns bottom right), centred on desktop */
     '.yks-sc{position:fixed;z-index:299;bottom:22px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;',
     'display:flex;align-items:center;gap:2px;transition:opacity .35s,transform .35s;font-family:Inter,system-ui,sans-serif}',
@@ -519,7 +543,21 @@
     '@media(max-width:640px){.yks-sc{left:14px;bottom:14px;transform:translateY(16px);max-width:calc(100vw - 210px)}',
     '.yks-sc.on{transform:none}.yks-sc a{padding:0 12px;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;min-width:0}',
     '.yks-sc a b{display:none}.yks-sc .yks-scl{display:none}.yks-sc .yks-scs{display:inline}}',
-    '@media(prefers-reduced-motion:reduce){.yks-sc,.yks-fy-c{transition:none}}'
+    '.yks-ex{position:fixed;z-index:300;right:22px;bottom:22px;width:min(380px,calc(100vw - 28px));padding:20px 20px 14px;border-radius:16px;',
+    'background:rgba(14,11,18,.97);border:1px solid rgba(255,140,59,.45);color:#f4ede2;font-family:Inter,system-ui,sans-serif;',
+    'box-shadow:0 24px 60px -20px rgba(0,0,0,.9);opacity:0;transform:translateY(14px);transition:opacity .3s,transform .3s}',
+    '.yks-ex.on{opacity:1;transform:none}',
+    '.yks-ex h2{margin:0 0 6px;font-size:1.15rem;font-weight:500;line-height:1.3;padding-right:24px}',
+    '.yks-ex p{margin:0 0 10px;font-size:.88rem;line-height:1.5;color:rgba(244,237,226,.78)}',
+    '.yks-ex .yks-ex-pr{font-size:.78rem;color:rgba(244,237,226,.55)}',
+    '.yks-ex-a{display:flex;flex-direction:column;gap:8px;margin:4px 0 8px}',
+    '.yks-ex-p{display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:999px;background:#ff8c3b;color:#140f0a;font-weight:600;text-decoration:none;font-size:.92rem}',
+    '.yks-ex-g{font-size:.84rem;color:#ff8c3b;text-decoration:underline;text-underline-offset:3px;text-align:center;padding:4px 0}',
+    '.yks-ex-w{margin:0!important;text-align:center}.yks-ex-w a{font-size:.72rem;color:rgba(244,237,226,.45)}',
+    '.yks-ex-x{position:absolute;top:8px;right:8px;width:36px;height:36px;border:0;background:none;color:rgba(244,237,226,.6);font-size:20px;cursor:pointer;border-radius:50%}',
+    '.yks-ex-x:hover{color:#fff}.yks-ex a:focus-visible,.yks-ex-x:focus-visible{outline:2px solid #ff8c3b;outline-offset:2px}',
+    '@media(max-width:640px){.yks-ex{right:14px;left:14px;bottom:14px;width:auto}}',
+    '@media(prefers-reduced-motion:reduce){.yks-sc,.yks-fy-c,.yks-ex{transition:none}}'
   ].join('');
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var cssOn = false;
@@ -544,7 +582,7 @@
     var recent = (P.pages || []).filter(function (x) { return x.p !== path; }).slice(0, 5);
     sec.innerHTML = '<div class="yks-fy-in">' +
       '<div class="yks-fy-h"><div><p class="yks-fy-k">' + (kind === 'home' ? 'Picked for you' : 'You may also like') + '</p>' +
-      '<h2>' + (kind === 'home' ? (it.audience === 'talent' ? 'Your next step on YKS Talents' : 'Pick up where you left off') : 'More you might want to see') + '</h2>' +
+      '<h2>' + (kind === 'home' ? esc(greet()) + '. ' + (it.audience === 'talent' ? 'Your next step on YKS Talents' : 'Pick up where you left off') : 'More you might want to see') + '</h2>' +
       '<p>' + esc(reasonLine(it)) + '</p></div></div>' +
       '<div class="yks-fy-g">' + recs.map(function (r, i) {
         return '<a class="yks-fy-c" data-yks-rec="' + i + '" href="' + esc(r.u) + '"><span class="yks-fy-m"><img src="' + esc(r.img) +
@@ -555,7 +593,7 @@
         return '<a href="' + esc(x.p === '/' ? '/' : x.p + (/\/$/.test(x.p) ? '' : '.html')) + '">' + esc(x.t) + '</a>';
       }).join('') + '</div>' : '') +
       '<p class="yks-fy-n">Suggested from the pages you opened on this device. It stays in your browser and is never sent anywhere. ' +
-      '<button type="button" data-yks-reset>Clear my history</button> · <button type="button" data-yks-off>Turn off suggestions</button></p>' +
+      '<button type="button" data-yks-reset>Clear my history</button> · <button type="button" data-yks-off>Turn off suggestions</button> · <a href="/privacy.html#personalisation">How this works</a></p>' +
       '</div>';
     sec.querySelector('[data-yks-reset]').addEventListener('click', function () { reset(); sec.remove(); refreshScroll(); });
     sec.querySelector('[data-yks-off]').addEventListener('click', function () { setOff(true); sec.remove(); var s = document.querySelector('.yks-sc'); if (s) s.remove(); refreshScroll(); });
@@ -599,35 +637,174 @@
     box.setAttribute('data-yks-tuned', it.audience + (it.service ? ':' + it.service : ''));
   }
 
+  /* who this page is for, when the visitor has no history yet */
+  function pageAudience() {
+    if (viewBase.talent) return 'talent';
+    if (viewBase.cast) return 'cast';
+    for (var i = 0; i < SERVICES.length; i++) if (viewBase[SERVICES[i]]) return 'brand';
+    if (/photograph|videograph|video|film|shoot|production|marketing|content|reels|ugc|campaign|^\/(dubai|india)\//.test(path)) return 'brand';
+    return null;
+  }
+  var NO_CTA = /^\/(quote|talents\/apply|apply|edit|studio|privacy)|agreement|^\/links/;
+  function waHref(text) {
+    var t = text || 'Hi Yedukrishna, I’d like a quick quote for a shoot.';
+    return 'https://wa.me/' + waGeo() + '?text=' + encodeURIComponent(t);
+  }
+
+  /* sticky CTA. Phones get the smallest step (tap to WhatsApp), desktops get
+     the 60-second quote form. Shows once there is intent: a known audience
+     from history, or real engagement with this page (40% scrolled + 25s). */
   function sticky() {
-    var it = intent();
-    if (!it.audience) return;
-    if (/^\/(quote|talents\/apply|apply|edit)|agreement/.test(path)) return;
-    if (it.audience === 'talent' && /^\/talents/.test(path)) return;      // the page already says it
-    if (it.audience === 'cast' && /find-models|models-in-/.test(path)) return;
+    if (NO_CTA.test(path)) return;
+    var it = intent(), aud = it.audience, c = ctx();
+    if (aud === 'talent' && /^\/talents/.test(path)) return;      // the page already says it
+    if (aud === 'cast' && /find-models|models-in-/.test(path)) return;
     try { if (sessionStorage.getItem('yks_sc_x')) return; } catch (e) {}
-    var href, label, tail, short;
-    if (it.audience === 'talent') { href = '/talents/apply.html?from=sticky'; label = 'Get your free portfolio'; short = 'Free portfolio'; tail = 'Apply →'; }
-    else if (it.audience === 'cast') { href = '/find-models.html'; label = 'Find talent' + (it.cityName ? ' in ' + it.cityName : ''); short = 'Find talent'; tail = 'Browse →'; }
+    var earned = !!aud;
+    aud = aud || pageAudience();
+    if (!aud) return;
+    var phone = c.device === 'mobile', href, label, tail, short, ext = false;
+    if (aud === 'talent') { href = '/talents/apply.html?from=sticky'; label = 'Get your free portfolio'; short = 'Free portfolio'; tail = 'Apply →'; }
+    else if (aud === 'cast') { href = '/find-models.html'; label = 'Find talent' + (it.cityName ? ' in ' + it.cityName : ''); short = 'Find talent'; tail = 'Browse →'; }
+    else if (phone) { href = waHref(waText()); label = 'Quick quote on WhatsApp'; short = 'Quote on WhatsApp'; tail = ''; ext = true; }
     else { href = '/quote.html'; label = it.service ? 'Quote for your ' + SHORT[it.service] : 'Get a quote'; short = 'Get a quote'; tail = '60 sec →'; }
     style();
     var el = document.createElement('div');
     el.className = 'yks-sc';
     el.setAttribute('data-nosnippet', '');
-    el.innerHTML = '<a href="' + href + '" data-yks-sticky="' + it.audience + '"><span class="yks-scl">' + esc(label) + '</span><span class="yks-scs">' + esc(short) + '</span><b>' + tail + '</b></a>' +
+    el.innerHTML = '<a href="' + esc(href) + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + ' data-yks-sticky="' + aud + (phone ? ':wa' : '') + '"><span class="yks-scl">' + esc(label) + '</span><span class="yks-scs">' + esc(short) + '</span>' + (tail ? '<b>' + tail + '</b>' : '') + '</a>' +
       '<button type="button" aria-label="Hide this suggestion">×</button>';
     el.querySelector('button').addEventListener('click', function () {
       el.remove(); try { sessionStorage.setItem('yks_sc_x', '1'); } catch (e) {}
     });
     document.body.appendChild(el);
-    var shown = false;
+    var shown = false, fast = c.from === 'instagram' || c.from === 'whatsapp';
     function check() {
       var h = document.documentElement, d = (h.scrollHeight - innerHeight) || 1;
-      var f = (scrollY || h.scrollTop) / d;
-      var on = f > 0.28 && f < 0.97;
+      var f = (scrollY || h.scrollTop) / d, e = engagement();
+      var ready = earned || fast ? f > 0.28 : (f > 0.4 && e.sec >= 25);
+      var on = ready && f < 0.97 && !document.querySelector('.yks-ex.on');
       if (on !== shown) { shown = on; el.classList.toggle('on', on); }
     }
     addEventListener('scroll', check, { passive: true }); check();
+    if (!earned) setInterval(check, 5000);
+  }
+
+  /* free guides worth giving away (reciprocity) — real pages on this site */
+  function guideFor(it, aud) {
+    var dxb = it.market === 'uae', sv = it.service || (function () { var b = null, v = 0; Object.keys(viewBase).forEach(function (k) { if (SERVICES.indexOf(k) > -1 && viewBase[k] > v) { v = viewBase[k]; b = k; } }); return b; })();
+    if (aud === 'talent') return ['/talents/guides/how-to-make-a-modelling-portfolio.html', 'How to make a modelling portfolio'];
+    if (aud === 'cast') return ['/talents/guides/how-to-cast-models-for-a-brand-shoot.html', 'How to cast models for a brand shoot'];
+    if (sv === 'realestate') return dxb ? ['/blog/real-estate-video-cost-dubai.html', 'What a real estate video costs in Dubai'] : ['/blog/how-to-choose-real-estate-videographer-dubai.html', 'How to choose a real estate videographer'];
+    if (sv === 'corporate') return dxb ? ['/blog/corporate-video-cost-dubai.html', 'What a corporate video costs in Dubai'] : ['/blog/brand-video-cost-bangalore.html', 'What drives the cost of a brand video'];
+    if (sv === 'wedding') return dxb ? ['/blog/wedding-photographer-cost-dubai.html', 'What a wedding photographer costs in Dubai'] : ['/blog/best-wedding-venues-dubai-photos.html', 'Best wedding venues in Dubai for photos'];
+    if (sv === 'marketing') return dxb ? ['/blog/social-media-management-cost-dubai.html', 'What social media management costs in Dubai'] : ['/blog/linkedin-personal-branding-founders-mumbai.html', 'LinkedIn personal branding for founders'];
+    if (sv === 'adfilm') return ['/blog/brand-video-cost-bangalore.html', 'What drives the cost of a brand video'];
+    return ['/blog/plan-a-content-shoot-day.html', 'How to plan a content shoot day'];
+  }
+
+  /* exit intent: one gentle, dismissible nudge per session, never on forms.
+     Desktop: the pointer leaves through the top of the window.
+     Phone: a fast scroll back up after reading at least half the page. */
+  function exitNudge() {
+    if (NO_CTA.test(path)) return;
+    try { if (sessionStorage.getItem('yks_exit')) return; } catch (e) { return; }
+    var c = ctx(), phone = c.device !== 'desktop', done = false;
+    function busy() {   // a form field the visitor is actually using (on screen and focused)
+      var a = document.activeElement; if (!a || !/INPUT|TEXTAREA|SELECT/.test(a.nodeName)) return false;
+      var r = a.getBoundingClientRect(); return r.height > 0 && r.bottom > 0 && r.top < innerHeight;
+    }
+    function show(why) {
+      if (done || contacted || busy() || document.querySelector('.yks-chat-open,[aria-modal="true"]:not([hidden])')) return;
+      var e = engagement();
+      if (e.sec < (phone ? 20 : 10)) return;
+      var it = intent(), aud = it.audience || pageAudience() || 'brand';
+      if (aud === 'talent' && /^\/talents\/apply/.test(path)) return;
+      done = true; try { sessionStorage.setItem('yks_exit', why); } catch (er) {}
+      log('exit-nudge', why); save();
+      var g = guideFor(it, aud), head, line, cta, href, ext = false;
+      if (aud === 'talent') {
+        head = 'Your free portfolio is one form away';
+        line = 'YKS Talents is free, with no fees ever. Apply in a few minutes and I’ll take it from there.';
+        cta = 'Apply free'; href = '/talents/apply.html?from=exit';
+      } else if (aud === 'cast') {
+        head = 'Still casting' + (it.cityName ? ' in ' + it.cityName : '') + '?';
+        line = 'Tell me the brief and the dates, and I’ll shortlist talent that fits.';
+        cta = phone ? 'Send the brief on WhatsApp' : 'Browse talent'; href = phone ? waHref('Hi Yedukrishna, I’m casting talent for a shoot' + (it.cityName ? ' in ' + it.cityName : '') + '.') : '/find-models.html'; ext = phone;
+      } else {
+        head = (it.service ? 'Planning ' + art(SHORT[it.service]) : 'Planning a shoot') + '?';
+        line = 'Send me one line about it and I’ll reply with availability and a rough number. No forms, no obligation.';
+        cta = phone ? 'Get a quick quote on WhatsApp' : 'Get a quote in 60 seconds'; href = phone ? waHref(waText()) : '/quote.html?from=exit'; ext = phone;
+      }
+      style();
+      var box = document.createElement('aside');
+      box.className = 'yks-ex'; box.setAttribute('data-nosnippet', ''); box.setAttribute('aria-label', 'Before you go'); box.setAttribute('aria-live', 'polite');
+      box.innerHTML = '<button type="button" class="yks-ex-x" aria-label="Close">×</button>' +
+        '<p class="yks-fy-k">Before you go</p><h2>' + esc(head) + '</h2><p>' + esc(line) + '</p>' +
+        (aud === 'brand' ? '<p class="yks-ex-pr">Brands I’ve shot for include Marriott, Vaseline (Unilever), Atlantis The Royal and Cindrebay School of Design. One campaign reel crossed 3.3M views.</p>' : '') +
+        '<div class="yks-ex-a"><a class="yks-ex-p" href="' + esc(href) + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + ' data-yks-exit="' + aud + '">' + esc(cta) + '</a>' +
+        '<a class="yks-ex-g" href="' + g[0] + '">Free guide: ' + esc(g[1]) + '</a></div>' +
+        '<p class="yks-ex-w"><a href="/privacy.html#personalisation">Why am I seeing this?</a></p>';
+      function close() { box.classList.remove('on'); setTimeout(function () { box.remove(); }, 300); removeEventListener('keydown', key); }
+      function key(ev) { if (ev.key === 'Escape') close(); }
+      box.querySelector('.yks-ex-x').addEventListener('click', close);
+      box.addEventListener('click', function (ev) { if (ev.target.closest('a')) setTimeout(close, 50); });
+      addEventListener('keydown', key);
+      document.body.appendChild(box);
+      requestAnimationFrame(function () { box.classList.add('on'); var sc = document.querySelector('.yks-sc.on'); if (sc) sc.classList.remove('on'); });
+      teardown();
+    }
+    function out(e) { if (!e.relatedTarget && e.clientY <= 0) show('leave-top'); }
+    var prevY = scrollY, prevT = Date.now(), startY = scrollY, startT = prevT;
+    function up() {   // a quick flick back up: >0.9 screen within 700 ms
+      var y = scrollY, t = Date.now();
+      if (t - prevT > 250 || y > prevY) { startY = prevY; startT = prevT; }   // a new gesture starts here
+      prevY = y; prevT = t;
+      if (startY - y > innerHeight * 0.9 && t - startT < 700 && maxScroll >= 0.45) show('scroll-up');
+    }
+    function teardown() { document.removeEventListener('mouseout', out); removeEventListener('scroll', up); }
+    if (!phone) document.addEventListener('mouseout', out);
+    else addEventListener('scroll', up, { passive: true });
+  }
+
+  /* progressive profiling: what the visitor typed in a contact form before
+     comes back pre-filled next time. Stored on this device only, under
+     'yks_form_v1'; cleared by "Clear my history" / the privacy page. Never on
+     the talent application forms. */
+  var FORM_KEY = 'yks_form_v1';
+  var FIELDS = {
+    name: 'form.l-form [name="name"], #f-name, #cN',
+    phone: 'form.l-form [name="contact"], #f-phone, #cP',
+    email: 'form.l-form [name="email"], #cE'
+  };
+  function remember() {
+    if (/^\/talents\/(apply|edit)|^\/(apply|edit)|agreement|studio/.test(path)) return;
+    var F = {}; try { F = JSON.parse(ls.getItem(FORM_KEY) || '{}') || {}; } catch (e) {}
+    function fill(root) {
+      Object.keys(FIELDS).forEach(function (k) {
+        if (!F[k]) return;
+        (root.querySelectorAll ? root : document).querySelectorAll(FIELDS[k]).forEach(function (el) {
+          if (!el.value && !el.getAttribute('data-yks-filled')) { el.value = F[k]; el.setAttribute('data-yks-filled', '1'); }
+        });
+      });
+    }
+    fill(document);
+    document.addEventListener('change', function (e) {
+      var el = e.target; if (!el || !el.matches) return;
+      Object.keys(FIELDS).forEach(function (k) {
+        if (el.matches(FIELDS[k])) {
+          var v = String(el.value || '').trim().slice(0, 80);
+          if (k === 'email' && v && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) return;
+          if (v) F[k] = v; else delete F[k];
+          try { if (!off) ls.setItem(FORM_KEY, JSON.stringify(F)); } catch (er) {}
+        }
+      });
+    }, true);
+    // the quote flow builds its contact step later
+    if (path === '/quote' && window.MutationObserver) {
+      new MutationObserver(function (m) { m.forEach(function (r) { r.addedNodes.forEach(function (n) { if (n.nodeType === 1) fill(n); }); }); })
+        .observe(document.body, { childList: true, subtree: true });
+    }
   }
 
   function mount() {
@@ -649,6 +826,8 @@
       else if (b2) { var f = document.querySelector('footer'); if (f) f.parentNode.insertBefore(b2, f); }
     }
     sticky();
+    exitNudge();
+    remember();
     announce();
   }
 
@@ -657,6 +836,8 @@
     recommend: recommend,
     suggestQueries: suggestQueries,
     waText: waText,
+    context: ctx,
+    engagement: engagement,
     profile: function () { return off ? null : JSON.parse(JSON.stringify(P)); },
     signals: textSignals,
     reset: reset,

@@ -1,3 +1,6 @@
+---
+published: false
+---
 # Smart site layer (js/smart.js + js/search.js)
 
 On-device personalisation and smarter search for yksproductions.com.

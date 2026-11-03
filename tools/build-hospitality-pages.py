@@ -229,7 +229,7 @@ def build(src, p):
 </script>
 </head>
 <body>
-<script src="/js/contact.js?v=1"></script>
+<script src="/js/contact.js?v=2"></script>
 {nav.group(0)}
 
 <section class="l-hero">
