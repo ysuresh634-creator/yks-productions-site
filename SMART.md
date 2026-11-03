@@ -66,3 +66,25 @@ The same intent is mirrored at `JSON.parse(localStorage.yks_smart_v1).intent`.
   `tools/seo/production.py` do not, so regenerating with them drops the tag.
 - Catalogue of recommendable pages: `CAT` in `js/smart.js`. Use only existing
   site photos.
+
+## Region-aware contact number (js/contact.js)
+
+India visitors always see +91 97466 79720; UAE / Gulf visitors (UAE, Saudi, Qatar, Oman, Bahrain, Kuwait) always see +971 50 195 5122 — on WhatsApp links, tel: links, shown numbers, sticky CTAs and the quote / enquiry WhatsApp fallbacks.
+
+- Loaded as the first sync script inside `<body>` (`/js/contact.js?v=1`), so swaps happen as the parser adds nodes: no flash, no layout shift.
+- Detection: `?region=in|ae|auto` (kept for the session) → browser timezone → `navigator.languages` (`-IN` / `-AE|SA|QA|OM|BH|KW`). No IP lookup, no third-party call.
+- Unknown visitor (e.g. London, en-GB): nothing is changed, the page's own market number stays.
+- Static HTML and JSON-LD `telephone` are never edited — crawlers and no-JS visitors see the per-page defaults.
+- Opt out for a block that deliberately shows both numbers: add `data-geo-keep`.
+- Sets `body[data-wa]` when a region is detected (the chat widget already reads this).
+
+Helper for any script, including the chat widget:
+
+```js
+YKS.region()          // 'in' | 'ae' | null
+YKS.contactNumber()   // {region, wa:'919746679720', tel:'+919746679720', display:'+91 97466 79720', source:'timezone'|'language'|'param'|'page'}
+YKS.waNumber()        // '919746679720' or '971501955122'
+YKS.waLink('Hi ...')  // full wa.me link with the right number
+```
+
+Generators carry the tag; `tools/seo/production.py` and the marketing-agency-* pages do not (on purpose).

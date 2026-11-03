@@ -260,6 +260,7 @@ def page(g):
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
 </head>
 <body data-page="casting">
+<script src="/js/contact.js?v=1"></script>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -358,8 +359,8 @@ def page(g):
   </div>
 </footer>
 
-<script src="/js/landing.js?v=24"></script>
-<script src="/js/smart.js?v=1" defer></script>
+<script src="/js/landing.js?v=25"></script>
+<script src="/js/smart.js?v=2" defer></script>
 {scripts}</body>
 </html>
 """

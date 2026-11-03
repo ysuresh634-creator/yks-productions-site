@@ -13,6 +13,8 @@
      the same rule chat.js uses: India / South Asia → the India number, Gulf → Dubai.
      The static HTML keeps the Dubai number, so without JS nothing changes. */
   function geoNum() {
+    // js/contact.js is the single source of truth when it is on the page
+    try { if (window.YKS && YKS.region) return YKS.region() ? YKS.waNumber() : ''; } catch (e) {}
     var tz = '';
     try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
     if (/Kolkata|Calcutta|Colombo|Kathmandu|Dhaka/i.test(tz)) return WA_IN;

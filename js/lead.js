@@ -11,6 +11,8 @@
 
   var WA_AE = '971501955122';
   var WA_IN = '919746679720';
+  // the visitor's own region (js/contact.js) beats the page's guess
+  function geo() { try { return window.YKS && YKS.region && YKS.region() ? YKS.waNumber() : ''; } catch (e) { return ''; } }
 
   /* ── YOUR DIARY ───────────────────────────────────────────────
      Dates you are already booked or away. Add them as 'YYYY-MM-DD'
@@ -168,7 +170,7 @@
       num.textContent = 'Fixed quote';
       note.textContent = 'on request · all-in, no hidden extras';
       sub.textContent = 'Every shoot is different, so I don\'t publish rates. Send me these details and I\'ll reply with one fixed, all-in quote for ' + svcLabel.toLowerCase() + ' in ' + state.city + '.';
-      go.href = 'https://wa.me/' + (india ? WA_IN : WA_AE) + '?text=' + encodeURIComponent(msg);
+      go.href = 'https://wa.me/' + (geo() || (india ? WA_IN : WA_AE)) + '?text=' + encodeURIComponent(msg);
     }
 
     paintSvc(); paintScale(); paintExtras(); paintCity(); calc();
@@ -185,7 +187,7 @@
 
     var india = /bangalore|india|bengaluru/i.test(document.title) ||
                 /919746679720/.test(document.body.innerHTML);
-    var WA = india ? WA_IN : WA_AE;
+    var WA = geo() || (india ? WA_IN : WA_AE);
 
     var DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     var MON = ['January', 'February', 'March', 'April', 'May', 'June',

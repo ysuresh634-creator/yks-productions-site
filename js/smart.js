@@ -565,6 +565,8 @@
 
   function art(w) { return (/^[aeiou]/i.test(w) ? 'an ' : 'a ') + w; }
   function waGeo() {
+    // js/contact.js decides the line when it knows the visitor's region
+    try { if (window.YKS && YKS.region && YKS.region()) return YKS.waNumber(); } catch (e) {}
     var it = intent();
     return it.market === 'india' ? '919746679720' : '971501955122';
   }

@@ -533,7 +533,7 @@
         .catch(err => {
           if (btn) { btn.disabled = false; btn.textContent = 'Join waitlist'; }
           const text = 'Hi Yedukrishna, please add me to the masterclass waitlist: ' + email;
-          if (window.YKSEnquiry) window.YKSEnquiry.failBox(wlForm, text, '919746679720', err && err.userMessage);
+          if (window.YKSEnquiry) window.YKSEnquiry.failBox(wlForm, text, (window.YKS && YKS.region && YKS.region()) ? YKS.waNumber() : '919746679720', err && err.userMessage);
           else if (success) {
             success.textContent = 'Couldn’t save that — please WhatsApp +91 97466 79720 and I’ll add you.';
             success.style.color = 'var(--amber)';

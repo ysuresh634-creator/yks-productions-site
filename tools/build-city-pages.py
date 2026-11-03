@@ -268,6 +268,7 @@ def page(c):
 </script>
 </head>
 <body data-page="casting">
+<script src="/js/contact.js?v=1"></script>
 
 {nav(c)}
 
@@ -367,7 +368,7 @@ def page(c):
 {foot(c)}
 
 <script src="/js/talent-names.js?v=1"></script>
-<script src="/js/landing.js?v=13"></script>
+<script src="/js/landing.js?v=25"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=4"></script>
 </body>

@@ -263,6 +263,7 @@ def profile(t, plate):
 <link rel="stylesheet" href="/css/talents.css?v=90" />
 </head>
 <body>
+<script src="/js/contact.js?v=1"></script>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -362,7 +363,7 @@ def profile(t, plate):
 <script src="/js/talent-profile.js?v=6"></script>
 <script src="/js/talent-book.js?v=4"></script>
 <script src="/js/keep.js?v=1"></script>
-<script src="/js/landing.js?v=20"></script>
+<script src="/js/landing.js?v=25"></script>
 </body>
 </html>
 '''
