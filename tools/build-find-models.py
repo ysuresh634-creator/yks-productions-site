@@ -20,28 +20,28 @@ CITIES = [('mumbai', 'Mumbai'), ('delhi', 'Delhi NCR'), ('bangalore', 'Bangalore
           ('kolkata', 'Kolkata'), ('ahmedabad', 'Ahmedabad'), ('jaipur', 'Jaipur'),
           ('chandigarh', 'Chandigarh'), ('dubai', 'Dubai')]
 
-TITLE = 'Hire Female Models for Shoots in India and Dubai | YKS Talents'
-DESC = ('Hire female models for ad, fashion and brand shoots in India and Dubai. Browse curated '
-        'portfolios or send a free brief and get faces matched to your shoot.')
+TITLE = 'Find &amp; Book Models, Influencers &amp; Actors in India and Dubai | YKS Talents'
+DESC = ('Find and book models, influencers, content creators and actors for ad, fashion and brand shoots '
+        'in India and Dubai. Browse curated portfolios or send a free brief.')
 
 FAQ = [
  ('How do I find models for a photoshoot in India?',
   'Browse the portfolios on <a href="/talents.html">YKS Talents</a>, or send a short brief on this page — the look, the city, the dates and what the images are for. I come back with suitable profiles from the platform, usually within a day, and arrange everything with the talent for you. All contact goes through me.'),
- ('How do I hire a model for a photoshoot?',
+ ('How do I book a model for a photoshoot?',
   'Start with a clear brief: the look, the city, the dates, the usage (where and for how long the images will run) and your budget range. Shortlist from portfolios, check availability, agree the fee and usage in writing, and sign a model release before the shoot.'),
- ('How much does it cost to hire a model in India?',
+ ('How much does it cost to book a model in India?',
   'There isn&rsquo;t one rate. Model fees are agreed per project and depend mostly on usage — how long the images run, where, and on which channels — plus shoot length, travel and any exclusivity. A one-day social content shoot and a long outdoor campaign can use the same face and cost very differently. Browsing YKS Talents and sending a brief are free.'),
  ('Is YKS Talents a model agency?',
-  'No. YKS Talents is a free, curated portfolio platform run by one person — me, Yedukrishna Suresh, the photographer and filmmaker behind YKS Productions. Talent join free, with no fees, and the platform doesn&rsquo;t offer them jobs; clients come here to find them. I also cast my own YKS shoots from it.'),
+  'No. YKS Talents is a free, curated portfolio platform run by one person — me, Yedukrishna Suresh, the photographer and filmmaker behind YKS Productions. Talent join 100% free, with no fees ever, and the platform doesn&rsquo;t offer them jobs; it makes them visible to the brands and clients who come here to find them.'),
  ('Can I contact the talent directly?',
   'No. All contact between clients and talent goes through me, Yedukrishna, from the first enquiry to the shoot day and after. Talent names and contact details are never published or shared. It protects the talent, and it means you have one accountable person handling availability, terms and paperwork.'),
- ('What kind of models are on YKS Talents?',
-  'Women aged 18 to 34, based in or regularly working in India or the Middle East — polished, camera-ready faces suited to fashion, beauty, lifestyle, ethnic and bridal, jewellery and premium brand work. Everyone on the platform is over 18.'),
- ('Which cities can I find female models in?',
+ ('What kind of talent is on YKS Talents?',
+  'Models, influencers, content creators and actors aged 18 to 34, based in or regularly working in India or the Middle East — polished, camera-ready faces suited to fashion, beauty, lifestyle, ethnic and bridal, jewellery, ad film and premium brand work. Everyone on the platform is over 18.'),
+ ('Which cities can I find models in?',
   'Across India and the Middle East, including Mumbai, Delhi NCR, Bangalore, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad, Jaipur, Chandigarh and Dubai. Each city page explains what clients there tend to look for.'),
  ('Can I find models for an ad film or a brand campaign?',
   'Yes. Talent on YKS Talents are cast for ad films, digital and TV commercials, reels, launch films and brand campaigns as well as stills. Say in the brief whether you need video, spoken lines or language versions, and the profiles I send will reflect it. My guide on <a href="/talents/guides/how-to-cast-models-for-a-brand-shoot.html">how to cast models for a brand shoot</a> covers the whole process.'),
- ('Can I hire models in Dubai and the UAE?',
+ ('Can I book models in Dubai and the UAE?',
   'Yes. YKS Talents covers Dubai and the wider UAE as well as India. Shooting in the UAE generally involves location permits and talent who are legally able to work there, so share dates and locations early. See <a href="/models-in-dubai.html">models in Dubai</a>.'),
  ('Can I find international or foreign models for a shoot in India?',
   'Say so in the brief. If YKS Talents has a profile that fits the look and is able to work where you are shooting, I send it; if not, I tell you straight rather than pad the shortlist. Foreign nationals need the right visa to do paid work in India, so confirm that before you book anyone. There is more in the <a href="/talents/guides/foreign-models-in-india.html">guide for foreign models in India</a>.'),
@@ -60,7 +60,7 @@ graph = [
    'audience': {'@type': 'BusinessAudience', 'audienceType': 'Brands, photographers, stylists and productions looking for models'}},
   {'@type': 'Service', '@id': URL + '#service', 'name': 'Find models for a shoot — YKS Talents',
    'serviceType': 'Model discovery and casting brief',
-   'description': 'Clients browse curated YKS Talents portfolios of women models aged 18–34, or send a free brief and receive suitable profiles. YKS Talents is a free portfolio platform, not an agency.',
+   'description': 'Clients browse curated YKS Talents portfolios of models, influencers, content creators and actors aged 18–34, or send a free brief and receive suitable profiles. YKS Talents is a free portfolio platform, not an agency.',
    'provider': {'@id': f'{SITE}/talents.html#yks-talents'},
    'areaServed': [{'@type': 'Country', 'name': 'India'}, {'@type': 'Country', 'name': 'United Arab Emirates'}],
    'availableChannel': {'@type': 'ServiceChannel', 'name': 'Brief form', 'serviceUrl': URL + '#brief'},
@@ -98,8 +98,8 @@ page = f'''<!DOCTYPE html>
 <meta name="geo.region" content="IN" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="YKS Productions" />
-<meta property="og:title" content="Hire Models for Your Shoot in India &amp; Dubai — YKS Talents" />
-<meta property="og:description" content="Browse curated portfolios of women models across India and Dubai, or send a free brief and get faces matched to your shoot." />
+<meta property="og:title" content="Find &amp; Book Models and Talent for Your Shoot in India &amp; Dubai — YKS Talents" />
+<meta property="og:description" content="Browse curated portfolios of models, influencers, creators and actors across India and Dubai, or send a free brief and get faces matched to your shoot." />
 <meta property="og:url" content="{URL}" />
 <meta property="og:image" content="{SITE}/assets/og/og-talents.jpg" />
 <meta property="og:image:secure_url" content="{SITE}/assets/og/og-talents.jpg" />
@@ -109,8 +109,8 @@ page = f'''<!DOCTYPE html>
 <meta property="og:image:alt" content="YKS Talents — find models for your shoot in India and the Middle East" />
 <meta property="og:locale" content="en_IN" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Hire Models for Your Shoot in India &amp; Dubai — YKS Talents" />
-<meta name="twitter:description" content="Curated portfolios of women models across India and Dubai. Free to browse, free to brief." />
+<meta name="twitter:title" content="Find &amp; Book Models and Talent for Your Shoot in India &amp; Dubai — YKS Talents" />
+<meta name="twitter:description" content="Curated portfolios of models, influencers, creators and actors across India and Dubai. Free to browse, free to brief." />
 <meta name="twitter:image" content="{SITE}/assets/og/og-talents.jpg" />
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48.png" />
@@ -164,8 +164,8 @@ page = f'''<!DOCTYPE html>
   <div class="wrap">
     <nav class="l-crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/talents.html">YKS Talents</a> / <span aria-current="page">Find models</span></nav>
     <p class="l-eyebrow">For brands, photographers &amp; productions</p>
-    <h1>Find and hire models for <em>your shoot</em></h1>
-    <p class="l-lede">Curated portfolios of women models aged 18–34, across India and the Middle East. Browse the platform yourself, or tell me what you&rsquo;re making and I&rsquo;ll point you to the faces that fit — and arrange everything with the talent for you. Free to browse, free to brief.</p>
+    <h1>Find and book models &amp; talent for <em>your shoot</em></h1>
+    <p class="l-lede">Curated portfolios of models, influencers, content creators and actors aged 18–34, across India and the Middle East. Browse the platform yourself, or tell me what you&rsquo;re making and I&rsquo;ll point you to the faces that fit — and arrange everything with the talent for you. Free to browse, free to brief.</p>
     <div class="l-cta-row">
       <a class="btn btn-fill" href="#brief">Send a brief</a>
       <a class="btn btn-ghost" href="/talents.html#roster">Browse portfolios</a>
@@ -194,10 +194,10 @@ page = f'''<!DOCTYPE html>
       <h2>What YKS Talents <em>is — and isn&rsquo;t</em></h2>
     </div>
     <div class="l-prose">
-      <p>I&rsquo;m Yedukrishna Suresh, a photographer and filmmaker. YKS Talents is the free portfolio platform I run alongside YKS Productions. It&rsquo;s one person, not an agency with an office and a booking desk: I read every application myself, and I cast my own YKS shoots from it.</p>
+      <p>I&rsquo;m Yedukrishna Suresh, a photographer and filmmaker. YKS Talents is the free portfolio platform I run alongside YKS Productions. It&rsquo;s one person, not an agency with an office and a booking desk: I read every application myself, and every booking is arranged through me.</p>
       <ul>
-        <li><strong>Women aged 18 to 34</strong>, based in or regularly working in India or the Middle East. Everyone is over 18.</li>
-        <li><strong>Free for talent, forever.</strong> No joining fee, no registration fee and no paid tiers, so the people on it are there because they&rsquo;re serious, not because they paid.</li>
+        <li><strong>Models, influencers, content creators and actors aged 18 to 34</strong>, based in or regularly working in India or the Middle East. Everyone is over 18.</li>
+        <li><strong>100% free for talent, forever.</strong> No registration fee, no portfolio or listing fee and no paid tiers, so the people on it are there because they&rsquo;re serious, not because they paid.</li>
         <li><strong>Not a jobs board.</strong> YKS Talents doesn&rsquo;t offer jobs to talent; it gives clients a considered place to find them.</li>
         <li><strong>Privacy first.</strong> Talent names and contact details are never published or shared. All contact between clients and talent goes through me.</li>
       </ul>
@@ -216,6 +216,8 @@ page = f'''<!DOCTYPE html>
       <div class="l-card"><div class="t">Ethnic</div><h3>Bridal, ethnic &amp; jewellery</h3><p>Hands, neckline and patience — what bridal, saree, lehenga and jewellery work demands.</p></div>
       <div class="l-card"><div class="t">Beauty</div><h3>Beauty &amp; skincare</h3><p>Clean, close-up-ready skin and expression for beauty, skincare and haircare.</p></div>
       <div class="l-card"><div class="t">E-commerce</div><h3>Catalogue &amp; e-com</h3><p>Consistency across many looks in a day, with the stamina catalogue work needs.</p></div>
+      <div class="l-card"><div class="t">Social</div><h3>Influencers &amp; creators</h3><p>Creators who can shoot, present and post &mdash; for launches, UGC-style content and social campaigns.</p></div>
+      <div class="l-card"><div class="t">Screen</div><h3>Actors</h3><p>Talent comfortable with dialogue, direction and multiple takes, for ad films, brand films and scripted content.</p></div>
       <div class="l-card"><div class="t">Video</div><h3>Ad films &amp; reels</h3><p>Faces comfortable in motion for digital and TV commercials, launch films and reels &mdash; stills and video from the same booking.</p></div>
       <div class="l-card"><div class="t">Where</div><h3>India &amp; the Middle East</h3><p>{city_inline}.</p></div>
     </div>
@@ -225,7 +227,7 @@ page = f'''<!DOCTYPE html>
 <section class="l-section" id="cost">
   <div class="wrap">
     <div class="l-head">
-      <h2>How much does it cost to <em>hire a model</em> in India?</h2>
+      <h2>How much does it cost to <em>book a model</em> in India?</h2>
       <p>There isn&rsquo;t a single rate, and anyone quoting one without asking about your usage is guessing. Fees are agreed per project. These are the things that move the number most:</p>
     </div>
     <div class="fm-factors">
@@ -320,7 +322,7 @@ page = f'''<!DOCTYPE html>
         <a href="/quote.html">Get a quote</a>
       </div>
     </div>
-    <p class="l-related">Female models by city: {city_inline}</p>
+    <p class="l-related">Models by city: {city_inline}</p>
     <p class="l-related">
       Shooting in a particular city? <a href="/photographer-mumbai.html">Mumbai</a> · <a href="/photographer-delhi.html">Delhi NCR</a> · <a href="/photographer-hyderabad.html">Hyderabad</a> · <a href="/photographer-chennai.html">Chennai</a> · <a href="/photographer-goa.html">Goa</a> · <a href="/fashion-photographer-bangalore.html">Fashion photographer in Bangalore</a>
     </p>

@@ -56,7 +56,7 @@ TARGETS = {
               links=talent_links),
         '<section class="l-cta">'),
     'find-models.html': (
-        block('Female models by city',
+        block('Models and talent by city',
               'Find models <em>where you are shooting</em>',
               'What clients look for changes by city — catalogue stamina in NCR, availability in '
               'Bangalore, costume patience in Jaipur. Each page says what actually matters there.',

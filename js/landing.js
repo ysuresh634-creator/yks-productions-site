@@ -174,7 +174,7 @@
     var box = document.createElement('div');
     box.className = 'yks-tp'; box.setAttribute('role', 'status');
     box.innerHTML = '<h3>Looks like you’d like to join YKS Talents as talent — apply here (free, no fees)</h3>'
-      + '<p>YKS Talents is a free portfolio platform for women aged 18–34. Clients browse it to find talent, and I cast my own shoots from it too. There are no fees, and no jobs are offered or promised.</p>'
+      + '<p>YKS Talents is a 100% free portfolio platform for models, influencers, content creators and actors aged 18–34. Brands and clients browse it to find and book talent, with bookings arranged through me. There are no fees, ever, and no jobs are offered or promised.</p>'
       + '<div class="yks-tp-row"><a class="yks-tp-apply" href="/talents/apply.html?from=enquiry">Apply to YKS Talents →</a>'
       + '<button type="button" class="yks-tp-client">No, I’m a client — send my enquiry</button></div>'
       + '<small>Your message has been saved either way.</small>';

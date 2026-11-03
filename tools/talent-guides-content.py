@@ -1,6 +1,6 @@
 # Content for tools/build-talent-guides.py. Executed by that script; it uses fig().
 # Rules: no invented stats, quotes or prices; only released, published work as images;
-# YKS Talents is a free portfolio platform (women 18-34), not a jobs board, no fees.
+# YKS Talents is a 100% free portfolio platform (models, influencers, creators, actors 18-34), not a jobs board, no fees.
 
 CONTENT = []
 
@@ -52,7 +52,7 @@ sections=[
 <li><strong>A full-length image</strong> — standing, relaxed, in fitted clothing. Height and proportion matter for fashion and e-commerce.</li>
 <li><strong>A waist-up or mid shot</strong> — the most common crop in beauty and lifestyle campaigns.</li>
 <li><strong>One movement or candid frame</strong> — walking, turning, laughing. It proves you aren&rsquo;t stiff.</li>
-<li><strong>One look that matches your target market</strong> — for many women in India that&rsquo;s an ethnic or festive look; for others it&rsquo;s clean western wear or beauty.</li>
+<li><strong>One look that matches your target market</strong> — for many people in India that&rsquo;s an ethnic or festive look; for others it&rsquo;s clean western wear or beauty.</li>
 <li><strong>Your digitals</strong> — always, kept separate and clearly labelled.</li>
 </ol>
 <p>Six to twelve strong styled images plus a current set of digitals is a good, honest starting book. Add images only when they show something the book doesn&rsquo;t already show.</p>
@@ -92,7 +92,7 @@ sections=[
 '''),
 ('free-route', 'The free route: <em>YKS Talents</em>', '''
 <p>I built YKS Talents because the most common story I heard from new faces was the same: pay a fee to register, pay for a compulsory shoot, then hear nothing. It shouldn&rsquo;t work that way.</p>
-<p><a href="/talents.html">YKS Talents</a> is a free, curated portfolio platform for women aged 18 to 34, across India and the Middle East. You create a free modelling portfolio; clients — brands, photographers, stylists and productions — browse the platform to find talent. It is free forever: no joining fee, no registration fee, no paid tiers, no &ldquo;premium&rdquo; upgrade. I also cast my own YKS shoots from it.</p>
+<p><a href="/talents.html">YKS Talents</a> is a 100% free, curated portfolio platform for models, influencers, content creators and actors aged 18 to 34, across India and the Middle East. You create a free portfolio; clients — brands, photographers, stylists and productions — browse the platform to find and book talent, with every booking arranged through me. It is 100% free, forever: no registration fee, no portfolio fee, no listing fee, no paid tiers, no &ldquo;premium&rdquo; upgrade.</p>
 <p>To be clear about what it is not: YKS Talents is not a jobs board and not an agency, and I don&rsquo;t promise anyone work. It&rsquo;s a place to be seen properly. Every application is read by me personally.</p>
 <ul>
 <li><a href="/talents/apply.html">Create your free modelling portfolio</a> — one short form.</li>
@@ -115,10 +115,10 @@ sections=[
 faq=[
 ('How do I make a modelling portfolio with no experience?', 'Start with free digitals shot at home in daylight against a plain wall, practise your angles, choose a clear direction (commercial, fashion, beauty or ethnic), then add a small number of styled images from a collaborative or clearly-briefed shoot. Edit hard and put it somewhere clients can find it — for example a <a href="/talents/apply.html">free YKS Talents portfolio</a>.'),
 ('How many photos should a modelling portfolio have?', 'For a new model, roughly six to twelve strong styled images plus a current set of digitals is a good, honest starting point. Add images only when they show something new.'),
-('Can I make a modelling portfolio for free?', 'Yes. Digitals cost nothing, collaborative shoots are usually free for both sides, and YKS Talents lets women aged 18 to 34 create a modelling portfolio free forever — no joining fee, no registration fee and no paid tiers.'),
+('Can I make a modelling portfolio for free?', 'Yes. Digitals cost nothing, collaborative shoots are usually free for both sides, and YKS Talents lets models, influencers, content creators and actors aged 18 to 34 create a portfolio 100% free — no registration fee, no portfolio fee, no listing fee and no paid tiers, ever.'),
 ('Do I need a professional photoshoot to start modelling?', 'Not to start. Clean digitals are often the first thing clients ask for. Styled professional images help show range, but they don&rsquo;t need to come from an expensive package.'),
 ('What should I wear for a portfolio shoot?', 'For digitals: fitted, plain clothing in solid colours and minimal makeup. For styled images, bring looks that match the work you want — ethnic, western, beauty or lifestyle — and keep them simple enough that you stay the focus. More detail is in the <a href="/talents/guides/model-digitals.html">model digitals guide</a>.'),
-('Is YKS Talents a modelling agency or a job site?', 'Neither. YKS Talents is a free portfolio platform where clients find talent. It doesn&rsquo;t offer jobs, doesn&rsquo;t charge fees and isn&rsquo;t an agency. I also cast my own YKS shoots from it.'),
+('Is YKS Talents a modelling agency or a job site?', 'Neither. YKS Talents is a free portfolio platform where clients find talent. It doesn&rsquo;t offer jobs, it&rsquo;s 100% free and it isn&rsquo;t an agency. It makes your portfolio visible to brands and clients; any booking is arranged through me.'),
 ],
 ))
 
@@ -221,7 +221,7 @@ h1='Modelling agency fees &amp; <em>scams in India</em>',
 lede='The question I&rsquo;m asked most by new faces is some version of &ldquo;they want me to pay to register — is that normal?&rdquo; Here is a straight answer, the warning signs, and how to check anyone before you send money, documents or photos.',
 keywords='do modelling agencies charge fees, modelling agency registration fee, modelling scams India, fake modelling agency, how to verify a modelling agency, casting call scam',
 intro='''<div class="l-prose" style="margin-top:34px">
-<p>I&rsquo;m Yedukrishna Suresh, and I run <a href="/talents.html">YKS Talents</a>, a free portfolio platform for women 18 to 34. I&rsquo;m not going to name or point at any business here. This guide is about patterns, so you can judge any offer for yourself.</p>
+<p>I&rsquo;m Yedukrishna Suresh, and I run <a href="/talents.html">YKS Talents</a>, a 100% free portfolio platform for models, influencers, creators and actors aged 18 to 34. I&rsquo;m not going to name or point at any business here. This guide is about patterns, so you can judge any offer for yourself.</p>
 </div>''',
 sections=[
 ('do-they-charge', 'Do modelling agencies <em>charge fees</em>?', '''
@@ -273,9 +273,9 @@ sections=[
 </ul>
 '''),
 ('why-free', 'Why YKS Talents is <em>free forever</em>', '''
-<p>YKS Talents is free forever. There is no joining fee, no registration fee, no compulsory shoot, no &ldquo;premium profile&rdquo; and no paid tier — not now and not later. That&rsquo;s a deliberate decision, not a launch offer.</p>
-<p>It can stay free because it isn&rsquo;t how I earn a living. YKS Productions is my photography and film practice; clients pay for shoots and productions. Talent never pays. YKS Talents is the platform where those clients — and others — find talent, and where I cast my own YKS shoots from.</p>
-<p>Being equally clear about what it isn&rsquo;t: it&rsquo;s not an agency and not a jobs board, and I don&rsquo;t promise anyone work. It&rsquo;s open to women aged 18 to 34 across India and the Middle East, and every application is read by me personally. I&rsquo;ll never ask you for money, ID documents up front, or revealing images.</p>
+<p>YKS Talents is 100% free, forever. There is no joining fee, no registration fee, no compulsory shoot, no &ldquo;premium profile&rdquo; and no paid tier — not now and not later. That&rsquo;s a deliberate decision, not a launch offer.</p>
+<p>It can stay free because it isn&rsquo;t how I earn a living. YKS Productions is my photography and film practice; clients pay for shoots and productions. Talent never pays. YKS Talents is the platform where those clients — and others — find and book talent, with every booking arranged through me.</p>
+<p>Being equally clear about what it isn&rsquo;t: it&rsquo;s not an agency and not a jobs board, and I don&rsquo;t promise anyone work. It&rsquo;s open to models, influencers, content creators and actors aged 18 to 34 across India and the Middle East, and every application is read by me personally. I&rsquo;ll never ask you for money, ID documents up front, or revealing images.</p>
 <ul>
 <li><a href="/talents/apply.html">Create your free modelling portfolio</a></li>
 <li><a href="/talents/guides/how-to-make-a-modelling-portfolio.html">How to make a modelling portfolio</a> · <a href="/talents/guides/model-digitals.html">How to shoot your digitals</a> · <a href="/talents/guides/model-comp-card.html">Free comp card maker</a> · <a href="/talents/guides/modelling-portfolio-kaise-banaye.html" lang="hi">हिंदी में पढ़ें</a></li>
@@ -288,7 +288,7 @@ faq=[
 ('Is it a scam if an agency asks me to pay for a portfolio shoot?', 'It&rsquo;s a red flag if the shoot is compulsory, with their photographer, as a condition of acceptance. Paying a photographer you chose, for a clearly defined shoot with an invoice, is a normal transaction.'),
 ('How can I check if a modelling agency is genuine?', 'Ask for the registered company name and check it on the MCA website, verify any GSTIN on the GST portal, trace the campaigns they claim, speak to talent they represent, read the contract in full and never pay to a personal account.'),
 ('Where do I report a modelling scam in India?', 'Report it on the National Cyber Crime Reporting Portal (cybercrime.gov.in) or call the 1930 helpline, and file a complaint with your local police. Keep all messages and payment records.'),
-('Does YKS Talents charge anything?', 'No. YKS Talents is free forever for women aged 18 to 34 — no joining fee, no registration fee and no paid tiers. It&rsquo;s a portfolio platform where clients find talent, not an agency or a jobs board.'),
+('Does YKS Talents charge anything?', 'No. YKS Talents is 100% free for talent aged 18 to 34 — no registration fee, no portfolio fee, no listing fee and no paid tiers, ever. It&rsquo;s a portfolio platform where clients find talent, not an agency or a jobs board.'),
 ],
 ))
 
@@ -480,7 +480,7 @@ CONTENT.append(dict(
 slug='modelling-portfolio-kaise-banaye', lang='hi',
 title='Modelling Portfolio Kaise Banaye? Free Guide (Hindi) | YKS Talents',
 og_title='मॉडलिंग पोर्टफोलियो कैसे बनाएं? Free गाइड (हिंदी)',
-desc='मॉडलिंग portfolio कैसे बनाएं, model कैसे बनें, कितने पैसे लगते हैं और fees/scam से कैसे बचें — बिना experience के, free में। 18–34 साल की महिलाओं के लिए हिंदी गाइड।',
+desc='मॉडलिंग portfolio कैसे बनाएं, model कैसे बनें, कितने पैसे लगते हैं और fees/scam से कैसे बचें — बिना experience के, free में। Models, influencers, creators और actors (18–34) के लिए हिंदी गाइड।',
 headline='मॉडलिंग पोर्टफोलियो कैसे बनाएं — बिना experience के, free में',
 crumb='मॉडलिंग पोर्टफोलियो कैसे बनाएं',
 eyebrow='गाइड · हिंदी',
@@ -518,7 +518,7 @@ sections=[
 <li><strong>Full-length तस्वीर</strong> — सीधी, सहज, fitted कपड़ों में। Fashion और e-commerce के लिए ज़रूरी।</li>
 <li><strong>Waist-up या mid shot</strong> — beauty और lifestyle campaigns में सबसे आम crop।</li>
 <li><strong>एक movement वाली तस्वीर</strong> — चलते, मुड़ते या हँसते हुए। इससे पता चलता है कि आप अकड़ी हुई नहीं हैं।</li>
-<li><strong>आपके market का एक look</strong> — बहुत-सी महिलाओं के लिए यह साड़ी, लहंगा या festive look होता है; दूसरों के लिए साफ़ western wear या beauty।</li>
+<li><strong>आपके market का एक look</strong> — बहुत लोगों के लिए यह साड़ी, लहंगा या festive look होता है; दूसरों के लिए साफ़ western wear या beauty।</li>
 </ol>
 <p>नई तस्वीर तभी जोड़ें जब वह कुछ ऐसा दिखाए जो portfolio में पहले से नहीं है।</p>
 '''),
@@ -547,7 +547,7 @@ sections=[
 '''),
 ('free-yks', 'Free रास्ता: <em>YKS Talents</em>', '''
 <p>मैंने YKS Talents इसलिए बनाया क्योंकि नए चेहरों से सबसे आम कहानी यही सुनने को मिलती थी: register करने के पैसे भरो, ज़बरदस्ती का shoot करवाओ, और फिर कोई ख़बर नहीं। ऐसा नहीं होना चाहिए।</p>
-<p><a href="/talents.html">YKS Talents</a> भारत और Middle East में 18 से 34 साल की महिलाओं के लिए एक free, curated portfolio प्लेटफ़ॉर्म है। आप अपना free modelling portfolio बनाती हैं; clients — brands, photographers, stylists और productions — प्लेटफ़ॉर्म पर talent ढूंढते हैं। यह हमेशा free है: कोई joining fee नहीं, कोई registration fee नहीं, कोई paid plan या &ldquo;premium&rdquo; upgrade नहीं। मैं अपने YKS shoots की casting भी यहीं से करता हूँ।</p>
+<p><a href="/talents.html">YKS Talents</a> भारत और Middle East में 18 से 34 साल के models, influencers, creators और actors के लिए एक 100% free, curated portfolio प्लेटफ़ॉर्म है। आप अपना free portfolio बनाते हैं; clients — brands, photographers, stylists और productions — प्लेटफ़ॉर्म पर talent ढूंढते हैं। यह हमेशा free है: कोई joining fee नहीं, कोई registration fee नहीं, कोई paid plan या &ldquo;premium&rdquo; upgrade नहीं। हर booking मेरे ज़रिए होती है।</p>
 <p>साफ़ कर दूँ कि यह क्या नहीं है: YKS Talents कोई jobs board नहीं है, कोई agency नहीं है, और मैं किसी से काम का वादा नहीं करता। यह ठीक से दिखाई देने की जगह है। हर application मैं ख़ुद पढ़ता हूँ।</p>
 <ul>
 <li><a href="/talents/apply.html">अपना free modelling portfolio बनाएं</a> — बस एक छोटा-सा form।</li>
@@ -569,8 +569,8 @@ sections=[
 faq=[
 ('मॉडलिंग portfolio कैसे बनाएं, अगर कोई experience नहीं है?', 'घर पर खिड़की की रोशनी में सादी दीवार के सामने free digitals बनाएं, अपने angles का अभ्यास करें, एक साफ़ दिशा चुनें (commercial, fashion, beauty या ethnic), और फिर किसी collaborative या साफ़ brief वाले shoot से कुछ styled तस्वीरें जोड़ें। फिर उसे ऐसी जगह रखें जहाँ clients ढूंढ सकें — जैसे <a href="/talents/apply.html">YKS Talents पर free portfolio</a>।'),
 ('Model बनने के लिए कितने पैसे लगते हैं?', 'शुरुआत free हो सकती है: digitals का कोई ख़र्च नहीं और collaborative shoots आम तौर पर दोनों तरफ़ free होते हैं। Paid shoots के दाम शहर और photographer के हिसाब से बहुत बदलते हैं। Join करने या register होने के लिए पैसे माँगना एक चेतावनी का संकेत है।'),
-('क्या YKS Talents पर portfolio सच में free है?', 'हाँ। 18 से 34 साल की महिलाओं के लिए यह हमेशा free है — कोई joining fee नहीं, कोई registration fee नहीं और कोई paid plan नहीं।'),
-('क्या YKS Talents नौकरी या modelling jobs देता है?', 'नहीं। YKS Talents एक free portfolio प्लेटफ़ॉर्म है जहाँ clients talent ढूंढते हैं। यह jobs नहीं देता, fees नहीं लेता और कोई agency नहीं है। मैं अपने YKS shoots की casting भी यहीं से करता हूँ।'),
+('क्या YKS Talents पर portfolio सच में free है?', 'हाँ। 18 से 34 साल के talent के लिए यह 100% free है — कोई joining fee नहीं, कोई registration fee नहीं और कोई paid plan नहीं।'),
+('क्या YKS Talents नौकरी या modelling jobs देता है?', 'नहीं। YKS Talents एक free portfolio प्लेटफ़ॉर्म है जहाँ clients talent ढूंढते हैं। यह jobs नहीं देता, fees नहीं लेता और कोई agency नहीं है। यह आपके portfolio को brands और clients तक पहुँचाता है।'),
 ('Portfolio में कितनी तस्वीरें होनी चाहिए?', 'नए model के लिए लगभग छह से बारह अच्छी styled तस्वीरें और digitals का एक ताज़ा सेट एक अच्छी, ईमानदार शुरुआत है।'),
 ('Comp card क्या होता है?', 'Comp card एक पन्ने का सार है: सामने headshot और नाम, पीछे range दिखाने वाली कुछ तस्वीरें और आपके measurements। <a href="/talents/guides/model-comp-card.html">Free comp card maker</a> से आप इसे अपने browser में ही बना सकती हैं।'),
 ],
@@ -595,9 +595,9 @@ crumb='How to become a model in India',
 eyebrow='Guide · Getting started',
 h1='How to become a <em>model in India</em>',
 lede='There is no single door into modelling in India, and anyone selling you a guaranteed one is selling something else. What works is unglamorous and almost free: honest digitals, a small, focused portfolio, being findable by the people who cast, and saying no to anyone who asks you to pay for work. Here is the whole route, step by step.',
-keywords='how to become a model in India, how to become a model with no experience, modelling registration India, model registration free, modelling career India, female model India, apply as a model',
+keywords='how to become a model in India, how to become a model with no experience, modelling registration India, model registration free, modelling career India, apply as a model, apply as an influencer or actor',
 intro='''<div class="l-prose" style="margin-top:34px">
-<p>I&rsquo;m Yedukrishna Suresh. I direct and photograph fashion, beauty and brand shoots under YKS Productions, and I run YKS Talents, a free portfolio platform where clients find talent and where I cast my own shoots. I see new faces from the casting side every week. This guide is the advice I give in person: what the work actually is, what clients look at, and the order to do things in so you don&rsquo;t waste money or time.</p>
+<p>I&rsquo;m Yedukrishna Suresh. I direct and photograph fashion, beauty and brand shoots under YKS Productions, and I run YKS Talents, a 100% free portfolio platform where brands and clients find and book talent. I see new faces from the camera side every week. This guide is the advice I give in person: what the work actually is, what clients look at, and the order to do things in so you don&rsquo;t waste money or time.</p>
 </div>''',
 sections=[
 ('the-work', 'What modelling work in India <em>actually looks like</em>', '''
@@ -622,7 +622,7 @@ sections=[
 <h3>Height</h3>
 <p>Height matters most for runway and high-fashion work, where clothes are sampled to a size. For commercial, beauty, ethnic and most brand work, it matters much less than people think. If you are not tall, aim your portfolio at the work that doesn&rsquo;t depend on it rather than giving up.</p>
 <h3>Age</h3>
-<p>Brands advertise to every age group, so commercial modelling isn&rsquo;t only for teenagers. Plenty of people start in their twenties or early thirties. YKS Talents is for women aged 18 to 34. If you are under 18, any modelling should involve a parent or guardian at every step, from the first message to the shoot.</p>
+<p>Brands advertise to every age group, so commercial modelling isn&rsquo;t only for teenagers. Plenty of people start in their twenties or early thirties. YKS Talents is for models, influencers, content creators and actors aged 18 to 34. If you are under 18, any modelling should involve a parent or guardian at every step, from the first message to the shoot.</p>
 <h3>Looks</h3>
 <p>There is no single &ldquo;model look&rdquo;. Brands in India cast for their own audience, and that audience is varied. What every client does look for is that you look like your photos, that your skin, hair and teeth are cared for, and that you are comfortable in front of a camera. You do not need to change your skin tone, your features or your name.</p>
 <h3>What clients notice on set</h3>
@@ -664,10 +664,10 @@ sections=[
 <p class="g-callout">Basic rules that keep you safe: research the brand before any shoot; take someone with you to first meetings and unfamiliar locations; agree the wardrobe in advance and never let anyone change it on the day without your consent; and never send private photos as a &ldquo;test&rdquo;.</p>
 '''),
 ('yks-talents', 'Where <em>YKS Talents</em> fits', '''
-<p>YKS Talents is a free portfolio platform I run for women aged 18 to 34 across India and the Middle East. It is one person &mdash; me &mdash; not an agency with an office.</p>
+<p>YKS Talents is a 100% free portfolio platform I run for models, influencers, content creators and actors aged 18 to 34 across India and the Middle East. It is one person &mdash; me &mdash; not an agency with an office.</p>
 <ul>
 <li><strong>Free, permanently.</strong> No joining fee, no registration fee, no paid tiers.</li>
-<li><strong>Not a jobs board.</strong> I don&rsquo;t offer jobs. Clients come to the platform to find talent, and I also cast my own YKS shoots from it.</li>
+<li><strong>Not a jobs board.</strong> I don&rsquo;t offer jobs. Brands and clients come to the platform to find and book talent, and every booking is arranged through me.</li>
 <li><strong>Private.</strong> Your name and contact details are never published. Every client enquiry comes through me.</li>
 <li><strong>Read by a person.</strong> I read every application myself.</li>
 </ul>
@@ -682,11 +682,11 @@ faq=[
 ('What height do I need to be a model in India?',
  'Height matters most for runway and high-fashion work. For commercial, beauty, ethnic, jewellery and most brand work it matters far less, so aim your portfolio at the work that suits you rather than ruling yourself out.'),
 ('Can I start modelling in my twenties or early thirties?',
- 'Yes. Brands advertise to every age group and cast accordingly, so plenty of people start commercial modelling in their twenties or early thirties. YKS Talents is open to women aged 18 to 34.'),
+ 'Yes. Brands advertise to every age group and cast accordingly, so plenty of people start commercial modelling in their twenties or early thirties. YKS Talents is open to models, influencers, content creators and actors aged 18 to 34.'),
 ('How do I register as a model in India?',
  'There is no official registration you need to pay for. You make yourself findable: a portfolio, digitals, a comp card and a profile where clients look. You can <a href="/talents/apply.html">create a free YKS Talents portfolio</a> with no registration fee.'),
 ('Does YKS Talents give modelling jobs?',
- 'No. YKS Talents is a free portfolio platform where clients find talent, and I also cast my own YKS shoots from it. It does not offer or guarantee jobs, and it never charges talent.'),
+ 'No. YKS Talents is a 100% free portfolio platform where brands and clients find and book talent, with bookings arranged through me. It does not offer or guarantee jobs, and it never charges talent.'),
 ],
 ))
 
@@ -706,15 +706,15 @@ hero_cta='Send a casting brief →', hero_cta_href='/find-models.html#brief',
 hero_cta2='Find models', hero_cta2_href='/find-models.html',
 title='How to Cast Models for a Brand or Ad Shoot in India | YKS Talents',
 og_title='How to Cast Models for a Brand Shoot — India & Dubai',
-desc='A practical guide to hiring models for an ad, fashion or brand shoot in India or Dubai: the brief, choosing faces, models vs creators, what moves the fee, releases and usage, and the shoot day.',
+desc='A practical guide to booking models for an ad, fashion or brand shoot in India or Dubai: the brief, choosing faces, models vs creators, what moves the fee, releases and usage, and the shoot day.',
 headline='How to cast models for a brand or ad shoot in India and Dubai',
 crumb='How to cast models for a brand shoot',
 eyebrow='Guide · For brands &amp; productions',
 h1='How to cast models for a <em>brand shoot</em>',
-lede='Most casting problems are decided before anyone looks at a face: an unclear brief, usage nobody agreed, a model who doesn&rsquo;t look like her photos, or a fee that changes on the day. This is how I cast for the brand shoots I direct, written for brands, photographers and producers hiring models in India and Dubai.',
+lede='Most casting problems are decided before anyone looks at a face: an unclear brief, usage nobody agreed, a model who doesn&rsquo;t look like her photos, or a fee that changes on the day. This is how I cast for the brand shoots I direct, written for brands, photographers and producers booking models in India and Dubai.',
 keywords='hire models for brand shoot, models for ad shoot India, how to hire a model in India, commercial models India, fashion models for brand shoot, model casting India, hire models Dubai, model release India',
 intro='''<div class="l-prose" style="margin-top:34px">
-<p>I&rsquo;m Yedukrishna Suresh. I direct and photograph fashion, beauty and brand work under YKS Productions, and I run YKS Talents, a free portfolio platform where clients find women models aged 18 to 34 across India and the Middle East. I&rsquo;m one person, not a casting agency: every brief comes to me and every booking is arranged through me. This guide is what I check on every casting, whether I&rsquo;m shooting it or your own team is.</p>
+<p>I&rsquo;m Yedukrishna Suresh. I direct and photograph fashion, beauty and brand work under YKS Productions, and I run YKS Talents, a free portfolio platform where brands find and book models, influencers, creators and actors aged 18 to 34 across India and the Middle East. I&rsquo;m one person, not a casting agency: every brief comes to me and every booking is arranged through me. This guide is what I check on every casting, whether I&rsquo;m shooting it or your own team is.</p>
 </div>''',
 sections=[
 ('start-with-usage', 'Start with <em>where the images will run</em>', '''
@@ -765,7 +765,7 @@ sections=[
 <li><strong>Travel</strong> &mdash; out-of-city shoots add travel and stay; agree who covers what.</li>
 <li><strong>Overtime</strong> &mdash; agree the day length and what happens beyond it, before the shoot.</li>
 </ul>
-<p>There is more detail on <a href="/find-models.html#cost">what it costs to hire a model</a>. Browsing YKS Talents and sending a brief are free.</p>
+<p>There is more detail on <a href="/find-models.html#cost">what it costs to book a model</a>. Browsing YKS Talents and sending a brief are free.</p>
 '''),
 ('releases', 'Releases, usage and <em>paperwork</em>', '''
 <p>You aren&rsquo;t only paying for photographs. You&rsquo;re paying for permission to use a person&rsquo;s face for a defined purpose, in defined places, for a defined time. Put it in writing before the shoot:</p>
@@ -807,9 +807,9 @@ faq=[
  'As early as you can. Simple single-day shoots can come together quickly, but multi-day shoots, travel, festive-season dates and anything needing exclusivity need more notice, because the same faces are requested by several productions at once.'),
 ('Do I need a model release in India?',
  'You should always have one. A signed release that states the term, territory, channels and any exclusivity protects both the brand and the model, and makes renewals straightforward. For large campaigns, have your own counsel review the contract.'),
-('Should I hire a model or an influencer for a campaign?',
+('Should I book a model or an influencer for a campaign?',
  'A model gives you a face for content you publish on your own channels; a creator brings an audience and posts to it. Many campaigns use both. Decide which job you need done, and agree usage or posting deliverables accordingly.'),
-('Can I hire models in Dubai through YKS Talents?',
+('Can I book models in Dubai through YKS Talents?',
  'Yes. YKS Talents covers Dubai and the wider UAE as well as India. Share the location and dates early, because shooting in the UAE generally involves location permits and talent who are legally able to work there. See <a href="/models-in-dubai.html">models in Dubai</a>.'),
 ('Is YKS Talents a casting agency?',
  'No. It is a free portfolio platform run by one person, me, Yedukrishna Suresh. Clients come to it to find talent, every enquiry and booking runs through me, and talent never pay to be on it.'),
@@ -820,11 +820,11 @@ CONTENT.append(dict(
 slug='foreign-models-in-india', date='2026-11-03', published='2026-11-03',
 ui=dict(
   byline='By Yedukrishna Suresh · Photographer &amp; filmmaker, YKS Productions · Published November 2026',
-  note='For international models · Free forever · No fees · No jobs offered · No visa help or sponsorship · Women 18&ndash;34',
+  note='For international models · 100% free · No fees ever · No jobs offered · No visa help or sponsorship · Ages 18&ndash;34',
   og_alt='YKS Talents — a guide for foreign and international models looking at modelling work in India',
   html_lang='en', in_lang='en',
 ),
-audience={'@type': 'PeopleAudience', 'audienceType': 'International models considering modelling work in India', 'suggestedGender': 'Female', 'suggestedMinAge': 18, 'suggestedMaxAge': 34},
+audience={'@type': 'PeopleAudience', 'audienceType': 'International models considering modelling work in India', 'suggestedMinAge': 18, 'suggestedMaxAge': 34},
 content_location={'@type': 'Country', 'name': 'India'},
 title='Foreign Models in India: A Guide for International Models | YKS Talents',
 og_title='Modelling in India as a Foreign Model — An Honest Guide',
@@ -834,9 +834,9 @@ crumb='Foreign models in India',
 eyebrow='Guide · For international models',
 h1='Modelling in India as a <em>foreign model</em>',
 lede='India is a large, busy market for fashion, beauty and brand shoots, and international faces do get booked here. But it is not a place to fly into on a promise. This is what I tell models from other countries who ask me about working in India: where the work is, what the visa rules mean for you, how to protect yourself, and how to be findable without paying anyone.',
-keywords='foreign models in India, international models India, modelling jobs in India for foreigners, foreign model work India, models from abroad India, European models India, Russian models India, Brazilian models India, model visa India, foreign female models India',
+keywords='foreign models in India, international models India, modelling jobs in India for foreigners, foreign model work India, models from abroad India, European models India, Russian models India, Brazilian models India, model visa India, foreign influencers and actors India',
 intro='''<div class="l-prose" style="margin-top:34px">
-<p>I&rsquo;m Yedukrishna Suresh. I direct and photograph fashion, beauty and brand shoots under YKS Productions, and I run YKS Talents, a free portfolio platform where clients find women models aged 18 to 34 across India and the Middle East, and where I cast my own shoots. I&rsquo;m one person, not an agency. I don&rsquo;t offer jobs, arrange travel or help with visas, so nothing on this page is a sales pitch for any of those. It is the honest picture I would want if I were looking at India from abroad.</p>
+<p>I&rsquo;m Yedukrishna Suresh. I direct and photograph fashion, beauty and brand shoots under YKS Productions, and I run YKS Talents, a free portfolio platform where brands find and book models, influencers, creators and actors aged 18 to 34 across India and the Middle East. I&rsquo;m one person, not an agency. I don&rsquo;t offer jobs, arrange travel or help with visas, so nothing on this page is a sales pitch for any of those. It is the honest picture I would want if I were looking at India from abroad.</p>
 </div>''',
 sections=[
 ('the-market', 'Where international faces <em>get booked in India</em>', '''
@@ -901,13 +901,13 @@ sections=[
 ('yks-talents', 'Joining YKS Talents <em>from outside India</em>', '''
 <p>You can create your portfolio from anywhere. It is free, and it stays free: no joining fee, no registration fee, no paid tiers.</p>
 <ol>
-<li><strong>Open the <a href="/talents/apply.html">free portfolio form</a>.</strong> It is for women aged 18 to 34.</li>
+<li><strong>Open the <a href="/talents/apply.html">free portfolio form</a>.</strong> It is 100% free, for models, influencers, content creators and actors aged 18 to 34.</li>
 <li><strong>Where you live:</strong> choose your country from the list, or pick &ldquo;Other country&rdquo; and type it in, then add your state or region and town. Do the same for your home country.</li>
 <li><strong>Phone:</strong> include your country code, so I can reach you on WhatsApp.</li>
 <li><strong>Write in English.</strong> Your About me and every other field should be in English letters.</li>
 <li><strong>Add your photos</strong> &mdash; at least five, including two clear face close-ups and a full-length shot.</li>
 </ol>
-<p>To be clear about what this is and isn&rsquo;t: YKS Talents is a portfolio platform. Clients come to it to find faces, and I cast my own shoots from it, but it doesn&rsquo;t offer jobs, promise bookings, arrange travel or help with visas. Your contact details are never shown; any client enquiry comes through me.</p>
+<p>To be clear about what this is and isn&rsquo;t: YKS Talents is a portfolio platform. Clients come to it to find faces, and bookings are arranged through me, but it doesn&rsquo;t offer jobs, promise bookings, arrange travel or help with visas. Your contact details are never shown; any client enquiry comes through me.</p>
 '''),
 ],
 faq=[
@@ -916,9 +916,9 @@ faq=[
 ('Can I do modelling work in India on a tourist visa or e-Visa?',
  'No. Government of India guidance says tourist visas cannot be used for any work, employment or contract, and working on one can be treated as a visa violation. A paid shoot is work. This is general information, not legal advice; confirm with official sources before you travel.'),
 ('Does YKS Talents help with visas or offer modelling jobs in India?',
- 'No. YKS Talents is a free portfolio platform. It does not offer jobs, promise bookings, sponsor visas, write invitation letters or arrange travel. Clients find talent on it, I cast my own shoots from it, and any enquiry comes through me.'),
+ 'No. YKS Talents is a free portfolio platform. It does not offer jobs, promise bookings, sponsor visas, write invitation letters or arrange travel. Clients find talent on it, and any enquiry or booking comes through me.'),
 ('Can I join YKS Talents if I live outside India?',
- 'Yes, if you are a woman aged 18 to 34. In the <a href="/talents/apply.html">free portfolio form</a>, choose your country or pick &ldquo;Other country&rdquo; and type it in, add your state or region and town, and give a phone number with your country code. Everything must be written in English.'),
+ 'Yes, if you are aged 18 to 34. In the <a href="/talents/apply.html">free portfolio form</a>, choose your country or pick &ldquo;Other country&rdquo; and type it in, add your state or region and town, and give a phone number with your country code. Everything must be written in English.'),
 ('Do I have to pay anything to be on YKS Talents?',
  'No. There is no joining fee, registration fee or paid tier, now or later. If anyone asks you to pay to be considered for modelling work in India, walk away.'),
 ('Which Indian cities have the most modelling work?',
