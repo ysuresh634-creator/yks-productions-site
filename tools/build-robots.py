@@ -38,6 +38,9 @@ PRIVATE = [
      ['/_hero-preview.html', '/hero-motion-preview.html', '/work-preview.html',
       '/_fonts-preview.html', '/edit.html', '/studio.html', '/labs.html',
       '/yks-productions-onepage.html']),
+    ('Retired video clips: kept in the repo, no longer used on any page.',
+     ['/assets/realestate/dubai-property-1.mp4', '/assets/realestate/dubai-property-2.mp4',
+      '/assets/realestate/dubai-property-3.mp4', '/assets/realestate/dubai-property-4.mp4']),
 ]
 
 # Answer engines we want citing us. Each needs its own full copy of the rules.

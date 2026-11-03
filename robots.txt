@@ -28,6 +28,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 # ─────────────────────────────────────────────────────────────
@@ -59,6 +64,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: OAI-SearchBot
@@ -84,6 +94,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: ChatGPT-User
@@ -109,6 +124,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: ClaudeBot
@@ -134,6 +154,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Claude-User
@@ -159,6 +184,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Claude-SearchBot
@@ -184,6 +214,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: PerplexityBot
@@ -209,6 +244,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Perplexity-User
@@ -234,6 +274,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Google-Extended
@@ -259,6 +304,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Applebot
@@ -284,6 +334,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Applebot-Extended
@@ -309,6 +364,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Bingbot
@@ -334,6 +394,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: CCBot
@@ -359,6 +424,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Meta-ExternalAgent
@@ -384,6 +454,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Meta-WebIndexer
@@ -409,6 +484,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Meta-ExternalFetcher
@@ -434,6 +514,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: Amazonbot
@@ -459,6 +544,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: DuckAssistBot
@@ -484,6 +574,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: cohere-ai
@@ -509,6 +604,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 User-agent: YouBot
@@ -534,6 +634,11 @@ Disallow: /edit.html
 Disallow: /studio.html
 Disallow: /labs.html
 Disallow: /yks-productions-onepage.html
+# Retired video clips: kept in the repo, no longer used on any page.
+Disallow: /assets/realestate/dubai-property-1.mp4
+Disallow: /assets/realestate/dubai-property-2.mp4
+Disallow: /assets/realestate/dubai-property-3.mp4
+Disallow: /assets/realestate/dubai-property-4.mp4
 Allow: /
 
 Sitemap: https://yksproductions.com/sitemap.xml
