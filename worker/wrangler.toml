@@ -15,3 +15,9 @@ enabled = true
 name = "CLASSIFY_RL"
 namespace_id = "1701"
 simple = { limit = 12, period = 60 }
+
+# Response cache for /adsim, /classify and first chat messages (free KV; best-effort, all writes
+# wrapped in try/catch). Deliberately NOT named CHAT_KV — that name switches on the per-IP chat cap.
+[[kv_namespaces]]
+binding = "AI_CACHE"
+id = "d89ae877aa7e4045b92969b2d633c816"

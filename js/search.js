@@ -528,10 +528,38 @@
   }
 
   // the worker replies in light markdown
+  /* Owner rule: no phone number is ever shown as text. Bare wa.me / tel links and printed
+     numbers in an answer become "WhatsApp me" / "Call me" links (digits stay in the href). */
+  function waNum() {
+    var d = document.body && document.body.getAttribute('data-wa');
+    if (d) return d;
+    var tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    return /Kolkata|Calcutta|Colombo|Kathmandu|Dhaka/i.test(tz) ? '919746679720' : '971501955122';
+  }
+  var NUM_RE = /(?:https?:\/\/)?(?:wa\.me\/|api\.whatsapp\.com\/send\?phone=)\+?(\d{6,15})(\?[^\s)\]]*)?|tel:\+?(\d{6,15})|(\+?\d[\d\s().-]{7,}\d)/gi;
+  function noNumbers(t) {
+    return String(t).replace(NUM_RE, function (x, w, q, tl, raw) {
+      if (w) return '[WhatsApp me](https://wa.me/' + w + (q || '') + ')';
+      if (tl) return '[Call me](tel:+' + tl + ')';
+      return (raw.match(/\d/g) || []).length >= 9 ? '[WhatsApp me](https://wa.me/' + waNum() + ')' : x;
+    });
+  }
+  function safeText(s) {
+    var LINK = /\[([^\]]*)\]\(([^)\s]+)\)/g, out = '', last = 0, m;
+    s = String(s);
+    while ((m = LINK.exec(s))) {
+      var href = m[2], label = m[1];
+      if (/\d{6,}|\d[\d\s().-]{7,}\d/.test(label)) label = /^tel:/i.test(href) ? 'Call me' : 'WhatsApp me';
+      out += noNumbers(s.slice(last, m.index)) + '[' + label + '](' + href + ')';
+      last = LINK.lastIndex;
+    }
+    return out + noNumbers(s.slice(last));
+  }
   function md(s) {
-    return esc(s)
-      .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    return esc(safeText(s))
+      .replace(/\[([^\]]+)\]\((https?:[^)\s]+|tel:\+?\d{6,15})\)/g, function (x, label, href) {
+        return '<a href="' + href + '"' + (/^tel:/.test(href) ? '' : ' target="_blank" rel="noopener"') + '>' + label + '</a>';
+      })
       .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
   }
 
@@ -644,7 +672,7 @@
     if (a.text === '__ERR__') {
       return '<div class="yks-ans"><div class="yks-ans-h"><u>✦</u><b>Iris</b></div>' +
         '<div class="yks-ans-t">I can’t reach my brain right now — but the pages below should cover it, ' +
-        (/\/talents|\/models-in-|\/casting-|\/become-a-model/.test(location.pathname) ? 'or use the form on this page.' : 'or message Yedukrishna on <a href="https://wa.me/971501955122" target="_blank" rel="noopener">WhatsApp</a>.') +
+        (/\/talents|\/models-in-|\/casting-|\/become-a-model/.test(location.pathname) ? 'or use the form on this page.' : 'or reach Yedukrishna directly: <a href="https://wa.me/' + waNum() + '" target="_blank" rel="noopener">WhatsApp me</a> · <a href="tel:+' + waNum() + '">Call me</a>.') +
         '</div></div>';
     }
     var h = '<div class="yks-ans"><div class="yks-ans-h"><u>✦</u><b>Iris</b></div>' +

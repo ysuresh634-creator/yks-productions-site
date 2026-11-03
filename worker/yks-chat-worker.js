@@ -40,6 +40,117 @@ const GEMINI_MODELS = [
 ];
 const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
 
+/* ── Gemini capacity ─────────────────────────────────────────────
+   Free-tier limits are counted per model (per Google project), and Google retires
+   names often (2.5-flash and the 2.0 family now answer 404). So the usable list is
+   discovered from ListModels, cached for 6 h, and a model that answers 404/429/503 is
+   benched for a while. Gemma 4 has by far the largest free daily allowance, Flash-Lite
+   comes next, Flash writes best but only allows ~20 requests a day. */
+const GEMINI_FALLBACK_LIST = ['gemini-3.1-flash-lite', 'gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-flash-latest', 'gemma-4-31b-it', 'gemma-3-27b-it'];
+let gmList = null, gmAt = 0;
+const gmBench = new Map();
+async function geminiList(env) {
+  if (gmList && Date.now() - gmAt < 6 * 3600e3) return gmList;
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 2500);
+  try {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000&key=${env.GEMINI_API_KEY}`, { signal: ctl.signal });
+    if (!r.ok) throw new Error('list ' + r.status);
+    const d = await r.json();
+    const names = (d.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent')).map(m => String(m.name).replace(/^models\//, ''));
+    if (!names.length) throw new Error('empty list');
+    gmList = names; gmAt = Date.now();
+  } catch (e) {
+    gmList = gmList || GEMINI_FALLBACK_LIST; gmAt = Date.now() - 6 * 3600e3 + 600e3;   // retry discovery in 10 min
+  } finally { clearTimeout(t); }
+  return gmList;
+}
+const GM_NAME = /^(gemini-[\d.]+-(flash|flash-lite)(-preview)?(-\d\d-\d{4})?|gemini-(flash|flash-lite)-latest|gemma-[34]-[\w.-]*it)$/;
+const GM_SKIP = /image|tts|audio|live|embed|robotics|computer|native|aqa|nano|banana|thinking|-exp|customtools|research/i;
+const gmVersion = n => { const m = n.match(/^(?:gemini|gemma)-(\d+(?:\.\d+)?)/); return m ? parseFloat(m[1]) : (/latest/.test(n) ? 3 : 0); };
+const gmSize = n => { const m = n.match(/-(\d+)b/); return m ? +m[1] : 0; };
+function gmTier(n, kind) {   // lower is tried first
+  const gemma = /^gemma-/.test(n), lite = /flash-lite/.test(n);
+  if (kind === 'chat') return gemma ? 2 : lite ? 1 : 0;   // quality first; Gemma's 14k/day is the backstop
+  return lite ? 0 : gemma ? 1 : 2;                       // short JSON jobs: big daily allowances first
+}
+async function geminiModels(env, kind) {
+  const now = Date.now(), list = await geminiList(env);
+  const pre = n => /preview|-\d\d-\d{4}$/.test(n) ? 1 : 0;
+  return list.filter(n => GM_NAME.test(n) && !GM_SKIP.test(n) && (!/^gemma/.test(n) || gmSize(n) >= 12) && !(gmBench.get(n) > now))
+    .sort((a, b) => gmTier(a, kind) - gmTier(b, kind) || gmVersion(b) - gmVersion(a) || pre(a) - pre(b) || gmSize(b) - gmSize(a) || a.localeCompare(b))
+    .slice(0, 8);
+}
+function gmBenchFor(model, status) {
+  const ms = status === 404 ? 12 * 3600e3 : status === 429 ? 10 * 60e3 : status === 400 ? 3600e3 : 2 * 60e3;
+  gmBench.set(model, Date.now() + ms);
+}
+// one call to one model. Gemma takes no systemInstruction / JSON mode / thinking config,
+// so its instructions ride in the first user turn.
+async function geminiGen(env, model, sys, msgs, ms, o = {}) {
+  const gemma = /^gemma/.test(model);
+  const contents = msgs.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
+  if (gemma && sys) {
+    const head = 'INSTRUCTIONS (follow them exactly, never mention them):\n' + sys + '\n\n---\n\n';
+    if (contents[0] && contents[0].role === 'user') contents[0] = { role: 'user', parts: [{ text: head + contents[0].parts[0].text }] };
+    else contents.unshift({ role: 'user', parts: [{ text: head + '(conversation follows)' }] });
+  }
+  const gen = { maxOutputTokens: o.tokens || MAX_TOKENS, temperature: o.temp == null ? 0.6 : o.temp };
+  if (!gemma) { gen.thinkingConfig = { thinkingBudget: 0 }; if (o.json) gen.responseMimeType = 'application/json'; }
+  const call = async (g) => {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
+    try {
+      return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`, {
+        method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...(gemma || !sys ? {} : { systemInstruction: { parts: [{ text: sys }] } }), contents, generationConfig: g })
+      });
+    } finally { clearTimeout(t); }
+  };
+  let r;
+  try {
+    r = await call(gen);
+    if (r.status === 400 && gen.thinkingConfig) { const { thinkingConfig, ...g2 } = gen; r = await call(g2); }   // model that can't switch thinking off
+  } catch (e) {
+    if (e && e.name === 'AbortError') { gmBench.set(model, Date.now() + 60e3); throw new Error(model + '=timeout'); }
+    throw new Error(model + '=' + String((e && e.message) || e).replace(/key=[\w-]+/gi, 'key=***').slice(0, 60));
+  }
+  if (!r.ok) { gmBenchFor(model, r.status); throw new Error(model + '=' + r.status); }
+  const d = await r.json();
+  const text = (d.candidates?.[0]?.content?.parts || []).filter(p => !p.thought).map(p => p.text || '').join('').trim();
+  if (!text) throw new Error(model + '=empty');
+  return text;
+}
+
+/* Workers AI's 10k-neuron daily allowance resets 00:00 UTC (05:30 IST). Once it answers
+   4006, skip it until then instead of paying a round trip on every request. */
+let cfDeadUntil = 0;
+function cfNoteError(e) {
+  if (/4006|daily free allocation|neurons/i.test(String((e && e.message) || e))) {
+    const d = new Date(); cfDeadUntil = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1);
+  }
+}
+const cfDead = () => Date.now() < cfDeadUntil;
+
+/* ── response cache: in-isolate Map, plus the AI_CACHE KV namespace when bound ──
+   Only successful AI output is stored, keyed by a hash of the input (never the text itself). */
+const memCache = new Map();
+async function cacheKey(prefix, s) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(s)));
+  return prefix + ':' + [...new Uint8Array(b)].slice(0, 16).map(x => x.toString(16).padStart(2, '0')).join('');
+}
+async function cacheGet(env, key) {
+  const m = memCache.get(key);
+  if (m && m.exp > Date.now()) return m.v;
+  if (env.AI_CACHE) {
+    try { const v = await env.AI_CACHE.get(key, 'json'); if (v) { memCache.set(key, { v, exp: Date.now() + 600e3 }); return v; } } catch (e) { /* cache is best-effort */ }
+  }
+  return null;
+}
+async function cachePut(env, key, v, ttl) {
+  memCache.set(key, { v, exp: Date.now() + ttl * 1000 });
+  if (memCache.size > 400) memCache.delete(memCache.keys().next().value);
+  if (env.AI_CACHE) { try { await env.AI_CACHE.put(key, JSON.stringify(v), { expirationTtl: Math.max(60, ttl) }); } catch (e) { /* over the free write quota: memory only */ } }
+}
+
 const MAX_TOKENS = 1000; // headroom so replies never cut off mid-sentence
 const MAX_TURNS = 20;        // cap history sent upstream (keeps usage low)
 const DAILY_IP_LIMIT = 30;   // messages per IP per day (needs CHAT_KV)
@@ -50,7 +161,34 @@ const ALLOWED_ORIGINS = [
   'http://localhost:4173'
 ];
 
-const FALLBACK = wa => "I can't reach my brain right now — but I don't want to leave you stuck. Message Yedukrishna directly on WhatsApp (https://wa.me/" + wa + ") or use the quote form at /quote.html and he'll reply personally.";
+const FALLBACK = wa => "I can't reach my brain right now, but I don't want to leave you stuck. Yedukrishna replies personally: [WhatsApp me](https://wa.me/" + wa + ") [Call me](tel:+" + wa + ") or send the details through /quote.html.";
+
+/* Owner rule: a phone number is NEVER shown as visible text, not even in chat. Every reply
+   passes through noDigits(): bare wa.me / tel links become "WhatsApp me" / "Call me" markdown
+   links (the digits live only in the href), a link whose label is a number gets those labels,
+   and any printed phone-like run of 9+ digits is swapped for the visitor's WhatsApp link.
+   The widget (js/chat.js, js/search.js) applies the same scrub as a second line of defence. */
+const NUM_RE = /(?:https?:\/\/)?(?:wa\.me\/|api\.whatsapp\.com\/send\?phone=)\+?(\d{6,15})(\?[^\s)\]]*)?|tel:\+?(\d{6,15})|(\+?\d[\d\s().-]{7,}\d)/gi;
+function noNumbersPlain(t, wa) {
+  return String(t).replace(NUM_RE, (x, w, q, tl, raw) => {
+    if (w) return '[WhatsApp me](https://wa.me/' + w + (q || '') + ')';
+    if (tl) return '[Call me](tel:+' + tl + ')';
+    return (raw.match(/\d/g) || []).length >= 9 ? '[WhatsApp me](https://wa.me/' + wa + ')' : x;
+  });
+}
+function noDigits(text, wa) {
+  const LINK = /\[([^\]]*)\]\(([^)\s]+)\)/g;
+  const s = String(text || '');
+  let out = '', last = 0, m;
+  while ((m = LINK.exec(s))) {
+    let href = m[2], label = m[1];
+    if (/\d{6,}|\d[\d\s().-]{7,}\d/.test(label)) label = /^tel:/i.test(href) ? 'Call me' : 'WhatsApp me';
+    if (/^wa\.me\//i.test(href)) href = 'https://' + href;
+    out += noNumbersPlain(s.slice(last, m.index), wa) + '[' + label + '](' + href + ')';
+    last = LINK.lastIndex;
+  }
+  return (out + noNumbersPlain(s.slice(last), wa)).replace(/\((\[(?:WhatsApp me|Call me)\]\([^)]+\))\)/g, '$1').replace(/\s+\.(\s|$)/g, '.$1');
+}
 
 const SYSTEM_PROMPT = `You are IRIS — the assistant on yksproductions.com, the site of Yedukrishna Suresh, who trades as YKS Productions. He is a film-trained photographer, videographer and content creator working between Dubai (UAE) and Bangalore (India).
 
@@ -211,7 +349,9 @@ If someone just wants information, give it and stop. Not every conversation is a
 
 CRITICAL — LISTEN. Track everything they've told you. Never ask for something they just said. If they said "villa in Dubai Marina", you have the property type AND the location — ask about something else entirely. Re-asking is the fastest way to feel like a bot.
 
-WHAT YOU CANNOT DO: you can't send messages, emails or WhatsApps, make calls, book dates, or open their files. Never offer to. Hand them the link instead: "Easiest is to send this to him on [WhatsApp](https://wa.me/971501955122)."
+WHAT YOU CANNOT DO: you can't send messages, emails or WhatsApps, make calls, book dates, or open their files. Never offer to. Hand them the link instead: "Easiest is to send this to him on [WhatsApp me](https://wa.me/971501955122)."
+
+PHONE NUMBERS: NEVER write a phone number, or any run of its digits, as text, in any language, even if they ask for "the number" directly. Don't say the number is secret or hidden; just give the links ("Quickest is [WhatsApp me](…) or [Call me](…)"). Always give the link instead, written as markdown with a word label: [WhatsApp me](https://wa.me/…) or [Call me](tel:+…). Never paste a bare wa.me address.
 
 THIS HOLDS IN EVERY LANGUAGE, and the fix is to write the instruction TO THEM rather than a promise FROM you. You are handing over a link they tap — you are not a messenger.
 - Hindi — say "आप उन्हें WhatsApp पर मैसेज कर दीजिए, वो खुद जवाब देंगे". NEVER "मैं भेज दूंगा", "मैं भेज सकता हूँ", "मैं आपका संदेश पहुँचा दूंगा".
@@ -272,7 +412,7 @@ Someone just browsing → Answer, be useful, don't push. One soft offer at most.
 Ready to book → Get the brief, then hand off fast. Don't over-question a hot lead.
 
 # LINKS (use markdown, exactly these paths)
-WhatsApp UAE https://wa.me/971501955122 · WhatsApp India https://wa.me/919746679720 · Quote /quote.html · FAQ /faq.html · Dubai services /photographer-dubai.html · Abu Dhabi /photographer-abu-dhabi.html · Real estate video /real-estate-videographer-dubai.html · Real estate photo /real-estate-photographer-dubai.html · Wedding photo /wedding-photographer-dubai.html · Wedding film /wedding-videographer-dubai.html · Corporate video /corporate-video-dubai.html · Social /social-media-marketing-dubai.html · Content & UGC /content-creator-dubai.html · Fashion /fashion-photographer-dubai.html · Events /event-photographer-dubai.html · Headshots /corporate-headshots-dubai.html · Food /food-photographer-dubai.html · Portraits /portrait-photographer-dubai.html · Bangalore social /social-media-marketing-bangalore.html · Journal /blog/ · Gear /gear.html · Instagram https://instagram.com/yks_photoworks`;
+WhatsApp (UAE line) [WhatsApp me](https://wa.me/971501955122) · WhatsApp (India line) [WhatsApp me](https://wa.me/919746679720) · Call [Call me](tel:+971501955122) · Quote /quote.html · FAQ /faq.html · Dubai services /photographer-dubai.html · Abu Dhabi /photographer-abu-dhabi.html · Real estate video /real-estate-videographer-dubai.html · Real estate photo /real-estate-photographer-dubai.html · Wedding photo /wedding-photographer-dubai.html · Wedding film /wedding-videographer-dubai.html · Corporate video /corporate-video-dubai.html · Social /social-media-marketing-dubai.html · Content & UGC /content-creator-dubai.html · Fashion /fashion-photographer-dubai.html · Events /event-photographer-dubai.html · Headshots /corporate-headshots-dubai.html · Food /food-photographer-dubai.html · Portraits /portrait-photographer-dubai.html · Bangalore social /social-media-marketing-bangalore.html · Journal /blog/ · Gear /gear.html · Instagram https://instagram.com/yks_photoworks`;
 
 
 function cors(origin) {
@@ -310,7 +450,7 @@ function buildSystem(ctx) {
   if (!ctx) return SYSTEM_PROMPT;
   const bits = [];
   if (ctx.wa) {
-    bits.push(`This visitor should be given the WhatsApp number ${ctx.wa} — use https://wa.me/${ctx.wa} for EVERY WhatsApp link you write, and never the other one. It is the line they can dial without international rates.`);
+    bits.push(`This visitor should be given their local line — write EVERY WhatsApp link as [WhatsApp me](https://wa.me/${ctx.wa}) and every call link as [Call me](tel:+${ctx.wa}), never the other line. It is the one they can reach without international rates. Never print the number itself or its digits; if they ask for the number, give these links.`);
   }
   if (ctx.page) bits.push(`They are reading: "${ctx.page}" (${ctx.path || '/'}). Assume that's what they care about — don't ask them to state it again.`);
   if (ctx.lang) {
@@ -347,7 +487,7 @@ LANGUAGE: if they write in Malayalam, Hindi, Kannada, Arabic or a romanised mix 
 
 RESPECT — never the familiar pronoun, in any language. For Yedukrishna: addeham (Malayalam), avaru (Kannada), plural verb forms (Hindi). NEVER avan, ivan, avanu, or singular Hindi forms. For the visitor: ningal (Malayalam), aap (Hindi), neevu (Kannada) — NEVER nee, tu, tum, or neenu. Casual spelling is fine; casual respect is not.
 
-Always end by pointing them at WhatsApp: https://wa.me/971501955122 (or the quote form at /quote.html). He replies personally.`;
+Never write a phone number or its digits as text. Always end by pointing them at WhatsApp with the markdown link [WhatsApp me](https://wa.me/971501955122) (or the quote form at /quote.html). He replies personally.`;
 
 /* The fallback models can't write Malayalam, Kannada, Hindi or Arabic
    coherently — testing produced word salad. A broken reply in someone's own
@@ -467,6 +607,10 @@ async function viaWorkersAI(env, msgs, sys, wa) {
   const nonLatin = last && SCRIPT_HANDOFF.find(([re]) => re.test(last.content));
 
   let lastErr;
+  if (cfDead()) {
+    if (nonLatin) return nonLatin[1](wa);
+    throw new Error('workers-ai daily free allocation spent (resets 00:00 UTC)');
+  }
   for (const model of CF_MODELS) {
     // A weak model asked for Malayalam or Arabic produces word salad — hand
     // off in their own language instead of generating something embarrassing.
@@ -486,6 +630,8 @@ async function viaWorkersAI(env, msgs, sys, wa) {
     } catch (e) {
       lastErr = e;
       console.error('model failed', model.id, e && e.message);
+      cfNoteError(e);
+      if (cfDead()) break;
     }
   }
   if (nonLatin) return nonLatin[1](wa);
@@ -493,43 +639,18 @@ async function viaWorkersAI(env, msgs, sys, wa) {
   return '';
 }
 
+let lastChatModel = '';
 async function viaGemini(env, msgs, sys, wa) {
-  const body = JSON.stringify({
-    systemInstruction: { parts: [{ text: sys }] },
-    contents: msgs.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    })),
-    generationConfig: {
-      maxOutputTokens: MAX_TOKENS,
-      temperature: 0.6,
-      // Flash models reason internally and that reasoning is billed against
-      // maxOutputTokens — leaving it on truncated replies mid-sentence.
-      thinkingConfig: { thinkingBudget: 0 }
-    }
-  });
-
-  let lastErr;
-  const tried = [];
-  for (const model of GEMINI_MODELS) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`;
-      const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
-      if (!r.ok) {
-        tried.push(model + '=' + r.status);
-        lastErr = new Error('gemini [' + tried.join(' ') + '] ' + (await r.text()).slice(0, 120));
-        continue;
-      }
-      const d = await r.json();
-      const text = (d.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
-      if (text) return text;
-    } catch (e) {
-      lastErr = e;
-      console.error('gemini model failed', model, e && e.message);
-    }
+  const models = await geminiModels(env, 'chat');
+  if (!models.length) throw new Error('gemini: every model benched (quota) — retry later');
+  const tried = [], start = Date.now();
+  for (const model of models) {
+    const left = 24000 - (Date.now() - start);
+    if (left < 1500) break;
+    try { const t = await geminiGen(env, model, sys, msgs, Math.min(left, 14000), { tokens: MAX_TOKENS, temp: 0.6 }); lastChatModel = model; return t; }
+    catch (e) { tried.push(String(e.message || e)); }
   }
-  if (lastErr) throw lastErr;
-  return '';
+  throw new Error('gemini [' + tried.join(' ') + ']');
 }
 
 async function viaAnthropic(env, msgs, sys, wa) {
@@ -624,28 +745,24 @@ function withTimeout(p, ms) {
 }
 
 async function cfAsk(env, model, messages, ms, o = {}) {
-  const r = await withTimeout(env.AI.run(model, { messages, max_tokens: o.tokens || 70, temperature: o.temp || 0 }), ms);
-  return readAI(r);
-}
-async function geminiAsk(env, messages, ms, o = {}) {
-  const sys = messages[0].content, rest = messages.slice(1);
-  const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort(), ms);
+  if (cfDead()) throw new Error('workers-ai quota spent');
   try {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${env.GEMINI_API_KEY}`, {
-      method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: sys }] },
-        contents: rest.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
-        generationConfig: { maxOutputTokens: o.tokens || 70, temperature: o.temp || 0, responseMimeType: 'application/json', thinkingConfig: { thinkingBudget: 0 } }
-      })
-    });
-    if (!r.ok) throw new Error('gemini ' + r.status);
-    const d = await r.json();
-    return (d.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
-  } catch (e) {
-    throw new Error(e && e.name === 'AbortError' ? 'timeout' : String((e && e.message) || e).replace(/key=[\w-]+/gi, 'key=***'));
-  } finally { clearTimeout(t); }
+    const r = await withTimeout(env.AI.run(model, { messages, max_tokens: o.tokens || 70, temperature: o.temp || 0 }), ms);
+    return readAI(r);
+  } catch (e) { cfNoteError(e); throw e; }
+}
+// short JSON jobs (/classify, /bio, /adsim): walk the discovered Gemini models inside the time budget
+async function geminiAsk(env, messages, ms, o = {}) {
+  const sys = messages[0].content, rest = messages.slice(1), start = Date.now();
+  const models = await geminiModels(env, 'json');
+  const tried = [];
+  for (const model of models) {
+    const left = ms - (Date.now() - start);
+    if (left < 500) break;
+    try { return await geminiGen(env, model, sys, rest, models.length > 1 ? Math.max(1200, Math.min(left, Math.round(ms * 0.7))) : left, { tokens: o.tokens || 70, temp: o.temp || 0, json: true }); }
+    catch (e) { tried.push(String(e.message || e)); }
+  }
+  throw new Error(tried.length ? tried.join(' ').slice(0, 160) : 'gemini: no model available');
 }
 
 function ipKey(ip) {
@@ -679,7 +796,7 @@ async function llmVerdict(env, messages) {
   const deadline = Date.now() + CLASSIFY_BUDGET_MS;
   const tries = [];
   if (env.AI) tries.push(['llama-3.3-70b', ms => cfAsk(env, '@cf/meta/llama-3.3-70b-instruct-fp8-fast', messages, ms)]);
-  if (env.GEMINI_API_KEY) tries.push(['gemini-3.1-flash-lite', ms => geminiAsk(env, messages, ms)]);
+  if (env.GEMINI_API_KEY) tries.push(['gemini', ms => geminiAsk(env, messages, ms)]);
   if (env.AI) tries.push(['llama-4-scout', ms => cfAsk(env, '@cf/meta/llama-4-scout-17b-16e-instruct', messages, ms)]);
   if (!tries.length) return { error: 'no model', timeout: false };
   const errors = [];
@@ -757,14 +874,28 @@ async function classify(request, env, origin) {
   for (const [u, a] of CLASSIFY_SHOTS) messages.push({ role: 'user', content: u }, { role: 'assistant', content: a });
   messages.push({ role: 'user', content: user });
 
-  const llm = await llmVerdict(env, messages);
+  const ck = await cacheKey('cls1', user);
+  let llm = await cacheGet(env, ck), cached = !!llm;
+  if (!llm) {
+    llm = await llmVerdict(env, messages);
+    if (!llm.error) await cachePut(env, ck, { type: llm.type, confidence: llm.confidence, reason: llm.reason, model: llm.model, attempts: llm.attempts }, 86400);
+  }
+  if (llm.error && !injected && (rules === 'client' || rules === 'talent' && !brandWords)) {
+    // AI down: the keyword rules alone are clear enough here — a plain "I am a model / aspiring
+    // actor" with no brand words goes to talent (0.75 clears the 0.7 rules+AI gate), a clear
+    // client phrase goes to client. Anything ambiguous keeps the safe client/unsure fallback.
+    console.error('classify ai_failed, rules verdict', llm.error);
+    const v = rules === 'talent' ? { type: 'talent', confidence: 0.75 } : { type: 'client', confidence: 0.7 };
+    const dr = decide(v, rules, brandWords, injected);
+    return json({ ok: true, ...v, reason: 'keyword rules (AI unavailable)', model: 'rules', rules, injected, route: dr.route, unsure: dr.unsure, why: 'rules_only' }, 200, origin);
+  }
   const d = decide(llm, rules, brandWords, injected);
   if (llm.error) {
     console.error('classify ai_failed', llm.error);
     return json({ ok: false, error: llm.timeout ? 'timeout' : 'model_failed', detail: String(llm.error).slice(0, 200), rules, route: 'client', unsure: true, why: 'ai_failed' }, 200, origin);
   }
   return json({ ok: true, type: llm.type, confidence: llm.confidence, reason: llm.reason, model: llm.model, attempts: llm.attempts,
-    rules, injected, route: d.route, unsure: d.unsure, why: d.why }, 200, origin);
+    rules, injected, route: d.route, unsure: d.unsure, why: d.why, ...(cached ? { cached: true } : {}) }, 200, origin);
 }
 
 // GET /classify/health — bindings present + one tiny probe (rate-limited like /classify)
@@ -781,11 +912,13 @@ async function classifyHealth(request, env, origin) {
   };
   const list = [];
   if (env.AI) list.push(one('llama-3.3-70b', ms => cfAsk(env, '@cf/meta/llama-3.3-70b-instruct-fp8-fast', messages, ms)));
-  if (env.GEMINI_API_KEY) list.push(one('gemini-3.1-flash-lite', ms => geminiAsk(env, messages, ms)));
+  if (env.GEMINI_API_KEY) list.push(one('gemini', ms => geminiAsk(env, messages, ms)));
   if (env.AI) list.push(one('llama-4-scout', ms => cfAsk(env, '@cf/meta/llama-4-scout-17b-16e-instruct', messages, ms)));
   const providers = await Promise.all(list);
   const up = providers.filter(p => p.ok).length;
-  return json({ ok: up > 0, service: 'yks-classify', providers_up: up + '/' + providers.length, providers,
+  const gemini_models = env.GEMINI_API_KEY ? await geminiModels(env, 'json') : [];
+  return json({ ok: up > 0, service: 'yks-classify', providers_up: up + '/' + providers.length, providers, gemini_models,
+    workers_ai_quota_spent: cfDead(), rules_fallback: true, cache: env.AI_CACHE ? 'memory+kv' : 'memory',
     rate_limit: !!env.CLASSIFY_RL, ms: Date.now() - t }, up ? 200 : 503, origin);
 }
 
@@ -864,7 +997,7 @@ function hashSeed(s) { let h = 2166136261; for (const c of String(s)) { h ^= c.c
 async function hedged(env, messages, check, o) {
   const deadline = Date.now() + o.budget;
   const tries = [];
-  if (env.GEMINI_API_KEY) tries.push(['gemini-3.1-flash-lite', ms => geminiAsk(env, messages, ms, o)]);
+  if (env.GEMINI_API_KEY) tries.push(['gemini', ms => geminiAsk(env, messages, ms, o)]);
   if (env.AI) tries.push(['llama-4-scout', ms => cfAsk(env, '@cf/meta/llama-4-scout-17b-16e-instruct', messages, ms, o)]);
   if (env.AI) tries.push(['llama-3.3-70b', ms => cfAsk(env, '@cf/meta/llama-3.3-70b-instruct-fp8-fast', messages, ms, o)]);
   if (!tries.length) return { error: 'no model' };
@@ -1092,6 +1225,9 @@ async function adsim(request, env, origin) {
   const objective = ['awareness', 'traffic', 'leads', 'sales'].includes(b.objective) ? b.objective : 'traffic';
   if (!handle && !site && !typed.brand) return adsimJson({ ok: false, error: 'need_brand' }, 400, origin);
 
+  const ak = await cacheKey('adsim1', JSON.stringify([handle, site, typed, market, objective]));
+  const hit = await cacheGet(env, ak);
+  if (hit) return adsimJson({ ...hit, cached: true }, 200, origin);
   const profile = (handle || site) ? await adsimProfile(handle, site) : { source: 'typed', blocked: false, tried: [] };
   const name = typed.brand || profile.name || (handle ? handle.replace(/[._]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : '') || profile.site || 'Your brand';
   const facts = { name, handle: handle ? '@' + handle : '', what_they_sell: typed.sells, city: typed.city, market, objective, public_bio: profile.description || '', website_name: profile.site || '', notes: typed.notes };
@@ -1101,7 +1237,9 @@ async function adsim(request, env, origin) {
   const prof = { source: profile.source, blocked: !!profile.blocked, tried: profile.tried, name, handle: handle ? '@' + handle : '', description: profile.description || '', image: profile.image || '', web_image: profile.web_image || '', icon: profile.icon || '', theme: profile.theme || '', site: profile.site || '', ig_status: profile.ig_status || '', site_status: profile.site_status || '' };
   if (r.error) { console.error('adsim ai_failed', r.error); return adsimJson({ ok: false, error: r.timeout ? 'timeout' : 'model_failed', profile: prof }, 200, origin); }
   const { model, attempts, ...copy } = r;
-  return adsimJson({ ok: true, profile: prof, copy, model, injected }, 200, origin);
+  const out = { ok: true, profile: prof, copy, model, injected };
+  await cachePut(env, ak, out, 6 * 3600);   // same brand + inputs within 6 h → same preview, no AI call
+  return adsimJson(out, 200, origin);
 }
 
 /* ── worker ────────────────────────────────────────────────── */
@@ -1129,7 +1267,8 @@ export default {
       const key = `rl:${ip}:${new Date().toISOString().slice(0, 10)}`;
       const used = parseInt((await env.CHAT_KV.get(key)) || '0', 10);
       if (used >= DAILY_IP_LIMIT) {
-        return json({ reply: "I've hit today's chat limit — message Yedukrishna directly on WhatsApp: https://wa.me/971501955122" }, 200, origin);
+        const w = pickWa(request, '');
+        return json({ reply: "I've hit today's chat limit, but Yedukrishna replies personally: [WhatsApp me](https://wa.me/" + w + ") [Call me](tel:+" + w + ")" }, 200, origin);
       }
       await env.CHAT_KV.put(key, String(used + 1), { expirationTtl: 172800 });
     }
@@ -1167,7 +1306,10 @@ export default {
     if (env.AI) chain.push(['workers-ai', viaWorkersAI]);
     if (!indic && env.GEMINI_API_KEY) chain.push(['gemini', viaGemini]);
 
-    if (!chain.length) return json({ reply: FALLBACK(WA_AE), error: 'no provider configured' }, 200, origin);
+    if (!chain.length) return json({ reply: FALLBACK(wa), error: 'no provider configured' }, 200, origin);
+
+    // a first message (usually a suggestion chip) gets the same answer for 6 h without spending quota
+    const ck = msgs.length === 1 ? await cacheKey('chat1', JSON.stringify([msgs[0].content.trim().toLowerCase().replace(/\s+/g, ' '), wa, c.path || '', String(c.lang || '').slice(0, 2)])) : null;
 
     const debug = new URL(request.url).searchParams.get('debug') === '1';
     const problems = [];
@@ -1187,11 +1329,17 @@ export default {
       }));
     }
 
+    if (ck && !debug) {
+      const hit = await cacheGet(env, ck);
+      if (hit && hit.reply) return json({ reply: noDigits(hit.reply, wa), provider: hit.provider, cached: true }, 200, origin);
+    }
     for (const [name, fn] of chain) {
       try {
-        const reply = await fn(env, msgs, sys, wa);
-        if (reply) {
-          return json(debug ? { reply, provider: name, problems } : { reply, provider: name }, 200, origin);
+        const raw = await fn(env, msgs, sys, wa);
+        if (raw) {
+          const reply = noDigits(raw, wa);
+          if (ck && name !== 'workers-ai' || ck && !cfDead()) await cachePut(env, ck, { reply, provider: name }, 6 * 3600);
+          return json(debug ? { reply, provider: name, model: name === 'gemini' ? lastChatModel : undefined, problems } : { reply, provider: name }, 200, origin);
         }
         problems.push(name + ': empty reply');
       } catch (err) {

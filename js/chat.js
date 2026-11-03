@@ -139,7 +139,10 @@
     'See his work': 'https://www.instagram.com/yks_photoworks/'
   };
   // No one-tap WhatsApp on the talent/casting funnel — those routes are forms.
-  if (!TALENT_FUNNEL) ACTIONS['→ WhatsApp him'] = WA_URL;
+  var CALL_URL = 'tel:+' + NUM;
+  if (!TALENT_FUNNEL) { ACTIONS['→ WhatsApp him'] = WA_URL; ACTIONS['→ Call him'] = CALL_URL; }
+  // the fallback when the worker can't answer: buttons, never a printed number
+  var REACH = TALENT_FUNNEL ? '[WhatsApp me](' + WA_URL + ')' : '[WhatsApp me](' + WA_URL + ') [Call me](' + CALL_URL + ')';
 
   /* ── the aperture mark ─────────────────────────────────────────
      Blades live in their own group so they can animate: the dock CTA
@@ -285,6 +288,7 @@
     + '.yc-msg.me{align-self:flex-end;background:linear-gradient(135deg,rgba(255,140,59,.26),rgba(255,140,59,.16));'
     + 'color:#f4ede2;border:1px solid rgba(255,140,59,.28);border-bottom-right-radius:5px}'
     + '.yc-msg a{color:#ff8c3b;text-decoration:underline;text-underline-offset:2px}'
+    + '.yc-msg a.yc-cta{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;margin:6px 6px 0 0;border:1px solid rgba(255,140,59,.6);border-radius:999px;text-decoration:none;font-weight:600;white-space:nowrap}'
     /* chips live inside the log, directly under the last reply — so they read
        as part of the conversation instead of stranding a gap above the input */
     + '.yc-chips{display:flex;flex-wrap:wrap;gap:7px;padding:1px 0 6px}'
@@ -480,9 +484,35 @@
       return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c];
     });
   }
+  /* Owner rule: a phone number is never shown as text, not even in chat. Whatever the
+     worker or a model sends, a bare wa.me / tel link or a printed number becomes a
+     "WhatsApp me" / "Call me" link; the digits only ever live in the href. */
+  var NUM_RE = /(?:https?:\/\/)?(?:wa\.me\/|api\.whatsapp\.com\/send\?phone=)\+?(\d{6,15})(\?[^\s)\]]*)?|tel:\+?(\d{6,15})|(\+?\d[\d\s().-]{7,}\d)/gi;
+  function noNumbers(t) {
+    return String(t).replace(NUM_RE, function (x, w, q, tl, raw) {
+      if (w) return '[WhatsApp me](https://wa.me/' + w + (q || '') + ')';
+      if (tl) return '[Call me](tel:+' + tl + ')';
+      return (raw.match(/\d/g) || []).length >= 9 ? '[WhatsApp me](' + WA_URL + ')' : x;
+    });
+  }
+  function safeText(s) {
+    var LINK = /\[([^\]]*)\]\(([^)\s]+)\)/g, out = '', last = 0, m;
+    s = String(s);
+    while ((m = LINK.exec(s))) {
+      var href = m[2], label = m[1];
+      if (/\d{6,}|\d[\d\s().-]{7,}\d/.test(label)) label = /^tel:/i.test(href) ? 'Call me' : 'WhatsApp me';
+      if (/^(?:https?:\/\/)?wa\.me\//i.test(href) && !/^https?:/i.test(href)) href = 'https://' + href;
+      out += noNumbers(s.slice(last, m.index)) + '[' + label + '](' + href + ')';
+      last = LINK.lastIndex;
+    }
+    return out + noNumbers(s.slice(last));
+  }
   function md(s) {
-    return esc(s)
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|\/[^)\s]*)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    return esc(safeText(s))
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|tel:\+?\d{6,15}|\/[^)\s]*)\)/g, function (x, label, href) {
+        var cta = /^(https:\/\/wa\.me\/|tel:)/.test(href);
+        return '<a' + (cta ? ' class="yc-cta"' : '') + ' href="' + href + '"' + (/^tel:/.test(href) ? '' : ' target="_blank" rel="noopener"') + '>' + label + '</a>';
+      })
       .replace(/(^|[\s(])((?:https?:\/\/|\/)[^\s<)]+\.(?:html|com|ae|in)[^\s<)]*)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>')
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   }
@@ -569,15 +599,15 @@
         typing(false);
         speak();
         var reply = j && j.reply ? j.reply
-          : "Sorry — that one didn't reach me. Try again, or message Yedukrishna: " + WA_URL;
+          : "Sorry — that one didn't reach me. Try again, or reach Yedukrishna directly: " + REACH;
         add('bot', reply);
         history.push({ role: 'assistant', content: reply });
         setChips(followUps(reply, text));
       })
       .catch(function () {
         typing(false);
-        add('bot', "I can't reach my brain right now. Yedukrishna's on WhatsApp though: " + WA_URL);
-        setChips(['→ WhatsApp him', '→ Get a quote']);
+        add('bot', "I can't reach my brain right now. Yedukrishna replies personally: " + REACH);
+        setChips(TALENT_FUNNEL ? ['→ Get a quote'] : ['→ WhatsApp him', '→ Call him', '→ Get a quote']);
       })
       .then(function () { busy = false; send.disabled = false; input.focus(); });
   }
