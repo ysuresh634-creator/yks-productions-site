@@ -1,0 +1,26 @@
+name = "yks-stats"
+main = "yks-stats-worker.js"
+compatibility_date = "2026-01-01"
+
+# Cookieless, anonymous visit counting for yksproductions.com and
+# marketing.yksproductions.com, plus a private dashboard at /dashboard.
+# Free tier only: D1 for storage, Workers rate limiting, one daily cron.
+# Secret (not in this file): DASH_KEY  ->  npx wrangler secret put DASH_KEY
+
+[[d1_databases]]
+binding = "DB"
+database_name = "yks-stats"
+database_id = "46ad9da0-c8f9-4cea-b68c-1f9eea4ff0b5"
+
+# Per-IP limit on POST /c (beacons). The IP is only used as the limiter key, never stored.
+[[ratelimits]]
+name = "BEACON_RL"
+namespace_id = "1702"
+simple = { limit = 90, period = 60 }
+
+# Daily housekeeping at 00:05 IST: drop yesterday's session salt, trim rows older than 400 days.
+[triggers]
+crons = ["35 18 * * *"]
+
+[observability]
+enabled = true

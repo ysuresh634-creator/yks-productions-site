@@ -270,6 +270,7 @@ def page(c):
 </head>
 <body data-page="casting">
 <script src="/js/contact.js?v=3"></script>
+<script src="/js/stats.js?v=1" defer></script>
 
 {nav(c)}
 

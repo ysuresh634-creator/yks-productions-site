@@ -41,6 +41,7 @@
 </head>
 <body>
 <script src="/js/contact.js?v=3"></script>
+<script src="/js/stats.js?v=1" defer></script>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
@@ -102,7 +103,17 @@
       <li>No fake countdowns, fake &ldquo;only 2 left&rdquo; messages or made-up reviews. The brands named on the site are brands I have actually worked with.</li>
       <li>Search engines and visitors without JavaScript see the same published page as everyone else.</li>
     </ul>
-    <p>If your browser sends <strong>Do Not Track</strong> or <strong>Global Privacy Control</strong>, personalisation stays off. If you have asked for reduced motion, the site&rsquo;s pop-ups appear without animation.</p>
+    <h2 id="stats">Anonymous visit counting</h2>
+    <p>So I know which pages and which buttons are actually useful, the site counts visits with my own small counter (<code>/js/stats.js</code>, running on Cloudflare). It uses no cookies and keeps nothing on your device, and it can&rsquo;t tell who you are.</p>
+    <ul>
+      <li><strong>What it counts:</strong> the page opened, the website that linked you here (just its name, such as instagram.com), any campaign tag in the link, your country and city as Cloudflare estimates them, phone, tablet or computer, browser and system, a rough screen size, your language, whether your timezone is India, UAE or elsewhere, how long the page was open and how far you scrolled.</li>
+      <li><strong>Which buttons were used:</strong> WhatsApp, call or email taps, opening the chat and sending a message in it, a site search, the ad simulator, the &ldquo;Before you go&rdquo; note, and whether an enquiry or talent application was sent. It records that it happened, never what you typed: no search terms, chat messages or form contents.</li>
+      <li><strong>What it never keeps:</strong> your IP address, a cookie or any ID that follows you around. To avoid counting one visitor twice in a day, it uses a scrambled code built from a random value that is deleted at the end of each day, so visits can&rsquo;t be linked from one day to the next, or back to you.</li>
+      <li>Counts are kept for up to 400 days and only I can see them.</li>
+    </ul>
+    <p>&ldquo;Turn it off&rdquo; below also stops this counting on this device.</p>
+
+    <p>If your browser sends <strong>Do Not Track</strong> or <strong>Global Privacy Control</strong>, personalisation and visit counting stay off. If you have asked for reduced motion, the site&rsquo;s pop-ups appear without animation.</p>
 
     <div class="pv-box" id="pv-controls">
       <p class="pv-st" id="pv-status">Personalisation needs JavaScript, so with it switched off nothing is stored.</p>
@@ -121,7 +132,7 @@
       <li><strong>WhatsApp and phone</strong> are your own app; I only see what you send.</li>
       <li><strong>The chat assistant</strong> sends what you type to my server so it can answer.</li>
       <li><strong>YKS Talents applications</strong> are covered by their own terms on the application page.</li>
-      <li><strong>Visit statistics:</strong> the site uses Google Analytics to count visits and see which pages are useful.</li>
+      <li><strong>Visit statistics:</strong> anonymous visit counting (see above), plus Google Analytics on most pages.</li>
     </ul>
     <p>This notice was written with India&rsquo;s Digital Personal Data Protection Act and the UAE&rsquo;s Personal Data Protection Law in mind. To see, correct or delete anything you have sent me, email <a href="mailto:yksproductions893@gmail.com">yksproductions893@gmail.com</a>.</p>
   </div>
@@ -160,13 +171,13 @@
   function ls() { try { return window.localStorage; } catch (e) { return null; } }
   function render(msg) {
     var s = ls(), isOff = !s || dnt || s.getItem('yks_smart_off') === '1';
-    st.textContent = msg || (dnt ? 'Your browser asks sites not to track you, so personalisation is off.' : !s ? 'Your browser blocks site storage, so nothing is remembered.' : isOff ? 'Personalisation is off on this device.' : 'Personalisation is on for this device.');
+    st.textContent = msg || (dnt ? 'Your browser asks sites not to track you, so personalisation and visit counting are off.' : !s ? 'Your browser blocks site storage, so nothing is remembered.' : isOff ? 'Personalisation and visit counting are off on this device.' : 'Personalisation and anonymous visit counting are on for this device.');
     off.hidden = isOff; on.hidden = !isOff || dnt || !s;
   }
   function wipe() { var s = ls(); if (!s) return; KEYS.forEach(function (k) { s.removeItem(k); }); try { sessionStorage.removeItem('yks_exit'); sessionStorage.removeItem('yks_sc_x'); sessionStorage.removeItem('yks_from'); sessionStorage.removeItem('yks_region'); sessionStorage.removeItem('yks_arr'); } catch (e) {} }
   document.getElementById('pv-reset').addEventListener('click', function () { wipe(); render('Done. Everything the site remembered on this device has been cleared.'); });
-  off.addEventListener('click', function () { wipe(); var s = ls(); if (s) s.setItem('yks_smart_off', '1'); render('Personalisation is now off on this device, and its history is cleared.'); });
-  on.addEventListener('click', function () { var s = ls(); if (s) s.removeItem('yks_smart_off'); render('Personalisation is back on for this device.'); });
+  off.addEventListener('click', function () { wipe(); var s = ls(); if (s) s.setItem('yks_smart_off', '1'); render('Personalisation and visit counting are now off on this device, and its history is cleared.'); });
+  on.addEventListener('click', function () { var s = ls(); if (s) s.removeItem('yks_smart_off'); render('Personalisation and anonymous visit counting are back on for this device.'); });
   render();
 })();
 </script>

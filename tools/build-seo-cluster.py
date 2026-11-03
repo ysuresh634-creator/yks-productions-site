@@ -157,6 +157,7 @@ def head(path, title, desc, ogtitle, schema, region=None, placename=None, ogtype
 </head>
 <body{(' data-wa="' + NUM[CUR['cc']][0] + '"') if CUR['cc'] else ''}>
 <script src="/js/contact.js?v=3"></script>
+<script src="/js/stats.js?v=1" defer></script>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>

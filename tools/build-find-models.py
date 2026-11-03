@@ -138,6 +138,7 @@ page = f'''<!DOCTYPE html>
 </head>
 <body>
 <script src="/js/contact.js?v=3"></script>
+<script src="/js/stats.js?v=1" defer></script>
 
 <nav class="l-nav">
   <a class="l-brand" href="/index.html">YKS<span>.</span><em>Productions</em></a>
