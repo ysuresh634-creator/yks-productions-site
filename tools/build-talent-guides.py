@@ -28,10 +28,12 @@ CITIES = [('mumbai', 'Mumbai'), ('delhi', 'Delhi NCR'), ('bangalore', 'Bangalore
 
 # slug -> (English card title, Hindi card title)
 GUIDES = {
+  'how-to-become-a-model-in-india': ('How to become a model in India', 'India में model कैसे बनें (English)'),
   'how-to-make-a-modelling-portfolio': ('How to make a modelling portfolio', 'मॉडलिंग portfolio कैसे बनाएं (English)'),
   'model-digitals': ('What to wear for model digitals', 'Model digitals: क्या पहनें (English)'),
   'model-comp-card': ('Model comp card + free comp card maker', 'Comp card + free comp card maker (English)'),
   'modelling-agency-fees-scams-india': ('Modelling agency fees and scams in India', 'Agency fees और scams (English)'),
+  'how-to-cast-models-for-a-brand-shoot': ('How to cast models for a brand shoot', 'Brand shoot के लिए models कैसे cast करें (English)'),
   'modelling-portfolio-kaise-banaye': ('मॉडलिंग पोर्टफोलियो कैसे बनाएं (Hindi)', 'मॉडलिंग पोर्टफोलियो कैसे बनाएं'),
 }
 
@@ -114,7 +116,7 @@ def strip(s):
 def page(g):
     url = f"{SITE}/talents/guides/{g['slug']}.html"
     L = g.get('lang', 'en')
-    T = UI[L]
+    T = dict(UI[L]); T.update(g.get('ui', {}))
     gi = 1 if L == 'hi' else 0
     graph = [
         {
@@ -125,8 +127,8 @@ def page(g):
             'url': url,
             'mainEntityOfPage': url,
             'inLanguage': T['in_lang'],
-            'datePublished': DATE,
-            'dateModified': DATE,
+            'datePublished': g.get('date', DATE),
+            'dateModified': g.get('date', DATE),
             'image': g.get('image_abs', f'{SITE}/assets/og/og-talents.jpg'),
             'author': {
                 '@type': 'Person',
@@ -267,6 +269,7 @@ def page(g):
     <span class="l-cats-div" aria-hidden="true"></span>
     <a href="/talents.html">YKS Talents</a>
     <a href="/talents/apply.html">Free portfolio</a>
+    <a href="/talents/guides/how-to-become-a-model-in-india.html">Become a model</a>
     <a href="/talents/guides/how-to-make-a-modelling-portfolio.html">Portfolio guide</a>
     <a href="/talents/guides/model-digitals.html">Digitals</a>
     <a href="/talents/guides/model-comp-card.html">Comp card</a>
@@ -274,6 +277,7 @@ def page(g):
     <a href="/talents/guides/modelling-portfolio-kaise-banaye.html" lang="hi">हिंदी</a>
     <span class="l-cats-div" aria-hidden="true"></span>
     <a href="/find-models.html">Find models</a>
+    <a href="/talents/guides/how-to-cast-models-for-a-brand-shoot.html">Casting guide</a>
     <a href="/blog/">Journal</a>
   </div>
 </div>
@@ -324,8 +328,8 @@ def page(g):
     <h2>{T['end_h']}</h2>
     <p>{T['end_p']}</p>
     <div class="l-cta-row center">
-      <a class="btn btn-fill" href="/talents/apply.html">{T['end_b1']}</a>
-      <a class="btn btn-ghost" href="/talents.html">{T['end_b2']}</a>
+      <a class="btn btn-fill" href="{T.get('end_b1_href', '/talents/apply.html')}">{T['end_b1']}</a>
+      <a class="btn btn-ghost" href="{T.get('end_b2_href', '/talents.html')}">{T['end_b2']}</a>
     </div>
   </div>
 </section>
@@ -350,7 +354,7 @@ def page(g):
   </div>
 </footer>
 
-<script src="/js/landing.js?v=20"></script>
+<script src="/js/landing.js?v=24"></script>
 {scripts}</body>
 </html>
 """

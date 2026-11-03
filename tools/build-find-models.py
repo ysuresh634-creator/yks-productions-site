@@ -20,9 +20,9 @@ CITIES = [('mumbai', 'Mumbai'), ('delhi', 'Delhi NCR'), ('bangalore', 'Bangalore
           ('kolkata', 'Kolkata'), ('ahmedabad', 'Ahmedabad'), ('jaipur', 'Jaipur'),
           ('chandigarh', 'Chandigarh'), ('dubai', 'Dubai')]
 
-TITLE = 'Find Models for Your Shoot in India | YKS Talents'
-DESC = ('Find female models for your photoshoot in India and Dubai. Browse curated YKS Talents '
-        'portfolios, send a free brief, and get faces matched to your shoot — city by city.')
+TITLE = 'Hire Female Models for Shoots in India and Dubai | YKS Talents'
+DESC = ('Hire female models for ad, fashion and brand shoots in India and Dubai. Browse curated '
+        'portfolios or send a free brief and get faces matched to your shoot.')
 
 FAQ = [
  ('How do I find models for a photoshoot in India?',
@@ -39,6 +39,10 @@ FAQ = [
   'Women aged 18 to 34, based in or regularly working in India or the Middle East — polished, camera-ready faces suited to fashion, beauty, lifestyle, ethnic and bridal, jewellery and premium brand work. Everyone on the platform is over 18.'),
  ('Which cities can I find female models in?',
   'Across India and the Middle East, including Mumbai, Delhi NCR, Bangalore, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad, Jaipur, Chandigarh and Dubai. Each city page explains what clients there tend to look for.'),
+ ('Can I find models for an ad film or a brand campaign?',
+  'Yes. Talent on YKS Talents are cast for ad films, digital and TV commercials, reels, launch films and brand campaigns as well as stills. Say in the brief whether you need video, spoken lines or language versions, and the profiles I send will reflect it. My guide on <a href="/talents/guides/how-to-cast-models-for-a-brand-shoot.html">how to cast models for a brand shoot</a> covers the whole process.'),
+ ('Can I hire models in Dubai and the UAE?',
+  'Yes. YKS Talents covers Dubai and the wider UAE as well as India. Shooting in the UAE generally involves location permits and talent who are legally able to work there, so share dates and locations early. See <a href="/models-in-dubai.html">models in Dubai</a>.'),
  ('Can you shoot it as well?',
   'Yes. If you want the shoot handled too, I direct and photograph it under YKS Productions and quote the production as one clear number. If you already have a photographer, you can still find and book talent here through me without booking me to shoot.'),
  ('What about model releases and usage rights?',
@@ -92,7 +96,7 @@ page = f'''<!DOCTYPE html>
 <meta name="geo.region" content="IN" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="YKS Productions" />
-<meta property="og:title" content="Find Models for Your Shoot — YKS Talents" />
+<meta property="og:title" content="Hire Models for Your Shoot in India &amp; Dubai — YKS Talents" />
 <meta property="og:description" content="Browse curated portfolios of women models across India and Dubai, or send a free brief and get faces matched to your shoot." />
 <meta property="og:url" content="{URL}" />
 <meta property="og:image" content="{SITE}/assets/og/og-talents.jpg" />
@@ -103,7 +107,7 @@ page = f'''<!DOCTYPE html>
 <meta property="og:image:alt" content="YKS Talents — find models for your shoot in India and the Middle East" />
 <meta property="og:locale" content="en_IN" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Find Models for Your Shoot — YKS Talents" />
+<meta name="twitter:title" content="Hire Models for Your Shoot in India &amp; Dubai — YKS Talents" />
 <meta name="twitter:description" content="Curated portfolios of women models across India and Dubai. Free to browse, free to brief." />
 <meta name="twitter:image" content="{SITE}/assets/og/og-talents.jpg" />
 <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -158,7 +162,7 @@ page = f'''<!DOCTYPE html>
   <div class="wrap">
     <nav class="l-crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/talents.html">YKS Talents</a> / <span aria-current="page">Find models</span></nav>
     <p class="l-eyebrow">For brands, photographers &amp; productions</p>
-    <h1>Find models for <em>your shoot</em></h1>
+    <h1>Find and hire models for <em>your shoot</em></h1>
     <p class="l-lede">Curated portfolios of women models aged 18–34, across India and the Middle East. Browse the platform yourself, or tell me what you&rsquo;re making and I&rsquo;ll point you to the faces that fit — and arrange everything with the talent for you. Free to browse, free to brief.</p>
     <div class="l-cta-row">
       <a class="btn btn-fill" href="#brief">Send a brief</a>
@@ -210,6 +214,7 @@ page = f'''<!DOCTYPE html>
       <div class="l-card"><div class="t">Ethnic</div><h3>Bridal, ethnic &amp; jewellery</h3><p>Hands, neckline and patience — what bridal, saree, lehenga and jewellery work demands.</p></div>
       <div class="l-card"><div class="t">Beauty</div><h3>Beauty &amp; skincare</h3><p>Clean, close-up-ready skin and expression for beauty, skincare and haircare.</p></div>
       <div class="l-card"><div class="t">E-commerce</div><h3>Catalogue &amp; e-com</h3><p>Consistency across many looks in a day, with the stamina catalogue work needs.</p></div>
+      <div class="l-card"><div class="t">Video</div><h3>Ad films &amp; reels</h3><p>Faces comfortable in motion for digital and TV commercials, launch films and reels &mdash; stills and video from the same booking.</p></div>
       <div class="l-card"><div class="t">Where</div><h3>India &amp; the Middle East</h3><p>{city_inline}.</p></div>
     </div>
   </div>
@@ -241,6 +246,7 @@ page = f'''<!DOCTYPE html>
     <div class="l-prose">
       <p>You&rsquo;re not just paying for photographs; you&rsquo;re paying for permission to use someone&rsquo;s face for a defined purpose, in defined places, for a defined time. Put the term, territory, channels and any exclusivity in writing, with a signed model release, before anyone arrives on set. It&rsquo;s the step most shoots skip and regret when a campaign wants a renewal.</p>
       <p>I arrange that paperwork with the talent for every booking, whether I&rsquo;m shooting or your own team is. It protects both sides.</p>
+      <p>For the whole process &mdash; the brief, choosing faces, models versus creators, fees, releases and the shoot day &mdash; read my guide on <a href="/talents/guides/how-to-cast-models-for-a-brand-shoot.html">how to cast models for a brand shoot</a>.</p>
     </div>
   </div>
 </section>
@@ -304,6 +310,7 @@ page = f'''<!DOCTYPE html>
       <div class="l-foot-links">
         <a href="/talents.html">YKS Talents</a>
         <a href="/find-models.html">Find models</a>
+        <a href="/talents/guides/how-to-cast-models-for-a-brand-shoot.html">Casting guide</a>
         <a href="/talents/apply.html">Free portfolio</a>
         <a href="/index.html">Portfolio</a>
         <a href="/india/">India</a>
@@ -318,7 +325,7 @@ page = f'''<!DOCTYPE html>
   </div>
 </footer>
 
-<script src="/js/landing.js?v=22"></script>
+<script src="/js/landing.js?v=24"></script>
 <script src="/js/search.js?v=12" defer></script>
 <script src="/js/source.js?v=1"></script>
 <script src="/js/preferred-source.js?v=1" defer></script>

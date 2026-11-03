@@ -582,3 +582,236 @@ for _g in CONTENT:
         _g['alternates'] = [('en-IN', 'https://yksproductions.com/talents/guides/how-to-make-a-modelling-portfolio.html'),
                             ('hi-IN', 'https://yksproductions.com/talents/guides/modelling-portfolio-kaise-banaye.html'),
                             ('x-default', 'https://yksproductions.com/talents/guides/how-to-make-a-modelling-portfolio.html')]
+
+# ============================================================ BECOME A MODEL
+CONTENT.append(dict(
+slug='how-to-become-a-model-in-india', date='2026-11-03', published='2026-11-03',
+ui=dict(byline='By Yedukrishna Suresh · Photographer &amp; filmmaker, YKS Productions · Published November 2026'),
+title='How to Become a Model in India: Step-by-Step Guide | YKS Talents',
+og_title='How to Become a Model in India — Without Paying Anyone',
+desc='How to become a model in India with no experience: the kinds of modelling work, height and age, digitals, a free portfolio, where the work is city by city, getting paid, and avoiding fee scams.',
+headline='How to become a model in India: an honest, step-by-step guide for new faces',
+crumb='How to become a model in India',
+eyebrow='Guide · Getting started',
+h1='How to become a <em>model in India</em>',
+lede='There is no single door into modelling in India, and anyone selling you a guaranteed one is selling something else. What works is unglamorous and almost free: honest digitals, a small, focused portfolio, being findable by the people who cast, and saying no to anyone who asks you to pay for work. Here is the whole route, step by step.',
+keywords='how to become a model in India, how to become a model with no experience, modelling registration India, model registration free, modelling career India, female model India, apply as a model',
+intro='''<div class="l-prose" style="margin-top:34px">
+<p>I&rsquo;m Yedukrishna Suresh. I direct and photograph fashion, beauty and brand shoots under YKS Productions, and I run YKS Talents, a free portfolio platform where clients find talent and where I cast my own shoots. I see new faces from the casting side every week. This guide is the advice I give in person: what the work actually is, what clients look at, and the order to do things in so you don&rsquo;t waste money or time.</p>
+</div>''',
+sections=[
+('the-work', 'What modelling work in India <em>actually looks like</em>', '''
+<p>When most people picture modelling they picture a runway. In India, the runway is a small part of the work. Most paid days come from brands that need a believable face next to a product. Knowing the categories helps you aim your portfolio:</p>
+<ul>
+<li><strong>Commercial and lifestyle</strong> &mdash; brand campaigns, social content, product launches. Warm, natural, relatable. This is where the most work is.</li>
+<li><strong>E-commerce and catalogue</strong> &mdash; many looks in a day for product pages. Consistency and stamina matter more than drama.</li>
+<li><strong>Ethnic, bridal and jewellery</strong> &mdash; sarees, lehengas, festive wear and fine jewellery. Clients look closely at how you carry heavy styling, your hands and your neckline.</li>
+<li><strong>Beauty and skincare</strong> &mdash; close-ups where skin, expression and small movements carry the frame.</li>
+<li><strong>Fashion and editorial</strong> &mdash; lookbooks, magazine stories and designer campaigns, where styling and attitude lead.</li>
+<li><strong>Ad films and video</strong> &mdash; TV and digital commercials, reels and launch films. Being comfortable in motion, and sometimes speaking a line, matters here.</li>
+</ul>
+<p>Modelling is freelance. Work comes in bursts around festive seasons, launches and wedding seasons, and quiet weeks are normal. Most people build it alongside study or another job at first, and that is a sensible way to start.</p>
+<div class="g-figs">
+''' + fig('/assets/behance/ashika-06.webp', 1066, 1600, 'Smiling model in a black floral strapless top against a warm studio wall, from a published YKS fashion shoot', 'Commercial warmth &mdash; the face most brands are looking for.') + '''
+''' + fig('/assets/behance/divya-08.webp', 1066, 1600, 'Model in a cropped black track jacket and white jeans on a white studio backdrop, from a published YKS fashion shoot', 'Clean studio fashion &mdash; posture and how clothes sit.') + '''
+''' + fig('/assets/behance/ashika-07.webp', 1066, 1600, 'Model in a black and white striped halter top with arms folded, in soft outdoor light, from a published YKS fashion shoot', 'Outdoor light &mdash; relaxed, but still in control of the frame.') + '''
+</div>
+<p style="margin-top:18px">All three frames are from my own released work. They are different looks, but each one is easy to read: you can see the person, the clothes and the mood in a second. That clarity is what a client scrolling a portfolio on a phone needs.</p>
+'''),
+('requirements', 'Height, age and looks &mdash; <em>what really matters</em>', '''
+<h3>Height</h3>
+<p>Height matters most for runway and high-fashion work, where clothes are sampled to a size. For commercial, beauty, ethnic and most brand work, it matters much less than people think. If you are not tall, aim your portfolio at the work that doesn&rsquo;t depend on it rather than giving up.</p>
+<h3>Age</h3>
+<p>Brands advertise to every age group, so commercial modelling isn&rsquo;t only for teenagers. Plenty of people start in their twenties or early thirties. YKS Talents is for women aged 18 to 34. If you are under 18, any modelling should involve a parent or guardian at every step, from the first message to the shoot.</p>
+<h3>Looks</h3>
+<p>There is no single &ldquo;model look&rdquo;. Brands in India cast for their own audience, and that audience is varied. What every client does look for is that you look like your photos, that your skin, hair and teeth are cared for, and that you are comfortable in front of a camera. You do not need to change your skin tone, your features or your name.</p>
+<h3>What clients notice on set</h3>
+<p>Punctuality, taking direction calmly, holding a pose without stiffness, looking after the clothes and being pleasant through a long day. These are the things that get people booked again, and none of them depends on your height or face.</p>
+'''),
+('steps', 'How to become a model, <em>step by step</em>', '''
+<ol>
+<li><strong>Shoot your digitals.</strong> Plain wall, window light, fitted plain clothes, little or no makeup: front, both profiles, three-quarter, a smile, a neutral face, waist-up and full-length. A phone and a friend are enough. My <a href="/talents/guides/model-digitals.html">guide to model digitals</a> covers what to wear and the exact poses.</li>
+<li><strong>Measure yourself accurately.</strong> Height, bust, waist, hips, shoe size. Write down the real numbers. Being caught out at a fitting costs you far more than an honest number.</li>
+<li><strong>Pick a direction.</strong> Commercial, ethnic and bridal, beauty, e-commerce, fashion. You can do several, but your first edit should look like one clear person.</li>
+<li><strong>Build a small portfolio.</strong> Six to twelve strong images plus your digitals is enough to start. A collaborative shoot with a photographer building their own work is a normal, valid route. My <a href="/talents/guides/how-to-make-a-modelling-portfolio.html">guide to making a modelling portfolio</a> has the starter shot list.</li>
+<li><strong>Make a comp card.</strong> A one-page summary with your best headshot, three or four range images and your stats. You can <a href="/talents/guides/model-comp-card.html">make one free in your browser</a>.</li>
+<li><strong>Be findable.</strong> Keep a clean Instagram, and put a curated portfolio where clients actually look for talent. A free portfolio on <a href="/talents/apply.html">YKS Talents</a> is one option; genuine agencies that take a commission on work rather than charging you are another.</li>
+<li><strong>Go to genuine castings.</strong> Check who the brand or production is before you go, and read every message carefully. A real casting tells you the brand, the date, the usage and the fee &mdash; or will when you ask.</li>
+<li><strong>Keep everything current.</strong> Update digitals whenever your hair, weight or look changes. An out-of-date portfolio loses bookings at the fitting.</li>
+</ol>
+'''),
+('cities', 'Where the work is &mdash; <em>city by city</em>', '''
+<p>You don&rsquo;t have to move to Mumbai to start. Brands shoot all over the country, and each city has its own kind of work. I&rsquo;ve written a page on how casting works in each one:</p>
+<ul>
+<li><a href="/models-in-mumbai.html">Mumbai</a> &mdash; national campaigns, ad films, beauty and editorial; the most competitive market.</li>
+<li><a href="/models-in-delhi.html">Delhi NCR</a> &mdash; bridal, couture, jewellery and e-commerce apparel.</li>
+<li><a href="/models-in-bangalore.html">Bangalore</a> &mdash; digital-first D2C, beauty and design-led brands.</li>
+<li><a href="/models-in-hyderabad.html">Hyderabad</a> &mdash; film-industry crews, heritage jewellery and bridal couture.</li>
+<li><a href="/models-in-chennai.html">Chennai</a> &mdash; silk sarees, temple jewellery and traditional wear.</li>
+<li><a href="/models-in-pune.html">Pune</a>, <a href="/models-in-kolkata.html">Kolkata</a>, <a href="/models-in-ahmedabad.html">Ahmedabad</a>, <a href="/models-in-jaipur.html">Jaipur</a> and <a href="/models-in-chandigarh.html">Chandigarh</a> &mdash; lifestyle, festive, textile, heritage and bridal work close to where collections are made.</li>
+<li><a href="/models-in-dubai.html">Dubai</a> &mdash; luxury retail, hospitality, beauty and jewellery for the Middle East, often with international casts.</li>
+</ul>
+<p>Travelling for a shoot is normal once you&rsquo;re working. Just make sure travel and stay are agreed in writing before you go.</p>
+'''),
+('money', 'What it costs, and <em>how models get paid</em>', '''
+<h3>What starting should cost</h3>
+<p>Very little. Digitals cost nothing. A comp card can be made free. A small styled shoot can be collaborative. If you choose to pay a photographer, pay for photographs, with a clear brief and a clear number of edited images &mdash; never for a promise of work.</p>
+<h3>How payment works</h3>
+<p>Models are usually paid per day or per project. The fee depends on how the images will be used: for how long, in which places and on which channels, and whether you have to avoid competing brands for a period. Payment often comes some time after the shoot, on invoice. Before you agree to anything, get the fee, the hours, the usage, the payment date and who covers travel in writing &mdash; a WhatsApp message counts if it is clear.</p>
+'''),
+('safety', 'Registration fees, scams and <em>staying safe</em>', '''
+<p>Genuine clients pay models. They don&rsquo;t charge them. Be very careful with anyone who asks you for a registration fee, a membership fee, a &ldquo;portfolio package&rdquo; tied to guaranteed work, or money to be &ldquo;shortlisted&rdquo;. I&rsquo;ve written a full guide on <a href="/talents/guides/modelling-agency-fees-scams-india.html">modelling agency fees and scams in India</a>, with the red flags and how to verify anyone.</p>
+<p class="g-callout">Basic rules that keep you safe: research the brand before any shoot; take someone with you to first meetings and unfamiliar locations; agree the wardrobe in advance and never let anyone change it on the day without your consent; and never send private photos as a &ldquo;test&rdquo;.</p>
+'''),
+('yks-talents', 'Where <em>YKS Talents</em> fits', '''
+<p>YKS Talents is a free portfolio platform I run for women aged 18 to 34 across India and the Middle East. It is one person &mdash; me &mdash; not an agency with an office.</p>
+<ul>
+<li><strong>Free, permanently.</strong> No joining fee, no registration fee, no paid tiers.</li>
+<li><strong>Not a jobs board.</strong> I don&rsquo;t offer jobs. Clients come to the platform to find talent, and I also cast my own YKS shoots from it.</li>
+<li><strong>Private.</strong> Your name and contact details are never published. Every client enquiry comes through me.</li>
+<li><strong>Read by a person.</strong> I read every application myself.</li>
+</ul>
+<p>If that sounds right for you, <a href="/talents/apply.html">create your free portfolio</a>. It takes a few minutes, and you can update it whenever your look changes.</p>
+'''),
+],
+faq=[
+('How can I become a model in India with no experience?',
+ 'Start with honest digitals shot at home in daylight, take accurate measurements, choose the kind of work that suits you, and build a small portfolio of six to twelve strong images. Then put it where clients look for talent and go to genuine castings. Experience comes from the first few shoots; nobody expects it at the start.'),
+('Do I have to pay to become a model?',
+ 'No. Genuine clients pay models; they do not charge them. Be careful of registration fees, membership fees or portfolio packages sold with a promise of work. YKS Talents has no joining or registration fee and no paid tiers. See <a href="/talents/guides/modelling-agency-fees-scams-india.html">modelling agency fees and scams in India</a>.'),
+('What height do I need to be a model in India?',
+ 'Height matters most for runway and high-fashion work. For commercial, beauty, ethnic, jewellery and most brand work it matters far less, so aim your portfolio at the work that suits you rather than ruling yourself out.'),
+('Can I start modelling in my twenties or early thirties?',
+ 'Yes. Brands advertise to every age group and cast accordingly, so plenty of people start commercial modelling in their twenties or early thirties. YKS Talents is open to women aged 18 to 34.'),
+('How do I register as a model in India?',
+ 'There is no official registration you need to pay for. You make yourself findable: a portfolio, digitals, a comp card and a profile where clients look. You can <a href="/talents/apply.html">create a free YKS Talents portfolio</a> with no registration fee.'),
+('Does YKS Talents give modelling jobs?',
+ 'No. YKS Talents is a free portfolio platform where clients find talent, and I also cast my own YKS shoots from it. It does not offer or guarantee jobs, and it never charges talent.'),
+],
+))
+
+# ============================================================ CLIENT: CASTING
+CONTENT.append(dict(
+slug='how-to-cast-models-for-a-brand-shoot', date='2026-11-03', published='2026-11-03',
+ui=dict(
+  byline='By Yedukrishna Suresh · Photographer &amp; filmmaker, YKS Productions · Published November 2026',
+  note='For brands, photographers &amp; productions · Free to brief · Every enquiry goes through me · Talent contact details are never shared',
+  end_h='Casting a shoot? <em>Send the brief</em>',
+  end_p='The look, the city, the dates and where the images will run. I come back with profiles that fit from YKS Talents across India and the Middle East &mdash; or tell you straight if nothing does.',
+  end_b1='Send a casting brief', end_b1_href='/find-models.html#brief',
+  end_b2='Find models by city', end_b2_href='/find-models.html',
+  og_alt='YKS Talents — how to cast models for a brand shoot in India and Dubai',
+),
+hero_cta='Send a casting brief →', hero_cta_href='/find-models.html#brief',
+hero_cta2='Find models', hero_cta2_href='/find-models.html',
+title='How to Cast Models for a Brand or Ad Shoot in India | YKS Talents',
+og_title='How to Cast Models for a Brand Shoot — India & Dubai',
+desc='A practical guide to hiring models for an ad, fashion or brand shoot in India or Dubai: the brief, choosing faces, models vs creators, what moves the fee, releases and usage, and the shoot day.',
+headline='How to cast models for a brand or ad shoot in India and Dubai',
+crumb='How to cast models for a brand shoot',
+eyebrow='Guide · For brands &amp; productions',
+h1='How to cast models for a <em>brand shoot</em>',
+lede='Most casting problems are decided before anyone looks at a face: an unclear brief, usage nobody agreed, a model who doesn&rsquo;t look like her photos, or a fee that changes on the day. This is how I cast for the brand shoots I direct, written for brands, photographers and producers hiring models in India and Dubai.',
+keywords='hire models for brand shoot, models for ad shoot India, how to hire a model in India, commercial models India, fashion models for brand shoot, model casting India, hire models Dubai, model release India',
+intro='''<div class="l-prose" style="margin-top:34px">
+<p>I&rsquo;m Yedukrishna Suresh. I direct and photograph fashion, beauty and brand work under YKS Productions, and I run YKS Talents, a free portfolio platform where clients find women models aged 18 to 34 across India and the Middle East. I&rsquo;m one person, not a casting agency: every brief comes to me and every booking is arranged through me. This guide is what I check on every casting, whether I&rsquo;m shooting it or your own team is.</p>
+</div>''',
+sections=[
+('start-with-usage', 'Start with <em>where the images will run</em>', '''
+<p>Before you think about faces, decide where the images will be used, for how long and in which territory. Organic social for three months and a year of paid ads, outdoor and packaging across India are completely different bookings, with different fees and different paperwork. Usage also decides the kind of face: an image that will sit on a billboard needs a different presence from one that will live in a product carousel.</p>
+<p>Write it down as four things: <strong>term</strong> (how long), <strong>territory</strong> (India, the Gulf, worldwide), <strong>channels</strong> (social, paid ads, e-commerce, print, outdoor, packaging, TV) and <strong>exclusivity</strong> (whether the model must avoid competing brands during that term). Every good casting conversation starts from those four lines.</p>
+'''),
+('the-brief', 'What to put in a <em>casting brief</em>', '''
+<p>A brief that answers these questions gets a considered shortlist rather than a pile of profiles:</p>
+<ul>
+<li><strong>The product and the brand</strong> &mdash; with a website or Instagram link.</li>
+<li><strong>The look</strong> &mdash; age range, the feeling you want, and two or three reference images. References say more than adjectives.</li>
+<li><strong>How many models</strong>, and whether they need to look like they belong together.</li>
+<li><strong>City, location and dates</strong> &mdash; including any fitting day and a back-up date for outdoor shoots.</li>
+<li><strong>Number of looks</strong> and the hours you expect on set.</li>
+<li><strong>Stills, video or both</strong> &mdash; and whether there are spoken lines or language versions.</li>
+<li><strong>Usage</strong> &mdash; the four lines above.</li>
+<li><strong>Wardrobe sensitivities</strong> &mdash; swimwear, sheer fabrics or anything else talent should know about before they say yes.</li>
+<li><strong>Budget range</strong> &mdash; even a rough one saves days of back-and-forth.</li>
+</ul>
+<p>You can send exactly this through the <a href="/find-models.html#brief">casting brief form</a>; it&rsquo;s free.</p>
+'''),
+('choosing-faces', 'Choosing faces: <em>what to check</em>', '''
+<p><strong>Ask for current digitals.</strong> Retouched portfolio images show what someone can look like at their best; digitals show what will walk onto your set. If they disagree, believe the digitals.</p>
+<p><strong>See movement.</strong> For anything with video, reels or a lot of candid lifestyle, ask for a short clip. Some people photograph beautifully and freeze in motion, and the reverse.</p>
+<p><strong>Cast for the product.</strong> Ethnic wear and jewellery need talent who know how a drape falls and how to hold hands and neckline for a close-up. Beauty needs skin and expression that survive a macro lens. E-commerce needs consistency across a lot of looks and the stamina for it. Lifestyle needs people who look like they belong in the scene.</p>
+<p><strong>Cast for the audience.</strong> Your customers should be able to see themselves in the images. Cast a range of looks when the brief allows it.</p>
+<div class="g-figs">
+''' + fig('/assets/behance/olivia-05.webp', 1200, 1600, 'Model in a white shirt and dark sunglasses looking down, in soft natural light, from a published YKS fashion shoot', 'Lifestyle &mdash; mood carried by posture, not a big pose.') + '''
+''' + fig('/assets/behance/sharmiela-02.webp', 1280, 1600, 'Model in a pale floral saree with a statement choker necklace against a light wall, from a published YKS shoot', 'Ethnic and jewellery &mdash; drape, hands and neckline do the work.') + '''
+''' + fig('/assets/behance/divya-12.webp', 1066, 1600, 'Model with arms raised in a cropped black jacket and white jeans on a white studio backdrop, from a published YKS fashion shoot', 'Studio fashion &mdash; energy and shape in a clean frame.') + '''
+</div>
+<p style="margin-top:18px">Three frames from my own released work, cast for three different jobs. The same face can do more than one, but a shortlist should be built around the one your brief actually needs.</p>
+'''),
+('models-vs-creators', 'Models or creators <em>for a brand campaign?</em>', '''
+<p>The two are often confused, and they are different bookings.</p>
+<ul>
+<li><strong>A model</strong> gives your brand a face for content you produce and publish on your own channels. You pay for the shoot time and the usage you agree.</li>
+<li><strong>A creator or influencer</strong> brings an audience. You are usually paying for content they make and post to their own followers, sometimes with rights for you to reuse it. Follower counts, engagement and posting terms become part of the deal.</li>
+</ul>
+<p>Many campaigns use both: models for the hero shoot, creators for reach. Just don&rsquo;t book one and expect the other. If you want a model&rsquo;s images on your ads, agree that usage; if you want a creator to post, agree the deliverables and dates.</p>
+'''),
+('budget', 'What moves the <em>model fee</em>', '''
+<p>There is no fixed rate for a model in India or Dubai, and anyone quoting one without asking about your usage is guessing. The fee is agreed per project, and these move it most:</p>
+<ul>
+<li><strong>Usage</strong> &mdash; term, territory, channels. The harder and longer the images work, the higher the fee.</li>
+<li><strong>Exclusivity</strong> &mdash; asking a model to turn down competing brands has to be paid for.</li>
+<li><strong>Shoot length and looks</strong> &mdash; hours on set, number of looks, any fittings.</li>
+<li><strong>Travel</strong> &mdash; out-of-city shoots add travel and stay; agree who covers what.</li>
+<li><strong>Overtime</strong> &mdash; agree the day length and what happens beyond it, before the shoot.</li>
+</ul>
+<p>There is more detail on <a href="/find-models.html#cost">what it costs to hire a model</a>. Browsing YKS Talents and sending a brief are free.</p>
+'''),
+('releases', 'Releases, usage and <em>paperwork</em>', '''
+<p>You aren&rsquo;t only paying for photographs. You&rsquo;re paying for permission to use a person&rsquo;s face for a defined purpose, in defined places, for a defined time. Put it in writing before the shoot:</p>
+<ul>
+<li>A signed <strong>model release</strong> covering the usage you agreed.</li>
+<li>The <strong>fee, payment date</strong> and how invoicing works.</li>
+<li><strong>Wardrobe</strong> agreed in advance, including anything sensitive.</li>
+<li>What happens if you want to <strong>extend usage</strong> later &mdash; renewals are far easier when the original terms were clear.</li>
+</ul>
+<p>Every model on YKS Talents is 18 or over. For bookings that come through me, I arrange the release and usage terms with the talent so they are settled before anyone arrives on set. This is practical guidance, not legal advice; for large campaigns, have your own counsel look at the contract.</p>
+'''),
+('shoot-day', 'On the day: <em>a set people want to come back to</em>', '''
+<p>A good set gets better pictures. Send a call sheet the day before with the address, call time, contact on set, the looks and what to bring. Provide a private changing space, water and proper meal breaks. Keep the agreed hours, and keep the agreed wardrobe. If anything changes, ask &mdash; don&rsquo;t assume. Talent who are comfortable give you more, and they say yes the next time you call.</p>
+'''),
+('dubai', 'Casting a shoot in <em>Dubai and the UAE</em>', '''
+<p>Dubai briefs are usually for luxury retail, hospitality, real estate, beauty and jewellery, often with a mixed or international cast. A few things are different from India:</p>
+<ul>
+<li><strong>Permits.</strong> Shooting at many public and commercial locations generally needs permission. Build that into your schedule.</li>
+<li><strong>Right to work.</strong> Talent need to be legally able to work in the UAE. Raise it early, especially if anyone is travelling in.</li>
+<li><strong>Heat.</strong> From late spring through summer, outdoor shoots move to early morning, late afternoon or indoors.</li>
+<li><strong>Casting mix.</strong> If you need an Indian or South Asian face for one market and an international cast for another, say so in the brief.</li>
+</ul>
+<p>Rules change, so confirm current requirements with your production partner. There is more on <a href="/models-in-dubai.html">casting models in Dubai</a>.</p>
+'''),
+('how-yks-works', 'How casting through <em>YKS Talents</em> works', '''
+<ol>
+<li><strong>Browse or brief.</strong> Look through the portfolios yourself, or send a brief.</li>
+<li><strong>Profiles that fit.</strong> I come back with suitable profiles from the platform, with the work behind each face. If nothing fits, I say so.</li>
+<li><strong>Terms agreed.</strong> I confirm availability with the talent and agree fee, usage and release in writing. All contact goes through me; talent contact details are never shared.</li>
+<li><strong>The shoot.</strong> Shoot with your own team, or have me direct and photograph it under YKS Productions.</li>
+</ol>
+<p>Models by city: <a href="/models-in-mumbai.html">Mumbai</a> · <a href="/models-in-delhi.html">Delhi NCR</a> · <a href="/models-in-bangalore.html">Bangalore</a> · <a href="/models-in-hyderabad.html">Hyderabad</a> · <a href="/models-in-chennai.html">Chennai</a> · <a href="/models-in-pune.html">Pune</a> · <a href="/models-in-kolkata.html">Kolkata</a> · <a href="/models-in-ahmedabad.html">Ahmedabad</a> · <a href="/models-in-jaipur.html">Jaipur</a> · <a href="/models-in-chandigarh.html">Chandigarh</a> · <a href="/models-in-dubai.html">Dubai</a>.</p>
+'''),
+],
+faq=[
+('How do I find models for a brand shoot in India?',
+ 'Decide the usage first, then write a short brief with the look, references, city, dates, number of looks and budget range. Ask for current digitals before you confirm anyone. You can browse YKS Talents or <a href="/find-models.html#brief">send a free brief</a>, and I come back with profiles that fit.'),
+('How far in advance should I book a model?',
+ 'As early as you can. Simple single-day shoots can come together quickly, but multi-day shoots, travel, festive-season dates and anything needing exclusivity need more notice, because the same faces are requested by several productions at once.'),
+('Do I need a model release in India?',
+ 'You should always have one. A signed release that states the term, territory, channels and any exclusivity protects both the brand and the model, and makes renewals straightforward. For large campaigns, have your own counsel review the contract.'),
+('Should I hire a model or an influencer for a campaign?',
+ 'A model gives you a face for content you publish on your own channels; a creator brings an audience and posts to it. Many campaigns use both. Decide which job you need done, and agree usage or posting deliverables accordingly.'),
+('Can I hire models in Dubai through YKS Talents?',
+ 'Yes. YKS Talents covers Dubai and the wider UAE as well as India. Share the location and dates early, because shooting in the UAE generally involves location permits and talent who are legally able to work there. See <a href="/models-in-dubai.html">models in Dubai</a>.'),
+('Is YKS Talents a casting agency?',
+ 'No. It is a free portfolio platform run by one person, me, Yedukrishna Suresh. Clients come to it to find talent, every enquiry and booking runs through me, and talent never pay to be on it.'),
+],
+))
