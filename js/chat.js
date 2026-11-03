@@ -288,7 +288,9 @@
     + '.yc-msg.me{align-self:flex-end;background:linear-gradient(135deg,rgba(255,140,59,.26),rgba(255,140,59,.16));'
     + 'color:#f4ede2;border:1px solid rgba(255,140,59,.28);border-bottom-right-radius:5px}'
     + '.yc-msg a{color:#ff8c3b;text-decoration:underline;text-underline-offset:2px}'
-    + '.yc-msg a.yc-cta{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;margin:6px 6px 0 0;border:1px solid rgba(255,140,59,.6);border-radius:999px;text-decoration:none;font-weight:600;white-space:nowrap}'
+    + '.yc-msg a.yc-cta{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;margin:6px 6px 0 0;border:1px solid rgba(255,140,59,.6)!important;border-radius:999px;text-decoration:none;font-weight:600;white-space:nowrap;'
+    + 'background:rgba(255,140,59,.12)!important;color:#ff8c3b!important;box-shadow:none!important;font-size:14px;line-height:1;width:auto!important;height:auto!important}'
+    + '.yc-msg a.yc-cta:hover{background:rgba(255,140,59,.22)!important}'
     /* chips live inside the log, directly under the last reply — so they read
        as part of the conversation instead of stranding a gap above the input */
     + '.yc-chips{display:flex;flex-wrap:wrap;gap:7px;padding:1px 0 6px}'
@@ -513,7 +515,7 @@
         var cta = /^(https:\/\/wa\.me\/|tel:)/.test(href);
         return '<a' + (cta ? ' class="yc-cta"' : '') + ' href="' + href + '"' + (/^tel:/.test(href) ? '' : ' target="_blank" rel="noopener"') + '>' + label + '</a>';
       })
-      .replace(/(^|[\s(])((?:https?:\/\/|\/)[^\s<)]+\.(?:html|com|ae|in)[^\s<)]*)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>')
+      .replace(/(^|[\s(])((?:https?:\/\/|\/)[^\s<)]+\.(?:html|com|ae|in)(?:[^\s<)]*[^\s<).,!?;:])?)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>')
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   }
   function add(who, text) {

@@ -161,7 +161,7 @@ const ALLOWED_ORIGINS = [
   'http://localhost:4173'
 ];
 
-const FALLBACK = wa => "I can't reach my brain right now, but I don't want to leave you stuck. Yedukrishna replies personally: [WhatsApp me](https://wa.me/" + wa + ") [Call me](tel:+" + wa + ") or send the details through /quote.html.";
+const FALLBACK = wa => "I can't reach my brain right now, but I don't want to leave you stuck. Yedukrishna replies personally: [WhatsApp me](https://wa.me/" + wa + ") [Call me](tel:+" + wa + ") or send the details through the [quote form](/quote.html).";
 
 /* Owner rule: a phone number is NEVER shown as visible text, not even in chat. Every reply
    passes through noDigits(): bare wa.me / tel links become "WhatsApp me" / "Call me" markdown
@@ -187,7 +187,8 @@ function noDigits(text, wa) {
     out += noNumbersPlain(s.slice(last, m.index), wa) + '[' + label + '](' + href + ')';
     last = LINK.lastIndex;
   }
-  return (out + noNumbersPlain(s.slice(last), wa)).replace(/\((\[(?:WhatsApp me|Call me)\]\([^)]+\))\)/g, '$1').replace(/\s+\.(\s|$)/g, '.$1');
+  return (out + noNumbersPlain(s.slice(last), wa))
+    .replace(/\b(?:I|he|Yedukrishna)\s+(?:don't|doesn't|do not|does not)\s+(?:share|give out|hand out)\s+(?:his |my |the |a )?(?:phone |mobile |personal )?number(?: directly| here| publicly)?,?\s*but\s+(?:you can\s+)?/gi, 'Quickest is to ').replace(/\((\[(?:WhatsApp me|Call me)\]\([^)]+\))\)/g, '$1').replace(/\s+\.(\s|$)/g, '.$1');
 }
 
 const SYSTEM_PROMPT = `You are IRIS — the assistant on yksproductions.com, the site of Yedukrishna Suresh, who trades as YKS Productions. He is a film-trained photographer, videographer and content creator working between Dubai (UAE) and Bangalore (India).
@@ -351,7 +352,7 @@ CRITICAL — LISTEN. Track everything they've told you. Never ask for something 
 
 WHAT YOU CANNOT DO: you can't send messages, emails or WhatsApps, make calls, book dates, or open their files. Never offer to. Hand them the link instead: "Easiest is to send this to him on [WhatsApp me](https://wa.me/971501955122)."
 
-PHONE NUMBERS: NEVER write a phone number, or any run of its digits, as text, in any language, even if they ask for "the number" directly. Don't say the number is secret or hidden; just give the links ("Quickest is [WhatsApp me](…) or [Call me](…)"). Always give the link instead, written as markdown with a word label: [WhatsApp me](https://wa.me/…) or [Call me](tel:+…). Never paste a bare wa.me address.
+PHONE NUMBERS: NEVER write a phone number, or any run of its digits, as text, in any language, even if they ask for "the number" directly. Never say the number is secret, hidden or "not shared" (you are Iris, not him, and nothing is being withheld); just give the links ("Quickest is [WhatsApp me](…) or [Call me](…)"). Always give the link instead, written as markdown with a word label: [WhatsApp me](https://wa.me/…) or [Call me](tel:+…). Never paste a bare wa.me address.
 
 THIS HOLDS IN EVERY LANGUAGE, and the fix is to write the instruction TO THEM rather than a promise FROM you. You are handing over a link they tap — you are not a messenger.
 - Hindi — say "आप उन्हें WhatsApp पर मैसेज कर दीजिए, वो खुद जवाब देंगे". NEVER "मैं भेज दूंगा", "मैं भेज सकता हूँ", "मैं आपका संदेश पहुँचा दूंगा".
