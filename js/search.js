@@ -149,7 +149,7 @@
     chips = ov.querySelector('.yks-schips');
     ov.querySelector('.yks-sesc').addEventListener('click', close);
     ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
-    input.addEventListener('input', function () { render(input.value); });
+    input.addEventListener('input', function () { render(input.value); signal(input.value); });
     input.addEventListener('keydown', onKey);
   }
 
@@ -219,18 +219,119 @@
     bts: ['behind the scenes', 'on-set', 'stills'],
     reel: ['reels', 'instagram', 'social'],
     ad: ['campaign', 'brand', 'commercial'],
-    ads: ['campaign', 'brand', 'commercial']
+    ads: ['campaign', 'brand', 'commercial'],
+    // how people actually type it — slang, Hinglish, shop-talk
+    shoot: ['photography', 'video', 'production', 'shoots'],
+    shoots: ['shoot', 'photography', 'video'],
+    film: ['films', 'video', 'brand film'],
+    films: ['film', 'video'],
+    commercial: ['ad film', 'brand', 'campaign'],
+    commercials: ['ad film', 'brand', 'campaign'],
+    tvc: ['ad film', 'commercial'],
+    advertisement: ['ad film', 'campaign'],
+    product: ['products', 'e-commerce', 'catalogue'],
+    products: ['product', 'e-commerce'],
+    ecommerce: ['e-commerce', 'product', 'catalogue'],
+    catalog: ['catalogue', 'product', 'e-commerce'],
+    catalogue: ['product', 'e-commerce'],
+    amazon: ['e-commerce', 'product'],
+    flipkart: ['e-commerce', 'product'],
+    myntra: ['e-commerce', 'fashion'],
+    influencer: ['influencers', 'creator', 'talent'],
+    influencers: ['influencer', 'creator', 'talent'],
+    creator: ['creators', 'content', 'influencer'],
+    creators: ['creator', 'content', 'influencer'],
+    ugc: ['content creator', 'reels', 'content'],
+    youtube: ['video', 'content', 'reels'],
+    instagram: ['reels', 'social', 'content'],
+    insta: ['instagram', 'reels', 'social'],
+    reels: ['reel', 'instagram', 'social', 'content'],
+    shorts: ['reels', 'youtube'],
+    wedding: ['weddings', 'bride'],
+    weddings: ['wedding'],
+    party: ['nights', 'nightlife', 'events'],
+    parties: ['party', 'nights', 'nightlife'],
+    club: ['nights', 'nightlife'],
+    event: ['events', 'launch'],
+    events: ['event', 'launch'],
+    launch: ['event', 'launches'],
+    headshot: ['headshots', 'portrait', 'linkedin'],
+    headshots: ['headshot', 'portrait', 'linkedin'],
+    hotel: ['hotels', 'resort', 'hospitality'],
+    resort: ['hotel', 'hospitality'],
+    restaurant: ['food', 'menu', 'cafe'],
+    cafe: ['food', 'restaurant'],
+    interior: ['real estate', 'property'],
+    interiors: ['real estate', 'property'],
+    villa: ['real estate', 'property'],
+    apartment: ['real estate', 'property'],
+    startup: ['corporate', 'brand'],
+    company: ['corporate', 'brand'],
+    become: ['apply', 'how to become'],
+    apply: ['register', 'join', 'talents'],
+    register: ['apply', 'join', 'registration'],
+    registration: ['apply', 'register'],
+    join: ['apply', 'talents'],
+    portfolio: ['portfolios', 'talents'],
+    modelling: ['model', 'models', 'modeling'],
+    modeling: ['modelling', 'model', 'models'],
+    actress: ['actor', 'talent', 'casting'],
+    audition: ['casting', 'talent'],
+    auditions: ['casting', 'talent'],
+    scam: ['scams', 'fees', 'red flags'],
+    agency: ['agencies', 'production house'],
+    freelance: ['independent', 'freelancer']
   };
 
-  var STOP = ('a an the do does did you your i me my we our is are was be been am can could will '
+  /* Whole-phrase rewrites run before splitting — "model banna hai" and
+     "ad video" are one idea each, not three words to match one by one. */
+  var PHRASES = [
+    [/\b(kaise|kese|kaisa|kaise\s+se)\s+(ban\w*)\s+(model|actor|actress)\b/g, 'become a $3'],
+    [/\b(model|actor|actress)\s+(kaise|kese|kaisa)\s+(ban\w*)\b/g, 'become a $1'],
+    [/\bmodel\s*(banna|banana|bane|banu|banni|bano|aakan\w*|aagan\w*|aaganum)(\s+(hai|h|he|chahta|chahti|hoon|hun|venam|venum))*\b/g, 'become a model'],
+    [/\b(actor|actress|heroine|hero)\s*(banna|banana|bane|banu|aakan\w*)(\s+(hai|h|he|chahta|chahti|hoon|hun))*\b/g, 'become an actor talents'],
+    [/\b(acting|modell?ing)\s+(chance|chances|career|opportunity|kaam|work)\b/g, 'become a model talents'],
+    [/\b(ad|ads|advert|advertisement|advertising|promo|promotional)\s*(video|videos|shoot|shoots|film|films)\b/g, 'ad film'],
+    [/\bcommercial\s+(video|shoot|film)s?\b/g, 'ad film'],
+    [/\bbrand\s+(video|shoot)s?\b/g, 'brand film'],
+    [/\bproduct\s*(shoot|shoots|photo|photos|pics|pictures|images|photoshoot)\b/g, 'product photography'],
+    [/\b(e[\s-]?com|ecom|e-?commerce)\b/g, 'e-commerce'],
+    [/\b(insta|instagram)\s+(reel|reels|video|videos)\b/g, 'reels'],
+    [/\breels?\s+(shoot|making|banana|video|videos|production)\b/g, 'reels production'],
+    [/\bpre\s*wedding\b/g, 'pre-wedding'],
+    [/\b(shaadi|shadi|vivah|kalyanam|nikah)\b/g, 'wedding'],
+    [/\bphoto\s*shoot\b/g, 'shoot'],
+    [/\bvideo\s+grapher\b/g, 'videographer'],
+    [/\bphoto\s+grapher\b/g, 'photographer'],
+    [/\bcasting\s+calls?\b/g, 'casting'],
+    [/\bfree\s+(registration|signup|sign up)\b/g, 'apply free'],
+    [/\bbengaluru\b/g, 'bangalore'], [/\bbombay\b/g, 'mumbai'], [/\bmadras\b/g, 'chennai'],
+    [/\b(gurgaon|gurugram|noida|ncr)\b/g, 'delhi'], [/\babudhabi\b/g, 'abu dhabi'],
+    [/\breal\s*estate\b/g, 'real estate']
+  ];
+
+  var STOP = ('hai h he hoon hun mujhe mera meri mere chahiye chahta chahti karna karni karwana kya ka ki ke ko se mein '
+    + 'ek wala wali venam venum vendi enikku ennu pannanum pls plz bro sir near nearby best good top '
+    + 'a an the do does did you your i me my we our is are was be been am can could will '
     + 'would should shall may might have has had of for to in on at by with from as and or but if '
     + 'it its this that these those there here what when where how why who whom which any some '
     + 'about into over under out up down off then than too very just also get got take takes '
     + 'use uses used using need needs want wants looking look please tell show me'
   ).split(' ');
 
+  function phrase(q) {
+    var l = ' ' + q.toLowerCase() + ' ';
+    PHRASES.forEach(function (p) { l = l.replace(p[0], p[1]); });
+    return l.trim();
+  }
+
+  // two-word ideas that must match together, or "ad" matches every "made"
+  var KEEP = ['ad film', 'brand film', 'product photography', 'real estate', 'abu dhabi', 'content creator', 'how to cast'];
+
   function terms(q) {
-    var raw = q.toLowerCase().replace(/[?!.,;:'"]/g, ' ').split(/\s+/).filter(Boolean);
+    var l = phrase(q);
+    KEEP.forEach(function (k) { l = l.split(k).join(k.replace(/ /g, '\u00a0')); });
+    var raw = l.replace(/[?!.,;:'"]/g, ' ').split(/[ \t\n]+/).filter(Boolean).map(function (w) { return w.replace(/\u00a0/g, ' '); });
     var kept = raw.filter(function (w) { return STOP.indexOf(w) === -1; });
     return kept.length ? kept : raw;
   }
@@ -240,7 +341,7 @@
   // Levenshtein, abandoned as soon as every cell in a row exceeds max
   function dist(a, b, max) {
     if (Math.abs(a.length - b.length) > max) return max + 1;
-    var prev = [], cur = [], i, j;
+    var pp = [], prev = [], cur = [], i, j;
     for (j = 0; j <= b.length; j++) prev[j] = j;
     for (i = 1; i <= a.length; i++) {
       cur[0] = i;
@@ -248,9 +349,13 @@
       for (j = 1; j <= b.length; j++) {
         cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1,
                           prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+        // swapped neighbours ("dubia", "potrait") count as one slip, not two
+        if (i > 1 && j > 1 && a.charAt(i - 1) === b.charAt(j - 2) && a.charAt(i - 2) === b.charAt(j - 1))
+          cur[j] = Math.min(cur[j], pp[j - 2] + 1);
         if (cur[j] < best) best = cur[j];
       }
       if (best > max) return max + 1;
+      pp = prev.slice();
       prev = cur.slice();
     }
     return prev[b.length];
@@ -264,8 +369,11 @@
     for (var i = 0; i < vocab.length; i++) {
       var v = vocab[i];
       if (Math.abs(v.length - w.length) > max) continue;
-      if (v.charAt(0) !== w.charAt(0)) continue;   // typos rarely hit the first letter
-      var d = dist(w, v, max);
+      // typos rarely hit the first letter — but phones do, so long words get one free swap
+      var firstOk = v.charAt(0) === w.charAt(0);
+      if (!firstOk && w.length < 6) continue;
+      var d = dist(w, v, firstOk ? max : 1);
+      if (!firstOk && d > 1) continue;
       if (d < bd) { bd = d; best = v; if (d === 1) break; }
     }
     return best;
@@ -310,15 +418,64 @@
   var CAT_BOOST = { Work: 7, Home: 3, Market: 3, Services: 2, Talent: 2, Journal: 0, Info: 0 };
 
   function catRank(c) {
+    var it = intentNow();
+    // someone building a portfolio, or casting one, wants Talent first
+    if (c === 'Talent' && it && (it.audience === 'talent' || it.audience === 'cast')) return -1;
     var i = CAT_ORDER.indexOf(c);
     return i < 0 ? 99 : i;
   }
 
   function inFilter(e) { return !activeSub || (e.g && e.g.indexOf(activeSub) !== -1); }
 
+  /* Does a word occur anywhere on the site (literally or via a synonym)? */
+  function known(w) {
+    var alts = [w].concat(SYN[w] || []);
+    for (var i = 0; i < index.length; i++) {
+      for (var j = 0; j < alts.length; j++) if (index[i]._h.indexOf(alts[j]) !== -1) return true;
+    }
+    return false;
+  }
+
+  /* Soft AND: a stray word that exists nowhere on the site ("bro", a typo
+     past saving) should not zero out an otherwise good query. Fix it if we
+     can, drop it if we can't — as long as something meaningful remains. */
+  function tidy(t) {
+    var out = [], changed = false;
+    t.forEach(function (w) {
+      if (known(w)) { out.push(w); return; }
+      var f = fix(w);
+      if (f && f !== w) { out.push(f); changed = true; }
+      else if (t.length > 1) changed = true;              // dropped
+      else out.push(w);
+    });
+    return { t: out.length ? out : t, changed: changed };
+  }
+
+  /* On-device intent (js/smart.js) nudges ties, never overrides relevance */
+  var SVC_WORDS = {
+    adfilm: ['ad film', 'brand film', 'production'], product: ['product', 'e-commerce', 'catalogue'],
+    corporate: ['corporate', 'headshot'], events: ['event', 'nights'], realestate: ['real estate', 'property'],
+    fashion: ['fashion', 'editorial'], wedding: ['wedding'], reels: ['reels', 'content'],
+    hospitality: ['hotel', 'food'], portrait: ['portrait'], marketing: ['marketing'],
+    talent: ['apply', 'become', 'portfolio', 'guides'], cast: ['find-models', 'models-in', 'cast']
+  };
+  function intentNow() {
+    try { return window.YKSSmart && window.YKSSmart.enabled() ? window.YKSSmart.intent() : null; } catch (e) { return null; }
+  }
+  function boost(e, it) {
+    if (!it) return 0;
+    var b = 0, h = e._h;
+    if (it.city && h.indexOf(it.city.replace('-', ' ')) !== -1 || it.city && e.u.indexOf(it.city) !== -1) b += 3;
+    var ws = SVC_WORDS[it.service] || [];
+    for (var i = 0; i < ws.length; i++) if (h.indexOf(ws[i]) !== -1) { b += 3; break; }
+    if (it.audience === 'talent' && e.c === 'Talent' && !/\/talents\/id\//.test(e.u)) b += 3;
+    return b;
+  }
+
   function rank(t) {
+    var it = intentNow();
     return index.filter(inFilter)
-      .map(function (e) { return { e: e, s: score(e, t) }; })
+      .map(function (e) { var s = score(e, t); return { e: e, s: s ? s + boost(e, it) : 0 }; })
       .filter(function (r) { return r.s > 0; })
       .sort(function (a, b) { return b.s - a.s; })
       .map(function (r) { return r.e; });
@@ -387,8 +544,24 @@
       r.unshift(add);
       r = r.slice(0, 6);
       try { localStorage.setItem(RECENT_KEY, JSON.stringify(r)); } catch (e) {}
+      signal(add, true);
     }
     return r;
+  }
+
+  /* What visitors look for tells js/smart.js what to suggest. The event
+     carries the query only; smart.js drops anything that looks personal. */
+  var sigTimer = 0, lastSig = '';
+  function signal(q, now) {
+    clearTimeout(sigTimer);
+    q = (q || '').trim();
+    if (q.length < 3) return;
+    var fire = function () {
+      if (q.toLowerCase() === lastSig) return;
+      lastSig = q.toLowerCase();
+      try { window.dispatchEvent(new CustomEvent('yks:search', { detail: { q: q } })); } catch (e) {}
+    };
+    if (now) fire(); else sigTimer = setTimeout(fire, 1200);
   }
 
   /* ---------- AI ---------- */
@@ -515,22 +688,37 @@
         return;
       }
 
-      var r = recent();
-      list.innerHTML = r.length
-        ? '<div class="yks-sgrp">Recent</div>' + r.map(function (s, i) {
-            return '<a class="yks-sr" data-i="' + i + '" data-recent="' + esc(s) + '" href="#">' +
-              '<b>' + esc(s) + '</b></a>';
-          }).join('')
-        : '<div class="yks-smsg">Search the whole site, or pick a subject above.' +
-          (aiReady() ? '<br>Ask a real question and Iris answers it.' : '') + '</div>';
+      var r = recent(), sug = [], n = 0;
+      try { if (window.YKSSmart && window.YKSSmart.enabled()) sug = window.YKSSmart.suggestQueries(); } catch (e) {}
+      sug = sug.filter(function (x) { return r.indexOf(x) === -1; });
+      var row = function (s) {
+        return '<a class="yks-sr" data-i="' + (n++) + '" data-recent="' + esc(s) + '" href="#"><b>' + esc(s) + '</b></a>';
+      };
+      var start = r.length || sug.length ? '' : ['ad film production', 'product photography', 'photographer in Dubai', 'become a model'];
+      list.innerHTML = (sug.length ? '<div class="yks-sgrp">Suggested for you</div>' + sug.map(row).join('') : '') +
+        (r.length ? '<div class="yks-sgrp">Recent</div>' + r.map(row).join('') : '') +
+        (start ? '<div class="yks-smsg">Search the whole site, or pick a subject above.' +
+          (aiReady() ? '<br>Ask a real question and Iris answers it.' : '') + '</div>' +
+          '<div class="yks-sgrp">Try</div>' + start.map(row).join('') : '');
       bind(q);
       return;
     }
 
     if (!index) { list.innerHTML = '<div class="yks-smsg">Loading…</div>'; return; }
 
-    var t = terms(q);
-    results = rank(t);
+    var t = terms(q), suggest = '';
+    var td = tidy(t);
+    if (td.changed) {
+      var soft = rank(td.t);
+      if (soft.length) { results = soft; corrected = td.t.join(' '); t = td.t; }
+    }
+    if (!corrected) results = rank(t);
+
+    // few results — would a corrected spelling find more? offer it, don't force it
+    if (!corrected && results.length && results.length < 3) {
+      var alt2 = t.map(function (w) { return w.length >= 5 ? (fix(w) || w) : w; });
+      if (alt2.join(' ') !== t.join(' ') && rank(alt2).length > results.length) suggest = alt2.join(' ');
+    }
 
     // nothing matched — try correcting each term once
     if (!results.length) {
@@ -540,12 +728,30 @@
         if (alt.length) { results = alt; corrected = fixed.join(' '); t = fixed; }
       }
     }
+    // still nothing on a long query ("model banna hai delhi") — accept pages
+    // that miss just one of the words, best overall match first
+    var nearMode = false;
+    if (!results.length && t.length >= 3) {
+      nearMode = true;
+      var it2 = intentNow(), near = [];
+      t.forEach(function (skip, k) {
+        var sub = t.filter(function (_, m) { return m !== k; });
+        index.filter(inFilter).forEach(function (e) {
+          var s = score(e, sub);
+          if (s) near.push({ e: e, s: s + boost(e, it2) });
+        });
+      });
+      var seenU = {};
+      results = near.sort(function (a, b) { return b.s - a.s; })
+        .filter(function (r) { var id = r.e.u + '#' + (r.e.a || ''); if (seenU[id]) return false; seenU[id] = 1; return true; })
+        .map(function (r) { return r.e; });
+    }
+
     // Relevance decides WHICH pages make the cut; section priority decides the
     // order they're shown in — so the portfolio is never buried under blog posts
     // and service pages for a query about work he actually shot.
-    results = results.slice(0, 24).sort(function (a, b) {
-      return catRank(a.c) - catRank(b.c);
-    });
+    results = results.slice(0, 24);
+    if (!nearMode) results.sort(function (a, b) { return catRank(a.c) - catRank(b.c); });
 
     var ai = aiReady();
     var key = q.toLowerCase().trim();
@@ -559,6 +765,9 @@
     if (corrected) {
       out += '<div class="yks-sfix">Showing results for <b>' + esc(corrected) + '</b> — ' +
         '<button type="button" data-exact="1">search ' + esc(q) + ' instead</button></div>';
+    } else if (suggest) {
+      out += '<div class="yks-sfix">Did you mean <button type="button" data-dym="' + esc(suggest) + '">' +
+        esc(suggest) + '</button>?</div>';
     }
 
     var group = '';
@@ -608,6 +817,8 @@
       var id = !el.dataset.ai && !el.dataset.recent && samePage(el.getAttribute('href') || '');
       if (id) el.addEventListener('click', function (ev) { ev.preventDefault(); jump(id, q); });
     });
+    var dym = list.querySelector('[data-dym]');
+    if (dym) dym.addEventListener('click', function () { input.value = dym.dataset.dym; render(input.value); input.focus(); });
     var ex = list.querySelector('[data-exact]');
     if (ex) ex.addEventListener('click', function () { corrected = ''; askAI(q); });
     var cs = list.querySelector('[data-clearsub]');
@@ -672,6 +883,7 @@
   function open(seed) {
     if (!input) mount();
     lastFocus = document.activeElement;
+    clearTimeout(closeT);
     ov.classList.add('on');
     requestAnimationFrame(function () { ov.classList.add('in'); });
     // rAF throttles in background tabs; without this the overlay can sit
@@ -688,10 +900,12 @@
     });
   }
 
+  var closeT;
   function close() {
     ov.classList.remove('in');
     document.documentElement.style.overflow = '';
-    setTimeout(function () { ov.classList.remove('on'); }, 200);
+    clearTimeout(closeT);
+    closeT = setTimeout(function () { ov.classList.remove('on'); }, 200);
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 

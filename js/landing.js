@@ -193,6 +193,8 @@
     var onSent = ui.onSent || noop, onFail = ui.onFail || noop;
     var skip = /\/talents\/apply/.test(location.pathname) || meta.form === 'waitlist';
     (skip ? Promise.resolve({ route: 'client', category: 'client', rules: 'none', ai: { status: 'skipped' } }) : classify(fields, meta)).then(function (v) {
+      // tell js/smart.js what the classifier decided — category + service label only, never the message
+      if (!skip) try { window.dispatchEvent(new CustomEvent('yks:classified', { detail: { category: v.category, route: v.route, service: String((fields && (fields.service || fields.type)) || '').slice(0, 60) } })); } catch (e) {}
       var withMeta = function (extra) { var m = {}, k; for (k in meta) m[k] = meta[k]; for (k in extra) m[k] = extra[k]; return m; };
       var keywordTalent = v.rules === 'talent' && v.route !== 'talent';
       if (v.route !== 'talent' || !ui.anchor) {

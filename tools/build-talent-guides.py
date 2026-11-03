@@ -359,6 +359,7 @@ def page(g):
 </footer>
 
 <script src="/js/landing.js?v=24"></script>
+<script src="/js/smart.js?v=1" defer></script>
 {scripts}</body>
 </html>
 """

@@ -294,7 +294,8 @@ def tail(source, watext, related_line=''):
 <script src="/js/lead.js?v=2"></script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=9"></script>
-<script src="/js/search.js?v=11" defer></script>
+<script src="/js/search.js?v=13" defer></script>
+<script src="/js/smart.js?v=1" defer></script>
 <script src="/js/source.js?v=1"></script>
 <script src="/js/preferred-source.js?v=1" defer></script>
 <script src="/js/rail.js?v=6"></script>
