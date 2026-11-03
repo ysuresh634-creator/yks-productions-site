@@ -51,9 +51,6 @@
 .l-play::after{content:"";border-style:solid;border-width:13px 0 13px 21px;border-color:transparent transparent transparent #07060a;margin-left:5px}
 .l-reel-frame:hover .l-play{transform:scale(1.08);box-shadow:0 12px 34px rgba(255,140,59,.4)}
 @media(max-width:760px){.l-reel-inner{grid-template-columns:1fr;justify-items:center;text-align:center;gap:30px}.l-reel-frame{max-width:300px}}
-.l-vgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.l-vgrid video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:#000;display:block;cursor:pointer}
-@media(max-width:760px){.l-vgrid{grid-template-columns:1fr 1fr}}
 </style>
 
 <script type="application/ld+json">
@@ -299,20 +296,13 @@
   </div>
 </section>
 
-<!-- DUBAI PROPERTY REELS -->
+<!-- PROPERTY FILMS: recent reels shared on request -->
 <section class="l-section alt">
   <div class="wrap">
     <div class="l-head"><p class="l-eyebrow">01</p>
-      <h2>Dubai property, <em>in motion</em></h2>
-      <p>Recent vertical films from a Dubai real-estate shoot — the social-first reels that sell off-plan and fill viewings.</p>
+      <h2>Property films, <em>on request</em></h2>
+      <p>More real estate work on request. <a href="https://wa.me/971501955122?text=Hi%20Yedukrishna%2C%20could%20you%20share%20some%20recent%20real%20estate%20films%3F" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;text-underline-offset:3px">WhatsApp me</a> and I’ll send recent property films that match your project.</p>
     </div>
-    <div class="l-vgrid">
-      <video class="l-vreel" data-src="/assets/realestate/dubai-property-1.mp4" muted loop playsinline preload="none" aria-label="Dubai real estate property film"></video>
-      <video class="l-vreel" data-src="/assets/realestate/dubai-property-2.mp4" muted loop playsinline preload="none" aria-label="Dubai real estate property film"></video>
-      <video class="l-vreel" data-src="/assets/realestate/dubai-property-3.mp4" muted loop playsinline preload="none" aria-label="Dubai real estate property film"></video>
-      <video class="l-vreel" data-src="/assets/realestate/dubai-property-4.mp4" muted loop playsinline preload="none" aria-label="Dubai real estate property film"></video>
-    </div>
-    <p class="l-form-alt" style="text-align:center;margin-top:18px">Tap a reel to unmute</p>
   </div>
 </section>
 
@@ -529,38 +519,13 @@
   });
 })();
 
-/* Dubai property reels — lazy-play when in view, tap to unmute */
-(function(){
-  var vids = document.querySelectorAll('.l-vreel');
-  if(!vids.length) return;
-  /* slow or data-saver connection (js/contact.js sets this): hold the reels until tapped */
-  if(document.documentElement.getAttribute('data-yks-net') === 'slow'){
-    /* js/fx.js holds them and plays one on tap */
-    var hint = vids[0].parentNode.parentNode.querySelector('.l-form-alt');
-    if(hint) hint.textContent = 'Your connection looks slow, so the reels wait for you: tap one to play it';
-    return;
-  }
-  if('IntersectionObserver' in window){
-    var io = new IntersectionObserver(function(es){
-      es.forEach(function(e){
-        var v = e.target;
-        if(e.isIntersecting){ if(!v.src){ v.src = v.dataset.src; } v.play().catch(function(){}); }
-        else { v.pause(); }
-      });
-    }, { threshold: 0.35 });
-    vids.forEach(function(v){ io.observe(v); });
-  } else {
-    vids.forEach(function(v){ v.src = v.dataset.src; v.play().catch(function(){}); });
-  }
-  vids.forEach(function(v){ v.addEventListener('click', function(){ v.muted = !v.muted; }); });
-})();
 </script>
 <script src="/js/chat-config.js"></script>
 <script src="/js/chat.js?v=9"></script>
   <script src="/js/search.js?v=13" defer></script>
 <script src="/js/smart.js?v=4" defer></script>
-<script src="/js/source.js?v=2"></script>
-<script src="/js/preferred-source.js?v=2" defer></script>
+<script src="/js/source.js?v=3"></script>
+<script src="/js/preferred-source.js?v=3" defer></script>
 <script src="/js/rail.js?v=6"></script>
 </body>
 </html>

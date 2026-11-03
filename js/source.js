@@ -87,7 +87,8 @@
         t: Date.now()
       };
       // not when the visitor turned personalisation off (yksproductions.com/privacy.html)
-      try { if (localStorage.getItem('yks_smart_off') !== '1') localStorage.setItem(STORE, JSON.stringify(stored)); } catch (e) {}
+      var dnt = navigator.doNotTrack === '1' || window.doNotTrack === '1' || navigator.msDoNotTrack === '1' || navigator.globalPrivacyControl === true;
+      try { if (!dnt && localStorage.getItem('yks_smart_off') !== '1') localStorage.setItem(STORE, JSON.stringify(stored)); } catch (e) {}   // nothing stored under Do Not Track / GPC or after Turn off
     }
   }
 

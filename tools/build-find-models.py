@@ -334,8 +334,8 @@ page = f'''<!DOCTYPE html>
 <script src="/js/landing.js?v=25"></script>
 <script src="/js/search.js?v=13" defer></script>
 <script src="/js/smart.js?v=4" defer></script>
-<script src="/js/source.js?v=2"></script>
-<script src="/js/preferred-source.js?v=2" defer></script>
+<script src="/js/source.js?v=3"></script>
+<script src="/js/preferred-source.js?v=3" defer></script>
 <script src="/js/rail.js?v=6"></script>
 </body>
 </html>
