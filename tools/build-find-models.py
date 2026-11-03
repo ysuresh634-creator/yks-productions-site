@@ -43,6 +43,8 @@ FAQ = [
   'Yes. Talent on YKS Talents are cast for ad films, digital and TV commercials, reels, launch films and brand campaigns as well as stills. Say in the brief whether you need video, spoken lines or language versions, and the profiles I send will reflect it. My guide on <a href="/talents/guides/how-to-cast-models-for-a-brand-shoot.html">how to cast models for a brand shoot</a> covers the whole process.'),
  ('Can I hire models in Dubai and the UAE?',
   'Yes. YKS Talents covers Dubai and the wider UAE as well as India. Shooting in the UAE generally involves location permits and talent who are legally able to work there, so share dates and locations early. See <a href="/models-in-dubai.html">models in Dubai</a>.'),
+ ('Can I find international or foreign models for a shoot in India?',
+  'Say so in the brief. If YKS Talents has a profile that fits the look and is able to work where you are shooting, I send it; if not, I tell you straight rather than pad the shortlist. Foreign nationals need the right visa to do paid work in India, so confirm that before you book anyone. There is more in the <a href="/talents/guides/foreign-models-in-india.html">guide for foreign models in India</a>.'),
  ('Can you shoot it as well?',
   'Yes. If you want the shoot handled too, I direct and photograph it under YKS Productions and quote the production as one clear number. If you already have a photographer, you can still find and book talent here through me without booking me to shoot.'),
  ('What about model releases and usage rights?',

@@ -815,3 +815,113 @@ faq=[
  'No. It is a free portfolio platform run by one person, me, Yedukrishna Suresh. Clients come to it to find talent, every enquiry and booking runs through me, and talent never pay to be on it.'),
 ],
 ))
+
+CONTENT.append(dict(
+slug='foreign-models-in-india', date='2026-11-03', published='2026-11-03',
+ui=dict(
+  byline='By Yedukrishna Suresh · Photographer &amp; filmmaker, YKS Productions · Published November 2026',
+  note='For international models · Free forever · No fees · No jobs offered · No visa help or sponsorship · Women 18&ndash;34',
+  og_alt='YKS Talents — a guide for foreign and international models looking at modelling work in India',
+  html_lang='en', in_lang='en',
+),
+audience={'@type': 'PeopleAudience', 'audienceType': 'International models considering modelling work in India', 'suggestedGender': 'Female', 'suggestedMinAge': 18, 'suggestedMaxAge': 34},
+content_location={'@type': 'Country', 'name': 'India'},
+title='Foreign Models in India: A Guide for International Models | YKS Talents',
+og_title='Modelling in India as a Foreign Model — An Honest Guide',
+desc='For international models considering India: where foreign faces get booked, visas and the right to work, contracts, safety, what Indian clients look for, and a free portfolio you can create from any country.',
+headline='Foreign models in India: an honest guide for international models',
+crumb='Foreign models in India',
+eyebrow='Guide · For international models',
+h1='Modelling in India as a <em>foreign model</em>',
+lede='India is a large, busy market for fashion, beauty and brand shoots, and international faces do get booked here. But it is not a place to fly into on a promise. This is what I tell models from other countries who ask me about working in India: where the work is, what the visa rules mean for you, how to protect yourself, and how to be findable without paying anyone.',
+keywords='foreign models in India, international models India, modelling jobs in India for foreigners, foreign model work India, models from abroad India, European models India, Russian models India, Brazilian models India, model visa India, foreign female models India',
+intro='''<div class="l-prose" style="margin-top:34px">
+<p>I&rsquo;m Yedukrishna Suresh. I direct and photograph fashion, beauty and brand shoots under YKS Productions, and I run YKS Talents, a free portfolio platform where clients find women models aged 18 to 34 across India and the Middle East, and where I cast my own shoots. I&rsquo;m one person, not an agency. I don&rsquo;t offer jobs, arrange travel or help with visas, so nothing on this page is a sales pitch for any of those. It is the honest picture I would want if I were looking at India from abroad.</p>
+</div>''',
+sections=[
+('the-market', 'Where international faces <em>get booked in India</em>', '''
+<p>Most work in India goes to Indian talent, and that is right: brands want customers to see themselves in the images. International models are booked when a brief calls for a specific look. The briefs that most often ask for one are:</p>
+<ul>
+<li><strong>Fashion e-commerce and catalogue</strong> &mdash; western wear, basics, denim and activewear, often shot in long studio days with many looks.</li>
+<li><strong>Premium and international brands</strong> &mdash; labels selling in India and abroad who want one campaign for several markets.</li>
+<li><strong>Luxury, hospitality and real estate</strong> &mdash; hotels, residences and lifestyle campaigns that want a global feel.</li>
+<li><strong>Beauty, hair and skincare</strong> &mdash; particularly for products positioned as international.</li>
+<li><strong>Ad films and digital video</strong> &mdash; commercials and reels where a specific look is part of the story.</li>
+</ul>
+<p>Mumbai is the centre of fashion and advertising production, followed by Delhi NCR and Bangalore, with regular shoots in Hyderabad, Chennai and Pune. Work is project-based and seasonal: busy around festive campaigns and launches, quiet at other times. No one can honestly promise a fixed number of bookings before you arrive.</p>
+<div class="g-figs">
+''' + fig('/assets/behance/olivia-06.webp', 1200, 1600, 'Model in a white shirt, wide-leg jeans and sunglasses sitting on stone steps outside a glass building, from a published YKS fashion shoot', 'Western wear on location &mdash; the kind of brief that often asks for a specific look.') + '''
+''' + fig('/assets/behance/olivia-08.webp', 1200, 1600, 'Model in a white shirt and sunglasses adjusting her hair at an outdoor caf&eacute; table, from a published YKS lifestyle shoot', 'Lifestyle &mdash; relaxed, believable, product-friendly.') + '''
+</div>
+'''),
+('visas', 'Visas and the <em>right to work</em>', '''
+<p>This is the part that catches people out, so I&rsquo;ll be direct. I&rsquo;m not a lawyer or a visa adviser, and the rules change; the official sources below are what count.</p>
+<ul>
+<li><strong>A tourist visa or e-Tourist visa does not allow paid work in India.</strong> The Government of India&rsquo;s own guidance says tourist visas cannot be used for any kind of work, employment or contract, and working on one can be treated as a visa violation. A paid modelling shoot is work.</li>
+<li><strong>Paid work generally needs the right visa, usually an Employment visa</strong>, which is applied for from your own country with a contract from an organisation registered in India. Requirements, documents and fees vary by nationality.</li>
+<li><strong>Check the official sources yourself:</strong> the Government of India visa portal at <a href="https://indianvisaonline.gov.in/" target="_blank" rel="noopener">indianvisaonline.gov.in</a>, and the Indian embassy or consulate in the country where you live.</li>
+</ul>
+<p>Be wary of anyone who tells you to come on a tourist visa &ldquo;because everyone does&rdquo;. If something goes wrong, you carry the risk, not them. YKS Talents does not sponsor visas, write invitation letters or give immigration advice.</p>
+'''),
+('before-you-travel', 'Before you <em>book a flight</em>', '''
+<p>If someone offers you work in India, get these in writing before you travel:</p>
+<ul>
+<li><strong>Who the client is</strong> &mdash; a real company you can look up, not just a phone number.</li>
+<li><strong>The dates, city and fee</strong> &mdash; and when and how you will be paid.</li>
+<li><strong>Usage</strong> &mdash; where the images will run, for how long and in which countries.</li>
+<li><strong>Who pays for flights and accommodation</strong>, and whether any of it is deducted from your fee later.</li>
+<li><strong>The visa route</strong> &mdash; who is responsible for it, and on what basis you will be working.</li>
+</ul>
+<p>If an offer is vague on any of these, treat it as a conversation, not a job.</p>
+'''),
+('safety', 'Red flags <em>for international models</em>', '''
+<ul>
+<li><strong>Any fee to join, register or be &ldquo;placed&rdquo;.</strong> Legitimate clients pay you. See my guide to <a href="/talents/guides/modelling-agency-fees-scams-india.html">modelling fees and scams in India</a>.</li>
+<li><strong>Anyone asking to hold your passport.</strong> Your passport stays with you.</li>
+<li><strong>Pressure to work on a tourist visa</strong>, or to describe paid work as a holiday.</li>
+<li><strong>Unpaid &ldquo;trial&rdquo; shoots that never end</strong>, or a fee that keeps shrinking after you arrive.</li>
+<li><strong>Accommodation or living costs</strong> taken from your earnings without a written agreement.</li>
+<li><strong>Private meetings</strong> at hotels or homes instead of a studio or office. Bring someone, or don&rsquo;t go.</li>
+</ul>
+<p>Trust your judgement. A real booking survives you asking questions.</p>
+'''),
+('what-clients-want', 'What Indian clients <em>look for</em>', '''
+<p>The basics are the same everywhere, but a few things help in India:</p>
+<ul>
+<li><strong>Current digitals</strong> &mdash; clean, natural light, no heavy retouching. My guide to <a href="/talents/guides/model-digitals.html">model digitals</a> covers what to wear and how to shoot them.</li>
+<li><strong>Measurements in centimetres and inches</strong> &mdash; height, bust, waist, hips and shoe size. Indian clients use both.</li>
+<li><strong>A short, focused portfolio</strong> &mdash; a few strong, varied images beat forty similar ones. See <a href="/talents/guides/how-to-make-a-modelling-portfolio.html">how to make a modelling portfolio</a>.</li>
+<li><strong>A clear note on where you are</strong> &mdash; the country you live in now, and whether you are already able to work in India or the UAE. Clients plan castings around that.</li>
+<li><strong>Comfort with ethnic and festive styling</strong> is a plus. Many Indian campaigns include sarees, lehengas or jewellery, and a model who carries them well stands out.</li>
+</ul>
+'''),
+('middle-east', 'Already in <em>Dubai or the Gulf?</em>', '''
+<p>YKS Talents covers the Middle East as well as India. If you live in the UAE or elsewhere in the Gulf, clients there can find you too, and the same rule applies: you need to be legally able to work where the shoot is. There is more on <a href="/models-in-dubai.html">models in Dubai</a>.</p>
+'''),
+('yks-talents', 'Joining YKS Talents <em>from outside India</em>', '''
+<p>You can create your portfolio from anywhere. It is free, and it stays free: no joining fee, no registration fee, no paid tiers.</p>
+<ol>
+<li><strong>Open the <a href="/talents/apply.html">free portfolio form</a>.</strong> It is for women aged 18 to 34.</li>
+<li><strong>Where you live:</strong> choose your country from the list, or pick &ldquo;Other country&rdquo; and type it in, then add your state or region and town. Do the same for your home country.</li>
+<li><strong>Phone:</strong> include your country code, so I can reach you on WhatsApp.</li>
+<li><strong>Write in English.</strong> Your About me and every other field should be in English letters.</li>
+<li><strong>Add your photos</strong> &mdash; at least five, including two clear face close-ups and a full-length shot.</li>
+</ol>
+<p>To be clear about what this is and isn&rsquo;t: YKS Talents is a portfolio platform. Clients come to it to find faces, and I cast my own shoots from it, but it doesn&rsquo;t offer jobs, promise bookings, arrange travel or help with visas. Your contact details are never shown; any client enquiry comes through me.</p>
+'''),
+],
+faq=[
+('Can foreign models work in India?',
+ 'Yes. International models are booked in India, mostly for fashion e-commerce, premium brands, beauty and hospitality campaigns. But paid work needs the right visa, usually an Employment visa applied for from your own country; a tourist visa does not allow it. Check <a href="https://indianvisaonline.gov.in/" target="_blank" rel="noopener">indianvisaonline.gov.in</a> and your nearest Indian embassy or consulate.'),
+('Can I do modelling work in India on a tourist visa or e-Visa?',
+ 'No. Government of India guidance says tourist visas cannot be used for any work, employment or contract, and working on one can be treated as a visa violation. A paid shoot is work. This is general information, not legal advice; confirm with official sources before you travel.'),
+('Does YKS Talents help with visas or offer modelling jobs in India?',
+ 'No. YKS Talents is a free portfolio platform. It does not offer jobs, promise bookings, sponsor visas, write invitation letters or arrange travel. Clients find talent on it, I cast my own shoots from it, and any enquiry comes through me.'),
+('Can I join YKS Talents if I live outside India?',
+ 'Yes, if you are a woman aged 18 to 34. In the <a href="/talents/apply.html">free portfolio form</a>, choose your country or pick &ldquo;Other country&rdquo; and type it in, add your state or region and town, and give a phone number with your country code. Everything must be written in English.'),
+('Do I have to pay anything to be on YKS Talents?',
+ 'No. There is no joining fee, registration fee or paid tier, now or later. If anyone asks you to pay to be considered for modelling work in India, walk away.'),
+('Which Indian cities have the most modelling work?',
+ 'Mumbai is the centre of fashion and advertising production, followed by Delhi NCR and Bangalore, with regular shoots in Hyderabad, Chennai and Pune. Work is project-based and seasonal, so no one can honestly promise you a set number of bookings.'),
+],
+))

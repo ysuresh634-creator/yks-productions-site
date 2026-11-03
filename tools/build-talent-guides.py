@@ -33,6 +33,7 @@ GUIDES = {
   'model-digitals': ('What to wear for model digitals', 'Model digitals: क्या पहनें (English)'),
   'model-comp-card': ('Model comp card + free comp card maker', 'Comp card + free comp card maker (English)'),
   'modelling-agency-fees-scams-india': ('Modelling agency fees and scams in India', 'Agency fees और scams (English)'),
+  'foreign-models-in-india': ('Foreign models in India: a guide', 'Foreign models के लिए India guide (English)'),
   'how-to-cast-models-for-a-brand-shoot': ('How to cast models for a brand shoot', 'Brand shoot के लिए models कैसे cast करें (English)'),
   'modelling-portfolio-kaise-banaye': ('मॉडलिंग पोर्टफोलियो कैसे बनाएं (Hindi)', 'मॉडलिंग पोर्टफोलियो कैसे बनाएं'),
 }
@@ -142,6 +143,8 @@ def page(g):
             'publisher': {'@id': f'{SITE}/#business'},
             'about': {'@id': f'{SITE}/talents.html#yks-talents'},
             'keywords': g['keywords'],
+            **({'audience': g['audience']} if g.get('audience') else {}),
+            **({'contentLocation': g['content_location']} if g.get('content_location') else {}),
         },
         {
             '@type': 'BreadcrumbList',
@@ -274,6 +277,7 @@ def page(g):
     <a href="/talents/guides/model-digitals.html">Digitals</a>
     <a href="/talents/guides/model-comp-card.html">Comp card</a>
     <a href="/talents/guides/modelling-agency-fees-scams-india.html">Fees &amp; scams</a>
+    <a href="/talents/guides/foreign-models-in-india.html">International models</a>
     <a href="/talents/guides/modelling-portfolio-kaise-banaye.html" lang="hi">हिंदी</a>
     <span class="l-cats-div" aria-hidden="true"></span>
     <a href="/find-models.html">Find models</a>
