@@ -165,6 +165,11 @@ img{display:block;max-width:100%;height:auto}
 .hero-cta .hero-cta-wa{background:rgba(7,6,10,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .hero-cta svg{flex:none;width:16px;height:16px}
 .hero-cta + .hero-meta{margin-top:36px}
+.hero-talent{margin:18px auto 0;text-align:center;font-size:15px;line-height:1.5;max-width:92vw}
+.hero-talent a{display:inline-block;padding:10px 18px;border-radius:999px;background:rgba(7,6,10,.55);border:1px solid rgba(255,140,59,.6);color:#f6f1e9;text-decoration:none}
+.hero-talent a b{color:#ff8c3b;font-weight:600}
+.hero-talent span{display:block;margin-top:6px;font-size:12.5px;color:rgba(246,241,233,.7)}
+.hero-talent + .hero-meta{margin-top:28px}
 @media (max-height:760px){.hero-cta{margin-top:2.4vh}.hero-cta + .hero-meta{margin-top:2.6vh}}
 @media (max-width:420px){.hero-cta{gap:10px}.hero-cta .btn{min-width:0;flex:1 1 0;padding-left:14px;padding-right:14px}}
 .hero-meta b{display:block;font-family:var(--font-m);font-weight:400;font-size:9.5px;letter-spacing:.3em;
