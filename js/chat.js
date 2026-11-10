@@ -551,7 +551,7 @@
         if (ACTIONS[c]) {
           var href = ACTIONS[c];
           if (window.gtag) gtag('event', 'chat_action', { method: c });
-          if (/^https?:/.test(href)) window.open(href, '_blank', 'noopener');
+          if (/wa\.me|whatsapp/i.test(href) && window.YKSGate) window.YKSGate.open(href); else if (/^https?:/.test(href)) window.open(href, '_blank', 'noopener');
           else location.href = href;
           return;
         }
