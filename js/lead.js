@@ -230,7 +230,7 @@
       var pretty = new Date(iso + 'T00:00:00').toLocaleDateString('en-GB',
         { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       var msg = 'Hi Yedukrishna, are you free on ' + pretty + '? I\'d like to talk about a shoot.';
-      window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      var u = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(msg); if (window.YKSGate) window.YKSGate.open(u); else window.open(u, '_blank', 'noopener');
     });
   })();
 
