@@ -598,14 +598,11 @@
     var followVerified = '';
     say('Checking your follow\u2026');
     followCheck(D.handle).then(function (f) {
-      if (f === false) {   // stop here: nothing uploaded or sent, everything typed stays put
-        busy = false; sync(); submitBtn.textContent = 'Submit application';
-        say('Please follow @yks_photoworks first, then tap Submit again.');
-        if (refollow) refollow.hidden = false;
-        if (statusEl.scrollIntoView) statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-      }
-      if (f === true) followVerified = 'yes'; else FLAGS.push('Follow check unavailable');
+      // never block: the follower list check gives false "no" results (e.g. private accounts, handle
+      // typos, Instagram limits), so a "no" is only a review flag for Yedukrishna, never a stop.
+      if (f === true) followVerified = 'yes';
+      else if (f === false) { followVerified = 'no'; FLAGS.push('Follow not confirmed by check'); }
+      else FLAGS.push('Follow check unavailable');
       submitBtn.textContent = 'Sending\u2026';
       send();
     });
