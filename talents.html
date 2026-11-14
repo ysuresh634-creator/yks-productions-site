@@ -355,7 +355,7 @@
         </p>
         <div class="tal-cta-row">
           <a class="tal-cta-main" href="/talents/apply.html">Build my portfolio — free</a>
-          <a class="tal-cta-ghost" href="#cast">Casting? Send a brief</a>
+          <a class="tal-cta-ghost" href="/find-models.html#brief">Casting? Send a brief</a>
         </div>
       </div>
 
@@ -544,7 +544,7 @@
         <button class="tal-chip" data-val="uae">UAE</button>
       </div>
     </div>
-    <p class="tal-seed-note">New faces join the edit every week. Nothing here is the whole roster &mdash; <a href="#cast">send a brief</a> to see everyone who fits yours.</p>
+    <p class="tal-seed-note">New faces join the edit every week. Nothing here is the whole roster &mdash; <a href="/find-models.html#brief">send a brief</a> to see everyone who fits yours.</p>
 
     <!-- grid (each card carries its full profile in data-* for the modal) -->
     <div class="tal-grid" id="talGrid">
@@ -628,7 +628,7 @@
       </li>
     </ol>
     <div class="tal-steps-cta">
-      <a class="btn btn-fill" href="#cast">Send a brief →</a>
+      <a class="btn btn-fill" href="/find-models.html#brief">Send a brief →</a>
     </div>
   </div>
 </section>
@@ -722,7 +722,7 @@
   <div class="wrap">
     <div class="l-head">
       <h2>YKS Talents — <em>the questions I get</em></h2>
-      <p>For talent and for clients, across India and the Middle East. If yours isn't here, <a href="#cast">ask it in the brief</a> and I'll answer it straight.</p>
+      <p>For talent and for clients, across India and the Middle East. If yours isn't here, <a href="/find-models.html#brief">ask it in the brief</a> and I'll answer it straight.</p>
     </div>
     <div class="l-faq">
       <details><summary>Does YKS Talents offer modelling jobs?</summary><p>No. YKS Talents does not offer jobs, placements or guaranteed work to anyone. It is a portfolio platform: you build and present a polished portfolio, and clients use the platform to find the right talent for their shoots. Client enquiries come through YKS Talents, so your contact details stay private.</p></details>
@@ -798,65 +798,7 @@
 
 
 
-<section class="l-cta" id="cast">
-  <div class="wrap">
-    <p class="tal-kicker">Casting</p>
-    <h2>Looking to <em>cast someone?</em></h2>
-    <p>Tell me the brief — the look, the city, the dates — and I'll come back with a shortlist and one all-in number.</p>
-    <form class="cast-form" id="castForm" novalidate>
-      <div class="cast-row">
-        <label>Your name<input type="text" name="client_name" placeholder="You / your brand" required /></label>
-        <label>Email or phone<input type="text" name="client_contact" placeholder="How I reach you" required /></label>
-      </div>
-      <label>What are you casting?<textarea name="brief" rows="3" placeholder="The look, the usage, how many faces — a line or two is plenty." required></textarea>
-        <span class="cast-aid"><button type="button" class="cast-ai" id="castAi">✨ Tidy up my brief</button><small>Rough notes are fine — this shapes them into a clear brief.</small></span></label>
-      <div class="cast-row3">
-        <label>City<input type="text" name="city" placeholder="Mumbai, Dubai…" /></label>
-        <label>Dates<input type="text" name="shoot_dates" placeholder="e.g. 12–13 Sep" /></label>
-        <label>Budget <span class="cast-opt">optional</span><input type="text" name="budget" placeholder="Ballpark's fine" /></label>
-      </div>
-      <div class="cast-actions">
-        <button type="submit" class="btn btn-fill">Send the brief →</button>
-      </div>
-      <p class="cast-ok" id="castOk" hidden>✓ Got it — I'll come back with a shortlist and one all-in number. Thank you.</p>
-    </form>
-  </div>
-</section>
 
-
-<script>
-(function () {
-  var ENGINE = 'https://yks-talents-engine.ysuresh634.workers.dev';
-  var f = document.getElementById('castForm'); if (!f) return;
-  // AI: shape a rough note into a clear casting brief (never invents budget, dates or brands)
-  var aiBtn = document.getElementById('castAi');
-  if (aiBtn) aiBtn.addEventListener('click', function () {
-    var el = f.brief, src = (el.value || '').trim();
-    if (!src) { el.focus(); return; }
-    var old = aiBtn.textContent; aiBtn.disabled = true; aiBtn.textContent = '✨ Writing…';
-    var done = false, to = setTimeout(function () { if (!done) { done = true; aiBtn.disabled = false; aiBtn.textContent = old; } }, 20000);
-    fetch(ENGINE + '/ai/write', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: 'brief', text: src }) })
-      .then(function (r) { return r.json(); })
-      .then(function (j) { if (done) return; done = true; clearTimeout(to); if (j && j.text) el.value = j.text; aiBtn.disabled = false; aiBtn.textContent = old; })
-      .catch(function () { if (done) return; done = true; clearTimeout(to); aiBtn.disabled = false; aiBtn.textContent = old; });
-  });
-  f.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!f.checkValidity()) { f.reportValidity(); return; }
-    var btn = f.querySelector('button[type="submit"]'), orig = btn.textContent;
-    btn.disabled = true; btn.textContent = 'Sending…';
-    var d = { client_name: f.client_name.value, client_contact: f.client_contact.value, brief: f.brief.value, city: f.city.value, shoot_dates: f.shoot_dates.value, budget: f.budget.value };
-    fetch(ENGINE + '/bookings/new', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) })
-      .then(function (r) { return r.json(); })
-      .then(function (j) {
-        if (!j || !j.ok) throw new Error('x');
-        f.reset(); document.getElementById('castOk').hidden = false; btn.textContent = 'Sent ✓';
-        if (window.gtag) gtag('event', 'casting_brief');
-      })
-      .catch(function () { btn.disabled = false; btn.textContent = orig; alert('Couldn’t send just now — please WhatsApp me instead and I’ll pick it up.'); });
-  });
-})();
-</script>
 
 </main>
 
