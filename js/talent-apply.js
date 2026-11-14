@@ -1,7 +1,14 @@
 /* YKS Talents — the application (one screen, mobile-first).
 
+   Fail-proof rules (Nov 2026): nothing outside the form can stop a real applicant.
+   Follow tap, follow check, AI bio and the PDF build are all optional: on failure or
+   timeout they only add a review flag. Photos are converted/compressed on the phone
+   (HEIC → JPEG, shrunk until the set fits), the post is retried, and if it still can't
+   go through she gets a WhatsApp fallback. Everything typed (and the photos, where the
+   browser allows) is kept on the device until a successful send.
+
    Order is strict and every step lives in ONE handler chain:
-     1. Follow @yks_photoworks (tap) → submit unlocks
+     1. Follow @yks_photoworks (tap): a nudge only, submit is never locked behind it
      2. Submit → every field validated → board gate (the select's own value)
         → photos + PDF → Apps Script (Drive + owner email) → engine
      3. Only then: "Last step: send me a WhatsApp" — the number is assembled
@@ -20,13 +27,14 @@
   // YKS Talents intake (Google Apps Script web app on the owner's Google account).
   // It re-checks every rule server-side, saves to Drive and emails the owner.
   var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_36FeQLa2AsN-GzlYZWhT-VgqQ9UabIogrysT_5eHl-tZWbpNAkZhg26S3E2l3QRp/exec';
-  var SEND_TIMEOUT = 180000;   // up to 12 photos + the PDF can take a couple of minutes on a slow phone
+  var SEND_TIMEOUT = 150000;   // per try: up to 12 photos + the PDF can take a couple of minutes on a slow phone
+  var RETRY_WAITS = [4000, 10000];   // two more tries after a dropped / failed post (the script de-duplicates)
   var ENGINE_URL = 'https://yks-talents-engine.ysuresh634.workers.dev';
   var MAX_RAW = 12 * 1024 * 1024;   // a photo the phone can't re-encode is sent as-is up to this size
   // photo prep before sending, sharper for short sets; each step down is used only if the set is over budget.
   // Apps Script has no published cap on a web-app POST (reports put failures around ~24 MB+), so the
   // whole body is kept under ~14 MB of base64: photos ≤ ~9.5 MB, the PDF ≤ ~4 MB.
-  var PREP_STEPS = [[2000, 0.85], [1800, 0.82], [1600, 0.78], [1400, 0.74]];
+  var PREP_STEPS = [[2000, 0.85], [1800, 0.82], [1600, 0.78], [1400, 0.74], [1200, 0.7], [1024, 0.66]];
   var PHOTO_BUDGET = 9.5e6, PDF_BUDGET = 4.2e6, BODY_CAP = 16e6;   // base64 characters
   var BLOCKED = 'Sorry, this application can\u2019t be submitted right now.';
   // live follower check (workers/follow-check). Unreachable / slow / unsure → null → the
@@ -48,21 +56,23 @@
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var form = $('#talForm'); if (!form) return;
   var submitBtn = $('#taSubmit'), statusEl = $('#taStatus');
+  var SUBMIT_LABEL = (submitBtn.textContent || '').trim() || 'Submit application';
   var followBtn = $('#taFollow'), followTick = $('#taFollowed'), followHint = $('#taFollowHint');
   var photos = [];          // File[] — the ordered set: close-up 1, close-up 2, full-length, mid-shot, other, extras
   var followed = false, busy = false;
   var T0 = Date.now(), MIN_MS = 8000;   // a real person can't fill this in under ~8 s; scripts and replays can
 
   function say(t) { statusEl.textContent = t || ''; statusEl.hidden = !t; }
-  function sync() { submitBtn.disabled = !followed || busy; }   // photo checks never disable submit; submit explains what's missing
+  function sync() { submitBtn.disabled = busy; }   // only an in-flight send disables submit; submit explains anything missing
 
-  /* ── 1 · follow ── */
-  followBtn.addEventListener('click', function () {
+  /* ── 1 · follow: a gentle nudge, never a lock ── */
+  function markFollowed() {
     followed = true; followTick.checked = true;
     followBtn.classList.add('done'); followBtn.querySelector('span').textContent = 'Following @yks_photoworks \u2713';
     if (followHint) followHint.hidden = true;
-    sync();
-  });
+  }
+  followBtn.addEventListener('click', function () { markFollowed(); try { localStorage.setItem('yks_apply_followed', '1'); } catch (e) {} });
+  try { if (localStorage.getItem('yks_apply_followed') === '1') markFollowed(); } catch (e) {}
   sync();
 
   /* ── photos: 5 labelled slots (2 face close-ups first) + up to 3 extras ──
@@ -77,9 +87,35 @@
     { k: 'mid', label: 'Mid-shot', sub: 'waist up', cap: 'Mid-shot' },
     { k: 'other', label: 'One more', sub: 'any other angle or look', cap: 'Other' }
   ];
-  var MIN_PHOTOS = 5, MAX_EXTRA = 7, MIN_SIDE = 800;   // 5 required + up to 7 extras = 12
+  // MIN_SIDE: below this a photo is refused (it can't print). 600 lets WhatsApp-forwarded photos
+  // (720×1280) through; anything under GOOD_SIDE is accepted but flagged for review.
+  var MIN_PHOTOS = 5, MAX_EXTRA = 7, MIN_SIDE = 600, GOOD_SIDE = 800;   // 5 required + up to 7 extras = 12
   var slotBox = $('#taSlots'), slotState = {}, extras = [], pending = 0;
   function isImg(f) { return /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif|avif)$/i.test(f.name); }
+  function isHeic(f) { return /image\/hei[cf]/i.test(f.type || '') || /\.(heic|heif)$/i.test(f.name || ''); }
+  function loadScript(src, test) {
+    return new Promise(function (res) {
+      if (test()) return res(true);
+      var s = document.createElement('script'); s.src = src;
+      s.onload = function () { res(test()); }; s.onerror = function () { res(false); };
+      document.head.appendChild(s);
+    });
+  }
+  function asFile(blob, name, type) {
+    try { return new File([blob], name, { type: type }); } catch (e) { try { blob.name = name; } catch (e2) {} return blob; }
+  }
+  // HEIC this browser can't show (Android Chrome, older Safari) → JPEG on the phone, so it previews,
+  // gets size-checked and compresses like any other photo. null if it can't (then it goes as-is).
+  function heicToJpeg(f) {
+    var work = loadScript('/js/vendor/heic2any.min.js', function () { return !!window.heic2any; }).then(function (ok) {
+      if (!ok) return null;
+      return window.heic2any({ blob: f, toType: 'image/jpeg', quality: 0.9 }).then(function (o) {
+        var b = Array.isArray(o) ? o[0] : o;
+        return b && b.size ? asFile(b, String(f.name || 'photo').replace(/\.[^.]*$/, '') + '.jpg', 'image/jpeg') : null;
+      }, function () { return null; });
+    }, function () { return null; });
+    return Promise.race([work, new Promise(function (res) { setTimeout(function () { res(null); }, 90000); })]);
+  }
   function hex(buf) { return [].map.call(new Uint8Array(buf), function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); }
   function sha(f) {
     try { if (!(window.crypto && crypto.subtle && f.arrayBuffer)) return Promise.resolve(''); return f.arrayBuffer().then(function (b) { return crypto.subtle.digest('SHA-256', b); }).then(hex, function () { return ''; }); }
@@ -107,21 +143,31 @@
   function dupOf(e, skip) {
     var all = entries();
     for (var i = 0; i < all.length; i++) { var o = all[i]; if (o === skip) continue;
-      if ((o.file.name === e.file.name && o.file.size === e.file.size) || (e.sha && o.sha === e.sha) || ham(e.d, o.d) <= 3) return o; }
+      if ((o.file.name === e.file.name && o.file.size === e.file.size) || (e.sha && o.sha === e.sha) || ham(e.d, o.d) <= 2) return o; }
     return null;
   }
   function check(f) {   // → Promise<{ok, e, msg}>
     if (!isImg(f)) return Promise.resolve({ ok: false, msg: 'That file isn\u2019t a photo. Add a JPG, PNG or HEIC.' });
-    pending++; sync();
+    pending++; if (isHeic(f)) { var pc = $('#taPhotoCount'); if (pc) pc.textContent = 'Reading your HEIC photo\u2026 a few seconds.'; }
     return Promise.all([sha(f), look(f)]).then(function (r) {
-      pending--; sync();
-      var e = { file: f, sha: r[0], w: r[1].w, h: r[1].h, d: r[1].d };
+      if (r[1].w || !isHeic(f)) return [f, r[0], r[1]];
+      return heicToJpeg(f).then(function (j) {
+        if (!j) return [f, r[0], r[1]];
+        return look(j).then(function (l) { return l.w ? [j, r[0], l] : [f, r[0], r[1]]; });
+      });
+    }).then(function (r3) {
+      pending--;
+      var f0 = f; f = r3[0]; var r = [r3[1], r3[2]];
+      var e = { file: f, orig: f0, sha: r[0], w: r[1].w, h: r[1].h, d: r[1].d };
       if (dims && e.w) dims.set(f, [e.w, e.h]);
       if (!e.w && f.size > MAX_RAW) return { ok: false, msg: 'This photo is too large to send (' + Math.round(f.size / 1048576) + ' MB). Pick a JPG version of it, or a smaller copy.' };
       if (e.w && Math.min(e.w, e.h) < MIN_SIDE) return { ok: false, msg: 'This photo is too small (' + e.w + '\u00d7' + e.h + '). Use the original from your camera roll, at least ' + MIN_SIDE + ' px on the short side.' };
       var d = dupOf(e);
       if (d) return { ok: false, msg: 'That\u2019s the same photo as ' + (d.cap ? '\u201c' + d.cap + '\u201d' : 'one you already added') + '. Each slot needs a different photo.' };
       return { ok: true, e: e };
+    }, function () {   // never leave the counter stuck: a failed read lets the photo through as-is
+      pending = Math.max(0, pending - 1); slotErr('');
+      return f.size > MAX_RAW ? { ok: false, msg: 'This photo couldn\u2019t be read on this phone. Pick another photo, or a screenshot of it.' } : { ok: true, e: { file: f, orig: f, sha: '', w: 0, h: 0, d: '' } };
     });
   }
   function thumb(e, onRemove, cap, sub) {
@@ -174,12 +220,15 @@
     var n = SLOTS.filter(function (x) { return slotState[x.k]; }).length;
     $('#taPhotoCount').textContent = n + ' of ' + MIN_PHOTOS + ' required added' + (extras.length ? ' + ' + extras.length + ' extra' : '');
     photos = ordered();
+    if (n && slotBox.parentNode && fieldBox(slotBox).classList.contains('bad') && !photoProblem()) clearErr(slotBox);
+    if (typeof keepPhotos === 'function') keepPhotos();
   }
   // PDF order: close-up 1 is the cover, the full-length sits beside the profile (its caption reads
   // FULL LENGTH), then close-up 2, mid-shot, the other photo and any extras
   function pdfOrder() {
-    var o = ['close1', 'full', 'close2', 'mid', 'other'].map(function (k) { return slotState[k] && slotState[k].file; }).filter(Boolean);
-    return o.concat(extras.map(function (e) { return e.file; }));
+    // the phone-prepared JPEG when there is one: lighter to decode (no memory crash) and HEIC-safe
+    var o = ['close1', 'full', 'close2', 'mid', 'other'].map(function (k) { return slotState[k] && (slotState[k]._prep || slotState[k].file); }).filter(Boolean);
+    return o.concat(extras.map(function (e) { return e._prep || e.file; }));
   }
   // what's still missing, in words — '' when the set is complete
   function photoProblem() {
@@ -244,7 +293,8 @@
     if (!photos.length) F.push('No photos');
     else photos.forEach(function (f, i) {
       var d = dims && dims.get(f);
-      if (f.size < 25 * 1024 || (d && Math.min(d[0], d[1]) < 400)) F.push('Photo ' + (i + 1) + ' very small (' + Math.round(f.size / 1024) + ' KB' + (d ? ', ' + d[0] + '\u00d7' + d[1] : '') + ')');
+      if (f.size < 25 * 1024 || (d && Math.min(d[0], d[1]) < GOOD_SIDE)) F.push('Photo ' + (i + 1) + ' low resolution (' + Math.round(f.size / 1024) + ' KB' + (d ? ', ' + d[0] + '\u00d7' + d[1] : '') + ')');
+      else if (!d) F.push('Photo ' + (i + 1) + ' couldn\u2019t be previewed on her phone (sent as-is)');
     });
     return F;
   }
@@ -480,7 +530,14 @@
           var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
           var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
           URL.revokeObjectURL(u);
-          c.toBlob(function (bl) { res(bl ? { blob: bl, mime: 'image/jpeg', ext: 'jpg' } : null); }, 'image/jpeg', q);
+          var viaUrl = function () {   // some phones hand back no blob for a big canvas: try the data URL instead
+            try { var du = c.toDataURL('image/jpeg', q), bin = atob(du.split(',')[1] || ''), arr = new Uint8Array(bin.length);
+              for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+              res(arr.length > 1000 ? { blob: new Blob([arr], { type: 'image/jpeg' }), mime: 'image/jpeg', ext: 'jpg' } : null);
+            } catch (e2) { res(null); }
+          };
+          if (c.toBlob) c.toBlob(function (bl) { if (bl && bl.size > 1000) res({ blob: bl, mime: 'image/jpeg', ext: 'jpg' }); else viaUrl(); }, 'image/jpeg', q);
+          else viaUrl();
         } catch (e) { URL.revokeObjectURL(u); res(null); }
       };
       im.onerror = function () { URL.revokeObjectURL(u); res(null); };
@@ -489,15 +546,38 @@
       if (r) return r;
       if (f.size > MAX_RAW) throw new Error('raw too large');
       var m = rawMime(f); return { blob: f, mime: m, ext: (f.name.split('.').pop() || 'jpg').toLowerCase() };
-    }).then(function (r) { return b64(r.blob).then(function (d) { return { mime: r.mime, ext: r.ext, data: d }; }); });
+    }).then(function (r) { return b64(r.blob).then(function (d) { return { mime: r.mime, ext: r.ext, data: d, blob: r.mime === 'image/jpeg' && r.blob !== f ? r.blob : null }; }); });
   }
   // POST as text/plain: Apps Script can't answer a CORS preflight, and a simple request needs none.
   // fetch follows the 302 to script.googleusercontent.com and reads the JSON.
   function postIntake(body) {
-    var ctl = typeof AbortController === 'function' ? new AbortController() : null;
-    var t = setTimeout(function () { if (ctl) ctl.abort(); }, SEND_TIMEOUT);
+    var ctl = typeof AbortController === 'function' ? new AbortController() : null, timedOut = false;
+    var t = setTimeout(function () { timedOut = true; if (ctl) ctl.abort(); }, SEND_TIMEOUT);
     return fetch(APPS_SCRIPT_URL, { method: 'POST', redirect: 'follow', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body, signal: ctl ? ctl.signal : undefined })
-      .then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('http ' + r.status); return r.json(); }, function (e) { clearTimeout(t); throw e; });
+      .then(function (r) {
+        clearTimeout(t); if (!r.ok) throw new Error('http ' + r.status);
+        return r.text().then(function (x) { try { return JSON.parse(x); } catch (e) { throw new Error('not json'); } });   // a Google error page is a network failure, not an answer
+      }, function (e) { clearTimeout(t); if (timedOut) e = new Error('timeout'); throw e; });
+  }
+  function wait(ms) { return new Promise(function (res) { setTimeout(res, ms); }); }
+  // the post with 2 more tries (backoff) for anything that isn't a real answer from the script
+  function postWithRetry(body, note) {
+    var n = 0;
+    function go() {
+      return postIntake(body).catch(function (er) {
+        if (n >= RETRY_WAITS.length) throw er;
+        var ms = RETRY_WAITS[n++];
+        note('Connection dropped \u2014 trying again (' + n + ' of ' + RETRY_WAITS.length + ')\u2026 keep this page open.');
+        return wait(ms).then(go);
+      });
+    }
+    return go();
+  }
+  // last resort when the browser can't read the reply (some in-app browsers): send it blind.
+  // Resolves true if the request left the phone; the script still validates and de-duplicates.
+  function postBlind(body) {
+    try { return fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body }).then(function () { return true; }, function () { return false; }); }
+    catch (e) { return Promise.resolve(false); }
   }
   var PORTFOLIO_JS = '/js/talent-portfolio.js?v=8';
   // one id per application: seeds the portfolio's art direction (name + id), so the uploaded PDF and a
@@ -552,21 +632,143 @@
   function vitals(D) { return { height: D.height_full, heightShort: D.height_short, bust: D.bust, waist: D.waist, hips: D.hips, shoe: D.shoe, hair: D.hair, eyes: D.eyes }; }
   function source() { try { var v = JSON.parse(localStorage.getItem('yks_src_v1') || 'null'); return v && v.src ? v.src + (v.camp ? ' · ' + v.camp : '') : 'Direct'; } catch (e) { return 'Direct'; } }
 
+  /* ── keep everything she typed (and her photos) on this phone until a send succeeds ──
+     Text → localStorage, photos → IndexedDB. Both best-effort: a browser that refuses
+     storage (private mode, some in-app browsers) just doesn't get the restore. */
+  var DRAFT_KEY = 'yks_apply_draft_v1', SKIP = { website: 1, botcheck: 1, height: 1 }, restoring = false;
+  function draftFields() { return [].filter.call(form.elements, function (el) { return el.name && !SKIP[el.name] && el.type !== 'file' && el.type !== 'submit' && el.type !== 'button'; }); }
+  var saveT;
+  function saveDraft() {
+    if (restoring) return;
+    clearTimeout(saveT);
+    saveT = setTimeout(function () {
+      try {
+        var v = {}; draftFields().forEach(function (el) { if (el.value) v[el.name] = el.value; });
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({ v: v, hMode: hMode, t0: T0, at: Date.now() }));
+      } catch (e) {}
+    }, 300);
+  }
+  function clearDraft() {
+    try { localStorage.removeItem(DRAFT_KEY); localStorage.removeItem('yks_apply_followed'); } catch (e) {}
+    idb(function (st) { st.delete('set'); }, 'readwrite');
+  }
+  function restoreDraft() {
+    var d; try { d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) { d = null; }
+    if (!d || !d.v || Date.now() - (d.at || 0) > 30 * 864e5) return;
+    restoring = true;
+    try {
+      ['live_country', 'home_country'].forEach(function (n) { if (d.v[n] && form[n]) { form[n].value = d.v[n]; geoSync(n.split('_')[0]); } });
+      if (d.hMode === 'cm') { var cmBtn = document.querySelector('.ta-unit[data-unit=cm]'); if (cmBtn) cmBtn.click(); }
+      draftFields().forEach(function (el) { if (d.v[el.name] != null && el.name.slice(-8) !== '_country') { el.value = d.v[el.name]; } });
+      syncHeight();
+      if (form.about) form.about.dispatchEvent(new Event('input'));
+      if (d.t0 && d.t0 < T0) T0 = d.t0;   // her time on the form counts from the first visit
+    } catch (e) {}
+    restoring = false;
+  }
+  form.addEventListener('input', saveDraft);
+  form.addEventListener('change', saveDraft);
+  [].forEach.call(document.querySelectorAll('.ta-unit'), function (b) { b.addEventListener('click', saveDraft); });
+  restoreDraft();
+
+  function idb(fn, mode) {
+    try {
+      if (!window.indexedDB) return;
+      var rq = indexedDB.open('yks_apply', 1);
+      rq.onupgradeneeded = function () { rq.result.createObjectStore('photos'); };
+      rq.onsuccess = function () {
+        try { var db = rq.result, tx = db.transaction('photos', mode || 'readonly'); fn(tx.objectStore('photos')); tx.oncomplete = tx.onerror = tx.onabort = function () { db.close(); }; } catch (e) {}
+      };
+      rq.onerror = function () {};
+    } catch (e) {}
+  }
+  var photosRestored = false, keepT;
+  function keepPhotos() {
+    if (!photosRestored) return;   // don't overwrite the saved set before it has been read back
+    clearTimeout(keepT);
+    keepT = setTimeout(function () {
+      var list = SLOTS.filter(function (x) { return slotState[x.k]; }).map(function (x) { var e = slotState[x.k]; return { k: x.k, b: e.file, n: e.file.name || 'photo.jpg', t: e.file.type || '' }; })
+        .concat(extras.map(function (e) { return { k: 'extra', b: e.file, n: e.file.name || 'photo.jpg', t: e.file.type || '' }; }));
+      idb(function (st) { st.put(list, 'set'); }, 'readwrite');
+    }, 400);
+  }
+  (function restorePhotos() {
+    var done = false, finish = function () { if (done) return; done = true; photosRestored = true; renderSlots(); };
+    setTimeout(finish, 4000);   // storage that never answers must not freeze the photo slots
+    idb(function (st) {
+      var g = st.get('set');
+      g.onsuccess = function () {
+        var list = Array.isArray(g.result) ? g.result : [];
+        if (!list.length || done) return finish();
+        list.reduce(function (p, it) {
+          return p.then(function () {
+            if (!it || !it.b || done) return;
+            var f = asFile(it.b, it.n, it.t || it.b.type || 'image/jpeg');
+            return check(f).then(function (r) {
+              if (!r.ok) return;
+              if (it.k === 'extra') { if (extras.length < MAX_EXTRA) { r.e.cap = 'Extra ' + (extras.length + 1); extras.push(r.e); } }
+              else if (!slotState[it.k]) { var s = SLOTS.filter(function (x) { return x.k === it.k; })[0]; if (s) { r.e.cap = s.label; slotState[it.k] = r.e; } }
+            }, function () {});
+          });
+        }, Promise.resolve()).then(finish, finish);
+      };
+      g.onerror = finish;
+    });
+    if (!window.indexedDB) finish();
+  })();
+
+  /* ── when the send can't go through: a WhatsApp fallback (number built here, never shown) ── */
+  function hideFallback() { var f = $('#taFail'); if (f) f.hidden = true; }
+  function showFallback(D, text) {
+    var box = $('#taFail');
+    if (!box) {
+      box = document.createElement('div'); box.id = 'taFail'; box.className = 'ta-fail';
+      box.innerHTML = '<p class="ta-fail-msg"></p><a class="ta-wa" target="_blank" rel="noopener" data-no-gate><span>Send me a WhatsApp instead</span></a>';
+      statusEl.parentNode.insertBefore(box, statusEl.nextSibling);
+    }
+    box.querySelector('.ta-fail-msg').textContent = text;
+    var msg = 'Hi Yedukrishna, I tried to apply to YKS Talents on your website but the form wouldn\u2019t send.' +
+      '\nName: ' + (D.name || '') + '\nInstagram: ' + (D.handle ? 'https://instagram.com/' + D.handle : '') + '\nCity: ' + (D.city || '') +
+      '\nI can send my photos here.';
+    box.querySelector('a').href = 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(msg);
+    box.hidden = false;
+    if (box.scrollIntoView) statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  var LABELS = { name: 'Full name', phone: 'Phone', email: 'Email', instagram: 'Instagram', category: 'Category', gender: 'Gender', dob: 'Date of birth',
+    live_country: 'Country you live in', live_state: 'State you live in', city: 'Town / city', home_country: 'Home country', home_state: 'Home state',
+    education: 'Highest education', course: 'Course / field', training: 'Extra training', height: 'Height', bust: 'Bust', waist: 'Waist', hips: 'Hips', about: 'About me' };
+  // the script's own checks, mapped back to the field she has to fix
+  var SERVER_FIELD = { bad_email: 'email', bad_phone: 'phone', bad_instagram: 'instagram', bad_age: 'dob', bad_height: 'height', bad_bust: 'bust', bad_waist: 'waist',
+    bad_hips: 'hips', bad_about: 'about', bad_education: 'education', photos: 'photos', duplicate: 'photos' };
+  function goTo(el) {
+    var box = el === slotBox ? fieldBox(slotBox) : fieldBox(el);
+    if (box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var f = el === slotBox ? null : focusFor(el);
+    if (f && f.focus) try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); }
+  }
+
   /* ── 2 · submit ── */
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (busy) return;
-    say('');
-    if (!followed) { say('Tap \u201cFollow @yks_photoworks\u201d first.'); return; }
-    var first = null;
+    say(''); hideFallback();
+    var bad = [];
     Object.keys(CHECKS).forEach(function (n) {
-      var el = form[n]; if (n === 'height') syncHeight();
+      var el = form[n]; if (!el) return; if (n === 'height') syncHeight();
       var m = CHECKS[n](String(el.value || '').trim());
-      if (m) { setErr(el, m); first = first || focusFor(el); } else clearErr(el);
+      if (m) { setErr(el, m); bad.push({ n: n, el: el, m: m }); } else clearErr(el);
     });
     var pp = photoProblem(); photos = ordered();
-    if (pp) { setErr(slotBox, pp); first = first || slotBox; }
-    if (first) { say(first === slotBox && pp ? pp : 'Please fix the fields marked in red.' + (pp ? ' ' + pp : '')); (first === slotBox ? first : fieldBox(first)).scrollIntoView({ behavior: 'smooth', block: 'center' }); if (first.focus) first.focus({ preventScroll: true }); return; }
+    if (pp) { setErr(slotBox, pp); bad.push({ n: 'photos', el: slotBox, m: pp }); }
+    if (bad.length) {
+      // first in page order, named, so she knows exactly where to look
+      bad.sort(function (a, b) { return fieldBox(a.el).compareDocumentPosition(fieldBox(b.el)) & 4 ? -1 : 1; });
+      var f0 = bad[0], what = f0.n === 'photos' ? 'Photos' : (LABELS[f0.n] || f0.n);
+      say('Please fix \u201c' + what + '\u201d: ' + f0.m + (bad.length > 1 ? ' (' + (bad.length - 1) + ' more marked in red below it.)' : ''));
+      goTo(f0.el);
+      return;
+    }
     if (!boardGate()) { say(BLOCKED); return; }   // silent: no upload, no email, no link
     var yrs = age(form.dob.value); if (yrs < 18 || yrs > 34) { say('Sorry, YKS Talents currently accepts talent aged 18\u201334.'); return; }
     // backstops for bots and scripted posts: honeypots must stay empty, and the form can't be instant
@@ -593,50 +795,66 @@
       .concat(D.shoe ? ['Shoe ' + D.shoe] : [], D.hair ? ['Hair ' + D.hair] : [], D.eyes ? ['Eyes ' + D.eyes] : []).join(' \u00b7 ').slice(0, 200);
     D.profile = 'https://instagram.com/' + D.handle;
     var secs = Math.round((Date.now() - T0) / 1000), FLAGS = reviewFlags(D, secs);
-    busy = true; sync(); submitBtn.textContent = 'Checking\u2026';
+    if (!followed) FLAGS.push('Follow button not tapped on the form');
+    busy = true; sync(); submitBtn.textContent = 'Sending\u2026';
     var refollow = $('#taRefollow'); if (refollow) refollow.hidden = true;
+    // the follow check and the bio run alongside the photo prep; neither can block or delay the send past ~5 s
     var followVerified = '';
-    say('Checking your follow\u2026');
-    followCheck(D.handle).then(function (f) {
+    var followP = followCheck(D.handle).then(function (f) {
       // never block: the follower list check gives false "no" results (e.g. private accounts, handle
       // typos, Instagram limits), so a "no" is only a review flag for Yedukrishna, never a stop.
       if (f === true) followVerified = 'yes';
       else if (f === false) { followVerified = 'no'; FLAGS.push('Follow not confirmed by check'); }
       else FLAGS.push('Follow check unavailable');
-      submitBtn.textContent = 'Sending\u2026';
-      send();
-    });
-    function send() {
+    }, function () { FLAGS.push('Follow check unavailable'); });
+    var bioP = polishBio(D);
     var list = entries(), KEYS = SLOTS.map(function (x) { return x.k; });
+    function fail(msg, opts) {
+      busy = false; sync(); submitBtn.textContent = SUBMIT_LABEL;
+      say(msg);
+      if (opts && opts.field) { var el = opts.field === 'photos' ? slotBox : form[opts.field]; if (el) { setErr(el, opts.fieldMsg || msg); goTo(el); } }
+      if (!opts || opts.fallback !== false) showFallback(D, opts && opts.fallbackText || 'If it keeps failing, send me a WhatsApp instead and I\u2019ll take your application there. Everything you typed is saved on this phone.');
+      else if (statusEl.scrollIntoView && !(opts && opts.field)) statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
     // one photo at a time (12 full-size decodes at once can run a phone out of memory); a set that's
-    // over the upload budget is re-encoded one step smaller until it fits
+    // over the upload budget is re-encoded one step smaller until it fits. A photo that can't be
+    // prepared: an extra is left out (and she's told), a required one is named so she can swap it.
     function prepAll(step) {
-      var st = PREP_STEPS[step], done = 0, out = [];
+      var st = PREP_STEPS[step], done = 0, out = [], skipped = [], broken = [];
       say('Preparing your photos\u2026 0 / ' + list.length);
       return list.reduce(function (p, en, i) {
         return p.then(function () {
-          return prep(en.file, st[0], st[1]).then(function (r) {
+          return prep(en.file, st[0], st[1]).then(null, function () { return null; }).then(function (r) {
             done++; say('Preparing your photos\u2026 ' + done + ' / ' + list.length);
             var key = KEYS.filter(function (k) { return slotState[k] === en; })[0] || 'extra';
-            out.push({ slot: key, label: en.cap, name: ('0' + (i + 1)).slice(-2) + '-' + en.cap.replace(/[^A-Za-z0-9]+/g, '-') + '.' + r.ext, mime: r.mime, data: r.data });
+            if (!r) { (key === 'extra' ? skipped : broken).push(en.cap); return; }
+            if (r.blob && !en._prep) en._prep = r.blob;
+            out.push({ slot: key, label: en.cap, name: ('0' + (out.length + 1)).slice(-2) + '-' + en.cap.replace(/[^A-Za-z0-9]+/g, '-') + '.' + r.ext, mime: r.mime, data: r.data });
           });
         });
       }, Promise.resolve()).then(function () {
+        if (broken.length) return { broken: broken };
         var size = out.reduce(function (a, x) { return a + x.data.length; }, 0);
-        return size > PHOTO_BUDGET && step < PREP_STEPS.length - 1 ? prepAll(step + 1) : out;
+        if (size > PHOTO_BUDGET && step < PREP_STEPS.length - 1) return prepAll(step + 1);
+        // still too big at the smallest size (photos the phone couldn't shrink): drop extras from the end
+        while (size > PHOTO_BUDGET && out.length > MIN_PHOTOS && out[out.length - 1].slot === 'extra') { var x = out.pop(); size -= x.data.length; skipped.push(x.label); }
+        return { photos: out, skipped: skipped };
       });
     }
-    var bioP = polishBio(D);
     prepAll(list.length > 8 ? 1 : 0)
-      .then(function (ph) {
+      .then(function (P) {
+        if (P.broken) { var e1 = new Error('broken'); e1.broken = P.broken; throw e1; }
+        if (P.skipped.length) FLAGS.push(P.skipped.length + ' extra photo(s) left out on her phone: ' + P.skipped.join(', '));
         say('Preparing your portfolio\u2026');
-        return bioP.then(function (b) {
-          D.bio = b.about; D.quote = b.quote; D.bio_source = b.source;
-          return builtPortfolio(D).then(function (pdf) { return { photos: ph, pdf: pdf }; });
+        return Promise.all([bioP, followP]).then(function (r) {
+          var b = r[0] || {};
+          D.bio = b.about || ''; D.quote = b.quote || ''; D.bio_source = b.source || 'own words';
+          return builtPortfolio(D).then(function (pdf) { if (!pdf) FLAGS.push('Portfolio PDF not built on her phone'); return { photos: P.photos, pdf: pdf, skipped: P.skipped }; });
         });
       })
       .then(function (up) {
-        say('Sending your application\u2026 this can take a minute or two, keep this page open.');
+        if (up.skipped.length) say(up.skipped.length + ' extra photo' + (up.skipped.length > 1 ? 's' : '') + ' couldn\u2019t be read on this phone, so ' + (up.skipped.length > 1 ? 'they were' : 'it was') + ' left out. Sending the rest\u2026');
+        else say('Sending your application\u2026 this can take a minute or two, keep this page open.');
         var hp = form.querySelector('[name=website]');
         var design = designName(D);
         function bodyFor(ph, pdf) { return JSON.stringify({
@@ -656,32 +874,31 @@
         }); }
         var body = bodyFor(up.photos, up.pdf);
         // never risk the whole application on the PDF: past the cap it goes without (she can still download it)
-        if (body.length > BODY_CAP && up.pdf) body = bodyFor(up.photos, null);
-        var tries = 0, trimmed = false;
-        function attempt() {
-          tries++;
-          return postIntake(body).then(function (j) {
-            // an older script that still takes fewer photos: resend once with the 5 required + the first extras
-            // (the PDF already shows every photo). Nothing was saved by the rejected try.
-            var m = j && !j.ok && j.error === 'photos' && /At most (\d+)/.exec(j.message || '');
-            if (m && !trimmed && +m[1] >= MIN_PHOTOS && +m[1] < up.photos.length) {
-              trimmed = true; body = bodyFor(up.photos.slice(0, +m[1]), up.pdf);
-              if (body.length > BODY_CAP && up.pdf) body = bodyFor(up.photos.slice(0, +m[1]), null);
-              return postIntake(body);
-            }
-            return j;
-          }, function (er) {   // one quiet retry for a dropped connection; the script de-duplicates
-            if (tries < 2) { say('Still sending\u2026'); return attempt(); }
-            throw er;
-          });
-        }
-        return attempt();
+        if (body.length > BODY_CAP && up.pdf) { FLAGS.push('PDF left out of the upload (size)'); body = bodyFor(up.photos, null); }
+        var trimmed = false;
+        function note(t) { say(t); }
+        return postWithRetry(body, note).then(function (j) {
+          // an older script that still takes fewer photos: resend once with the 5 required + the first extras
+          // (the PDF already shows every photo). Nothing was saved by the rejected try.
+          var m = j && !j.ok && j.error === 'photos' && /At most (\d+)/.exec(j.message || '');
+          if (m && !trimmed && +m[1] >= MIN_PHOTOS && +m[1] < up.photos.length) {
+            trimmed = true; body = bodyFor(up.photos.slice(0, +m[1]), up.pdf);
+            if (body.length > BODY_CAP && up.pdf) body = bodyFor(up.photos.slice(0, +m[1]), null);
+            return postWithRetry(body, note);
+          }
+          return j;
+        }, function (er) {
+          // every try failed without a readable answer: send it once blind, then offer WhatsApp
+          var e2 = new Error('network'); e2.cause = er; e2.body = body;
+          throw e2;
+        });
       })
       .then(function (j) {
         if (!j || !j.ok) {
-          if (j && j.error === 'blocked') { busy = false; sync(); submitBtn.textContent = 'Submit application'; say(BLOCKED); return; }
-          var e = new Error('rejected'); e.msg = j && j.message; throw e;
+          if (j && j.error === 'blocked') { busy = false; sync(); submitBtn.textContent = SUBMIT_LABEL; say(BLOCKED); return; }
+          var e = new Error('rejected'); e.msg = j && j.message; e.code = j && j.error; throw e;
         }
+        clearDraft();
         var direct = (j.photos || []).map(function (p) { return { url: p.url, cat: p.slot || 'extra' }; }).filter(function (p) { return p.url; });
         try {
           fetch(ENGINE_URL + '/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
@@ -692,16 +909,34 @@
             photos: direct, cover_url: direct[0] ? direct[0].url : '', portfolio_seed: APP_ID
           }) }).catch(function () {});
         } catch (er) {}
-        if (window.gtag) gtag('event', 'talent_apply');
+        try { if (window.gtag) gtag('event', 'talent_apply'); } catch (er) {}
+        D.followed = followed || followVerified === 'yes';
         success(D, Promise.resolve(j.pdfUrl || ''));
       })
       .catch(function (er) {
-        busy = false; sync(); submitBtn.textContent = 'Submit application';
-        say(er && er.msg ? 'That didn\u2019t go through: ' + er.msg
-          : 'Your application didn\u2019t send \u2014 nothing was lost, everything you added is still here. Check your connection and tap Submit again.');
-        if (statusEl.scrollIntoView) statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        er = er || {};
+        if (er.broken) {
+          return fail('This phone couldn\u2019t read your ' + er.broken.map(function (c) { return '\u201c' + c + '\u201d'; }).join(', ') + ' photo. Remove it (\u00d7), add another photo or a screenshot of it, and tap Submit again.',
+            { field: 'photos', fallback: false });
+        }
+        if (er.code || er.msg) {   // the script answered with a reason: point at the field
+          var fld = SERVER_FIELD[er.code];
+          var txt = er.msg ? 'That didn\u2019t go through: ' + er.msg : 'That didn\u2019t go through.';
+          return fail(txt, { field: fld, fieldMsg: er.msg, fallback: !fld });
+        }
+        if (er.body) {
+          say('Still trying\u2026');
+          return postBlind(er.body).then(function (left) {
+            fail(left
+              ? 'We couldn\u2019t confirm your application arrived. Tap Submit to try again (it won\u2019t be sent twice), or send me a WhatsApp so I can check.'
+              : 'Your application didn\u2019t send \u2014 nothing was lost, everything you added is still here. Check your connection and tap Submit again.');
+          });
+        }
+        fail('Something went wrong on this phone \u2014 nothing was lost, everything you added is still here. Tap Submit to try again.');
+      })
+      .catch(function () {   // absolute backstop: the button must never stay stuck on "Sending…"
+        busy = false; sync(); submitBtn.textContent = SUBMIT_LABEL;
       });
-    }
   });
 
   /* ── 3 · last step (built only here) ── */
@@ -722,7 +957,7 @@
     a.addEventListener('click', function (ev) { if (a.classList.contains('wait')) ev.preventDefault(); });
     $('#taWaSlot').appendChild(a);
     (pdfReady || Promise.resolve('')).then(null, function () { return ''; }).then(function (pdfUrl) {
-      var msg = 'Hi Yedukrishna, I\u2019ve applied to YKS Talents and followed @yks_photoworks.\nName: ' + D.name +
+      var msg = 'Hi Yedukrishna, I\u2019ve applied to YKS Talents' + (D.followed ? ' and followed @yks_photoworks' : '') + '.\nName: ' + D.name +
         '\nInstagram: https://instagram.com/' + D.handle + '\nCity: ' + D.city +
         '\nPortfolio: ' + (pdfUrl || '(the upload didn\u2019t go through \u2014 I\u2019ll send my PDF here)');
       a.href = 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(msg);
