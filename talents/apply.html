@@ -409,6 +409,8 @@
 .ta-submit:disabled{opacity:.45}
 .ta-hint{grid-column:span 2;margin:0;font-size:13px;color:var(--paper-dim);text-align:center}
 .ta-status{grid-column:span 2;margin:0;font-size:14.5px;text-align:center}
+.ta-fail{grid-column:span 2}
+.ta-fail-msg{margin:0;font-size:14px;line-height:1.5;color:var(--paper-dim);text-align:center}
 .ta-done h2{font-family:var(--serif);font-size:30px;margin:0 0 8px}
 .ta-done p{color:var(--paper-dim);line-height:1.5}
 .ta-wa{display:flex;align-items:center;justify-content:center;min-height:60px;border-radius:14px;background:#25D366;color:#06210f;font-weight:700;font-size:18px;text-decoration:none;margin:14px 0 22px}
@@ -534,8 +536,8 @@
       <span class="ta-help ta-help-sm ta-count" id="taAboutCount" aria-live="polite">0 / 600 &middot; at least 120 characters</span>
     </label>
     <div class="ta-hp" aria-hidden="true"><input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" /><input type="text" name="website" tabindex="-1" autocomplete="off" /></div>
-    <button type="submit" class="ta-submit" id="taSubmit" disabled>Create my free portfolio</button>
-    <p class="ta-hint" id="taFollowHint">Tap Follow above to unlock submit.</p>
+    <button type="submit" class="ta-submit" id="taSubmit">Create my free portfolio</button>
+    <p class="ta-hint" id="taFollowHint">Tap Follow above to stay in touch with @yks_photoworks.</p>
     <p class="ta-status" id="taStatus" role="status" aria-live="polite" hidden></p>
     <a class="ta-follow-btn ta-refollow" id="taRefollow" href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener" hidden><span>Follow @yks_photoworks</span></a>
   </form>
@@ -616,7 +618,7 @@
   </div>
 </footer>
 
-<script src="/js/talent-apply.js?v=94"></script>
+<script src="/js/talent-apply.js?v=95"></script>
 <script src="/js/wa-gate.js?v=1" defer></script>
 </body>
 </html>
