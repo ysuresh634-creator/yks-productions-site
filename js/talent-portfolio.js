@@ -632,6 +632,9 @@
 
     /* ── last page: the card back — booking only through YKS ── */
     function back() {
+      // every photo is already used on the cover, profile and photo pages, so the back is type only:
+      // no contact sheet and no back photo, so a picture never appears twice in a portfolio
+      S.back = 'card';
       var dk = DARK || S.back === 'photo' ? true : false, bg = DARK ? BG : (S.back === 'photo' ? NIGHT : BG);
       if (!DARK && S.back !== 'photo') dk = false;
       var tc = dk ? IVORY : INK, sc = dk ? [196, 186, 172] : SUB, rc = dk ? [84, 76, 70] : RULE;
@@ -647,7 +650,7 @@
         cap('YKS Talents', M, 58, 6.5, tc, { bold: true, ls: 3 });
         cap('The Card', W - M, 58, 6.5, sc, { ls: 3, align: 'right' });
         rule(M, 70, W - M, rc, 0.4);
-        yName = 136;
+        yName = Math.round((H - 196) / 2) - 10;
       }
       var full = first + (last ? ' ' + last : '');
       if (S.names === 'caps' || !HAS_IT) { var zc = fit(NAME_UP, 'normal', 34, 14, CW, 0.12); disp(NAME_UP, W / 2, yName, zc, tc, { align: 'center', ls: zc * 0.12 }); }
@@ -659,8 +662,8 @@
       }
       var vl = CORE.map(function (r) { return r[0] + ' ' + r[1]; }).join('   \u00b7   ');
       if (vl) disp(vl, W / 2, yName + 30, fit(vl, 'italic', 11, 6, CW), sc, { italic: true, align: 'center' });
-      if (S.back !== 'photo') {
-        // one contact sheet: six frames in two rows (three in one row for short books), sized to fill the page
+      if (false) {
+        // one contact sheet (retired: it repeated photos): six frames in two rows (three in one row for short books), sized to fill the page
         var n = N >= 6 ? 6 : Math.min(3, N), pick = [];
         for (var k = 0; k < n; k++) pick.push(Math.round(k * (N - 1) / Math.max(1, n - 1)));
         pick = pick.filter(function (v, j) { return pick.indexOf(v) === j; });
