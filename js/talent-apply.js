@@ -614,6 +614,61 @@
         .then(function (r) { clearTimeout(t); return r; });
     } catch (e) { return Promise.resolve(own); }
   }
+  /* who is in the photos: the YKS worker's vision check (Gemini / Llama 4 Scout) on the first two
+     close-ups, downscaled to 512 px on the phone. Review-only: it never blocks or delays the send past
+     ~6 s, the applicant never sees any of it. A likely man gets a flag in the email, no portfolio PDF
+     and no WhatsApp step. Any failure or timeout → null → the name list decides alone. */
+  var GENDER_URL = 'https://yks-chat.ysuresh634.workers.dev/gender', GENDER_TIMEOUT = 6000, GENDER_CONF = 0.7, GENDER_FEMALE_SURE = 0.85;
+  function smallJpeg(blob) {
+    return new Promise(function (res) {
+      if (!blob) return res(null);
+      var done = false, u = '', t = setTimeout(function () { fin(null); }, 3000);
+      function fin(v) { if (done) return; done = true; clearTimeout(t); if (u) try { URL.revokeObjectURL(u); } catch (e) {} res(v); }
+      try {
+        var im = new Image();
+        im.onload = function () {
+          try {
+            var w = im.naturalWidth, h = im.naturalHeight, k = Math.min(1, 512 / Math.max(w, h));
+            if (!w || !h) return fin(null);
+            var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+            c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+            var d = c.toDataURL('image/jpeg', 0.8); fin(/^data:image\/jpeg;base64,/.test(d) ? d.split(',')[1] : null);
+          } catch (e) { fin(null); }
+        };
+        im.onerror = function () { fin(null); };
+        u = URL.createObjectURL(blob); im.src = u;
+      } catch (e) { fin(null); }
+    });
+  }
+  function genderPhotos(usePrep) {
+    var es = ['close1', 'close2'].map(function (k) { return slotState[k]; }).filter(Boolean);
+    return Promise.all(es.map(function (e) { return smallJpeg(usePrep ? e._prep : e.file); }))
+      .then(function (a) { return a.filter(Boolean); }, function () { return []; });
+  }
+  // → {gender, confidence, reason, model, photos} or null; never throws
+  function askGender(D, images) {
+    try {
+      var ctl = typeof AbortController === 'function' ? new AbortController() : null, t;
+      var call = fetch(GENDER_URL, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' }, signal: ctl ? ctl.signal : undefined,
+        body: JSON.stringify({ name: D.name, handle: D.handle, images: images }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) { return j && j.ok && /^(male|female|unclear)$/.test(j.gender) ? { gender: j.gender, confidence: +j.confidence || 0, reason: String(j.reason || '').slice(0, 80), model: j.model || '', photos: +j.photos || 0 } : null; }, function () { return null; });
+      return Promise.race([call, new Promise(function (res) { t = setTimeout(function () { if (ctl) ctl.abort(); res(null); }, GENDER_TIMEOUT); })])
+        .then(function (r) { clearTimeout(t); return r; }, function () { clearTimeout(t); return null; });
+    } catch (e) { return Promise.resolve(null); }
+  }
+  // AI says male with decent confidence, OR the first word of her name is a common male name
+  // (unless the photos clearly show a woman)
+  function maleVerdict(ai, nameHit) {
+    var aiMale = !!(ai && ai.gender === 'male' && ai.confidence >= GENDER_CONF);
+    var aiSureFemale = !!(ai && ai.gender === 'female' && ai.photos > 0 && ai.confidence >= GENDER_FEMALE_SURE);
+    return aiMale || (!!nameHit && !aiSureFemale);
+  }
+  function maleFlag(ai, nameHit) {
+    // starts with "Likely male name" so the intake script's subject marker picks it up; kept short (the script keeps 200 chars of flags)
+    return 'Likely male name/photo [MALE?]: ' + (ai ? 'AI ' + ai.gender + ' ' + Math.round(ai.confidence * 100) + '%' + (ai.photos ? '' : ' (name only)') : 'AI unavailable') +
+      (nameHit ? ', name list: ' + nameHit : '') + '. No PDF, no WhatsApp step';
+  }
   function designName(D) { try { var g = window.YKSPortfolio.design(pdfData(D)); return [g.themeName, g.cover, g.profile, g.back].join(' \u00b7 '); } catch (e) { return ''; } }
   function portfolioLib() {
     return window.YKSPortfolio ? Promise.resolve() : new Promise(function (res, rej) {
@@ -731,6 +786,7 @@
       '\nName: ' + (D.name || '') + '\nInstagram: ' + (D.handle ? 'https://instagram.com/' + D.handle : '') + '\nCity: ' + (D.city || '') +
       '\nI can send my photos here.';
     box.querySelector('a').href = 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(msg);
+    box.querySelector('a').style.display = D.male ? 'none' : '';
     box.hidden = false;
     if (box.scrollIntoView) statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
@@ -808,6 +864,12 @@
       else FLAGS.push('Follow check unavailable');
     }, function () { FLAGS.push('Follow check unavailable'); });
     var bioP = polishBio(D);
+    // gender check: from the original files at once; if this browser can't decode them (HEIC), from the
+    // phone-prepared JPEGs once they exist. Capped, never rejects.
+    var nameMale = maleNameHit(D.name, 0), prepDone, prepReady = new Promise(function (res) { prepDone = res; });
+    var genderP = genderPhotos(false).then(function (im) { return im.length ? im : prepReady.then(function () { return genderPhotos(true); }); })
+      .then(function (im) { return askGender(D, im); }, function () { return null; });
+    var genderCapped = function () { return Promise.race([genderP, wait(GENDER_TIMEOUT + 1500).then(function () { return null; })]).then(null, function () { return null; }); };
     var list = entries(), KEYS = SLOTS.map(function (x) { return x.k; });
     function fail(msg, opts) {
       busy = false; sync(); submitBtn.textContent = SUBMIT_LABEL;
@@ -843,12 +905,16 @@
     }
     prepAll(list.length > 8 ? 1 : 0)
       .then(function (P) {
-        if (P.broken) { var e1 = new Error('broken'); e1.broken = P.broken; throw e1; }
+        if (P.broken) { prepDone(); var e1 = new Error('broken'); e1.broken = P.broken; throw e1; }
         if (P.skipped.length) FLAGS.push(P.skipped.length + ' extra photo(s) left out on her phone: ' + P.skipped.join(', '));
+        prepDone();
         say('Preparing your portfolio\u2026');
-        return Promise.all([bioP, followP]).then(function (r) {
-          var b = r[0] || {};
+        return Promise.all([bioP, followP, genderCapped()]).then(function (r) {
+          var b = r[0] || {}, ai = r[2] || null;
           D.bio = b.about || ''; D.quote = b.quote || ''; D.bio_source = b.source || 'own words';
+          D.male = maleVerdict(ai, nameMale);
+          // a likely man: flagged first in the email, and no portfolio PDF is built, sent or offered
+          if (D.male) { FLAGS.unshift(maleFlag(ai, nameMale)); return { photos: P.photos, pdf: null, skipped: P.skipped }; }
           return builtPortfolio(D).then(function (pdf) { if (!pdf) FLAGS.push('Portfolio PDF not built on her phone'); return { photos: P.photos, pdf: pdf, skipped: P.skipped }; });
         });
       })
@@ -950,6 +1016,13 @@
   function success(D, pdfReady) {
     form.hidden = true; say('');
     var box = $('#taDone'); box.hidden = false;
+    if (D.male) {   // neutral close: no WhatsApp step, no portfolio (and no wording about why)
+      var lead = $('#taDoneLead'); if (lead) lead.textContent = 'Thank you. I\u2019ll review your application and get in touch if there\u2019s a fit.';
+      var slot = $('#taWaSlot'); if (slot) { slot.hidden = true; slot.style.display = 'none'; }
+      var dlb = box.querySelector('.ta-dlbox'); if (dlb) { dlb.hidden = true; dlb.style.display = 'none'; }
+      box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     var a = document.createElement('a');
     a.className = 'ta-wa wait'; a.id = 'taWa'; a.target = '_blank'; a.rel = 'noopener';
     a.setAttribute('aria-disabled', 'true'); a.removeAttribute('href');
