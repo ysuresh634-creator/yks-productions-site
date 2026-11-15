@@ -579,7 +579,7 @@
     try { return fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body }).then(function () { return true; }, function () { return false; }); }
     catch (e) { return Promise.resolve(false); }
   }
-  var PORTFOLIO_JS = '/js/talent-portfolio.js?v=8';
+  var PORTFOLIO_JS = '/js/talent-portfolio.js?v=9';
   // one id per application: seeds the portfolio's art direction (name + id), so the uploaded PDF and a
   // later download are the same book, while two applicants almost never get the same one
   var APP_ID = 'A' + Date.now().toString(36) + Math.floor(Math.random() * 1679616).toString(36);
