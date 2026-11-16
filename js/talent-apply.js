@@ -13,12 +13,12 @@
         → photos + PDF → Apps Script (Drive + owner email) → engine
      3. Only then: "Last step: send me a WhatsApp" — the number is assembled
         here, inside the success handler, never earlier
-     4. After the WhatsApp tap (and the return to this tab) the portfolio PDF
-        unlocks for the applicant to download.
+     4. The applicant never gets the portfolio PDF (no link, no download):
+        it goes only to the owner, who shares it with the talent he picks.
    The same YKS portfolio PDF is also built inside the submit chain (after the
    gate) and sent with the photos in ONE post to the YKS Apps Script web app,
    which saves everything to Google Drive, emails the owner and answers with
-   the Drive link of the PDF — that link goes in the WhatsApp message.
+   the Drive link of the PDF (kept off the applicant's screen and WhatsApp).
    A failed PDF build never blocks the application.
    An application the board can't take stops at step 2 with one neutral
    line: nothing uploads, nothing is sent, no link, no number. */
@@ -939,7 +939,7 @@
           photos: ph, pdf: pdf
         }); }
         var body = bodyFor(up.photos, up.pdf);
-        // never risk the whole application on the PDF: past the cap it goes without (she can still download it)
+        // never risk the whole application on the PDF: past the cap it goes without (the photos still go through)
         if (body.length > BODY_CAP && up.pdf) { FLAGS.push('PDF left out of the upload (size)'); body = bodyFor(up.photos, null); }
         var trimmed = false;
         function note(t) { say(t); }
@@ -1023,49 +1023,14 @@
       box.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
+    // the portfolio PDF goes only to the owner's email/Drive; applicants never get a link or download
     var a = document.createElement('a');
-    a.className = 'ta-wa wait'; a.id = 'taWa'; a.target = '_blank'; a.rel = 'noopener';
-    a.setAttribute('aria-disabled', 'true'); a.removeAttribute('href');
-    a.innerHTML = '<span>Preparing your portfolio link\u2026</span>';
-    a.addEventListener('click', function (ev) { if (a.classList.contains('wait')) ev.preventDefault(); });
+    a.className = 'ta-wa'; a.id = 'taWa'; a.target = '_blank'; a.rel = 'noopener';
+    var msg = 'Hi Yedukrishna, I\u2019ve applied to YKS Talents' + (D.followed ? ' and followed @yks_photoworks' : '') + '.\nName: ' + D.name +
+      '\nInstagram: https://instagram.com/' + D.handle + '\nCity: ' + D.city;
+    a.href = 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(msg);
+    a.innerHTML = '<span>Send me a WhatsApp</span>';
     $('#taWaSlot').appendChild(a);
-    (pdfReady || Promise.resolve('')).then(null, function () { return ''; }).then(function (pdfUrl) {
-      var msg = 'Hi Yedukrishna, I\u2019ve applied to YKS Talents' + (D.followed ? ' and followed @yks_photoworks' : '') + '.\nName: ' + D.name +
-        '\nInstagram: https://instagram.com/' + D.handle + '\nCity: ' + D.city +
-        '\nPortfolio: ' + (pdfUrl || '(the upload didn\u2019t go through \u2014 I\u2019ll send my PDF here)');
-      a.href = 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(msg);
-      a.classList.remove('wait'); a.removeAttribute('aria-disabled');
-      a.innerHTML = '<span>Send me a WhatsApp</span>';
-      if (!pdfUrl) {
-        var n = document.createElement('p'); n.className = 'ta-wa-note'; n.id = 'taWaNote';
-        n.textContent = 'Your portfolio link couldn\u2019t be prepared just now. Send the message anyway, then download your portfolio below and attach the PDF in the same chat.';
-        a.parentNode.insertBefore(n, a.nextSibling);
-      }
-    });
-    var dl = $('#taDl'), hint = $('#taDlHint'), tapped = false, unlocked = false;
-    function unlock() {
-      if (!tapped || unlocked) return; unlocked = true;
-      dl.disabled = false; dl.textContent = 'Download your portfolio';
-      hint.textContent = 'Your YKS portfolio PDF is built on this phone from your photos.';
-    }
-    a.addEventListener('click', function () {
-      tapped = true;
-      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') unlock(); });
-      window.addEventListener('focus', unlock);
-      setTimeout(unlock, 4000);
-    });
-    dl.addEventListener('click', function () {
-      if (!unlocked) return;
-      dl.disabled = true; dl.textContent = 'Building your portfolio\u2026';
-      var go = function () {
-        return window.YKSPortfolio.download(pdfData(D));
-      };
-      (window.YKSPortfolio ? go() : new Promise(function (res, rej) {
-        var s = document.createElement('script'); s.src = PORTFOLIO_JS; s.onload = res; s.onerror = rej; document.head.appendChild(s);
-      }).then(go))
-        .then(function () { dl.disabled = false; dl.textContent = 'Downloaded \u2713 \u2014 download again'; })
-        .catch(function () { dl.disabled = false; dl.textContent = 'Download your portfolio'; hint.textContent = 'Couldn\u2019t build the PDF just now \u2014 tap to try again.'; });
-    });
     box.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 })();
