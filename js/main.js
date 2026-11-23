@@ -188,7 +188,7 @@
       .from('.hero-title .char', { yPercent: 130, opacity: 0, rotateX: -50, stagger: .03, duration: 1.25 }, '-=.55')
       .from('.hero-name .char', { yPercent: 120, opacity: 0, stagger: .04, duration: .9 }, '-=.75')
       .from('.hero-roles .word', { y: 26, opacity: 0, stagger: .05, duration: .8 }, '-=.7')
-      .from('.hero-cta > a', { y: 22, opacity: 0, stagger: .08, duration: .7 }, '-=.55')
+      .from('.hero-cta > a', { y: 22, opacity: 0, stagger: .08, duration: .7, clearProps: 'transform' }, '-=.55')
       .from('.hero-meta > div', { y: 30, opacity: 0, stagger: .1, duration: .7 }, '-=.5')
       .from('.hero-scrollcue, .hero-frameinfo', { opacity: 0, duration: .8 }, '-=.4');
   }
