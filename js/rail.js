@@ -44,7 +44,7 @@
        44px circles instead: same tap target, a quarter of the footprint, and
        still a proper button rather than the bare unlabelled icon this
        replaced in the nav. aria-label carries the name for screen readers. */
-    '@media(max-width:640px){.yks-rail{left:16px;bottom:88px;gap:10px}',
+    '@media(max-width:640px){.yks-rail{left:14px;bottom:19px;gap:8px;flex-direction:row}',
       '.yks-rail-btn{width:44px;padding:0;justify-content:center;border-radius:50%}',
       '.yks-rail-btn span{position:absolute;width:1px;height:1px;overflow:hidden;',
       'clip:rect(0 0 0 0);white-space:nowrap}',
