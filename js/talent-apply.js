@@ -15,11 +15,13 @@
         here, inside the success handler, never earlier
      4. The applicant never gets the portfolio PDF (no link, no download):
         it goes only to the owner, who shares it with the talent he picks.
-   The same YKS portfolio PDF is also built inside the submit chain (after the
-   gate) and sent with the photos in ONE post to the YKS Apps Script web app,
-   which saves everything to Google Drive, emails the owner and answers with
-   the Drive link of the PDF (kept off the applicant's screen and WhatsApp).
-   A failed PDF build never blocks the application.
+   The portfolio PDF is built inside the submit chain only AFTER the likely-male
+   verdict (name list or photo AI, capped at ~7.5 s). A likely man: the book is
+   never rendered or uploaded (pdfSkipped=likely male); photos still go to Drive
+   and the email is flagged. Otherwise the PDF is sent with the photos in ONE
+   post to the YKS Apps Script web app, which saves everything to Google Drive,
+   emails the owner and answers with the Drive link of the PDF (kept off the
+   applicant's screen and WhatsApp). A failed PDF build never blocks the application.
    An application the board can't take stops at step 2 with one neutral
    line: nothing uploads, nothing is sent, no link, no number. */
 (function () {
@@ -260,7 +262,7 @@
     return 0;
   }
   // common male first names (review only: never shown to the applicant, never blocks)
-  var MALE_FIRST = {}; ('abhishek manjunath prakash shyam naresh sathish suhas basavaraj shivakumar nagaraj ravikumar ashok raju abhijith abhijit abhinav abhilash abhay adarsh aditya adithya adil adithyan advaith advait ajay ajith ajit akash akhil akshay akshat alok aman amal amar amarnath ambrish amit amitabh amol anand anant anil anirudh ankit ankur anoop anup anurag anush aravind arvind arjun arnav arun arpit ashish ashok ashwin aswin atul ayush balaji balu bharat bhaskar bhavesh bijoy biju bimal binoy bipin brijesh chandan chandrashekar chetan chirag darshan deepak devendra devesh dhananjay dhanush dharmendra dheeraj dhruv dilip dinesh dipak ganesh gaurav girish gokul gopal gopi govind gururaj hari harish harsh harshad hemant hitesh jagadish jagdish jatin jayan jayesh jeevan jithin jithu jitendra kailash kamal kannan karan karthik karthikeyan kartik kaushik keshav kishore krishna kunal lakshman lokesh madhav mahesh manas manish manoj mayank mithun mohan mohit mukesh murali murugan naveen navin nikhil nilesh niraj nirmal nitin nithin omkar pankaj paresh parth pawan piyush pradeep pramod pranav prasad prasanth prashant pratap prateek pravin praveen premkumar prithvi pushkar raghav raghu rahul rajeev rajiv rajesh rajan rajat rajendra rajkumar rakesh ram raman ramesh ramu ranjith ranjit ravi ravindra rishi ritesh rohan rohit rohith sachin sagar sahil sajan sajeev sajith sameer sandeep sanjay sanjeev santosh santhosh sarath satish saurabh senthil shailesh shankar sharath shashank shekhar shiva shivam shivaji shreyas shubham siddharth siddhu sourav subhash subramanian sudheer sudhir sujith sumit sundar sunil suraj suresh surya swapnil tarun tejas thomas tushar uday umesh utkarsh vaibhav varun vasanth vasu venkat venkatesh vignesh vijay vikas vikram vimal vinay vineeth vinod vinu vipin vishal vishnu vivek yogesh yuvraj nandu sreejith sreenath sreekanth srinivas srikanth sriram sudarshan anirban arindam debashish debasish partha pritam sayan subhajit sudip tanmoy biswajit indranil kaushal rupesh tukaram vitthal sambhaji ganpat baldev balwinder gurjeet jasvir sukhwinder jagjit ranveer ranbir harjit mohammed mohammad mohamed muhammad mohd ahmed ahmad ali abdul abdullah abdulla abu adnan afsal afzal akbar ameer amir anas anwar arif arshad asif aslam ashraf ayaan azhar bilal danish ehsan faisal faizal farhan faris fahad fazil firoz habeeb hamza haris harris hassan hasan hussain hussein ibrahim imran irfan ismail jabir jafar jamal javed junaid kabir khalid mansoor mubarak mujeeb musthafa mustafa nabeel nadeem naseer navas nazeer niyas noushad rafi rafeeq rahim rasheed rashid rayan riyas rizwan sadiq saif sajid salim saleem salman shabeer shafi shahid shahul shameer shamsu shareef shihab shoaib siraj sohail sulaiman suhail tariq tahir usman wasim waseem yasir yaseen yousuf yusuf zubair zaid zakir omar umar othman osama hamad hamdan khalifa majid mohsin nasser rashed saeed sultan talal turki waleed fahd john joseph jose joshy jomon joby jijo jibin justin jaison jaimon binu shibu sabu babu tomy tom mathew matthew mathews george varghese kurian chacko abraham philip paul peter james jacob jince jinto jobin jeswin sebastian antony anthony xavier francis augustine alex alexander albin alwin benny bobby denny dennis eldho eldhose geo jerin jeril jerry jestin libin linto melvin nibin robin roshan sanju sibi sijo sinto tijo tinto vinil david daniel michael christopher william richard robert charles mark steven kevin brian edward ryan jason andrew joshua brandon tyler aaron adam benjamin samuel nathan patrick jonathan henry jack harry oliver noah liam ethan lucas mason logan luke elijah gabriel caleb isaac dylan connor ian kyle sean shawn eric derek travis troy wayne scott gary larry jeffrey frank raymond gregory carl arthur roger keith terry juan carlos miguel luis antonio rodel rommel ramil jomar jayson jerome reynaldo ronaldo ricardo eduardo fernando manuel rafael emmanuel jojo arnel efren kwame kofi kojo yaw chinedu chukwu emeka ikenna obinna olu oluwaseun tunde babatunde segun femi musa abdi tendai tafadzwa sipho thabo themba mandla kagiso bongani juma baraka otieno kipchoge mamadou moussa ousmane sekou').split(' ').forEach(function (n) { MALE_FIRST[n] = 1; });
+  var MALE_FIRST = {}; ('abhishek manjunath prakash shyam naresh sathish suhas basavaraj shivakumar nagaraj ravikumar ashok raju abhijith abhijit abhinav abhilash abhay adarsh aditya adithya adil adithyan advaith advait ajay ajith ajit akash akhil akshay akshat alok aman amal amar amarnath ambrish amit amitabh amol anand anant anil anirudh ankit ankur anoop anup anurag anush aravind arvind arjun arnav arun arpit ashish ashok ashwin aswin atul ayush balaji balu bharat bhaskar bhavesh bijoy biju bimal binoy bipin brijesh chandan chandrashekar chetan chirag darshan deepak devendra devesh dhananjay dhanush dharmendra dheeraj dhruv dilip dinesh dipak ganesh gaurav girish gokul gopal gopi govind gururaj hari harish harsh harshad hemant hitesh jagadish jagdish jatin jayan jayesh jeevan jithin jithu jitendra kailash kamal kannan karan karthik karthikeyan kartik kaushik keshav kishore krishna kunal lakshman lokesh madhav mahesh manas manish manoj mayank mithun mohan mohit mukesh murali murugan naveen navin nikhil nilesh niraj nirmal nitin nithin omkar pankaj paresh parth pawan piyush pradeep pramod pranav prasad prasanth prashant pratap prateek pravin praveen premkumar prithvi pushkar raghav raghu rahul rajeev rajiv rajesh rajan rajat rajendra rajkumar rakesh ram raman ramesh ramu ranjith ranjit ravi ravindra rishi ritesh rohan rohit rohith sachin sagar sahil sajan sajeev sajith sameer sandeep sanjay sanjeev santosh santhosh sarath satish saurabh senthil shailesh shankar sharath shashank shekhar shiva shivam shivaji shreyas shubham siddharth siddhu sourav subhash subramanian sudheer sudhir sujith sumit sundar sunil suraj suresh surya swapnil tarun tejas thomas tushar uday umesh utkarsh vaibhav varun vasanth vasu venkat venkatesh vignesh vijay vikas vikram vimal vinay vineeth vinod vinu vipin vishal vishnu vivek yogesh yuvraj nandu sreejith sreenath sreekanth srinivas srikanth sriram sudarshan anirban arindam debashish debasish partha pritam sayan subhajit sudip tanmoy biswajit indranil kaushal rupesh tukaram vitthal sambhaji ganpat baldev balwinder gurjeet jasvir sukhwinder jagjit ranveer ranbir harjit mohammed mohammad mohamed muhammad mohd ahmed ahmad ali abdul abdullah abdulla abu adnan afsal afzal akbar ameer amir anas anwar arif arshad asif aslam ashraf ayaan azhar bilal danish ehsan faisal faizal farhan faris fahad fazil firoz habeeb hamza haris harris hassan hasan hussain hussein ibrahim imran irfan ismail jabir jafar jamal javed junaid kabir khalid mansoor mubarak mujeeb musthafa mustafa nabeel nadeem naseer navas nazeer niyas noushad rafi rafeeq rahim rasheed rashid rayan riyas rizwan sadiq saif sajid salim saleem salman shabeer shafi shahid shahul shameer shamsu shareef shihab shoaib siraj sohail sulaiman suhail suheb soheb suhaib sohaib suhayb shuhaib shoeb tariq tahir usman wasim waseem yasir yaseen yousuf yusuf zubair zaid zakir omar umar othman osama hamad hamdan khalifa majid mohsin nasser rashed saeed sultan talal turki waleed fahd john joseph jose joshy jomon joby jijo jibin justin jaison jaimon binu shibu sabu babu tomy tom mathew matthew mathews george varghese kurian chacko abraham philip paul peter james jacob jince jinto jobin jeswin sebastian antony anthony xavier francis augustine alex alexander albin alwin benny bobby denny dennis eldho eldhose geo jerin jeril jerry jestin libin linto melvin nibin robin roshan sanju sibi sijo sinto tijo tinto vinil david daniel michael christopher william richard robert charles mark steven kevin brian edward ryan jason andrew joshua brandon tyler aaron adam benjamin samuel nathan patrick jonathan henry jack harry oliver noah liam ethan lucas mason logan luke elijah gabriel caleb isaac dylan connor ian kyle sean shawn eric derek travis troy wayne scott gary larry jeffrey frank raymond gregory carl arthur roger keith terry juan carlos miguel luis antonio rodel rommel ramil jomar jayson jerome reynaldo ronaldo ricardo eduardo fernando manuel rafael emmanuel jojo arnel efren kwame kofi kojo yaw chinedu chukwu emeka ikenna obinna olu oluwaseun tunde babatunde segun femi musa abdi tendai tafadzwa sipho thabo themba mandla kagiso bongani juma baraka otieno kipchoge mamadou moussa ousmane sekou').split(' ').forEach(function (n) { MALE_FIRST[n] = 1; });
   function maleNameHit(v, loose) {
     // only the first real word: later words are often a father's or husband's name (Riya Thomas, Aisha Ali)
     var t = String(v || '').toLowerCase().split(/[^a-z]+/).filter(function (x) { return x.length >= 3; }).slice(0, 1), i, j, w;
@@ -678,6 +680,8 @@
   // the applicant's YKS portfolio PDF as base64; null on any failure or after 75 s, never throws.
   // A book over budget is rebuilt once a little lighter (still full-page sharp).
   function builtPortfolio(D) {
+    // hard stop: a likely man must never reach html2canvas / jsPDF / the upload
+    if (D.male) return Promise.resolve(null);
     function one(q) { return window.YKSPortfolio.blob(pdfData(D, q)).then(function (blob) { return b64(blob); }); }
     var work = portfolioLib().then(function () { return one(0); })
       .then(function (d) { return d.length > PDF_BUDGET ? one(0.8).then(function (d2) { return d2.length < d.length ? d2 : d; }, function () { return d; }) : d; })
@@ -908,22 +912,27 @@
         if (P.broken) { prepDone(); var e1 = new Error('broken'); e1.broken = P.broken; throw e1; }
         if (P.skipped.length) FLAGS.push(P.skipped.length + ' extra photo(s) left out on her phone: ' + P.skipped.join(', '));
         prepDone();
-        say('Preparing your portfolio\u2026');
+        say('Finishing your application\u2026');
+        // verdict first: the portfolio library is not even loaded until we know this is not a likely man
         return Promise.all([bioP, followP, genderCapped()]).then(function (r) {
           var b = r[0] || {}, ai = r[2] || null;
           D.bio = b.about || ''; D.quote = b.quote || ''; D.bio_source = b.source || 'own words';
           D.male = maleVerdict(ai, nameMale);
-          // a likely man: flagged first in the email, and no portfolio PDF is built, sent or offered
-          if (D.male) { FLAGS.unshift(maleFlag(ai, nameMale)); return { photos: P.photos, pdf: null, skipped: P.skipped }; }
-          return builtPortfolio(D).then(function (pdf) { if (!pdf) FLAGS.push('Portfolio PDF not built on her phone'); return { photos: P.photos, pdf: pdf, skipped: P.skipped }; });
+          // a likely man: flagged first in the email; the portfolio is never rendered or uploaded
+          if (D.male) { FLAGS.unshift(maleFlag(ai, nameMale)); return { photos: P.photos, pdf: null, skipped: P.skipped, pdfSkipped: 'likely male' }; }
+          say('Preparing your portfolio\u2026');
+          return builtPortfolio(D).then(function (pdf) {
+            if (!pdf) FLAGS.push('Portfolio PDF not built on the applicant\u2019s phone');
+            return { photos: P.photos, pdf: pdf, skipped: P.skipped, pdfSkipped: pdf ? '' : 'build failed' };
+          });
         });
       })
       .then(function (up) {
         if (up.skipped.length) say(up.skipped.length + ' extra photo' + (up.skipped.length > 1 ? 's' : '') + ' couldn\u2019t be read on this phone, so ' + (up.skipped.length > 1 ? 'they were' : 'it was') + ' left out. Sending the rest\u2026');
         else say('Sending your application\u2026 this can take a minute or two, keep this page open.');
         var hp = form.querySelector('[name=website]');
-        var design = designName(D);
-        function bodyFor(ph, pdf) { return JSON.stringify({
+        var design = D.male ? '' : designName(D);
+        function bodyFor(ph, pdf, pdfSkip) { return JSON.stringify({
           fields: {
             name: D.name, phone: D.phone, email: D.email, city: D.city, instagram: D.handle, category: D.category,
             dob: D.dob, height: D.height, gender: D.gender, about: D.about,
@@ -933,14 +942,14 @@
             home_country: D.home_country, home_state: D.home_state,
             height_cm: String(D.height_cm), height_ft_in: D.height_short, bust: D.bust, waist: D.waist, hips: D.hips, shoe: D.shoe, hair: D.hair, eyes: D.eyes,
             follow_verified: followVerified || '', flags: FLAGS.join('; '), source: source(), seconds_on_form: secs,
-            app_id: APP_ID, portfolio_design: design,
+            app_id: APP_ID, portfolio_design: design, pdfSkipped: pdfSkip || '',
             website: hp ? hp.value : '', botcheck: ''
           },
           photos: ph, pdf: pdf
         }); }
-        var body = bodyFor(up.photos, up.pdf);
+        var body = bodyFor(up.photos, up.pdf, up.pdfSkipped);
         // never risk the whole application on the PDF: past the cap it goes without (the photos still go through)
-        if (body.length > BODY_CAP && up.pdf) { FLAGS.push('PDF left out of the upload (size)'); body = bodyFor(up.photos, null); }
+        if (body.length > BODY_CAP && up.pdf) { FLAGS.push('PDF left out of the upload (size)'); body = bodyFor(up.photos, null, 'size'); }
         var trimmed = false;
         function note(t) { say(t); }
         return postWithRetry(body, note).then(function (j) {
@@ -948,8 +957,8 @@
           // (the PDF already shows every photo). Nothing was saved by the rejected try.
           var m = j && !j.ok && j.error === 'photos' && /At most (\d+)/.exec(j.message || '');
           if (m && !trimmed && +m[1] >= MIN_PHOTOS && +m[1] < up.photos.length) {
-            trimmed = true; body = bodyFor(up.photos.slice(0, +m[1]), up.pdf);
-            if (body.length > BODY_CAP && up.pdf) body = bodyFor(up.photos.slice(0, +m[1]), null);
+            trimmed = true; body = bodyFor(up.photos.slice(0, +m[1]), up.pdf, up.pdfSkipped);
+            if (body.length > BODY_CAP && up.pdf) body = bodyFor(up.photos.slice(0, +m[1]), null, 'size');
             return postWithRetry(body, note);
           }
           return j;
