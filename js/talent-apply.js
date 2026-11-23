@@ -450,7 +450,7 @@
   }
   function aboutProblem(v) {
     v = String(v || '').replace(/\s+/g, ' ').trim();
-    if (!v) return 'Tell us about you in a few sentences (at least ' + ABOUT_MIN + ' characters).';
+    if (!v) return 'Tell me about you in a few sentences (at least ' + ABOUT_MIN + ' characters).';
     if (notEnglish(v)) return 'Please write this in English letters, without emoji (e.g. I love editorial and dance shoots).';
     var w = wordsOf(v), low = v.toLowerCase();
     if (/lorem|ipsum|dolor sit|consectetur|asdf|qwerty|\b(test|abc|xyz|blah)( \1\b)+/.test(low)) return 'Please write about you in your own words.';
@@ -465,7 +465,12 @@
   }
   (function () {
     var ta = form.about, out = $('#taAboutCount'); if (!ta || !out) return;
-    function count() { var n = ta.value.replace(/\s+/g, ' ').trim().length; out.textContent = n + ' / ' + ABOUT_MAX + (n < ABOUT_MIN ? ' \u00b7 at least ' + ABOUT_MIN + ' characters' : ' \u2713'); }
+    function count() {
+      var n = ta.value.replace(/\s+/g, ' ').trim().length;
+      if (!n) out.textContent = 'A few sentences is enough';
+      else if (n < ABOUT_MIN) out.textContent = n + ' characters \u2014 a little more is perfect';
+      else out.textContent = n + ' / ' + ABOUT_MAX + ' \u2713';
+    }
     ta.addEventListener('input', count); count();
   })();
 
@@ -714,7 +719,7 @@
   /* ── keep everything she typed (and her photos) on this phone until a send succeeds ──
      Text → localStorage, photos → IndexedDB. Both best-effort: a browser that refuses
      storage (private mode, some in-app browsers) just doesn't get the restore. */
-  var DRAFT_KEY = 'yks_apply_draft_v1', SKIP = { website: 1, botcheck: 1, height: 1 }, restoring = false;
+  var DRAFT_KEY = 'yks_apply_draft_v1', SKIP = { website: 1, botcheck: 1, height: 1 }, restoring = false, currentStep = 1, restoredDraft = false;
   function draftFields() { return [].filter.call(form.elements, function (el) { return el.name && !SKIP[el.name] && el.type !== 'file' && el.type !== 'submit' && el.type !== 'button'; }); }
   var saveT;
   function saveDraft() {
@@ -723,7 +728,7 @@
     saveT = setTimeout(function () {
       try {
         var v = {}; draftFields().forEach(function (el) { if (el.value) v[el.name] = el.value; });
-        localStorage.setItem(DRAFT_KEY, JSON.stringify({ v: v, hMode: hMode, t0: T0, at: Date.now() }));
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({ v: v, hMode: hMode, t0: T0, at: Date.now(), step: currentStep || 1 }));
       } catch (e) {}
     }, 300);
   }
@@ -742,6 +747,9 @@
       syncHeight();
       if (form.about) form.about.dispatchEvent(new Event('input'));
       if (d.t0 && d.t0 < T0) T0 = d.t0;   // her time on the form counts from the first visit
+      if (typeof fillDobFromValue === 'function') fillDobFromValue(form.dob && form.dob.value);
+      currentStep = d.step >= 1 && d.step <= 3 ? d.step : 1;
+      restoredDraft = true;
     } catch (e) {}
     restoring = false;
   }
@@ -1026,7 +1034,7 @@
           say('Still trying\u2026');
           return postBlind(er.body).then(function (left) {
             fail(left
-              ? 'We couldn\u2019t confirm your application arrived. Tap Submit to try again (it won\u2019t be sent twice), or send me a WhatsApp so I can check.'
+              ? 'I couldn\u2019t confirm your application arrived. Tap Submit to try again (it won\u2019t be sent twice), or send me a WhatsApp so I can check.'
               : 'Your application didn\u2019t send \u2014 nothing was lost, everything you added is still here. Check your connection and tap Submit again.');
           });
         }
@@ -1063,6 +1071,99 @@
     a.href = 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(msg);
     a.innerHTML = '<span>Send me a WhatsApp</span>';
     $('#taWaSlot').appendChild(a);
-    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        box.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+
+  /* ── date of birth as day / month / year (avoids the mm/dd/yyyy phone picker) ── */
+  function pad2(n) { n = +n; return (n < 10 ? '0' : '') + n; }
+  function fillDobFromValue(v) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''), day = form.dob_day, mo = form.dob_month, yr = form.dob_year;
+    if (!m || !day) return;
+    yr.value = String(+m[1]); mo.value = String(+m[2]); day.value = String(+m[3]);
+  }
+  (function setupDob() {
+    var day = form.dob_day, mo = form.dob_month, yr = form.dob_year, hid = form.dob;
+    if (!day || !mo || !yr || !hid) return;
+    var now = new Date().getFullYear(), i, o;
+    if (day.options.length < 5) {
+      for (i = 1; i <= 31; i++) { o = document.createElement('option'); o.value = String(i); o.textContent = String(i); day.appendChild(o); }
+    }
+    if (yr.options.length < 5) {
+      for (i = now - 17; i >= now - 35; i--) { o = document.createElement('option'); o.value = String(i); o.textContent = String(i); yr.appendChild(o); }
+    }
+    function isReal(y, m, d) {
+      var dt = new Date(y + '-' + pad2(m) + '-' + pad2(d) + 'T00:00:00');
+      return !isNaN(dt.getTime()) && dt.getFullYear() === +y && dt.getMonth() + 1 === +m && dt.getDate() === +d;
+    }
+    function syncDob() {
+      if (day.value && mo.value && yr.value) {
+        if (!isReal(yr.value, mo.value, day.value)) { hid.value = ''; setErr(hid, 'Check that date \u2014 that day isn\u2019t in the month.'); return; }
+        hid.value = yr.value + '-' + pad2(mo.value) + '-' + pad2(day.value);
+      } else hid.value = '';
+    }
+    [day, mo, yr].forEach(function (el) {
+      el.addEventListener('change', function () {
+        syncDob();
+        if (hid.value) { var err = CHECKS.dob(hid.value); err ? setErr(hid, err) : clearErr(hid); }
+        else if (day.value && mo.value && yr.value) { /* invalid date already flagged */ }
+        else clearErr(hid);
+      });
+    });
+    fillDobFromValue(hid.value);
+  })();
+
+  /* ── 3 short steps: only the current group is on screen ── */
+  var STEP_LABELS = { 1: 'About you', 2: 'Location & vitals', 3: 'Photos & a few words' };
+  var STEP_FIELDS = {
+    1: ['name', 'phone', 'email', 'instagram', 'category', 'dob'],
+    2: ['live_country', 'live_state', 'city', 'home_country', 'home_state', 'education', 'course', 'height', 'bust', 'waist', 'hips'],
+    3: ['about']
+  };
+  function showStep(n) {
+    n = +n; if (n < 1 || n > 3) n = 1;
+    currentStep = n;
+    [].forEach.call(document.querySelectorAll('.ta-step'), function (s) { s.hidden = +s.getAttribute('data-step') !== n; });
+    var prog = $('#taProgress'), fill = $('#taProgFill'), text = $('#taProgText');
+    if (prog) prog.hidden = false;
+    if (fill) fill.style.width = Math.round((n / 3) * 100) + '%';
+    if (text) text.textContent = 'Step ' + n + ' of 3 \u00b7 ' + STEP_LABELS[n];
+    var note = $('#taDraftNote');
+    if (note && restoredDraft && n === 1) { note.hidden = false; restoredDraft = false; }
+    else if (note && n !== 1) note.hidden = true;
+    try { var ta = document.querySelector('.ta'); if (ta) { var y = ta.getBoundingClientRect().top + window.scrollY - 8; window.scrollTo(0, Math.max(0, y)); } } catch (e) {}
+    saveDraft();
+  }
+  function stepOk(n) {
+    var names = STEP_FIELDS[n] || [], bad = [];
+    names.forEach(function (name) {
+      if (name === 'height') { var hm = checkHeight(true); if (hm) bad.push({ el: form.height, m: hm }); return; }
+      var el = form[name]; if (!el || !CHECKS[name]) return;
+      var val = name === 'dob' ? el.value : el.value.trim();
+      var m = CHECKS[name](val);
+      if (m) { setErr(el, m); bad.push({ el: el, m: m }); } else clearErr(el);
+    });
+    if (n === 3) {
+      var pp = photoProblem();
+      if (pp) { setErr(slotBox, pp); bad.push({ el: slotBox, m: pp }); } else clearErr(slotBox);
+    }
+    if (bad.length) { goTo(bad[0].el); return false; }
+    return true;
+  }
+  form.addEventListener('click', function (ev) {
+    var next = ev.target.closest && ev.target.closest('[data-next]');
+    var prev = ev.target.closest && ev.target.closest('[data-prev]');
+    if (next) { ev.preventDefault(); if (stepOk(+next.getAttribute('data-next') - 1)) showStep(next.getAttribute('data-next')); }
+    else if (prev) { ev.preventDefault(); showStep(prev.getAttribute('data-prev')); }
+  });
+  // Enter in a field should go to the next step, not skip to a hidden submit
+  form.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter') return;
+    if (ev.target && ev.target.tagName === 'TEXTAREA') return;
+    if (currentStep < 3) {
+      ev.preventDefault();
+      var btn = document.querySelector('.ta-step[data-step="' + currentStep + '"] [data-next]');
+      if (btn) btn.click();
+    }
+  });
+  showStep(currentStep || 1);
 })();

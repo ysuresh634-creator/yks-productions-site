@@ -325,7 +325,6 @@
 </script>
 <!-- ENTITY:END -->
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
-<style>.yks-eligibility{box-sizing:border-box;max-width:1100px;margin:24px auto;padding:24px clamp(18px,4vw,36px);border:1px solid currentColor;border-radius:12px;line-height:1.65;overflow-wrap:anywhere}.yks-eligibility h2{font-size:clamp(22px,4vw,32px);line-height:1.25;margin:0 0 16px}.yks-eligibility p{margin:12px 0}.yks-eligibility a{text-decoration:underline}@media(max-width:700px){.yks-eligibility{margin:20px 16px}}</style>
 </head>
 <body>
 <script src="/js/contact.js?v=4"></script>
@@ -421,33 +420,89 @@
 .ta-dl:disabled{opacity:.45;border-color:var(--line);color:var(--paper-dim)}
 .ta-dlhint{font-size:13px;margin:.6em 0 0}
 @media(max-width:380px){.ta-f.half{grid-column:span 2}}
+.ta-kicker{margin:0 0 8px;font-size:13px;letter-spacing:.04em;color:var(--amber,#ff8c3b);font-weight:500}
+.ta-intro{margin:0 0 14px}
+.ta-progress{position:sticky;top:56px;z-index:8;margin:0 -18px 16px;padding:10px 18px 8px;background:rgba(12,10,14,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.ta-prog-label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13px;color:var(--paper-dim);margin:0 0 7px}
+.ta-prog-label b{color:var(--paper,#f4f0e8);font-weight:600}
+.ta-prog-track{height:4px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden}
+.ta-prog-fill{height:100%;width:33%;border-radius:999px;background:var(--amber,#ff8c3b);transition:width .25s ease}
+.ta-saved{font-size:13px;color:var(--paper-dim);margin:0 0 12px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.ta-step{grid-column:span 2;display:grid;grid-template-columns:1fr 1fr;gap:12px;min-width:0}
+.ta-step[hidden]{display:none!important}
+.ta-follow,.ta-nav,.ta-reassure,.ta-hint,.ta-status,.ta-refollow,.ta-hp{grid-column:span 2}
+.ta-nav{display:flex;gap:10px;grid-column:span 2;margin-top:8px}
+.ta-back{flex:0 0 auto;min-height:52px;min-width:108px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--paper,#f4f0e8);font:inherit;font-weight:600;font-size:16px;padding:0 16px}
+.ta-next{flex:1;min-height:52px;border-radius:12px;border:0;font:inherit;font-weight:600;font-size:16px;background:var(--amber);color:var(--black);padding:0 16px}
+.ta-reassure{grid-column:span 2;margin:2px 0 0;font-size:13.5px;line-height:1.45;color:var(--paper-dim)}
+.ta-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.ta-dob{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px}
+.ta-dob select{min-height:48px}
+.ta-follow{margin:0 0 16px}
+.ta-follow-note{margin:0;font-size:13px;line-height:1.45;color:var(--paper-dim)}
+.ta-thumb,.ta-add{width:104px;height:130px}
+.ta-add{font-size:13px}
+.ta-rules{margin:6px 0 10px;padding:0 0 0 18px;font-size:13px;line-height:1.45;color:var(--paper-dim)}
+.yks-eligibility{max-width:560px;margin:0 auto 18px;padding:0;border:1px solid var(--line);border-radius:12px;line-height:1.55;overflow-wrap:anywhere;background:rgba(255,255,255,.03)}
+.yks-eligibility>summary{list-style:none;cursor:pointer;padding:12px 40px 12px 14px;position:relative}
+.yks-eligibility>summary::-webkit-details-marker{display:none}
+.yks-eligibility>summary:after{content:'';position:absolute;right:16px;top:50%;width:8px;height:8px;border-right:2px solid var(--paper-dim);border-bottom:2px solid var(--paper-dim);transform:translateY(-70%) rotate(45deg)}
+.yks-eligibility[open]>summary:after{transform:translateY(-20%) rotate(-135deg)}
+.yks-eligibility h2,.yks-eligibility .yks-elig-title{font-family:var(--serif);font-size:17px;line-height:1.3;margin:0 0 4px;color:var(--paper,#f4f0e8);font-weight:500}
+.yks-eligibility .yks-elig-sum{margin:0;font-size:13.5px;color:var(--paper-dim)}
+.yks-eligibility .yks-elig-more{display:inline;color:var(--amber,#ff8c3b);font-weight:600;font-size:13.5px}
+.yks-eligibility .yks-elig-body{padding:0 14px 14px;font-size:14px;color:var(--paper-dim)}
+.yks-eligibility .yks-elig-body p{margin:10px 0 0}
+.yks-eligibility .yks-elig-body p:first-child{margin-top:0}
+.yks-eligibility a{text-decoration:underline}
+@media(max-width:380px){.ta-thumb,.ta-add{width:96px;height:122px}.ta-dob{grid-template-columns:1fr 1fr;}.ta-dob .ta-dob-year{grid-column:span 2}}
+@media(max-width:420px){.ta-progress{top:52px}}
+@media(max-height:700px){
+  .ta{padding-top:76px;padding-bottom:28px}
+  .ta h1{font-size:clamp(26px,7.4vw,34px)}
+  .ta-intro{font-size:14px;margin:0 0 10px}
+  .ta-kicker{margin-bottom:4px}
+  .yks-eligibility{margin-bottom:12px}
+  .yks-eligibility>summary{padding:10px 36px 10px 12px}
+  .ta-progress{padding:8px 18px 6px}
+}
+
 </style>
 
 <main>
 <section class="ta" id="apply">
+  <p class="ta-kicker">3 quick steps &middot; about 2 minutes &middot; 100% free</p>
   <h1>Create your free <em>talent portfolio</em></h1>
-  <p class="ta-intro">For models, influencers, content creators and actors. A curated portfolio on YKS Talents, where brands and clients come to find talent across India &amp; the Middle East. One short form, read by me personally.</p>
-  <p class="ta-note"><b>Ages 18–34</b> · <b>100% free</b> — no registration, portfolio or listing fees, ever · <b>Not a jobs board</b> — YKS Talents doesn&rsquo;t offer jobs.</p>
+  <p class="ta-intro">A short form for models, creators and actors, 18&ndash;34, across India and the Middle East. I read every application myself.</p>
 
-  <div class="ta-follow">
-    <a class="ta-follow-btn" id="taFollow" href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener"><span>Follow @yks_photoworks</span></a>
-    <label class="ta-tick"><input type="checkbox" id="taFollowed" disabled /> I follow @yks_photoworks</label>
+  <div class="ta-progress" id="taProgress" hidden>
+    <div class="ta-prog-label"><b id="taProgText">Step 1 of 3 &middot; About you</b><span id="taProgSave">Saved on this phone</span></div>
+    <div class="ta-prog-track"><div class="ta-prog-fill" id="taProgFill" style="width:33%"></div></div>
   </div>
+  <p class="ta-saved" id="taDraftNote" hidden>Your answers from last time are still here. You can pick up where you left off.</p>
 
-<section class="yks-eligibility" aria-labelledby="yks-eligibility-title">
-<h2 id="yks-eligibility-title">Paid shoots require experience</h2>
+<details class="yks-eligibility" aria-labelledby="yks-eligibility-title">
+<summary>
+  <h2 class="yks-elig-title" id="yks-eligibility-title">Free to apply. Paid shoots need experience.</h2>
+  <p class="yks-elig-sum">Signing up is free and does not guarantee selection or work. <span lang="hi-Latn"><strong>Apply karna free hai, kaam ki guarantee nahi.</strong></span> <span class="yks-elig-more">Read more</span></p>
+</summary>
+<div class="yks-elig-body">
 <p>Applying to YKS Talents is free. Building your skills and portfolio is your responsibility. Paid shoots require experience and a strong portfolio; signing up does not entitle you to work. You can enquire about a portfolio shoot with YKS Productions, but it does not guarantee bookings.</p>
-<p lang="hi-Latn"><strong>Bina experience ke paid shoots nahi milte.</strong> YKS Talents mein apply karna free hai. Apni skills aur portfolio banana aapki zimmedari hai. Paid shoots ke liye experience aur strong portfolio zaroori hai—sirf register karne se kaam nahi milta. YKS Productions ke saath portfolio shoot ke liye enquiry kar sakte hain, lekin isse selection ya paid work ki guarantee nahi milti.</p>
+<p lang="hi-Latn"><strong>Bina experience ke paid shoots nahi milte.</strong> YKS Talents mein apply karna free hai. Apni skills aur portfolio banana aapki zimmedari hai. Paid shoots ke liye experience aur strong portfolio zaroori hai&mdash;sirf register karne se kaam nahi milta. YKS Productions ke saath portfolio shoot ke liye enquiry kar sakte hain, lekin isse selection ya paid work ki guarantee nahi milti.</p>
 <p>YKS Talents focuses mainly on Western fashion shoots. Saree shoots are rare, and hand-modelling assignments are not offered.</p>
-<p>The free application and portfolio builder use your existing photos. An optional YKS Productions portfolio photography session is a separate service, not a paid test or a condition of selection. You can use a portfolio from any photographer.</p>
-<p><a href="/talents/apply.html">Apply as talent — free</a> · <a href="/india/">Enquire about a YKS Productions portfolio shoot</a></p>
-</section>
+<p>The free application uses your existing photos. An optional YKS Productions portfolio photography session is a separate service, not a paid test or a condition of selection. You can use photos from any photographer.</p>
+<p><a href="/india/">Enquire about a YKS Productions portfolio shoot</a></p>
+</div>
+</details>
+
   <form class="ta-form" id="talForm" novalidate>
+
+    <div class="ta-step" data-step="1">
     <label class="ta-f">Full name<input type="text" name="name" autocomplete="name" placeholder="Your name" required /></label>
-    <label class="ta-f">Phone<input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="+91 / +971 …" required /></label>
-    <label class="ta-f">Email<input type="email" name="email" autocomplete="email" inputmode="email" placeholder="you@gmail.com" required /></label>
-    <label class="ta-f half">Instagram<input type="text" name="instagram" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="@yourhandle" required /></label>
-    <label class="ta-f half">Category
+    <label class="ta-f half">Phone<input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="+91 / +971 &hellip;" required /></label>
+    <label class="ta-f half">Email<input type="email" name="email" autocomplete="email" inputmode="email" placeholder="you@gmail.com" required /></label>
+    <label class="ta-f half">Instagram<input type="text" name="instagram" autocapitalize="none" autocomplete="username" spellcheck="false" inputmode="text" placeholder="@yourhandle" required /></label>
+    <label class="ta-f half">I apply as
       <select name="category" required>
         <option value="">Select</option>
         <option>Model</option>
@@ -455,16 +510,33 @@
         <option>Actor</option>
       </select>
     </label>
-    <label class="ta-f half">Gender
+    <label class="ta-sr">Gender
       <select name="gender" required>
         <option value="">Select</option>
-        <option value="Woman">Woman</option>
+        <option value="Woman" selected>Woman</option>
       </select>
     </label>
-    <label class="ta-f half">Date of birth<input type="date" name="dob" required aria-describedby="taDobHelp" /><span class="ta-help ta-help-sm" id="taDobHelp">You must be 18&ndash;34.</span></label>
+    <div class="ta-f" id="taDobBox">Date of birth
+      <div class="ta-dob">
+        <label class="ta-sub"><select name="dob_day" aria-label="Day"><option value="">Day</option></select></label>
+        <label class="ta-sub"><select name="dob_month" aria-label="Month"><option value="">Month</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></label>
+        <label class="ta-sub ta-dob-year"><select name="dob_year" aria-label="Year"><option value="">Year</option></select></label>
+      </div>
+      <input type="hidden" name="dob" required />
+      <span class="ta-help ta-help-sm" id="taDobHelp">You need to be 18&ndash;34.</span>
+    </div>
+    <div class="ta-nav"><button type="button" class="ta-next" data-next="2">Continue</button></div>
+    <div class="ta-follow">
+      <p class="ta-follow-note">Optional, but it helps me find you later.</p>
+      <a class="ta-follow-btn" id="taFollow" href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener"><span>Follow @yks_photoworks</span></a>
+      <label class="ta-tick"><input type="checkbox" id="taFollowed" disabled /> I follow @yks_photoworks</label>
+    </div>
+    </div>
+
+    <div class="ta-step" data-step="2" hidden>
     <fieldset class="ta-f ta-vitals" id="taPlace">
       <legend>Where you live <span class="ta-req">required</span></legend>
-      <p class="ta-help">Castings are booked by location, so tell us where you are now and where you&rsquo;re from. Living outside India and the Gulf? Choose &ldquo;Other country&rdquo; and type it in.</p>
+      <p class="ta-help">Castings are booked by location, so tell me where you are now and where you&rsquo;re from. Living outside India and the Gulf? Choose &ldquo;Other country&rdquo; and type it in.</p>
       <span class="ta-vl ta-sub">Currently living in</span>
       <div class="ta-pgrid">
         <div class="ta-f" data-geo="live"><span class="ta-vl">Country</span><select name="live_country" required aria-label="Country you live in"><option selected>India</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Bahrain</option><option>Kuwait</option><option>Oman</option><option value="Other">Other country</option></select><input type="text" name="live_country_other" placeholder="Country name" autocomplete="country-name" hidden aria-label="Country you live in" /></div>
@@ -489,7 +561,7 @@
     </fieldset>
     <fieldset class="ta-f ta-vitals" id="taVitals">
       <legend>Your vitals <span class="ta-req">required</span></legend>
-      <p class="ta-help">Clients filter castings by height and measurements, so we can&#39;t put you forward without them. Measure over light clothing with a soft tape; an honest number is better than a flattering one.</p>
+      <p class="ta-help">Clients filter castings by height and measurements, so I can&#39;t put you forward without them. Measure over light clothing with a soft tape; an honest number is better than a flattering one.</p>
       <div class="ta-f" id="taHeightBox">
         <span class="ta-vl">Height</span>
         <div class="ta-units" role="group" aria-label="Height unit">
@@ -518,28 +590,35 @@
         <label class="ta-f">Eyes<select name="eyes"><option value="">Pick</option><option>Black</option><option>Dark brown</option><option>Brown</option><option>Hazel</option><option>Green</option><option>Blue</option><option>Grey</option></select></label>
       </div>
     </fieldset>
-    <div class="ta-f" id="taPhotoField">Photos <span class="ta-opt">minimum 5 different photos, up to 12, including 2 clear face close-ups</span>
+    <div class="ta-nav"><button type="button" class="ta-back" data-prev="1">Back</button><button type="button" class="ta-next" data-next="3">Continue</button></div>
+    </div>
+
+    <div class="ta-step" data-step="3" hidden>
+    <div class="ta-f" id="taPhotoField">Your photos <span class="ta-opt">Add 5 to start &mdash; phone photos are fine. You can add more, up to 12.</span>
       <ul class="ta-rules">
-        <li>Clear and well-lit, phone photos are fine</li>
-        <li>No heavy filters or face-editing apps</li>
-        <li>Close-ups: your face clearly visible, no sunglasses or masks</li>
-        <li>Just you, no group photos</li>
-        <li>5 different photos, not the same photo repeated</li>
+        <li>Clear and well-lit, just you, no heavy filters</li>
+        <li>Two close-ups of your face, a full-length, a mid-shot, and one more look</li>
       </ul>
       <div id="taSlots" class="ta-photos" aria-live="polite"></div>
       <span class="ta-opt" id="taPhotoCount"></span>
     </div>
     <label class="ta-f" id="taAboutBox">About me <span class="ta-req">required</span>
-      <span class="ta-help ta-help-sm">In your own words, in English letters. We polish it into the short bio on your portfolio, using only what you write here.</span>
+      <span class="ta-help ta-help-sm">A few sentences in English is enough. I only use what you write here, for a short bio.</span>
       <span class="ta-hints" aria-hidden="true"><span>What you love shooting</span><span>Your experience</span><span>Languages you speak</span><span>What makes you different</span></span>
-      <textarea name="about" rows="5" minlength="120" maxlength="600" placeholder="Tell clients about you: the shoots you enjoy, any experience or training, the languages you speak, and what makes you different." required></textarea>
-      <span class="ta-help ta-help-sm ta-count" id="taAboutCount" aria-live="polite">0 / 600 &middot; at least 120 characters</span>
+      <textarea name="about" rows="5" minlength="120" maxlength="600" placeholder="The shoots you enjoy, any experience or training, the languages you speak, and what makes you different." required></textarea>
+      <span class="ta-help ta-help-sm ta-count" id="taAboutCount" aria-live="polite">A few sentences is enough</span>
     </label>
     <div class="ta-hp" aria-hidden="true"><input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" /><input type="text" name="website" tabindex="-1" autocomplete="off" /></div>
-    <button type="submit" class="ta-submit" id="taSubmit">Create my free portfolio</button>
-    <p class="ta-hint" id="taFollowHint">Tap Follow above to stay in touch with @yks_photoworks.</p>
+    <p class="ta-reassure">It&rsquo;s free to apply, it takes about a minute, and your contact details stay private.</p>
+    <div class="ta-nav">
+      <button type="button" class="ta-back" data-prev="2">Back</button>
+      <button type="submit" class="ta-submit" id="taSubmit">Send my application</button>
+    </div>
+    <p class="ta-hint" id="taFollowHint">You can still follow @yks_photoworks on step 1 if you&rsquo;d like me to find you easily.</p>
     <p class="ta-status" id="taStatus" role="status" aria-live="polite" hidden></p>
     <a class="ta-follow-btn ta-refollow" id="taRefollow" href="https://instagram.com/yks_photoworks" target="_blank" rel="noopener" hidden><span>Follow @yks_photoworks</span></a>
+    </div>
+
   </form>
 
   <div class="ta-done" id="taDone" hidden>
@@ -614,7 +693,7 @@
   </div>
 </footer>
 
-<script src="/js/talent-apply.js?v=100"></script>
+<script src="/js/talent-apply.js?v=101"></script>
 <script src="/js/wa-gate.js?v=1" defer></script>
 </body>
 </html>
