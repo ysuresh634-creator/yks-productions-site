@@ -1101,3 +1101,7 @@ img{display:block;max-width:100%;height:auto}
 @media (max-width:640px) and (max-height:700px){
   .hero-meta{display:none}
 }
+
+/* phones: the booking grid's children could grow past a 360px screen */
+.book-grid>*{min-width:0}
+.book-form input,.book-form select,.book-form textarea{min-width:0;max-width:100%}

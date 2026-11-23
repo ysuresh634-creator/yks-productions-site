@@ -223,5 +223,13 @@
   document.addEventListener('DOMContentLoaded', function () {
     var sel = document.getElementById('f-region');
     if (sel && sel.querySelector('option[value="' + to.wa + '"]') && !sel.getAttribute('data-touched')) sel.value = to.wa;
+    // a Dubai / UAE shoot always books on the Dubai line, whoever is looking
+    var ty = document.getElementById('f-type');
+    function fit() {
+      if (!sel || !ty || sel.getAttribute('data-touched')) return;
+      if (/dubai|uae/i.test(ty.value) && sel.querySelector('option[value="971501955122"]')) sel.value = '971501955122';
+    }
+    if (sel) sel.addEventListener('change', function () { sel.setAttribute('data-touched', '1'); });
+    if (ty) { ty.addEventListener('change', fit); fit(); }
   });
 })();
