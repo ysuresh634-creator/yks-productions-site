@@ -618,9 +618,10 @@
   }
   /* who is in the photos: the YKS worker's vision check (Gemini / Llama 4 Scout) on the first two
      close-ups, downscaled to 512 px on the phone. Review-only: it never blocks or delays the send past
-     ~6 s, the applicant never sees any of it. A likely man gets a flag in the email, no portfolio PDF
-     and no WhatsApp step. Any failure or timeout → null → the name list decides alone. */
-  var GENDER_URL = 'https://yks-chat.ysuresh634.workers.dev/gender', GENDER_TIMEOUT = 6000, GENDER_CONF = 0.7, GENDER_FEMALE_SURE = 0.85;
+     ~7.5 s, the applicant never sees any of it. A likely man gets a flag in the email, no portfolio PDF
+     and no WhatsApp step. Likely AI-generated photos get a flag and fields.aiPhotos=likely. Any failure
+     or timeout → null → the name list decides alone, and no AI-photo flag is added. */
+  var GENDER_URL = 'https://yks-chat.ysuresh634.workers.dev/gender', GENDER_TIMEOUT = 6000, GENDER_CONF = 0.7, GENDER_FEMALE_SURE = 0.85, AI_PHOTO_CONF = 0.85;
   function smallJpeg(blob) {
     return new Promise(function (res) {
       if (!blob) return res(null);
@@ -647,14 +648,26 @@
     return Promise.all(es.map(function (e) { return smallJpeg(usePrep ? e._prep : e.file); }))
       .then(function (a) { return a.filter(Boolean); }, function () { return []; });
   }
-  // → {gender, confidence, reason, model, photos} or null; never throws
+  // → {gender, confidence, reason, model, photos, ai_generated?} or null; never throws
+  function readAiGenerated(v) {
+    if (v == null || v === '') return null;
+    if (typeof v === 'boolean') return v ? 0.9 : 0;
+    var s = String(v).toLowerCase().trim();
+    if (/^(likely|yes|true|generated|synthetic|ai)$/.test(s)) return 0.9;
+    if (/^(unlikely|no|false|real|photo|none|natural)$/.test(s)) return 0;
+    var n = +s; if (!isFinite(n)) return null; if (n > 1 && n <= 100) n = n / 100;
+    if (n < 0) n = 0; if (n > 1) n = 1; return Math.round(n * 100) / 100;
+  }
   function askGender(D, images) {
     try {
       var ctl = typeof AbortController === 'function' ? new AbortController() : null, t;
       var call = fetch(GENDER_URL, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' }, signal: ctl ? ctl.signal : undefined,
         body: JSON.stringify({ name: D.name, handle: D.handle, images: images }) })
         .then(function (r) { return r.json(); })
-        .then(function (j) { return j && j.ok && /^(male|female|unclear)$/.test(j.gender) ? { gender: j.gender, confidence: +j.confidence || 0, reason: String(j.reason || '').slice(0, 80), model: j.model || '', photos: +j.photos || 0 } : null; }, function () { return null; });
+        .then(function (j) {
+          if (!(j && j.ok && /^(male|female|unclear)$/.test(j.gender))) return null;
+          return { gender: j.gender, confidence: +j.confidence || 0, reason: String(j.reason || '').slice(0, 80), model: j.model || '', photos: +j.photos || 0, ai_generated: readAiGenerated(j.ai_generated != null ? j.ai_generated : j.aiGenerated) };
+        }, function () { return null; });
       return Promise.race([call, new Promise(function (res) { t = setTimeout(function () { if (ctl) ctl.abort(); res(null); }, GENDER_TIMEOUT); })])
         .then(function (r) { clearTimeout(t); return r; }, function () { clearTimeout(t); return null; });
     } catch (e) { return Promise.resolve(null); }
@@ -670,6 +683,13 @@
     // starts with "Likely male name" so the intake script's subject marker picks it up; kept short (the script keeps 200 chars of flags)
     return 'Likely male name/photo [MALE?]: ' + (ai ? 'AI ' + ai.gender + ' ' + Math.round(ai.confidence * 100) + '%' + (ai.photos ? '' : ' (name only)') : 'AI unavailable') +
       (nameHit ? ', name list: ' + nameHit : '') + '. No PDF, no WhatsApp step';
+  }
+  // conservative: only a high score on real photos; filters / retouch / timeout / missing field → no flag
+  function aiPhotosLikely(ai) {
+    return !!(ai && ai.photos > 0 && typeof ai.ai_generated === 'number' && isFinite(ai.ai_generated) && ai.ai_generated >= AI_PHOTO_CONF);
+  }
+  function aiPhotosFlag(ai) {
+    return 'AI-looking photos (likely generated, ' + Math.round(ai.ai_generated * 100) + '%) \u2014 check before sharing';
   }
   function designName(D) { try { var g = window.YKSPortfolio.design(pdfData(D)); return [g.themeName, g.cover, g.profile, g.back].join(' \u00b7 '); } catch (e) { return ''; } }
   function portfolioLib() {
@@ -918,6 +938,9 @@
           var b = r[0] || {}, ai = r[2] || null;
           D.bio = b.about || ''; D.quote = b.quote || ''; D.bio_source = b.source || 'own words';
           D.male = maleVerdict(ai, nameMale);
+          D.aiPhotos = aiPhotosLikely(ai) ? 'likely' : '';
+          // review flags only: never shown to the applicant, never block the send
+          if (D.aiPhotos) FLAGS.unshift(aiPhotosFlag(ai));
           // a likely man: flagged first in the email; the portfolio is never rendered or uploaded
           if (D.male) { FLAGS.unshift(maleFlag(ai, nameMale)); return { photos: P.photos, pdf: null, skipped: P.skipped, pdfSkipped: 'likely male' }; }
           say('Preparing your portfolio\u2026');
@@ -942,7 +965,7 @@
             home_country: D.home_country, home_state: D.home_state,
             height_cm: String(D.height_cm), height_ft_in: D.height_short, bust: D.bust, waist: D.waist, hips: D.hips, shoe: D.shoe, hair: D.hair, eyes: D.eyes,
             follow_verified: followVerified || '', flags: FLAGS.join('; '), source: source(), seconds_on_form: secs,
-            app_id: APP_ID, portfolio_design: design, pdfSkipped: pdfSkip || '',
+            app_id: APP_ID, portfolio_design: design, pdfSkipped: pdfSkip || '', aiPhotos: D.aiPhotos || '',
             website: hp ? hp.value : '', botcheck: ''
           },
           photos: ph, pdf: pdf
