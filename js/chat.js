@@ -327,7 +327,8 @@
     + '.yc-cta{height:54px;padding:0 20px;font-size:14.5px}'
     + '.yc-menu{width:100%}'
     /* clear of the hero's scroll cue, which runs up the left of the same edge */
-    + '.yc-tease{right:14px;left:14px;bottom:84px;max-width:none}'
+    /* phones: no pop-up teaser, it sat on top of the page text; the Let\u2019s talk bar stays */
+    + '.yc-tease{display:none}'
     + '.yc-panel{right:0;left:0;bottom:0;width:100%;height:86vh;height:86dvh;'
     + 'border-radius:22px 22px 0 0;border-bottom:0}'
     + '.yc-panel.on{animation:ycUp .34s cubic-bezier(.22,.61,.36,1)}'
