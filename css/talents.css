@@ -1044,3 +1044,23 @@ main{overflow-x:clip}
   .tal-ig{grid-template-columns:1fr;gap:12px}
   .tal-ig-go{text-align:center}
 }
+
+
+/* Phone: get the apply CTA onto the first screen (360–390 tall phones were
+   cutting it off under the masthead, stand-first and index). */
+@media(max-width:640px){
+  .tal-hero{padding:88px 0 24px}
+  .mag-folio{display:none}
+  .tal-hero-grid{margin-top:12px;gap:18px}
+  .tal-hero .tal-kicker{margin-bottom:10px}
+  .tal-masthead{font-size:clamp(40px,12vw,56px)!important;margin-bottom:8px}
+  .tal-h1sub{display:block;max-height:2.8em;overflow:hidden}
+  .tal-stand{margin:10px 0 12px;font-size:14.5px;line-height:1.5;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+  .tal-index{margin:0 0 14px}
+  .tal-cta-row{margin-top:0}
+  .tal-hero-art{display:none}
+}
+@media(max-width:640px) and (max-height:700px){
+  .tal-stand{display:none}
+  .tal-index span:nth-child(n+6){display:none}
+}

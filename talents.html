@@ -44,7 +44,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/landing.css?v=26" />
-<link rel="stylesheet" href="/css/talents.css?v=91" />
+<link rel="stylesheet" href="/css/talents.css?v=92" />
 
 <!-- PAGE-SCHEMA: one graph for this page — WebPage, YKS Talents, the business and person it belongs to,
      breadcrumb and FAQ. The FAQ text mirrors the visible FAQ word for word. -->
@@ -202,7 +202,7 @@
           "name": "How does the free portfolio builder work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "On the apply page, follow @yks_photoworks, fill in your details and measurements, and upload minimum 5 photos — two clear face close-ups, a full-length, a mid-shot and one more, up to 12 in total. The builder designs a multi-page portfolio PDF on your phone. After you submit and send the WhatsApp that follows, you can download the PDF. It is yours to keep, whether or not your profile is added to the platform. Selection is not guaranteed, and mobile or poor-quality photos are not added to the talent pool."
+            "text": "On the apply page, follow @yks_photoworks if you like, fill in a short form — your details, measurements and minimum 5 photos (two clear face close-ups, a full-length, a mid-shot and one more, up to 12 in total). It takes about two minutes. After you submit, women applicants are asked to send a WhatsApp so I can reach them. I review every application myself. If you are selected, I share your portfolio with you. Selection is not guaranteed, and mobile or poor-quality photos are not added to the talent pool."
           }
         },
         {
@@ -305,7 +305,20 @@
 <!-- intentionally empty on this page: the business and person are in PAGE-SCHEMA as Organization/Person (no LocalBusiness — one-person operation, no office). tools/wire-entity.py will refill this if re-run. -->
 <!-- ENTITY:END -->
 <link rel="alternate" type="application/atom+xml" title="YKS Productions — Journal" href="https://yksproductions.com/blog/feed.xml" />
-<style>.yks-eligibility{box-sizing:border-box;max-width:1100px;margin:24px auto;padding:24px clamp(18px,4vw,36px);border:1px solid currentColor;border-radius:12px;line-height:1.65;overflow-wrap:anywhere}.yks-eligibility h2{font-size:clamp(22px,4vw,32px);line-height:1.25;margin:0 0 16px}.yks-eligibility p{margin:12px 0}.yks-eligibility a{text-decoration:underline}@media(max-width:700px){.yks-eligibility{margin:20px 16px}}</style>
+<style>
+.yks-eligibility{box-sizing:border-box;max-width:1100px;margin:24px auto;padding:0;border:1px solid currentColor;border-radius:12px;line-height:1.55;overflow-wrap:anywhere}
+.yks-eligibility>summary{list-style:none;cursor:pointer;padding:16px 44px 16px 20px;position:relative}
+.yks-eligibility>summary::-webkit-details-marker{display:none}
+.yks-eligibility>summary:after{content:'';position:absolute;right:20px;top:50%;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-70%) rotate(45deg);opacity:.7}
+.yks-eligibility[open]>summary:after{transform:translateY(-20%) rotate(-135deg)}
+.yks-eligibility .yks-elig-title,.yks-eligibility h2{font-size:clamp(18px,3.4vw,26px);line-height:1.3;margin:0 0 6px}
+.yks-eligibility .yks-elig-sum{margin:0;font-size:15px;line-height:1.5;opacity:.88}
+.yks-eligibility .yks-elig-more{color:inherit;font-weight:600;text-decoration:underline}
+.yks-eligibility .yks-elig-body{padding:0 20px 18px}
+.yks-eligibility .yks-elig-body p{margin:12px 0 0}
+.yks-eligibility a{text-decoration:underline}
+@media(max-width:700px){.yks-eligibility{margin:20px 16px}}
+</style>
 </head>
 <body>
 <script src="/js/contact.js?v=4"></script>
@@ -376,21 +389,26 @@
          half of this page that recruits effectively invisible. -->
     <a class="tal-talent-band" href="/talents/apply.html">
       <span class="tal-tb-kick">Models · influencers · creators · actors · India &amp; Middle East</span>
-      <span class="tal-tb-main">Build your portfolio — free, about 3 minutes</span>
+      <span class="tal-tb-main">Build your portfolio — free, about 2 minutes</span>
       <span class="tal-tb-note">No joining fee · no registration fee · your name stays private</span>
       <span class="tal-tb-go">Apply →</span>
     </a>
   </div>
 </section>
 
-<section class="yks-eligibility" aria-labelledby="yks-eligibility-title">
-<h2 id="yks-eligibility-title">Paid shoots require experience</h2>
+<details class="yks-eligibility" aria-labelledby="yks-eligibility-title">
+<summary>
+<h2 class="yks-elig-title" id="yks-eligibility-title">Free to apply. Paid shoots need experience.</h2>
+<p class="yks-elig-sum">Signing up is free and does not guarantee selection or work. <span lang="hi-Latn"><strong>Apply karna free hai, kaam ki guarantee nahi.</strong></span> <span class="yks-elig-more">Read more</span></p>
+</summary>
+<div class="yks-elig-body">
 <p>Applying to YKS Talents is free. Building your skills and portfolio is your responsibility. Paid shoots require experience and a strong portfolio; signing up does not entitle you to work. You can enquire about a portfolio shoot with YKS Productions, but it does not guarantee bookings.</p>
 <p lang="hi-Latn"><strong>Bina experience ke paid shoots nahi milte.</strong> YKS Talents mein apply karna free hai. Apni skills aur portfolio banana aapki zimmedari hai. Paid shoots ke liye experience aur strong portfolio zaroori hai—sirf register karne se kaam nahi milta. YKS Productions ke saath portfolio shoot ke liye enquiry kar sakte hain, lekin isse selection ya paid work ki guarantee nahi milti.</p>
 <p>YKS Talents focuses mainly on Western fashion shoots. Saree shoots are rare, and hand-modelling assignments are not offered.</p>
-<p>The free application and portfolio builder use your existing photos. An optional YKS Productions portfolio photography session is a separate service, not a paid test or a condition of selection. You can use a portfolio from any photographer.</p>
+<p>The free application uses your existing photos. An optional YKS Productions portfolio photography session is a separate service, not a paid test or a condition of selection. You can use photos from any photographer.</p>
 <p><a href="/talents/apply.html">Apply as talent — free</a> · <a href="/india/">Enquire about a YKS Productions portfolio shoot</a></p>
-</section>
+</div>
+</details>
 
 <!-- ══ TALENT LANE — free portfolio builder, first ══ -->
 <section class="tal-join" id="join">
@@ -413,7 +431,7 @@
           <li><b>A booking QR.</b> Anyone who sees your card can reach a booking — through me, never around you.</li>
         </ul>
         <a class="btn btn-fill" href="/talents/apply.html">Build my portfolio — free →</a>
-        <p class="tal-join-fine">No fee. No card. You download the PDF at the end whether you join the roster or not.</p>
+        <p class="tal-join-fine">No fee. No card. I read every application myself, and I share your portfolio with you if you are selected.</p>
       </div>
 
       <div class="tal-join-card tal-join-promise">
@@ -729,7 +747,7 @@
       <details><summary>Is YKS Talents free? Are there any fees?</summary><p>Yes, 100% free. There is no registration fee, no portfolio fee, no listing fee and no paid test shoot, now or ever. If anyone asks you for money in the name of YKS Talents, it is not us.</p></details>
       <details><summary>Who can join YKS Talents?</summary><p>Models, influencers, content creators and actors aged 18 to 34 who live in or regularly work in India or the Middle East. The platform is curated for polished, camera-ready talent suited to premium fashion, beauty, lifestyle and luxury brand work. Every application is read personally.</p></details>
       <details><summary>I&rsquo;m an international model or creator. Can I join?</summary><p>Yes. Talent aged 18 to 34 from any country can create a portfolio, 100% free. Clients on YKS Talents shoot in India and the Middle East, so it works best if you live there or can legally work there; paid work in India needs the right visa, and a tourist visa doesn&rsquo;t allow it. YKS Talents doesn&rsquo;t offer jobs or help with visas. Read <a href="/talents/guides/foreign-models-in-india.html">the guide for foreign models in India</a>.</p></details>
-      <details><summary>How does the free portfolio builder work?</summary><p>On the <a href="/talents/apply.html">apply page</a>, follow @yks_photoworks, fill in your details and measurements, and upload minimum 5 photos — two clear face close-ups, a full-length, a mid-shot and one more, up to 12 in total. The builder designs a multi-page portfolio PDF on your phone. After you submit and send the WhatsApp that follows, you can download the PDF. It is yours to keep, whether or not your profile is added to the platform. Selection is not guaranteed, and mobile or poor-quality photos are not added to the talent pool. More: <a href="/talents/free-modelling-portfolio-maker.html">free modelling portfolio maker</a> · <a href="/talents/model-portfolio-pdf-free.html">model portfolio PDF free</a>.</p></details>
+      <details><summary>How does the free portfolio builder work?</summary><p>On the <a href="/talents/apply.html">apply page</a>, follow @yks_photoworks if you like, fill in a short form — your details, measurements and minimum 5 photos (two clear face close-ups, a full-length, a mid-shot and one more, up to 12 in total). It takes about two minutes. After you submit, women applicants are asked to send a WhatsApp so I can reach them. I review every application myself. If you are selected, I share your portfolio with you. Selection is not guaranteed, and mobile or poor-quality photos are not added to the talent pool. More: <a href="/talents/free-modelling-portfolio-maker.html">free modelling portfolio maker</a> · <a href="/talents/model-portfolio-pdf-free.html">model portfolio PDF free</a>.</p></details>
       <details><summary>Does joining YKS Talents guarantee work?</summary><p>No. YKS Talents makes your portfolio visible to brands and clients looking for talent. When a client wants to book you, the booking is arranged through YKS, but no work is ever promised.</p></details>
       <details><summary>Will my name or number show up on the internet if I join?</summary><p>No. Names and contact details are never published — not on the page, not in the page source, not in the schema a search engine reads. Clients see a profile code and your work, and every enquiry comes through YKS Talents.</p></details>
       <details><summary>How do I find a model in India or the Middle East?</summary><p>Browse the portfolios here, or <a href="/find-models.html#brief">send a brief</a> — the look, the city, the dates and what it&rsquo;s for. I come back with suitable profiles from the platform, usually within a day, and arrange everything with the talent for you. All contact goes through me.</p></details>
@@ -756,7 +774,7 @@
     </div>
     <div class="l-grid">
       <a class="l-card" href="/talents/free-modelling-portfolio-maker.html"><span class="t">Free builder</span><h3>Free modelling portfolio maker</h3><p>A model portfolio maker online, free: fill the application with your photos and details, and get a designed PDF. No fees — and no promise of paid work.</p></a>
-      <a class="l-card" href="/talents/model-portfolio-pdf-free.html"><span class="t">Free PDF</span><h3>Model portfolio PDF — free download</h3><p>Download a designed modelling portfolio PDF after you apply. Not a blank template you have to lay out yourself.</p></a>
+      <a class="l-card" href="/talents/model-portfolio-pdf-free.html"><span class="t">Free PDF</span><h3>Model portfolio PDF — free download</h3><p>Apply in about two minutes with photos you already have. If you are selected, I share a designed portfolio with you.</p></a>
       <a class="l-card" href="/talents/guides/how-to-become-a-model-in-india.html"><span class="t">Start here</span><h3>How to become a model in India</h3><p>The kinds of work, height and age, the step-by-step route, where the work is city by city, getting paid &mdash; and never paying anyone.</p></a>
       <a class="l-card" href="/talents/guides/how-to-make-a-modelling-portfolio.html"><span class="t">Pillar guide</span><h3>How to make a modelling portfolio</h3><p>What shots to take, digitals vs editorial, comp cards, cost, mistakes — and the free route, with no experience needed.</p></a>
       <a class="l-card" href="/talents/guides/model-digitals.html"><span class="t">Digitals</span><h3>Model digitals: what to wear &amp; how to shoot</h3><p>Clothing, the standard poses, window light and the phone settings that keep digitals honest.</p></a>
